@@ -54,6 +54,7 @@ main p {
 }
 
 footer {
+    position: fixed;
     height: 132px;
     background-color: #434445;
     color: #a4a4a4;
