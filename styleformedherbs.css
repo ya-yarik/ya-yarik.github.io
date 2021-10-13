@@ -1,0 +1,69 @@
+body {
+    background-image: url("https://sun9-24.userapi.com/impf/G12h69pUuNk2w-ETqP0YOxCqRbs-NceNUCUxNQ/ZDzDrX72PMo.jpg?size=1278x1024&quality=96&sign=527cf25822d41d8c7b714f5e830cc82f");
+    font-family: sans-serif;
+}
+
+header {
+    border: 1px solid #b5b7ba;
+    background-color: #dfdfdf;
+    height: 68px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+header a {
+    color: #4d4d4d;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+h1 {
+    color: #2e353d;
+    font-size: 50px;
+    font-weight: 300;
+    text-align: center;
+}
+
+h2 {
+    color: #2e353d;
+    font-size: 24px;
+    font-weight: 100;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1%;
+}
+
+main img {
+    width: 500px;
+    padding-bottom: 3%;
+}
+
+main p {
+    width: 693px;
+    color: #242424;
+    font-size: 24px;
+    font-weight: 100;
+    line-height: 36px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    background-color: #434445;
+    color: #a4a4a4;
+    font-size: 20px;
+    font-style: italic;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
