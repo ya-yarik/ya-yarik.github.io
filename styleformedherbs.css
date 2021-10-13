@@ -21,10 +21,11 @@ header a {
 }
 
 h1 {
-    color: #2e353d;
+    color: #b0b7c6;
     font-size: 50px;
     font-weight: 300;
     text-align: center;
+    text-shadow: 1px 1px #732372, 1px -1px #732372, -1px 1px #732372, -1px -1px #732372, 3px 3px 6px rgba(0,0,0,.5);
 }
 
 h2 {
@@ -40,6 +41,16 @@ main {
     align-items: center;
     flex-wrap: wrap;
     padding: 1%;
+}
+
+table {
+    width: 100%;
+    border: none;
+    margin-bottom: 20px;
+    border-collapse: separate;
+    border-radius: 20px 20px 20px 20px;
+    text-align: center;
+    font-size:24px;
 }
 
 main img {
