@@ -11,12 +11,37 @@
 <body>
     <header>
         <a href="feedarchive.html">Архив ленты</a>
-        <a href="bp.html">Бизнес-планы</a>
         <a href="contacts.html">Контакты</a>
-        <a href="https://farmsite-2.000webhostapp.com">Проектная ферма</a>
+        <a href="https://farmsite-2.000webhostapp.com">Ферма</a>
         <a href="nature.html">Наша природа</a>
         <a href="laws.html">Закон и право</a>
+        <a href="gkh.html">ЖКХ</a>
         <a href="https://knigi.github.io">Книги Зои Сизых</a>
+        <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">Смотрите далее</button>
+              <div id="myDropdown" class="dropdown-content">
+                <a href="bp.html">Бизнес-планы</a>
+                <a href="https://kpk-mk.github.io">Кредиты и займы</a>
+                <a href="index.html">Квартиры государству</a>
+        <script>
+        function myFunction() {
+        document.getElementById("myDropdown").classList.toggle("show");
+        }
+        window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+        }
+        }
+        }
+        }
+</script>
+ </div>
+</div>
     </header>
 
     <h1>Добро пожаловать!</h1>
