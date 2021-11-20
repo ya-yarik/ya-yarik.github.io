@@ -1,0 +1,79 @@
+body {
+    background-image: url("https://raw.githubusercontent.com/ya-yarik/ya-yarik.github.io/master/image/41.jpg");
+    background-size:cover;
+    font-family: sans-serif;
+}
+
+header {
+    color: #b0b7c6;
+    font-size: 50px;
+    font-weight: 300;
+    text-align: center;
+    text-shadow: 1px 1px #732372, 1px -1px #732372, -1px 1px #732372, -1px -1px #732372, 3px 3px 6px rgba(0,0,0,.5);
+}
+
+header a {
+    color: #4d4d4d;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+h1 {
+    color: #2e353d;
+    font-size: 50px;
+    font-weight: 300;
+    text-align: center;
+}
+
+h2 {
+    color: #2e353d;
+    font-size: 24px;
+    font-weight: 100;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1%;
+}
+table {
+    width: 30%;
+    border: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 20px;
+    border-collapse: separate;
+    border-radius: 20px 20px 20px 20px;
+    text-align: justify;
+    font-size:24px;
+}
+main img {
+    width: 500px;
+    padding-bottom: 3%;
+}
+
+main p {
+    width: 693px;
+    color: #242424;
+    font-size: 24px;
+    font-weight: 100;
+    line-height: 36px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+    background-color: #434445;
+    color: #a4a4a4;
+    font-size: 20px;
+    font-style: italic;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
