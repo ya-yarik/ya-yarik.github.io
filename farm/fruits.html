@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='logo/logo.gif' rel='shortcut icon'>
+    <title>Сайт</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+.dropbtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #2980B9;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  overflow: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}
+</style>
+</head>
+
+<body>
+    <header>
+        <a href="online.html">Заказать онлайн</a>
+        <a href="products.html">Другая продукция</a>
+        <a href="index.html">На главную</a>
+        <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">Реализуемые плоды</button>
+              <div id="myDropdown" class="dropdown-content">
+                <a href="fapple.html">Плоды яблони</a>
+                <a href="frowan.html">Плоды рябины красной</a>
+                <a href="fchokeberry.html">Плоды черноплодной рябины</a>
+                <a href="fplum.html">Плоды сливы</a>
+                <a href="fhawthorn.html">Плоды боярышника</a>
+        </div>
+        </div>
+        <script>
+        function myFunction() {
+        document.getElementById("myDropdown").classList.toggle("show");
+        }
+        window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+        }
+        }
+        }
+        }
+</script>
+
+    </header>
+
+    <h1>Плоды</h1>
+    <main>
+        <table border="0" style="background: rgba(255, 255, 255, 0.8)" align="center" cellpadding="5px" cellspacing="10px">
+        <tr><td><img src="image/6.jpg" alt="photo"></td><td><p style="text-indent: 10%;">Реализуем плоды древесных и кустарниковых культур собственного производства</p>
+        </td>
+        </tr>
+        </table>
+    </main>
+    <footer>"Пчела Майя", 2019-2021</footer>
+</body>
+
+</html>
