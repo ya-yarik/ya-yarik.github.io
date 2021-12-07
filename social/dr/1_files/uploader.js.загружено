@@ -1,0 +1,1306 @@
+{
+	D.UploaderPar = function(){
+	};
+	D.UploaderPar.prototype.DS = '';
+	D.UploaderPar.prototype.limit = -1;
+	D.UploaderPar.prototype.caption = '';
+	D.UploaderPar.prototype.labalClassName = '';
+	D.UploaderPar.prototype.thumbWidth = 0;
+	D.UploaderPar.prototype.thumbHeight = 0;
+	D.UploaderPar.prototype.thumbCrop = true;
+	/** @type {Node|null} */
+	D.UploaderPar.prototype.dropNode = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onBeforeSelect = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onSelect = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onRemove = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onUploadProgress = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onUploadComplete = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onUploadCompleteData = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onUploadSecurityError = null;
+	D.UploaderPar.prototype.onThumb = null;
+	D.UploaderPar.prototype.onInit = null;
+	// autoupload
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onGetUploadData = null;
+	/** @type {Function|null} */
+	D.UploaderPar.prototype.onListUploadComplete = null;
+	D.UploaderPar.prototype.log = D.DEV;
+	D.UploaderPar.prototype.tooltip = '';
+
+	/**
+	 * @param {Object|D.UploaderPar} par
+	 * @constructor
+	 */
+	D.NativeUploader = function(par){
+		par = par || {};
+		/** @type {D.SortedMap.<D.NativeUploader.File>} */
+		this._files = new D.SortedMap;
+		/** @type {D.SortedMap.<D.NativeUploader.File>} */
+		this._thumbFiles = new D.SortedMap;
+		this.DS = par.DS || D.DS || false;
+		this.limit = isset( par.limit ) ? par.limit : -1;
+		this.accept = par.accept || null;
+		this.tooltip = par.tooltip || '';
+		this.node = mkE( {
+			tag:'div',
+			className:'NativeUploader',
+			els:[
+				this.labelNode = mkE( {
+					tag:'div',
+					className:'flashUploadLabel',
+					els:[
+						par.caption || false
+					]
+				} ),
+				this._makeInput()
+			]
+		} );
+		if( par.labelClassName ){
+			addClassName( this.labelNode, par.labelClassName );
+		}
+		this.thumbWidth = par.thumbWidth || 0;
+		this.thumbHeight = par.thumbHeight || 0;
+		this.thumbCrop = par.thumbCrop || true;
+		this.log = isset( par.log ) ? par.log : D.DEV;
+		this.onBeforeSelect = par.onBeforeSelect || this.onBeforeSelect;
+		this.onSelect = par.onSelect || this.onSelect;
+		this.onRemove = par.onRemove || this.onRemove;
+		this.onUploadProgress = par.onUploadProgress || this.onUploadProgress;
+		this.onUploadComplete = par.onUploadComplete || this.onUploadComplete;
+		this.onUploadCompleteData = par.onUploadCompleteData || this.onUploadCompleteData;
+		this.onUploadIOError = par.onUploadIOError || this.onUploadIOError;
+		this.onUploadSecurityError = par.onUploadSecurityError || this.onUploadSecurityError;
+		this.onThumb = par.onThumb || this.onThumb;
+		this.dropNode = par.dropNode || null;
+		if( par.onInit ){
+			setTimeout( D.closure( this, function(){
+				par.onInit.call(this);
+			} ), 10 );
+		}
+		// autoupload
+		this.uploading = false;
+		this.onGetUploadData = par.onGetUploadData || null;
+		this.onListUploadComplete = par.onListUploadComplete || this.onListUploadComplete;
+	};
+
+	D.NativeUploader.isSupported = function(){
+		if( isset( this._isSupported ) ){
+			return this._isSupported;
+		}
+		this._isSupported = Boolean( window.addEventListener && window.File && window.XMLHttpRequest && window.FormData && window.FileReader );
+		if( !this._isSupported ){
+			return false;
+		}
+		var fileInput = mkE( {
+			tag:'input',
+			type:'file'
+		} );
+		if( !isset( fileInput.files ) || !isset( fileInput.multiple ) ){
+			return this._isSupported = false;
+		}
+		if( !(new XMLHttpRequest).upload ){
+			return this._isSupported = false;
+		}
+		return true;
+	};
+
+
+	D.NativeUploader.prototype.append = function(parent){
+		this.node.append(parent);
+		if( this.dropNode ){
+			this._addDragDropEvent();
+		}
+		return this;
+	};
+
+	/** @type {Object.<D.NativeUploader.File>|D.SortedMap} */
+	D.NativeUploader.prototype._files = null;
+	/** @type {Object.<D.NativeUploader.File>|D.SortedMap} */
+	D.NativeUploader.prototype._thumbFiles = null;
+
+	D.NativeUploader.prototype._log = function( par, v ){
+		if( this.log ){
+			if(v){
+				D.log( par, v );
+ 			} else {
+				D.log(par);
+			}
+		}
+	};
+
+	D.NativeUploader.prototype._makeInput = function(){
+		var attributes = {
+			size: 50,
+			title: this.tooltip
+		};
+		if( this.accept ){
+			attributes.accept = this.accept;
+		}
+		this._fileInputNode = mkE( {
+			tag:'input',
+			type:'file',
+			attr: attributes,
+			prop:{
+				onchange:D.closure( this, this._fileOnchange )
+			}
+		} );
+		if( this.limit == -1 || this.limit > 1 ){
+			this._fileInputNode.multiple = true;
+		}
+		return this._fileInputNode;
+	};
+
+
+	D.NativeUploader.prototype._fileOnchange = function(){
+		var inp = this._fileInputNode;
+		if( !inp.files.length ){
+			return;
+		}
+		if( this.onBeforeSelect() === false ){
+			this._makeInput().replace(inp);
+			return;
+		}
+		this._makeInput().replace(inp);
+		this._addFiles( inp.files );
+	};
+
+	D.NativeUploader.prototype._addFiles = function(files){
+		for( var k = 0; k < files.length; ++ k ){
+			if( this.limit != -1 && this._files.length() == this.limit ){
+				continue;
+			}
+			var file = new D.NativeUploader.File( this, files[k] );
+			if( !file.size ){
+				continue;
+			}
+			this._files.set( file.id, file );
+			var onSelectPar = {
+				id:file.id,
+				name:file.name,
+				size:file.size
+			};
+			if( this._onSelect(onSelectPar) === false ){
+				this._files.del( file.id );
+				continue;
+			}
+			if( this.thumbWidth && this.thumbHeight ){
+				this._thumbFiles.set( file.id, file );
+				this._getThumbs();
+			}
+		}
+		this.listUpload();
+	};
+
+	D.NativeUploader.prototype.onBeforeSelect = function(){
+	};
+
+	D.NativeUploader.prototype._onSelect = function(file){
+		return this.onSelect(file);
+		//if( re !== false && this.onGetUploadData ){
+		//	this.listUpload();
+		//}
+		//return re;
+	};
+
+	D.NativeUploader.prototype.onSelect = function(file){
+	};
+
+	D.NativeUploader.prototype.onRemove = function(file){
+	};
+
+	D.NativeUploader.prototype.onUploadProgress = function(){
+	};
+
+	D.NativeUploader.prototype._onUploadComplite = function(file){
+		this._log( 'onUploadComplete', file );
+		this.onUploadComplete(file);
+	};
+
+	D.NativeUploader.prototype.onUploadComplete = function(file){
+	};
+
+	D.NativeUploader.prototype._onUploadCompliteData = function(file){
+		this._log( 'onUploadCompleteData', file );
+		this.onUploadCompleteData(file);
+		if( this.onGetUploadData ){
+			if( this.uploading ){
+				this.uploading = false;
+				this.listUpload();
+			}
+			if( !this.uploading && empty( this.list() ) ){
+				this._log('onListUploadComplete');
+				this.onListUploadComplete();
+			}
+		}
+	};
+
+	D.NativeUploader.prototype.onUploadCompleteData = function(file){
+	};
+
+	D.NativeUploader.prototype.onUploadIOError = function(){
+	};
+
+	D.NativeUploader.prototype.onUploadSecurityError = function(){
+	};
+
+	D.NativeUploader.prototype.onListUploadComplete = function(){
+	};
+
+	D.NativeUploader.prototype._onThumb = function(par){
+		this._log( 'onThumb', par );
+		this._getThumbsProcess = false;
+		this._getThumbs();
+		this.onThumb(par);
+		/*
+		mkE( {
+			tag:'img',
+			src:par.url
+		} ).append( $('#ct')[0] );
+		*/
+	};
+
+	D.NativeUploader.prototype.onThumb = function(par){
+	};
+
+	D.NativeUploader.prototype._getThumbs = function(){
+		if( this._getThumbsProcess ){
+			return;
+		}
+		this._getThumbsProcess = true;
+		/** @type {D.NativeUploader.File} file */
+		var file = this._thumbFiles.shift();
+		if(!file){
+			this._getThumbsProcess = false;
+			return;
+		}
+		if( file.type.match(/image.*/) ){
+			file._getThumb();
+			return;
+		}
+		this._getThumbsProcess = false;
+		this._getThumbs();
+	};
+
+	/** upload
+		@id - file id
+		@url - upload url
+		@data - post data
+	*/
+	D.NativeUploader.prototype.upload = function(par){
+		this._log( 'upload', par );
+		/** @type {D.NativeUploader.File} */
+		var file = this._files.get( par.id );
+		if(!file){
+			return false;
+		}
+		if( typeof par.data != 'object' ){
+			delete par.data;
+		}
+		par.data = par.data || {};
+		par.data.uploadFlash = 1;
+		if( this.DS ){
+			par.url = (new Get( par.url )).add( 'DS', this.DS ).toUrl();
+		}
+		if( D.nonce ){
+			par.data[ D.nonce.name ] = D.nonce.value;
+		}
+		if( !par.data.DS ){ // null, false, undef
+			delete par.data.DS;
+		}
+		if( file.upload(par) ){
+			this._files.del( file.id );
+			return true;
+		}
+		return false;
+	};
+
+	D.NativeUploader.prototype.remove = function(id){
+		this._thumbFiles.del(id);
+		var file = this._files.get(id);
+		if(!file){
+			return;
+		}
+		this._files.del(id);
+		this.onRemove(file);
+		if( file._xhr ){
+			file._xhr.abort();
+		}
+		if( this.onGetUploadData && this.uploading && p.id == this.uploading.id ){
+			this.uploading = false;
+			this.listUpload();
+		}
+	};
+
+	D.NativeUploader.prototype.count = function(){
+		return count( this._files );
+	};
+
+	D.NativeUploader.prototype.list = function(){
+		return this._files.toObject();
+	};
+
+	D.NativeUploader.prototype.clear = function(){
+		this._files.each( function( k, file ){
+			if( file._xhr ){
+				file._xhr.abort();
+			}
+		} );
+		this._files.clear();
+		this._thumbFiles.clear();
+	};
+
+	D.NativeUploader.prototype.listUpload = function(){
+		if( !this.onGetUploadData ){
+			return false;
+		}
+		if( this.uploading ){
+			return false;
+		}
+		this.uploading = reset( this.list() );
+		if( !this.uploading ){
+			return false;
+		}
+		var data = this.onGetUploadData( this.uploading );
+		if( typeof data != 'object' || !data.url ){
+			D.console.error( 'Uploader.onGetUploadData return error:', data );
+			this.uploading = false;
+			return false;
+		}
+		data.id = this.uploading.id;
+		this.upload(data);
+		return true;
+	};
+
+	D.NativeUploader.prototype._addDragDropEvent = function(){
+		this._dropOverlayNode = mkE( {
+			tag:'div',
+			className:'NativeUploaderDrop',
+			els:[
+				{
+					tag:'div',
+					text:D.Lang.get('upload_hover_msg')
+				}
+			]
+		} );
+		window.addEventListener( 'dragenter', this._onDragEnter = D.closure( this, this._onDragEnter ), false );
+		window.addEventListener( 'dragover', this._onDragOver = D.closure( this, this._onDragOver ), false );
+		window.addEventListener( 'dragleave', this._onDragLeave = D.closure( this, this._onDragLeave ), false );
+		this.dropNode.addEventListener( 'dragover', this._onDragOver, false );
+		this.dropNode.addEventListener( 'drop', this._onDrop = D.closure( this, this._onDrop ), false );
+	};
+
+	D.NativeUploader.prototype._removeDragDropEvent = function(){
+		window.removeEventListener( 'dragenter', this._onDragEnter, false );
+		window.removeEventListener( 'dragover', this._onDragOver, false );
+		window.removeEventListener( 'dragleave', this._onDragLeave, false );
+		this.dropNode.removeEventListener( 'dragover', this._onDragOver, false );
+		this.dropNode.removeEventListener( 'drop', this._onDrop, false );
+		this._log( 'unbind drag events', this );
+	};
+
+	D.NativeUploader.prototype._dragIsFiles = function(e){
+		var types = e.dataTransfer.types;
+		if(!types){
+			return false;
+		}
+		if( types.contains ){
+			return types.contains('Files');
+		}
+		var isFiles = false;
+		for( var i = 0; i < types.length; ++ i ){
+			if( types[i] == 'Files' ){
+				isFiles = true;
+				break;
+			}
+		}
+		return isFiles;
+	};
+
+	D.NativeUploader.prototype._onDragEnter = function(e){
+		if( !this._dragIsFiles(e) ){
+			return;
+		}
+		if( !$( this.node ).parents('body').length ){
+			this._removeDragDropEvent();
+			return;
+		}
+		if( !this._dropOverlayNode.parentNode ){
+			this._dropOverlayNode.append( this.dropNode );
+			addClassName(this.dropNode, 'uploaderDropOver');
+		}
+	};
+
+	D.NativeUploader.prototype._onDragOver = function(e){
+		if( !this._dragIsFiles(e) ){
+			return;
+		}
+		e.stopPropagation();
+		e.preventDefault();
+		clearTimeout( this._dropOverlayTO );
+	};
+
+	D.NativeUploader.prototype._onDragLeave = function(e){
+		this._dropOverlayTO = setTimeout( D.closure( this, this._dropOverlayRemove ), 50 );
+	};
+
+	D.NativeUploader.prototype._dropOverlayRemove = function(){
+		this._dropOverlayNode.remove();
+		removeClassName(this.dropNode, 'uploaderDropOver');
+	};
+
+	D.NativeUploader.prototype._onDrop = function(e){
+		e.stopPropagation();
+		e.preventDefault();
+		this._dropOverlayNode.remove();
+		removeClassName(this.dropNode, 'uploaderDropOver');
+		if( !e.dataTransfer.files ){
+			return;
+		}
+		var fls = e.dataTransfer.files;
+		var files = [];
+		for( var k = 0; k < fls.length; ++ k ){
+			files.push( fls[k] );
+		}
+		files.sort( function( a, b ){
+			if( a.name == b.name ){
+				return 0;
+			}
+			return a.name > b.name ? 1 : -1;
+		} );
+		D.log(files);
+		if( this.onBeforeSelect() === false ){
+			return;
+		}
+		this._addFiles(files);
+	};
+
+	/**
+	 * @constructor
+	 * @param {D.NativeUploader} uploader
+	 * @param {File} file
+	 */
+	D.NativeUploader.File = function( uploader, file ){
+		this._uploader = uploader;
+		this._file = file;
+		this.id = ++ this.constructor._n;
+		this.name = file.name;
+		this.size = file.size;
+		this.type = file.type;
+	};
+
+	D.NativeUploader.File._n = 0;
+	/** @type {File} */
+	D.NativeUploader.File.prototype._file = null;
+	D.NativeUploader.File.prototype.id = 0;
+	D.NativeUploader.File.prototype.name = '';
+	D.NativeUploader.File.prototype.size = 0;
+	D.NativeUploader.File.prototype.type = '';
+	D.NativeUploader.File.prototype.data = null;
+
+	D.NativeUploader.File.prototype.upload = function(par){
+		if( this._xhr ){
+			return false;
+		}
+		this._xhr = new XMLHttpRequest;
+		this._xhr.upload.addEventListener( 'progress', D.closure( this, this._onProgress ), false );
+		this._xhr.upload.addEventListener( 'load', D.closure( this, this._onUpload ), false );
+		this._xhr.addEventListener( 'load', D.closure( this, this._onLoad ), false );
+		this._xhr.addEventListener( 'error', D.closure( this, this._onError ), false );
+		this._xhr.open( 'POST', par.url, true );
+
+		var formData = new FormData();
+		if(par.fileName) {
+			formData.append("Filedata", this._file, par.fileName);
+		} else {
+			formData.append("Filedata", this._file);
+		}
+		if( par.data ){
+			for( var k in par.data ){
+				formData.append( k, par.data[k] );
+			}
+		}
+		this._xhr.send(formData);
+		return true;
+	};
+
+	/** @type {D.NativeUploader} */
+	D.NativeUploader.File.prototype._uploader = null;
+
+	D.NativeUploader.File.prototype._onProgress = function(e){
+		var p = {
+			id:this.id,
+			bytesLoaded:e.loaded,
+			bytesTotal:( e.total || this.size )
+		};
+		p.percent = Math.round( p.bytesLoaded / p.bytesTotal * 100 );
+		this._uploader._log( this.name, p.bytesLoaded / p.bytesTotal );
+		this._uploader.onUploadProgress(p);
+	};
+
+	D.NativeUploader.File.prototype._onUpload = function(){
+		this._uploader._onUploadComplite(this);
+	};
+
+	D.NativeUploader.File.prototype._onLoad = function(e){
+		this.data = this._xhr.response || this._xhr.responseText;
+		this._uploader._onUploadCompliteData(this);
+		this._xhr = null;
+	};
+
+	D.NativeUploader.File.prototype._onError = function(e){
+		this._uploader.onUploadIOError( {
+			id:this.id,
+			error:'error'
+		} );
+	};
+
+	D.NativeUploader.File.prototype._getThumb = function(){
+		var reader = new FileReader;
+		reader.onload = D.closure( this, this._fileOnload );
+		reader.readAsDataURL( this._file );
+	};
+
+	D.NativeUploader.File.prototype._fileOnload = function(e){
+		var img = new Image();
+		img.onload = D.closure( this, this._imageOnload, img );
+		img.src = e.target.result;
+	};
+
+	D.NativeUploader.File.prototype._imageOnload = function(img){
+		var w = this._uploader.thumbWidth;
+		var h = this._uploader.thumbHeight;
+		var canvas = mkE( {
+			tag:'canvas'
+		} );
+		if( this._uploader.thumbCrop ){
+			var k = Math.max( w / img.width, h / img.height );
+		} else {
+			var k = Math.min( w / img.width, h / img.height );
+		}
+		var rw = img.width * k;
+		var rh = img.height * k;
+		var context;
+		if( this._uploader.thumbCrop ){
+			canvas.width = w;
+			canvas.height = h;
+			context = canvas.getContext('2d');
+			context.clearRect( 0, 0, w, h );
+			context.drawImage( img, ( w - rw ) / 2, ( h - rh ) / 2, rw, rh );
+		} else {
+			canvas.width = rw;
+			canvas.height = rh;
+			context = canvas.getContext('2d');
+			context.clearRect( 0, 0, rw, rh );
+			context.drawImage( img, 0, 0, rw, rh );
+		}
+		var u = canvas.toDataURL( 'image/jpeg', 1.0 );
+		this._uploader._onThumb( {
+			id:this.id,
+			url:u,
+			data:u.substr( u.indexOf(',') + 1 )
+		} );
+	};
+	if( D.NativeUploader.isSupported() ){
+		window.Uploader = D.NativeUploader;
+	}
+}
+
+/**
+	params:Object
+		@caption
+		@limit
+		@DS
+		@thumbWidth
+		@thumbHeight
+		@onGetUploadData - listes menedžēšana, ja ir automātiskais upload
+		@onListUploadComplete - visa liste ir ielādējusies
+*/
+if( !window.Uploader ){
+	/**
+	 * @param {Object|D.UploaderPar} par
+	 * @constructor
+	 */
+	window.Uploader = function( par ){
+		par = par || {};
+		this.n = ++ window.Uploader._n;
+		window.Uploader._[ 'i' + String( this.n ) ] = this;
+		this.DS = par.DS || D.DS || false;
+		this.limit = par.limit || -1;
+		this.thumbWidth = par.thumbWidth || 0;
+		this.thumbHeight = par.thumbHeight || 0;
+		this.thumbCrop = par.thumbCrop || false;
+		this.accept = par.accept || null;
+		this.flashId = 'flashUpload' + this.n;
+		var events = [
+			'onInit',
+			'onInitTimeout',
+			'onError',
+			'onBeforeSelect',
+			'onSelect', // ( { id:, name:, size: } ) ja atgriež false, tad fails netiks pievienots sarakstā
+			'onRemove',
+			'onUploadComplete', // ( { id: } )
+			'onUploadProgress', // ( { id:, bytesLoaded:, bytesTotal: } )
+			'onUploadCompleteData', // ( { id:, data: } )
+			'onUploadStatus',
+			'onUploadIOError',
+			'onUploadSecurityError',
+			'onThumb'
+		];
+		for( var k in events ){
+			var r = events[ k ];
+			this[ r ] = par[ r ] || window.Uploader._doNothing;
+		}
+		this.log = par.log || D.DEV;
+		this.node = document.createElement( 'div' );
+		this.node.className = 'flashUpload';
+		this.node.appendChild( this.labelNode = document.createElement( 'div' ) );
+		this.labelNode.className = 'flashUploadLabel' + (typeof par.labelClassName != 'undefined' ? ' '+par.labelClassName : '');
+		this.labelNode.innerHTML = typeof par.caption != 'undefined' ? par.caption : 'Click Me!';
+		this.node.appendChild( this.contentNode = document.createElement( 'div' ) );
+		this.contentNode.className = 'flashUploadContent';
+		this.uploading = false;
+		//this.uploadNextWithoutData = Boolean( par.uploadNextWithoutData );
+		this.onGetUploadData = par.onGetUploadData || null;
+		this.onListUploadComplete = par.onListUploadComplete || window.Uploader._doNothing;
+		if( par.title ){
+			this.contentNode.title = par.title;
+		}
+		this.contentNode.onclick = function(e){ // neļaujam browserim iefokusēties
+			D.stopPropagation(e);
+			return false;
+		};
+	};
+
+	window.Uploader._n = 0;
+	window.Uploader._ = {};
+	window.Uploader._doNothing = function(){};
+
+	window.Uploader.prototype = {
+		/* methods */
+		append:function( node ){
+			var $uploader = this;
+			node.appendChild( this.node );			
+			this.initTimeout = setTimeout( function(){
+				$uploader.onInitTimeout();
+			}, 10000 );
+			this.embedFlash();
+		},
+		
+		/** upload
+			@id - file id
+			@url - upload url
+			@data - post data
+		*/
+		upload:function( par ){
+			if( typeof par.data != 'object' ){
+				par.data = {};
+			}
+			par.data.uploadFlash = 1;
+			par.data[ D.nonce.name ] = D.nonce.value;
+			return this.flash( 'upload', escape( D.JSON.encode(par) ) );
+		},
+		
+		/**
+			return:Object
+		*/
+		remove:function( id ){
+			return this.flash( 'remove', id );
+		},
+		
+		/**
+			return:int						
+		*/				
+		count:function(){
+			return this.flash( 'count' );
+		},
+		
+		/**
+			return:Array
+		*/
+		list:function(){
+			return this.flash( 'list' );
+		},
+
+		clear:function(){
+			var list = this.list();
+			for( var k in list ){
+				this.remove(k);
+			}
+			return true;
+		},
+		/**
+		 * @param {string} event
+		 * @param {*} p
+		 * @param {boolean} withoutTimer
+		 * @returns {*}
+		 * @private
+		 */
+		_call:function( event, p, withoutTimer ){
+			p = D.JSON.decode( unescape(p) );
+			if( this.log ){
+				D.log( 'Uploader.' + event, p );
+			}
+			if( ! withoutTimer ){
+				var $Uploader = this;
+				setTimeout( function(){
+					$Uploader[ event ]( p );
+				}, 1 );
+				return;
+			}
+			try{
+				return this[ event ]( p );
+			} catch( e ){
+				D.console.error( e );
+			}					
+		},
+		
+		_onInit:function( p ){
+			this.ready = true;
+			clearTimeout( this.initTimeout );
+			return this._call( 'onInit', p );
+		},
+		
+		_onError:function( p ){
+			return this._call( 'onError', p );
+		},
+		
+		_onBeforeSelect:function( p ){
+			return this._call( 'onBeforeSelect', p, true );
+		},
+		
+		_onSelect:function( p ){
+			var re = this._call( 'onSelect', p, true );
+			if( re !== false && this.onGetUploadData ){
+				this.listUpload();
+			}
+			return re;
+		},
+		
+		_onRemove:function( p ){
+			var re = this._call( 'onRemove', p );
+			if( this.onGetUploadData && this.uploading && p.id == this.uploading.id ){
+				this.uploading = false;
+				this.listUpload();
+			}
+			return re;
+		},
+		
+		_onUploadComplite:function( p ){
+			var re = this._call( 'onUploadComplete', p );
+			if( this.onGetUploadData && this.uploading && this.uploadNextWithoutData ){
+				this.uploading = false;
+				this.listUpload();
+			}
+			return re;
+		},
+		
+		_onUploadProgress:function(p){
+			p.percent = Math.round( p.bytesLoaded / p.bytesTotal * 100 );
+			return this._call( 'onUploadProgress', p );
+		},
+		
+		_onUploadCompliteData:function( p ){
+			var re = this._call( 'onUploadCompleteData', p, true );
+			if( this.onGetUploadData ){
+				if( this.uploading && !this.uploadNextWithoutData ){
+					this.uploading = false;
+					this.listUpload();
+				}
+				if( !this.uploading && empty( this.list() ) ){
+					this._call( 'onListUploadComplete', null );
+				}
+			}
+			return re;
+		},
+		
+		_onUploadStatus:function( p ){
+			return this._call( 'onUploadStatus', p );
+		},
+		
+		_onUploadIOError:function( p ){
+			var re = this._call( 'onUploadIOError', p );
+			if( this.onGetUploadData && this.uploading ){
+				this.uploading = false;
+				this.listUpload();
+			}
+			return re;
+		},
+		
+		_onUploadSecurityError:function( p ){
+			var re = this._call( 'onUploadSecurityError', p );
+			if( this.onGetUploadData && this.uploading ){
+				this.uploading = false;
+				this.listUpload();
+			}
+			return re;
+		},
+
+		_onThumb:function(p){
+			return this._call( 'onThumb', p );
+		},
+		
+		embedFlash:function(){
+			var path = D.PIMG + 'js/uploader/v' + D.JS + '/uploader.swf';
+			if( D.browser.name == 'Explorer' && D.browser.version < 9 ){
+				path += '?' + Math.random();
+			}
+			var width = this.contentNode.offsetWidth || '100%';
+			var height = this.contentNode.offsetHeight || '100%';
+			var so = new SWFObject( path, this.flashId, width, height, '10', '#FFFFFF' );
+			so.addParam( "wmode", "transparent" );
+			so.addParam( 'quality', 'high' );
+			so.addParam( 'play', 'true' );
+			so.addParam( 'allowScriptAccess', 'always' );
+			so.addVariable( 'object', 'window.Uploader._.i' + String( this.n ) );
+			so.addVariable( 'limit', this.limit );
+			so.addVariable( 'thumbWidth', this.thumbWidth );
+			so.addVariable( 'thumbHeight', this.thumbHeight );
+			so.addVariable( 'thumbCrop', this.thumbCrop ? '1' : '' );
+			if( this.DS ){
+				so.addVariable( 'DS', this.DS );
+			}
+			so.write( this.contentNode );
+		},
+
+		getFlashMovieObject:function( name ){
+			if( window.document[name] ){
+				return window.document[name];
+			}
+			if( navigator.appName.indexOf("Microsoft Internet") == -1 ){
+				if( document.embeds && document.embeds[name] ){
+					return document.embeds[name]; 
+				}
+			}
+			return document.getElementById(name);
+		},
+		
+		flash:function( k ){
+			if( !this.flash_ ){
+				this.flash_ = this.getFlashMovieObject( this.flashId );
+			}
+			if( !k ){
+				return this.flash_;
+			}
+			try{
+				if( arguments.length - 1 ){
+					var arg = [];
+					for( var i = 1; i < arguments.length; i ++ ){
+						arg.push( arguments[ i ] );
+					}
+					return this.flash_[ k ].apply( this.flash_, arg );
+				} else {
+					return this.flash_[ k ]();
+				}
+			} catch( e ){
+				D.console.info( "flash method: " + k );
+				D.console.info( this.flash_ );
+				D.console.error( e.name + ': ' + e.message + '@' + e.fileName + ' ' + e.lineNumber );
+				return null;
+			}
+		},
+
+		listUpload:function(){
+			if( !this.onGetUploadData ){
+				return false;
+			}
+			if( this.uploading ){
+				return false;
+			}
+			this.uploading = reset( this.list() );
+			if( !this.uploading ){
+				return false;
+			}
+			var data = this.onGetUploadData( this.uploading );
+			if( typeof data != 'object' || !data.url ){
+				D.console.error( 'Uploader.onGetUploadData return error:', data );
+				this.uploading = false;
+				return false;
+			}
+			data.id = this.uploading.id;
+			this.upload(data);
+			return true;
+		}
+	}; // window.Uploader.prototype
+		
+}
+
+// +++ Upload +++
+/*
+	par = {
+		url:[string] - upload urlis
+		data:{}, - post data
+		onSelect:[function],
+		onUpload:[function],
+		onProgress:[function],
+		withoutProgress:[bool] - nerādīt progres bāru (defaultā false)
+	};
+*/
+if( ! D.Upload ){
+	D.Upload = function( par ){
+		par = par || {};
+		this.par = par;
+		this.data = this.par.data || {};
+		this.data.url = par.url || false; // debug
+		this.onSelect = par.onSelect || function(){};
+		this.onUpload = par.onUpload || function(){};
+		this.onProgress = par.onProgress || function(){};
+		this.onBeforeSelect = par.onBeforeSelect || function(){};
+		this.allowedExtensions = par.allowedExtensions || null;
+		var $upload = this;
+		D.Upload.iframeN = ++ D.Upload.iframeN || 1;
+		var n = D.Upload.iframeN;
+		D.Upload.items[ n ] = this;
+		this.node = mkE( {
+			tag:'div',
+			className:'formsUpload',
+			els:[
+				this.button = mkE( {
+					tag:'span',
+					className:'button buttonStretch',
+					els:[
+						mkE( {
+							tag:'div',
+							className:'radius3',
+							els:[
+								this.buttonC = mkE( {
+									tag:'div',
+									className:'buttonC radius3'
+								} )
+							]
+						} )
+					]
+				} ),
+				this.iframeCont = mkE( {
+					tag:'div',
+					className:'formsUploadIframeC',
+					prop:{
+						innerHTML:'<iframe name="FormsUploadIframe' + n + '" id="FormsUploadIframe' + n + '"></iframe>'
+					}
+				} ),
+				this.inpCont = mkE( {
+					tag:'div',
+					className:'formsUploadInpC',
+					prop:{
+						innerHTML:'<input name="Filedata" type="file" size="50" />'
+					}
+				} ),
+				this.progress = mkE( {
+					tag:'table',
+					className:'formsUploadProgress',
+					els:[
+						mkE( {
+							tag:'tbody',
+							els:[
+								mkE( {
+									tag:'tr',
+									els:[
+										mkE( {
+											tag:'td',
+											text:'Ielādē:'
+										} ),
+										mkE( {
+											tag:'td',
+											els:[
+												this.progressC = mkE( {						
+													tag:'div',
+													prop:{
+														innerHTML:'&nbsp;'
+													}
+												} )
+											]
+										} )
+									]
+								} )
+							]
+						} ) // tbody
+					],
+					style:{
+						display:'none'
+					}
+				} )
+			]
+		} );
+		if( ! par.color || par.color == 'link' ){
+			addClassName( this.button, 'buttonLink' );
+		}
+		if( par.size === 'large' ){
+			addClassName( this.button, 'buttonLarge' );
+		}else if( par.size === 'medium' ){
+			addClassName( this.button, 'buttonMedium' );
+		}
+		//this.iframeCont.append( document.body );
+		this.iframe = this.iframeCont.firstChild;
+		this.inp = this.inpCont.firstChild;
+		this.inp.onchange = function(){
+			$upload.onSelectType = 'input';
+			$upload._onSelect();
+		};
+		this.inp.onclick = D.closure( this, this.onBeforeSelect );
+		var p = {
+			caption:par.caption || D.Lang.get( 'Izvēlies failu', 'xGlobal' ),
+			// events
+			onInit:function(){
+				$upload.inpCont.style.display = 'none';
+			},
+			onInitTimeout:function(){
+				clearNode( this.contentNode );
+				$upload.inpCont.style.display = '';
+			},
+			onUploadStatus:function( par ){
+				switch( par.status ){
+					case 403:
+						D.reload();
+						break;
+					case 502:
+						alert( '502 Bad gateway!' );
+						break;
+				}
+				D.Upload.log( {
+					error:'onUploadStatus ' + par.status,
+					data:par.data
+				} );
+			},
+			onUploadSecurityError:function(par){
+				$upload.inpCont.style.display = '';
+				D.Upload.log( {
+					error:'onUploadSecurityError',
+					data:par.data,
+					text:par.text
+				} );
+			},
+			onUploadIOError:function(par){
+				$upload.inpCont.style.display = '';
+				D.Upload.log( {
+					error:'onUploadIOError',
+					data:par.data,
+					text:par.text
+				} );
+			},
+			onSelect:function( par ){
+				if( $upload.allowedExtensions ) {
+					var ext = par.name.toLowerCase().split('.').pop();
+					if( array_search(ext, $upload.allowedExtensions) === false ) {
+						alert('Nepareizs faila formāts!');
+						return false;
+					}
+				}
+				var list = this.list();
+				for( var k in list ){
+					if( list[ k ].id != par.id ){
+						this.remove( list[ k ].id );
+					}
+				}
+				$upload.onSelectType = 'flash';
+				$upload._onSelect();
+				if( $upload.sucessNode ){
+					$upload.sucessNode.remove();
+				}
+			},
+			onUploadCompleteData:function( par ){
+				$upload._onUpload( D.JSON.decode( par.data ) );
+				this.remove( par.id );
+			},
+			onUploadProgress:function( par ){
+				$upload._onProgress( Math.round( par.bytesLoaded / par.bytesTotal * 100 ) / 100 );
+			},
+			onBeforeSelect:D.closure( this, this.onBeforeSelect )
+		};
+		/*
+		if( par.limit ){
+			p.limit = par.limit;
+		}	*/
+		p.limit = 1;
+		if( par.allowedExtensions ) {
+			p.accept = '.' + par.allowedExtensions.join(',.');
+		}
+		this.uploader = new Uploader(p);
+		this.uploader.append( this.buttonC );
+		if( D.browser.name == 'Explorer' && D.browser.version < 9 ){
+			clearNode( this.uploader.contentNode );
+		}
+		this.inpCont.append( this.buttonC );
+	};
+	
+	D.Upload.items = {};
+	
+	D.Upload.rpc = new RPC( '/pic/rq/app.php' );	
+	D.Upload.log = function(par){
+		this.rpc.send(
+			'log',
+			{
+				error:par.error,
+				data:D.JSON.encode( par.data || false ),
+				text:par.text || ''
+			},
+			function(re){
+			}
+		);
+	};
+	
+	D.Upload.prototype.append = function( node ){
+		if( typeof node == 'string' ){
+			node = document.getElementById( node );
+		}
+		this.node.append( node );
+	};
+
+	D.Upload.prototype.upload = function( par ){
+		var $upload = this;
+		par = par || {};
+		if( ! par.url ){
+			return false;
+		}
+		switch( this.onSelectType ){
+			case 'flash':
+				var item = reset( this.uploader.list() );
+				if( ! item ){
+					return false;
+				}
+				var data = { uploadFlash:'1' };
+				O2O( data, this.data  );
+				this.uploader.upload( { id:item.id, url:par.url, data:data } );
+				return true;
+			case 'input':
+				if( empty( this.inp.value ) ){
+					return false;
+				}
+				window.anonymous = window.anonymous + 1 || 1;
+				var varName = 'anonymous' + window.anonymous;
+				window[ varName ] = function( par ){
+					$upload._onUpload( par );
+				};
+				var form = '<form action="' + htmlspecialchars( par.url ) + '" enctype="multipart/form-data" method="post" target="' + this.iframe.name + '" style="display:none;">';
+				form += '<input name="uploadCallback" value="' + varName + '" />';
+				for( var k in this.data ){
+					form += '<input name="' + htmlspecialchars( k ) + '" value="' + htmlspecialchars( this.data[ k ] ) + '" type="hidden" />';
+				}
+				form += '</form>';
+				this.form = mkE( {
+					tag:'div',
+					prop:{
+						innerHTML:form
+					}
+				} ).firstChild;
+				this.form.appendChild( this.inp );
+				document.body.appendChild( this.form );
+				this.form.submit();
+				setTimeout( function(){
+					$upload.inpCont.appendChild( $upload.inp );
+				}, 1000 );
+				$upload._onProgress( 0.5 );
+				return true;
+		}
+		return false;
+	};
+	
+	D.Upload.prototype._onProgress = function( par ){
+		if( ! this.par.withoutProgress ){
+			this.progress.style.display = '';
+			this.progressC.style.width = Math.round( par * 100 ) + '%';
+		}
+		this.onProgress( par );
+	};
+	
+	D.Upload.prototype._onUpload = function( par ){
+		var $upload = this;
+		this.progress.style.display = 'none';
+		if( this.form ){
+			removeNode( this.form );
+		}
+		/*if( D.DEV ){
+			this.sucessNode = mkE( {
+				tag:'div',
+				className:'icon successIcon',
+				els:[
+					mkE( {
+						tag:'b',
+						className:'colorOk',
+						text:D.Lang.get( 'Upload sucess' )
+					} )
+				]
+			} );
+			D.insertBefore( this.sucessNode, this.button );
+		}*/
+		this.onUpload( par );
+	};
+	
+	D.Upload.prototype._onSelect = function( par ){
+		if( this.par.url ){
+			this.upload( { url:this.par.url } );
+		}
+		this.onSelect( par );
+	};
+	
+	D.Upload.prototype.picUploadError = function( par ){
+		if( ! par.errorNr ){
+			this.hidePicUploadError();
+			return;
+		}
+		if( this.picUploadErrorNode ){
+			this.picUploadErrorNode.remove();
+		}
+		if( this.picUploadSizeErrorNode ){
+			this.picUploadSizeErrorNode.remove();
+		}
+		this.picUploadErrorNode = mkE( {
+			tag:'b',
+			className:'color1 icon errorIcon',
+			style:{
+				display:'block'
+			},
+			text:((typeof par.error !== 'undefined' && par.errorNr == 5) ? par.error : D.Lang.get( 'pic upload error' + par.errorNr, 'xGlobal' ))
+		} );
+		//this.picUploadErrorNode = T.error( D.Lang.get( 'pic upload error' + par.errorNr, 'xGlobal' ) );
+		D.insertBefore( this.picUploadErrorNode, this.button );
+		if( par.errorNr && par.errorNr == 4 ){
+			this.picUploadSizeErrorNode = mkE({
+				tag: 'div',
+				els: [
+					{
+						tag: 'b',
+						className: 'color1',
+						text: D.Lang.get('pic_min_size').replace('$W', 360).replace('$H', 360)
+					}
+				]
+			});
+			D.insertAfter(this.picUploadSizeErrorNode, this.picUploadErrorNode);
+		}
+	};
+	
+	D.Upload.prototype.hidePicUploadError = function(){
+		if( this.picUploadErrorNode ){
+			this.picUploadErrorNode.remove();
+		}
+		if( this.picUploadSizeErrorNode ){
+			this.picUploadSizeErrorNode.remove();
+		}
+	};
+	
+	D.Upload.prototype.videoUploadError = function(par){
+		if( ! par.errorNr ){
+			this.hideVideoUploadError();
+			return;
+		}
+		if( this.videoUploadErrorNode ){
+			this.videoUploadErrorNode.remove();
+		}
+		this.videoUploadErrorNode = T.error( D.Lang.get( 'video upload' + par.errorNr, 'xGlobal' ) );
+		D.insertBefore( this.videoUploadErrorNode, this.button );
+	};
+	
+	D.Upload.prototype.hideVideoUploadError = function(){
+		if( this.videoUploadErrorNode ){
+			this.videoUploadErrorNode.remove();
+		}
+	};
+
+	D.loaded("Upload");
+}
+/// --- Upload ---

@@ -1,0 +1,4134 @@
+D.Comments = function(par){
+	D.Comments._inst = this;
+	par = par || { type:3, id:8912061 };
+	this.className = par.className || '';
+	this.formClass = par.formClass || D.CommentsForm;
+	this.noReplyIcon = par.noReplyIcon || false;
+	this.specialForm = par.specialForm || false;
+	this.specialFormOffsetEl = par.specialFormOffsetEl || null;
+	this.onPageChange = par.onPageChange || function(){};
+	this.todayComments = par.todayComments || false;
+	this.blogComments = par.blogComments || false;
+	this.formOnTop = par.formOnTop || false;
+	this.canOrder = par.canOrder || false;
+	this.disableAutoScroll = par.disableAutoScroll || false;
+	this.scrollParent = par.scrollParent || null;
+	if( par.rtKey ){
+		this.init(par);
+		return;
+	}
+
+	var get = new Get();
+
+	this._mParams = new DR.comments.Params;
+	this._mParams.type = par.type;
+	this._mParams.id = par.id;
+	if( (get.v('com_id') || par.comId) && !par.noComId ){
+		this._mParams.comId = Number(get.v('com_id')) || par.comId;
+	}
+	this._mParams.select = [
+		new DR.comments.select.ParamsRe().all()._nodeId(false),
+		new DR.comments.select.FormUser().all(),
+		new DR.base.select.Image().icon(),
+		new DR.users.select.User().id().title().url().image(),
+		new DR.users.select.Image().icon()
+	];
+
+	this._mTop = new DR.comments.Top;
+	this._mTop.type = par.type;
+	this._mTop.id = par.id;
+	this._mTop.select = [
+		new DR.comments.select.TopRe().all(),
+		new DR.comments.select.Item().all(),
+		new DR.comments.select.Image().say().uber(),
+		new DR.comments.select.Gif().thumb().video().tmpThumb(),
+		new DR.users.select.User().id().title().url().image(),
+		new DR.users.select.Image().icon(),
+		new DR.gallery.select.Embed().all(),
+		new DR.gallery.select.EmbedImage().all()
+	];
+
+	this._mGet = new DR.comments.Get;
+	this._mGet.type = par.type;
+	this._mGet.id = par.id;
+	if( par.order ){
+		this.order = par.order;
+		this._mGet.order = this.order;
+	}
+	if( (get.v('com_id') || par.comId) && !par.noComId ){
+		this._mGet.comId = Number(get.v('com_id')) || par.comId;
+	}
+	this._mGet.select = [
+		new DR.comments.select.GetRe().all(),
+		new DR.comments.select.Item().all(),
+		new DR.comments.select.Image().say().uber(),
+		new DR.comments.select.Gif().thumb().video().tmpThumb(),
+		new DR.users.select.User().id().title().url().image().deleted(),
+		new DR.users.select.UserDefault().isFriend(),
+		new DR.users.select.Image().icon(),
+		new DR.gallery.select.Embed().all(),
+		new DR.gallery.select.EmbedImage().all()
+	];
+
+	this._mGet.onLoad = D.closure(this, this.onComments, par);
+	if( par.apiCall ){
+		par.apiCall.addMethod(this._mParams);
+		par.apiCall.addMethod(this._mTop);
+		par.apiCall.addMethod(this._mGet);
+		return;
+	}
+	var apiCall = new DR.ApiCall( {
+		methods: [
+			this._mParams,
+			this._mTop,
+			this._mGet
+		]
+	} );
+	apiCall.call();
+};
+
+D.Comments.prototype = new mkE.Base;
+
+D.Comments.prototype.onComments = function(par){
+	if( !this._mParams || this._mParams.error || !this._mParams.re ){
+		return;
+	}
+	if( this.order ){
+		this._mParams.re.order = this.order;
+	}
+	this._mParams.re.topComments = this._mGet.re.pgs > 1 ? this._mTop.re.items : [];
+	this.init(this._mParams.re);
+	this.show(this._mGet.re, true);
+	if( par.parent ){
+		this.append(par.parent);
+	}
+	if( par.onInit ){
+		par.onInit();
+	}
+};
+
+D.Comments.prototype.append = function(parent){
+	this.node.append(parent);
+	this._checkParent();
+	return this;
+};
+
+D.Comments.prototype.init = function(par){
+	this._items = {};
+	this.type = par.type;
+	this.id = par.id;
+	this.rtKey = par.rtKey;
+	this.pg = par.pg || 1;
+	this.pgs = 0;
+	this.canAdd = par.canAdd || false;
+	this.canReply = par.canReply || false;
+	this.editorPar = par.editor && !D.browser.mobile ? eval( '(' + par.editor + ')' ) : false;
+	this._lastCid = par.cid || 0;
+	this.fid = par.fid || D.ID;
+	this.profiles = par.profiles || [];
+	this.lastSeen = par.lastSeen || 0;
+	this.canOrder = par.canOrder || this.canOrder;
+	this.order = par.order || 'ASC';
+	this.placeHolder = par.placeHolder || '';
+	this.hideTitle = par.hideTitle || false;
+	this.compactCommentBox = par.compactCommentBox || false;
+	this.compactCommentBoxSuccHeading = par.compactCommentBoxSuccHeading;
+	this.compactCommentBoxSuccDescription = par.compactCommentBoxSuccDescription;
+	this.disableShowNewAnimation = par.disableShowNewAnimation || false;
+	this.disableBackNext = par.disableBackNext || false;
+	this.maxLength = par.maxLength || 0;
+	this.canRate = par.canRate || false;
+	this.topComments = par.topComments || [];
+	this.emptyText = par.emptyText || '';
+	this.likeType = par.likeType;
+	this.dislikeType = par.dislikeType;
+	this.DS = par.DS || '';
+	this.onAdd = par.onAdd || '';
+	this.maxLevels = par.maxLevels || 0;
+	this.galOwner = par.galOwner || 0;
+	this.galOwnerTitle = par.galOwnerTitle || '';
+	this.canTrack = par.canTrack || false;
+	this.isBanned = par.isBanned > 0 || false;
+	this.hideProfiles = par.hideProfiles || false;
+
+	if( this.specialForm ){
+		this._titleNode = mkE( {
+			tag:'h' + par.h,
+			className: par.h == 2 ? 'ctTitle' : '',
+			els:[
+				this._titleTextNode = mkE({
+					tag: 'strong',
+					text: par.title
+				}),
+				this._countNode = mkE( {
+					tag:'span'
+				} )
+			]
+		} )
+	}else{
+		this._titleNode = mkE( {
+			tag:'h' + par.h,
+			className: par.h == 2 ? 'ctTitle' : '',
+			els:[
+				par.title,
+				' ',
+				this._countNode = mkE( {
+					tag:'span'
+				} )
+			]
+		} )
+	}
+
+	var userDenyComment = D.Lang.get('user deny comment');
+	if(this.type == 12) {
+		userDenyComment = D.Lang.get('user deny comment groups');
+	}
+	if(this.isBanned) {
+		userDenyComment = D.Lang.get('comments ban');
+	}
+
+	this.node = mkE( {
+		tag:'div',
+		className:'comments' + (this.className ? ' ' + this.className : ''),
+		els:[
+			this._topCommentsNode = mkE( {
+				tag:'div',
+				className:'commentsTop'
+			} ),
+			this._titleNode,
+			this._itemsNode = mkE( {
+				tag:'div',
+				className:'commentsList'
+			} ),
+			this._pgNode = mkE( {
+				tag:'div'
+			} ),
+			this._commentsDisabled = mkE({
+				tag: 'div',
+				className:'commentsDisabled',
+				els: [
+					T.info(userDenyComment)
+				]
+			})
+		]
+	} );
+	this.defaultFormPlace = this.node;
+	if( this.formOnTop ){
+		this.commentsTopForm = mkE({
+			tag: 'div',
+			className: 'commentsFormTop'
+		}).prepend(this.node);
+		this.defaultFormPlace = this.commentsTopForm;
+	}
+	if( par._nodeId ){
+		this.node.replace( $( '#' + par._nodeId )[0] );
+		this._checkParent();
+	}
+	if( this.rtKey ){
+		D.onLoad( 'chat', D.closure( this, this._chatReady ) );
+	}
+
+	var fp = D.closureObject( this, {
+		onAdd:this._onAdd
+	} );
+	fp.profiles = this.profiles;
+	fp.fid = this.fid;
+	this._form = new this.formClass( this, fp );
+	this._form.append( this.defaultFormPlace );
+
+	if( this.canAdd ){
+		this._form.node.style.display = 'block';
+	}else if( this.specialForm && !this.canAdd && D.ID ){
+		this._commentsDisabled.style.display = 'block';
+		this._form.node.style.display = 'none';
+	} else {
+		if( D.ID ){
+			this._commentsDisabled.style.display = 'block';
+		}
+		this._form.node.style.display = 'none';
+	}
+	if( this.isBanned ) {
+		this._commentsDisabled.style.display = 'block';
+		this._form.node.style.display = 'none';
+	}
+	if( this.canOrder && D.ID ){
+		mkE( {
+			tag:'p',
+			els:[
+				this._changeOrderNode = mkE( {
+					tag:'a',
+					text:this._orderText(),
+					prop:{
+						onclick:D.closure( this, this.toggleOrder )
+					}
+				} )
+			]
+		} ).append( this._titleNode );
+	}
+	if( this.hideTitle ){
+		this._titleNode.remove();
+	}
+	if (this.compactCommentBox) {
+		this._form._profileIcon.remove();
+		removeClassName(this._form._sayFormEditor, 'SayFormEditor');
+		removeClassName(this._form.node, 'item');
+	}
+};
+
+D.Comments.prototype.setCanAdd = function(canAdd){
+	if (canAdd) {
+		this._commentsDisabled.style.display = 'none';
+		this._form.node.style.display = 'block';
+	} else {
+		this._commentsDisabled.style.display = 'block';
+		this._form.node.style.display = 'none';
+	}
+};
+D.Comments.prototype._chatReady = function(){
+	this._rtCallback = D.closure( this, this._rt );
+	D.chat.subscribe( this.rtKey, this._rtCallback );
+};
+
+D.Comments.prototype.setCount = function( c, withoutAnimate ){
+	if( this.specialForm ){
+		if( c > 0){
+			this._titleTextNode.style.display = 'none';
+			this._countNode.style.display = '';
+			this._countNode.innerHTML = '<strong>' + String(c) + '</strong> ' + D.Lang.nget(c, 'comments');
+			removeClassName(this.node, 'emptyComments');
+			return;
+		}
+		this._titleTextNode.style.display = '';
+		this._countNode.style.display = 'none';
+		addClassName(this.node, 'emptyComments');
+	}
+	this._countNode.innerHTML = c ? '(' + String(c) + ')' : '';
+	if(withoutAnimate){
+		return;
+	}
+	this._countNode.style.color = '';
+	var color = getStyle( this._countNode, 'color' );
+	$(this._countNode).css( { color:'#f60' } ).animate( { color:color }, 1000 );
+};
+
+D.Comments.prototype._orderText = function(){
+	return ( this.order == 'ASC' ? D.Lang.get('Kārtot dilstoši') : D.Lang.get('Kārtot augoši') );
+};
+
+D.Comments.prototype.toggleOrder = function(){
+	this.order = this.order == 'ASC' ? 'DESC' : 'ASC';
+	this._changeOrderNode.innerHTML = this._orderText();
+	var method = new DR.comments.SetOrder;
+	method.type = this.type;
+	method.id = this.id;
+	method.order = this.order;
+	var apiCall = new DR.ApiCall( {
+		methods: [
+			method
+		],
+		onLoad: D.closure(this, this._toggleOrder),
+		context: this
+	} );
+	apiCall.call();
+	return false;
+};
+
+D.Comments.prototype._toggleOrder = function(){
+	this.pg = 0;
+	this.showPage(1);
+};
+
+/**
+ * @param {DR.comments.struct.GetRe} data
+ * @param init
+ */
+D.Comments.prototype.show = function( data, init ){
+	O2O( D.Comments._users, data.users );
+	clearNode( this._topCommentsNode );
+	var item, k, l, r;
+	if( this.pg == 1 && !empty( this.topComments ) ){
+		mkE( {
+			tag:'h3',
+			text:D.Lang.get(( this.todayComments || this.blogComments ) ? 'top_rated_comments' : 'Top Comments')
+		} ).append( this._topCommentsNode );
+		var node = mkE( {
+			tag:'div'
+		} ).append( this._topCommentsNode );
+		for( k = 0, l = this.topComments.length; k < l; k++ ){
+			r = this.topComments[k];
+			r.owner = this.owner;
+			item = new D.CommentsItem( this, r, { top:true } );
+			item.node.append(node);
+		}
+		if( !this.todayComments && !this.blogComments ){
+			T.sep().append( this._topCommentsNode );
+		}
+	}
+	if( this.pg == 1 && empty(data.items) ){
+		this._titleNode.style.display = 'none';
+	}
+	this._items = {};
+	this._tmpItems = {};
+	clearNode( this._itemsNode );
+	if( !data.items ){
+		data.items = [];
+	}
+	var com0count = 0;
+	var get = new Get();
+	var hasComId = !empty(get.v('com_id'));
+	for( k = 0, l = data.items.length; k < l; k++ ){
+		r = data.items[k];
+		if( this.lastSeen && r.created > this.lastSeen && D.ID != r.fid ){
+			r.unseen = true;
+		}
+		r.owner = this.owner;
+		item = new D.CommentsItem( this, r );
+		this.addItem(item);
+		var limited = this.blogComments ? 3 : 4;
+		if( this.pg == 1 && k >= limited && (this.todayComments || this.blogComments) && !this.allButton && !hasComId ){
+			item.node.style.display = 'none';
+		}
+		com0count++;
+	}
+	this.setCount( data.count, true );
+	//if( this.pgs != data.pgs ){
+		this.pgs = data.pgs;
+		clearNode( this._pgNode );
+		if( data.pgs > 1 ){
+			this.paginator = new T.Pg( {
+				//container:this._pgNode,
+				pg: this.pg,
+				pgs: data.pgs,
+				callback: D.closure( this, this.showPage ),
+				backNext : !this.disableBackNext
+			} );
+			this.paginator.append( this._pgNode );
+		}
+	//}
+	if( init && this._form && ( D.addComment || document.location.hash == "#addComment" ) ){
+		D.addComment = false;
+		D.scrollIntoView( this._form.node );
+		this._form.focus();
+	}
+	if ( this.pg == 1 && this.emptyText && empty( data.items ) ) {
+		this._emptyTextNode = T.info( this.emptyText );
+		D.insertBefore( this._emptyTextNode, this._itemsNode );
+	}
+	var limited = this.blogComments ? 3 : 4;
+	if( this.pg == 1 && ( this.todayComments || this.blogComments ) && com0count > limited && !this.allButton && !hasComId ){
+		this.allButton = true;
+		if( this.paginator ){
+			this.paginator.node.style.display = 'none';
+		}
+		this.showAllCommentsButton = new T.Form.Button({
+			caption: D.Lang.get('show_all_comments') + ' (' + data.count + ')',
+			size: this.blogComments ? '' : 'large',
+			color: 'link',
+			stretch: true,
+			onclick: D.closure(this, this.showAllComments)
+		}).append(this._itemsNode);
+	}
+	if( init && this._lastCid && this._items[this._lastCid] ){
+		D.scrollIntoView(this._items[this._lastCid].node);
+	}
+
+	if(this._changeOrderNode) {
+		this._changeOrderNode.style.display = data.count?'':'none';
+	}
+};
+
+D.Comments.prototype.showAllComments = function(){
+	if( this.paginator ) {
+		this.paginator.node.style.display = '';
+	}
+	for( var i in this._items ){
+		if( !this._items.hasOwnProperty(i) ){
+			continue;
+		}
+		this._items[i].node.style.display = '';
+	}
+	this.showAllCommentsButton.remove();
+	var m = new DR.comments.TrackStats();
+	m.key = 'show_all_comments';
+	m.call();
+};
+
+D.Comments.prototype.showPage = function(pg){
+	if( pg && this.pg == pg ){
+		return;
+	}
+	if(!pg){
+		this._showPageWithoutScroll = true;
+	}
+	this.pg = pg || this.pg;
+	D.loadingOverlay( this.node );
+	var method = new DR.comments.Get;
+	method.type = this.type;
+	method.id = this.id;
+	method.pg = this.pg;
+	method.order = this.order;
+	method.select = [
+		new DR.comments.select.GetRe().all(),
+		new DR.comments.select.Item().all(),
+		new DR.comments.select.Image().say().uber(),
+		new DR.comments.select.Gif().thumb().video().tmpThumb(),
+		new DR.users.select.User().id().title().url().image(),
+		new DR.users.select.Image().icon(),
+		new DR.gallery.select.Embed().all(),
+		new DR.gallery.select.EmbedImage().all()
+	];
+	var apiCall = new DR.ApiCall( {
+		methods: [
+			method
+		],
+		onLoad: D.closure(this, this._showPage, method),
+		context: this
+	} );
+	apiCall.call();
+};
+
+/**
+ * @param {DR.comments.Get} method
+ * @private
+ */
+D.Comments.prototype._showPage = function(method){
+	D.removeLoadingOverlay( this.node );
+	if(!method || method.error){
+		return;
+	}
+	var scroll = this._lastCid;
+	this.show(method.re, false);
+	if( !scroll && !this._showPageWithoutScroll ){
+		D.scrollIntoView( this.node );
+	}
+	this._showPageWithoutScroll = false;
+	this.onPageChange();
+};
+
+D.Comments.prototype.addItem = function( item, _new){
+	if( !_new || this.order == 'ASC' || !this._itemsNode.firstChild ){
+		item.node.append( this._itemsNode );
+	} else {
+		D.insertBefore(	item.node, this._itemsNode.firstChild );
+	}
+	if( this._lastCid && this._items[ this._lastCid ] ){
+		var lastItem = this._items[ this._lastCid ];
+		lastItem.showNew();
+		this._lastCid = false;
+		if (!this.disableAutoScroll) {
+			if( !D.GalleryFS || !D.GalleryFS.opened ){
+				setTimeout(D.closure(this, this._scrollComment, lastItem.node), 50);
+			}else{
+				setTimeout(D.closure(this, this._scrollGalleryComment, lastItem.node), 50);
+			}
+		}
+	}
+	if ( this.pg == 1 && this._emptyTextNode && !empty( this._items ) ) {
+		removeNode( this._emptyTextNode );
+	}
+};
+
+D.Comments.prototype._scrollComment = function(node){
+	D.scrollIntoView(node, this.scrollParent);
+};
+
+D.Comments.prototype._scrollGalleryComment = function(node){
+	D.scrollIntoView(node, this.scrollParent);
+};
+
+D.Comments._users = {};
+
+D.Comments.getUser = function(uid){
+	if( this._users[uid] ){
+		return this._users[uid];
+	}
+	return {
+		id:uid,
+		title:'',
+		url:'javascript:',
+		deleted:true,
+		image:{
+			icon:''
+		}
+	};
+};
+
+D.Comments.prototype.resetForm = function(){
+	if( this._form ){
+		this._form.clear();
+		this._form.node.append( this.defaultFormPlace );
+	}
+	if( this._replyNode ){
+		this._replyNode.innerHTML = D.Lang.get('reply');
+		this._replyNode = false;
+	}
+};
+
+D.Comments.prototype._callOnAdd = function(){
+	if( !this.onAdd ){
+		return;
+	}
+	try{
+		var cb = eval( '(' + this.onAdd + ')' );
+		if( typeof cb == 'function' ){
+			cb.call(this);
+		}
+	} catch(e){
+		D.console.error(e);
+	}
+};
+
+D.Comments.prototype._onAdd = function(re){
+	if (this.compactCommentBox) {
+		if ((this.compactCommentBoxSuccHeading != '') && (this.compactCommentBoxSuccDescription != '')) {
+			if (!this._compactCommentBoxSuccessBox) {
+				this._compactCommentBoxSuccessBox = T.success(
+					this.compactCommentBoxSuccHeading,
+					this.compactCommentBoxSuccDescription
+				);
+				this._compactCommentBoxSuccessBox.append(this.node);
+			}
+		}
+
+		this.resetForm();
+		return;
+	}
+	O2O(D.Comments._users, re.users);
+	var formParent = this._form.node.parentNode;
+	var formPreviousSibling = this._form.node.previousSibling;
+	this.resetForm();
+	if( this._items[ re.item.cid ] ){ // ja realtime tomēr paspēj ātrāk pievienot
+		return;
+	}
+	this._lastCid = re.item.cid;
+	var showPage = !re.item.parent || !this._items[ re.item.parent ];
+	if( this.order == 'ASC' ){
+		if( this.pg != re.pgs && showPage ){
+			this.showPage( re.addPg || re.pgs );
+			this._callOnAdd();
+			return;
+		}
+	} else {
+		if( this.pg != 1 && showPage ){
+			this.showPage( re.addPg || 1 );
+			this._callOnAdd();
+			return;
+		}
+	}
+	this.setCount( re.count );
+
+	if( this.type == DR.comments.Get.TYPE_FORUMDEV ){
+		var item = new D.CommentsItem( this, re.item );
+		if( item.parent ){
+			if( this._items[ item.parent ] ){
+				this._items[ item.parent ].addChild(item);
+			} else {
+				if(formPreviousSibling){
+					D.insertAfter( item.node, formPreviousSibling )
+				} else {
+					item.node.append(formParent);
+				}
+			}
+		} else {
+			this.addItem( item, true );
+		}
+		item.showNew();
+		if( (this.order == 'DESC' || this.type == 44) && ( !D.GalleryFS || !D.GalleryFS.opened ) ){ // tmp
+			D.scrollIntoView( item.node );
+		}
+		this._callOnAdd();
+		this._titleNode.style.display = '';
+		return;
+	}
+	var topParent = this.getTopParent(re.item.parent);
+	var tempItem = this.isTmpItem(re.item.parent, topParent);
+	var lastChild = this.getLastChild(re.item.parent);
+
+	var item = new D.CommentsItem( this, re.item, {
+		tempItem: tempItem
+	} );
+
+	this.addItemRT(item, topParent, lastChild);
+
+	item.showNew();
+	if (!this.disableAutoScroll) {
+		D.scrollIntoView( item.node, this.scrollParent );
+	}
+	this._callOnAdd();
+	this._titleNode.style.display = '';
+};
+
+D.Comments.prototype.addItemRT = function(item, topParent, lastChild){
+	if( item.parent ){
+		if( item.par.tempItem ){
+			this._items[ topParent ].addTempChild(item);
+		}else{
+			if( !lastChild && item.parent == topParent ){
+				this._items[ item.parent ].addChild(item);
+			}else if( !lastChild ){
+				D.insertAfter(item.node, this._items[ item.parent ].node);
+			}else{
+				D.insertAfter(item.node, lastChild.node);
+			}
+		}
+	} else {
+		this.addItem( item, true );
+	}
+};
+
+D.Comments.prototype.getLastChild = function(parent){
+	var childMap = {};
+	for( var cid in this._items ){
+		if( !this._items.hasOwnProperty(cid) ){
+			continue;
+		}
+		var item = this._items[cid];
+		if( !item.parent ){
+			continue;
+		}
+		if( !childMap[item.parent] || cid > childMap[item.parent].cid ){
+			childMap[item.parent] = item;
+		}
+	}
+	var lastChild = null;
+	while( childMap[parent] ){
+		lastChild = childMap[parent];
+		parent = lastChild.cid;
+	}
+	return lastChild;
+};
+
+D.Comments.prototype.getTopParent = function(parentId){
+	if( !parentId ){
+		return 0;
+	}
+	var parent = parentId;
+	var topParent;
+	if( !this._items[parent] && this._tmpItems[parent] ){
+		while( this._tmpItems[parent] ){
+			parent = this._tmpItems[parent].parent;
+		}
+	}
+	while( this._items[parent] ){
+		topParent = this._items[parent].cid;
+		parent = this._items[parent].parent;
+	}
+	return topParent;
+};
+
+D.Comments.prototype.isTmpItem = function(parentId, topParent){
+	if( !parentId ){
+		return false;
+	}
+	if( !topParent ){
+		return true;
+	}
+	if( !this._items[topParent]._loadAfter ){
+		return false;
+	}
+	var lastChild = this.getLastChild(parentId);
+	if( !lastChild && this._items[parentId] && this._items[parentId].node.nextSibling ){
+		return false;
+	}
+	return !lastChild || !lastChild.node.nextSibling;
+};
+
+D.Comments.prototype._checkParent = function(){
+	if( this._checkParentInterval ){
+		return;
+	}
+	this._checkParentInterval = setInterval( D.closure( this, this._onCheckParent ), 500 );
+};
+
+D.Comments.prototype._onCheckParent = function(){
+	var j = $( this.node ).closest( document.body );
+	if( j.length ){
+		return;
+	}
+	this._onRemove();
+};
+
+D.Comments.prototype._rt = function(par){
+	if( !par.msg ){
+		return;
+	}
+	switch( par.msg.t ){
+		case 'add':
+			if( this._items[ par.msg.cid ] ){
+				return;
+			}
+			setTimeout( D.closure( this, this._rtAdd, par.msg ), ( par.msg.ID == D.ID ? 500 : 100 ) );
+			break;
+		case 'del':
+			this.setCount( par.msg.count );
+			if( !this._items[ par.msg.cid ] ){
+				return;
+			}
+			this._items[ par.msg.cid ]._del(true);
+			break;
+		case 'gifEncoded':
+			if( !this._items[ par.msg.cid ] ){
+				return;
+			}
+			this._items[ par.msg.cid ].gif = par.msg.item.gif;
+			this._items[ par.msg.cid ].redrawGif();
+			break;
+		case 'videoEncoded':
+			if( !this._items[ par.msg.cid ] ){
+				return;
+			}
+			this._items[ par.msg.cid ].video = par.msg.item.video;
+			this._items[ par.msg.cid ].redrawVideo();
+			break;
+	}
+};
+
+D.Comments.prototype._rtAdd = function(msg){
+	this.setCount( msg.count );
+	if( this._lastCid == msg.cid ){
+		return;
+	}
+	if( this._items[ msg.cid ] || this._tmpItems[ msg.cid ] ){
+		return;
+	}
+	if( msg.parent && !this._items[ msg.parent ] && !this._tmpItems[ msg.parent ] ){
+		return;
+	}
+	var method = new DR.comments.GetComment;
+	method.type = this.type;
+	method.id = this.id;
+	method.cid = msg.cid;
+	method.select = [
+		new DR.comments.select.GetCommentRe().all(),
+		new DR.comments.select.Item().all(),
+		new DR.comments.select.Image().say().uber(),
+		new DR.comments.select.Gif().thumb().video().tmpThumb(),
+		new DR.users.select.User().id().title().url().image(),
+		new DR.users.select.Image().icon(),
+		new DR.gallery.select.Embed().all(),
+		new DR.gallery.select.EmbedImage().all()
+	];
+	var apiCall = new DR.ApiCall( {
+		methods: [
+			method
+		],
+		onLoad: D.closure(this, this._rtAddRe, method),
+		context: this
+	} );
+	apiCall.call();
+};
+
+/**
+ * @param {DR.comments.GetComment} method
+ * @private
+ */
+D.Comments.prototype._rtAddRe = function(method){
+	if (this.compactCommentBox) {
+		return;
+	}
+	if( !method || method.error || !method.re.item ){
+		return;
+	}
+	var re = method.re;
+	if( this._items[ re.item.cid ] || this._tmpItems[ re.item.cid ] ){
+		return;
+	}
+	O2O(D.Comments._users, re.users);
+	if( this.type == DR.comments.Get.TYPE_FORUMDEV ){
+		var item = new D.CommentsItem( this, re.item );
+		item.showNew();
+		if( item.parent ){
+			if( !this._items[ item.parent ] ){
+				return;
+			}
+			this._items[ item.parent ].addChild(item);
+			return;
+		}
+		this.addItem( item, true );
+	}else{
+		var topParent = this.getTopParent(re.item.parent);
+		var tempItem = this.isTmpItem(re.item.parent, topParent);
+		var lastChild = this.getLastChild(re.item.parent);
+
+		var item = new D.CommentsItem( this, re.item, {
+			tempItem: tempItem
+		} );
+
+		this.addItemRT(item, topParent, lastChild);
+		item.showNew();
+	}
+	this._titleNode.style.display = '';
+};
+
+D.Comments.prototype._onRemove = function(){
+	clearTimeout( this._checkParentInterval );
+	if( this.rtKey && D.chat ){
+		D.chat.unsubscribe( this.rtKey );
+	}
+};
+
+D.Comments.rpc = new RPC('/rq/comments_app.php');
+
+D.Comments._userReplace = function(text){
+	return text.replace( /<!-- user:([0-9]+) -->/g, this._userReplaceCB );
+};
+
+D.Comments._userReplaceCB = function( m, uid ){
+	var u = D.Comments.getUser(uid);
+	if( u.deleted ){
+		return '';
+	}
+	return '<a class="user" href="' + u.url + '">' + u.title + '</a>';
+};
+/**
+ * @param {D.Comments} comments
+ * @param {DR.comments.struct.Item} data
+ * @param {object} [par]
+ * @constructor
+ */
+D.CommentsItem = function( comments, data, par ){
+	this.comments = comments;
+	this.data = data;
+	this.cid = data.cid;
+	this.fid = data.fid;
+	this.parent = data.parent || 0;
+	this._user = data.user || D.Comments.getUser( data.fid );
+	this.created = data.created;
+	this.canDelete = data.canDelete || false;
+	this.canEdit = data.canEdit || false;
+	this.canHide = data.canHide || false;
+	this.canBlock = data.canBlock || false;
+	this.isBlocked = data.isBlocked || false;
+	this.headLinks = data.headLinks || [];
+	this.unseen = data.unseen || false; // Nenāk no PHP
+	this.likes = data.likes || 0;
+	this.dislikes = data.dislikes || 0;
+	this.count = data.count || null;
+	this.par = par || {};
+	this.image = data.image || null;
+	this.gif = data.gif || null;
+	this.video = data.video || null;
+	this.iLike = data.iLike || false;
+	this.iDislike = data.iDislike || false;
+	this.userLikes = data.userLikes || {};
+	this.userDislikes = data.userDislikes || {};
+	this.likeProfiles = data.likeProfiles || [];
+	this.dislikeProfiles = data.dislikeProfiles || [];
+	this.isHidden = data.isHidden || false;
+	this.lastEditTime = data.lastEditTime || null;
+	this.embeds = data.embeds || {};
+	this.canRate = data.canRate;
+	this.isBad = data.isBad;
+	this._childs = [];
+
+	if( this.par.level ){
+		this.level = this.par.level;
+	}else if( this.parent && this.comments._items[this.parent] ){
+		this.level = this.comments._items[this.parent].getLevel() + 1;
+	}else{
+		this.level = 1;
+	}
+	var text = data.text;
+	if( data.isBad && !D.ADMIN ){
+		text = '';
+	}
+	if( this.comments.editorPar ){ // nāk jau no PHP
+		evalScriptHTML(text);
+	} else {
+		text = text.replace( /(\r\n|\n\r|\n){2,}/g, '<br /><br />' ).replace( /(\r\n|\n\r|\n){1,}/g, '<br />' );
+	}
+	text = D.Comments._userReplace(text);
+	text = D.smileyReplace(text);
+	this.node = mkE( {
+		tag:'div',
+		className:'item',
+		els:[
+			{
+				tag:'div',
+				className:'profileSmallIcon',
+				style:{
+					backgroundImage:"url('" + this._user.image.icon + "')"
+				},
+				els:[
+					!this._user.deleted?{
+						tag:'a',
+						href:this._user.url
+					}:false
+				]
+			},
+			{
+				tag:'div',
+				className:'content',
+				els:[
+					this._head(),
+					this._bodyNode = mkE( {
+						tag:'div',
+						className:'body',
+						els:[
+							this._textNode = mkE({
+								tag:'div',
+								className:'comText',
+								innerHTML:text
+							})
+						]
+					} ),
+					this._optionsNode()
+				]
+			},
+			this._childsNode = mkE( {
+				tag:'div',
+				className:'childs'
+			} ),
+			this._tmpChildsNode = mkE( {
+				tag:'div',
+				className:'childs'
+			} )
+		],
+		attr:{
+			"data-id":this.cid
+		}
+	} );
+	if( data.isBad ){
+		T.error( D.Lang.get('Bad comment') ).append( this._textNode );
+	}
+	if ( this.unseen ) {
+		this.node.style.backgroundColor = '#fefed3';
+	}
+	if( data.giphy && T.Giphy ){
+		var size = this.comments.specialForm ? 220 : 270;
+		new T.Giphy.Embed( data.giphy, { maxHeight:size } ).append( this._bodyNode );
+	}
+	if( data.sound && T.Sounds ){
+		new T.Sounds.Embed( data.sound ).append( this._bodyNode );
+	}
+	if( !this.comments.editorPar ){
+		D.smileyReplace( this._bodyNode );
+		this.drawEmbeds();
+		this.drawYoutube();
+		D.linksReplace( this._bodyNode );
+		if( D.Say ){
+			D.Say.hashTagReplace( this._bodyNode );
+		}
+	}
+	if( !empty( data.childs ) ){
+		if( data.childsPg != 1 ){
+			this._loadBeforeCount = mkE({
+				tag: 'span',
+				className: 'childs-count',
+				text: (data.childsPg - 1) * 10
+			});
+			this._loadBefore = mkE({
+				tag: 'div',
+				className: 'load-childs',
+				els: [
+					this._loadBefore = new T.Form.Button({
+						caption: mkE({
+							tag: 'span',
+							els: [
+								D.Lang.get('load_previous_replies')
+							]
+						}),
+						onclick: D.closure(this, this._loadChilds, true),
+						stretch: true,
+						color: 'link'
+					})
+				]
+			});
+			D.insertBefore(this._loadBefore, this._childsNode);
+		}
+		for( var k = 0, l = data.childs.length; k < l; k++ ){
+			var r = data.childs[k];
+			if( this.comments.lastSeen && r.created > this.comments.lastSeen && D.ID != r.fid ){
+				r.unseen = true;
+			}
+			var item = new D.CommentsItem( comments, r, { level: this.level + 1} );
+			this._childs.push(item);
+			this.addChild(item);
+		}
+		if( data.count > data.childsPg * 10 ){
+			this._loadAfterCount = mkE({
+				tag: 'span',
+				className: 'childs-count',
+				text: data.count - data.childs.length - ((data.childsPg - 1) * 10)
+			});
+			this._loadAfter = mkE({
+				tag: 'div',
+				className: 'load-childs',
+				els: [
+					this._loadBefore = new T.Form.Button({
+						caption: mkE({
+							tag: 'span',
+							els: [
+								D.Lang.get('load_next_replies')
+							]
+						}),
+						onclick: D.closure(this, this._loadChilds, false),
+						stretch: true,
+						color: 'link'
+					})
+				]
+			});
+			D.insertAfter(this._loadAfter, this._childsNode);
+		}
+	}
+	if( !this.par.tempItem ){
+		this.comments._items[ this.cid ] = this;
+		if( this.comments._tmpItems[ this.cid ] ){
+			this.comments._tmpItems[ this.cid ].node.remove();
+		}
+	}else{
+		this.comments._tmpItems[ this.cid ] = this;
+	}
+	if( this.image ){
+		this.drawImage();
+	}else if( this.gif ){
+		this.drawGif();
+	}else if( this.video ){
+		this.drawVideo();
+	}
+	this._updateEdited();
+	this._updateVisibility();
+};
+
+D.CommentsItem.prototype.append = function(parent){
+	this.node.append(parent);
+	return this;
+};
+
+D.CommentsItem.prototype.prepend = function(parent){
+	this.node.prepend(parent);
+	return this;
+};
+
+D.CommentsItem.prototype.addChild = function(item){
+	item.node.append( this._childsNode );
+};
+
+D.CommentsItem.prototype.addTempChild = function(item){
+	item.node.append( this._tmpChildsNode );
+};
+
+D.CommentsItem.prototype._head = function(){
+	var userLinkNode = false, userNode;
+	if( this._user.deleted ) {
+		userNode = mkE({
+			tag:'strong',
+			className:'user',
+			text:htmlspecialchars_decode( this._user.title )
+		})
+	} else {
+		userLinkNode = mkE({
+			tag:'a',
+			href:this._user.url,
+			className:'user',
+			text:htmlspecialchars_decode( this._user.title )
+		});
+	}
+	var re = mkE( {
+		tag:'div',
+		className:'head',
+		els:[
+			userLinkNode ? userLinkNode : userNode,
+			this._iconsNode = mkE( {
+				tag:'div',
+				className:'icons'
+			} ) // div.icons
+		]
+	} );
+	if( userLinkNode ) {
+		D.Say.addUserTooltip(userLinkNode, {
+			type: this._user.type,
+			id: this._user.id
+		});
+	}
+
+	this._timeNode = mkE({
+		tag:'span',
+		className:'timestamp',
+		text:D.ddate2( this.created )
+	}).append(re);
+
+	if( !empty( this.headLinks ) ){
+		for( var k = 0, l = this.headLinks.length; k < l; k++ ){
+			var r = this.headLinks[k];
+			mkE( {
+				tag:'a',
+				href:r.href,
+				innerHTML:r.caption
+			} ).append( this._iconsNode );
+		}
+	}
+	var canReport = D.ID && this.fid !== D.ID;
+	if( this.canDelete || this.canEdit || this.canHide || this.canBlock || canReport ){
+		this._optIcon = mkE({
+			tag: 'a',
+			className: 'SIcon optionsSIcon',
+			onclick: D.closure( this, this._showOpt )
+		}).append( this._iconsNode );
+	}
+	return re;
+};
+
+D.CommentsItem.prototype._showOpt = function(){
+	if( this._optionsDropDown ){
+		this._optionsDropDown.toggle( this._optIcon.parentNode );
+		return;
+	}
+	var dd = new T.Options({
+		onShow: D.closure(this, this._onOptShow),
+		onRemove: D.closure(this, this._onOptHide)
+	});
+	var item;
+	if( this.canEdit ){
+		item = new T.Options.Item({
+			caption: D.Lang.get('edit'),
+			onclick: D.closure(this, this._triggerEdit)
+		});
+		dd.addItem(item);
+	}
+	if( this.canHide ){
+		item = new T.Options.Item({
+			caption: D.Lang.get(this.isHidden ? 'show_comment' : 'hide_comment'),
+			onclick: D.closure(this, this._toggleHide),
+			title: this.isHidden ? '' : D.Lang.get('hide_comment_text')
+		});
+		this._hideOption = item;
+		dd.addItem(item);
+	}
+	if( this.canBlock ){
+		item = new T.Options.Item({
+			caption: D.Lang.get(this.isBlocked ? 'unblock_comment_user' : 'block_comment_user'),
+			onclick: D.closure(this, this._toggleBlock),
+			title: this.isBlocked ? '' : D.Lang.get('block_comment_user_text')
+		});
+		this._blockOption = item;
+		dd.addItem(item);
+	}
+	if( this.canDelete ){
+		item = new T.Options.Item({
+			caption: D.Lang.get('delete'),
+			onclick: D.closure( this, this.del )
+		});
+		dd.addItem(item);
+	}
+	if( D.ID && this.fid !== D.ID ) {
+		item = new T.Options.Item({
+			caption: D.Lang.get('report_police'),
+			onclick: D.closure( this, this.report )
+		});
+		dd.addItem(item);
+	}
+	this._optionsDropDown = dd;
+	dd.toggle( this._optIcon.parentNode );
+};
+
+D.CommentsItem.prototype._onOptHide = function(){
+	removeClassName(this._iconsNode, 'visible');
+};
+
+D.CommentsItem.prototype._onOptShow = function(){
+	addClassName(this._iconsNode, 'visible');
+};
+
+D.CommentsItem.prototype._toggleHide = function(){
+	D.loadingOverlay(this.node);
+	this._mHideItem = new DR.comments.SetHidden();
+	this._mHideItem.hidden = !this.isHidden;
+	this._mHideItem.cid = this.cid;
+	this._mHideItem.onLoad = D.closure(this, this._onToggleHide);
+	this._mHideItem.onError = D.closure(this, this._onToggleHide);
+	this._mHideItem.call();
+};
+
+D.CommentsItem.prototype._onToggleHide = function(){
+	D.removeLoadingOverlay(this.node);
+	if( !this._mHideItem || this._mHideItem.error || !this._mHideItem.re ){
+		return;
+	}
+	this.isHidden = this._mHideItem.re.isHidden;
+	this._updateVisibility();
+};
+
+D.CommentsItem.prototype._updateVisibility = function(){
+	if( this._visibilityNode ){
+		this._visibilityNode.remove();
+		this._visibilityNode = null;
+	}
+	if( this.canHide && this._hideOption ){
+		this._hideOption.setTitle(this.isHidden ? '' : D.Lang.get('hide_comment_text'));
+		this._hideOption.caption(D.Lang.get(this.isHidden ? 'show_comment' : 'hide_comment'));
+	}
+	if( !this.isHidden || !this.canHide ){
+		removeClassName(this.node, 'item-hidden');
+		return;
+	}
+	addClassName(this.node, 'item-hidden');
+	this._visibilityNode = mkE({
+		tag: 'span',
+		className: 'visibility',
+		els: [
+			{
+				tag: 'span',
+				className: 'sep',
+				text: '·'
+			},
+			{
+				tag: 'span',
+				className: 'color1',
+				text: D.Lang.get('comment_hidden')
+			}
+		]
+	});
+	var node = this._timeNode;
+	if( this._editedNode ){
+		node = this._editedNode;
+	}
+	D.insertAfter(this._visibilityNode, node);
+};
+
+D.CommentsItem.prototype._toggleBlock = function(){
+	D.loadingOverlay(this.node);
+	this._mBlock = new DR.comments.Block();
+	if( this.isBlocked ){
+		this._mBlock = new DR.comments.Unblock();
+	}
+	this._mBlock.type = this.comments.type;
+	this._mBlock.id = this.comments.id;
+	this._mBlock.cid = this.cid;
+	this._mBlock.onLoad = D.closure(this, this._onToggleBlock);
+	this._mBlock.onError = D.closure(this, this._onToggleBlock);
+	this._mBlock.call();
+};
+
+D.CommentsItem.prototype._onToggleBlock = function(){
+	D.removeLoadingOverlay(this.node);
+	if( !this._mBlock || this._mBlock.error || !this._mBlock.re || !this._mBlock.re.ok ){
+		return;
+	}
+	this.isBlocked = !this.isBlocked;
+	this._updateBlock();
+};
+
+D.CommentsItem.prototype._updateBlock = function(){
+	if( !this.canBlock || !this._blockOption ){
+		return;
+	}
+	this._blockOption.caption(D.Lang.get(this.isBlocked ? 'unblock_comment_user' : 'block_comment_user'));
+	this._hideOption.setTitle(this.isBlocked ? '' : D.Lang.get('block_comment_user_text'));
+};
+
+D.CommentsItem.prototype._updateEdited = function(){
+	if( this._editedNode ){
+		this._editedNode.remove();
+	}
+	if( !this.lastEditTime ){
+		return;
+	}
+	this._editedNode = mkE({
+		tag: 'span',
+		className: 'edited',
+		els: [
+			{
+				tag: 'span',
+				className: 'icon editGrayIcon',
+				attr: {
+					title: D.Lang.get('Labots') + ' ' + D.ddate2(this.lastEditTime)
+				}
+			}
+		]
+	});
+	D.insertAfter(this._editedNode, this._timeNode);
+};
+
+D.CommentsItem.prototype._triggerEdit = function(){
+	if( this._editor ){
+		this._editor.remove();
+	}
+	var par = new D.CommentsItem.Editor.Par();
+	par.placeholder = this.comments.placeHolder;
+	par.onEdit = D.closure(this, this._onEdit);
+	par.onEditCancel = D.closure(this, this._onEditCancel);
+	par.item = this.data;
+	par.comments = this.comments;
+	par.editorPar = this.comments.editorPar || null;
+	this._editor = new D.CommentsItem.Editor(par);
+	D.insertAfter(this._editor.node, this._textNode);
+	this._textNode.style.display = 'none';
+};
+
+/**
+ * @param {DR.comments.struct.Item} item
+ */
+D.CommentsItem.prototype._onEdit = function(item){
+	this.data = item;
+	this.lastEditTime = item.lastEditTime || null;
+	this._updateEdited();
+	if( item.users ){
+		O2O( D.Comments._users, item.users );
+	}
+	var text = item.text;
+	if( this.comments.editorPar ){ // nāk jau no PHP
+		evalScriptHTML(text);
+	} else {
+		text = text.replace( /(\r\n|\n\r|\n){2,}/g, '<br /><br />' ).replace( /(\r\n|\n\r|\n){1,}/g, '<br />' );
+	}
+	text = D.Comments._userReplace(text);
+	text = D.smileyReplace(text);
+	this._textNode.innerHTML = text;
+	this._editor.remove();
+	delete this._editor;
+	this._textNode.style.display = '';
+};
+
+D.CommentsItem.prototype._onEditCancel = function(){
+	this._editor.remove();
+	delete this._editor;
+	this._textNode.style.display = '';
+};
+
+D.CommentsItem.prototype._optionsNode = function(){
+	var re = mkE( {
+		tag:'div',
+		className:'options'
+	} );
+	if( this.isBad ){
+		return re;
+	}
+	if( this.comments.canAdd && this.comments.canReply && ( this.comments.maxLevels == 0 || this.level < this.comments.maxLevels ) ){
+		this._optReplyNode = mkE( {
+			tag:'a',
+			text:D.Lang.get('reply'),
+			prop:{
+				onclick:D.closure( this, this._optReplyOnclick )
+			}
+		} ).append(re);
+	}
+	if( this.par.top ){
+		mkE( {
+			tag:'a',
+			prop:{
+				onclick:D.closure( this, this._showInThread )
+			},
+			els:[
+				D.Lang.get('Show all comments')
+			]
+		} ).append(re);
+	}
+	if( this.canRate ){
+		var rateNode = mkE( {
+			tag:'span',
+			className:'commentsRate',
+			els:[
+				this._likesButtonNode = mkE( {
+					tag:'span',
+					className:'comments-like-icon' + (this.iLike || !empty(this.likeProfiles) ? ' active' : ''),
+					prop:{
+						title:D.Lang.get('I like it'),
+						onclick:D.closure( this, this._showProfiles, 'like' )
+					},
+					els: [
+						T.svgIcon({
+							icon: 'thumbs-up'
+						})
+					]
+				} ),
+				this._likesNode = mkE( {
+					tag:'span',
+					text:this.likes,
+					className:'commentsLike',
+					prop:{
+						onclick:D.closure( this, this._showLikes )
+					}
+				} ),
+				this._dislikeButtonNode = mkE( {
+					tag:'span',
+					className:'comments-dislike-icon' + (this.iDislike || !empty(this.dislikeProfiles) ? ' active' : ''),
+					prop:{
+						title:D.Lang.get("I don't like it"),
+						onclick:D.closure( this, this._showProfiles, 'dislike' )
+					},
+					els: [
+						T.svgIcon({
+							icon: 'thumbs-down'
+						})
+					]
+				} ),
+				this._dislikeNode = mkE( {
+					tag:'span',
+					text:this.dislikes,
+					className:'commentsDisLike',
+					prop:{
+						onclick:D.closure( this, this._showDislikes )
+					}
+				} )
+			]
+		} ).append(re);
+		if( this.fid == D.ID && empty(this.comments.profiles) ){
+			addClassName( rateNode, 'commentsRateDisabled' );
+			this._likesButtonNode.title = '';
+			this._dislikeButtonNode.title = '';
+			if( !this.likes && !this.dislikes ){
+				rateNode.remove();
+			}
+		}
+		if( !this.likes ){
+			this._likesNode.style.display = 'none';
+		}
+		if( !this.dislikes ){
+			this._dislikeNode.style.display = 'none';
+		}
+	}
+	T.clear().append(re);
+	return re;
+};
+
+D.CommentsItem.prototype.getLevel = function(){
+	var level = 1;
+	if( this.parent && this.comments._items[this.parent] ){
+		level += this.comments._items[this.parent].getLevel();
+	}
+	return level;
+};
+
+D.CommentsItem.prototype._loadChilds = function(before){
+	before = before === true;
+	var cid;
+	if( before ){
+		cid = this._childs[0].cid;
+	}else{
+		cid = this._childs[this._childs.length - 1].cid;
+	}
+	this._mGetChilds = new DR.comments.GetChilds();
+	this._mGetChilds.type = this.comments.type;
+	this._mGetChilds.id = this.comments.id;
+	this._mGetChilds.cid = cid;
+	this._mGetChilds.before = before;
+	this._mGetChilds.select = [
+		new DR.comments.select.Item().all(),
+		new DR.comments.select.Image().say().uber(),
+		new DR.comments.select.Gif().thumb().video().tmpThumb(),
+		new DR.users.select.User().id().title().url().image().deleted(),
+		new DR.users.select.UserDefault().isFriend(),
+		new DR.users.select.Image().icon(),
+		new DR.gallery.select.Embed().all(),
+		new DR.gallery.select.EmbedImage().all()
+	];
+	this._mGetChilds.onLoad = D.closure(this, this._onLoadChilds);
+	this._mGetChilds.call();
+};
+
+D.CommentsItem.prototype._onLoadChilds = function(){
+	if( !this._mGetChilds || this._mGetChilds.error || !this._mGetChilds.re ){
+		return;
+	}
+	var re = this._mGetChilds.re;
+	if( !re.more ){
+		if( this._mGetChilds.before && this._loadBefore ){
+			removeNode(this._loadBefore);
+			delete this._loadBefore;
+		}else if( !this._mGetChilds.before && this._loadAfter ){
+			removeNode(this._loadAfter);
+			delete this._loadAfter;
+		}
+	}else{
+		if( this._mGetChilds.before && this._loadBeforeCount ){
+			setNodeText( this._loadBeforeCount, re.more );
+		}else if( !this._mGetChilds.before && this._loadAfterCount ){
+			setNodeText( this._loadAfterCount, re.more );
+		}
+	}
+	var items = re.items;
+	if( this._mGetChilds.before ){
+		items.reverse();
+	}
+	for( var i = 0, l = items.length; i < l; i++ ){
+		var item = new D.CommentsItem(this.comments, items[i], {level: this.level + 1});
+		if( this._mGetChilds.before ){
+			item.prepend(this._childsNode);
+			this._childs.unshift(item);
+		}else{
+			item.append(this._childsNode);
+			this._childs.push(item);
+		}
+	}
+};
+
+D.CommentsItem.prototype._cancelRate = function(){
+	this._mCancelRate = new DR.comments.CancelRate;
+	this._mCancelRate.type = this.comments.type;
+	this._mCancelRate.id = this.comments.id;
+	this._mCancelRate.cid = this.cid;
+	this._mCancelRate.uid = D.ID;
+	this._mCancelRate.select = [
+		new DR.comments.select.LikeRe().all()
+	];
+	this._mCancelRate.onLoad = D.closure(this, this._like, this._mCancelRate);
+	this._mCancelRate.call();
+};
+
+D.CommentsItem.prototype._showProfiles = function(action, e){
+	e = D.event(e);
+	D.stopPropagation(e);
+	if( empty(this.comments.profiles) ){
+		if( action == 'like' ){
+			this.like();
+		}else{
+			this.dislike();
+		}
+		return;
+	}
+	this._showProfilesPopup(action);
+};
+
+D.CommentsItem.prototype._showProfilesPopup = function(action){
+	var profiles = this.comments.profiles;
+	D.smallPopUp.open( '', {
+		title:D.Lang.get( action == 'like' ? 'Say like with' : 'Say dislike with', 'xGlobal' ),
+		width:200
+	} );
+	profiles = [ D.me ].concat( profiles );
+	var form = mkE( {
+		tag:'form'
+	} );
+	var boxes = {};
+	var checked;
+	for( var k = 0, l = profiles.length; k < l; k++ ){
+		var r = profiles[k];
+		if( this.fid != D.ID && this.fid == r.id ){
+			continue;
+		}
+		if( !checked ){
+			checked = r.id;
+		}
+		if( r.id == this.comments.galOwner && !this._user.isFriend ){
+			checked = r.id;
+		}
+		var cbx = new T.Form.CheckBox( {
+			caption:htmlspecialchars_decode(r.title),
+			_dr:r
+		} ).append(form);
+		boxes[r.id] = cbx;
+	}
+	boxes[checked].value(true);
+	var profilesContainer = mkE({
+		tag: 'div',
+		style: {
+			maxHeight: '200px'
+		},
+		els: [
+			form
+		]
+	});
+	mkE( {
+		tag:'div',
+		className:'commentsLikeProfiles',
+		els:[
+			profilesContainer,
+			T.submitButton( {
+				caption:D.Lang.get('Save'),
+				stretch:true,
+				onclick:D.closure(this, action == 'like' ? this._likeProfile : this._dislikeProfile, boxes)
+			} )
+		]
+	} ).append( D.smallPopUp.content );
+	D.smallPopUp.move();
+	var scrollPar = new T.ScrollBarPar;
+	scrollPar.parent = profilesContainer;
+	scrollPar.element = form;
+	scrollPar.nativeMac = true;
+	new T.ScrollBar(scrollPar);
+	return false;
+};
+
+D.CommentsItem.prototype._likeProfile = function(checkBoxes){
+	var uids = [];
+	for( var id in checkBoxes ){
+		if( checkBoxes.hasOwnProperty(id) && checkBoxes[id].value() ){
+			uids.push( id );
+		}
+	}
+	D.smallPopUp.close();
+	this._mLikeArray = new DR.comments.LikeArray();
+	this._mLikeArray.type = this.comments.type;
+	this._mLikeArray.id = this.comments.id;
+	this._mLikeArray.cid = this.cid;
+	this._mLikeArray.uids = uids;
+	this._mLikeArray.select = [
+		new DR.comments.select.LikeRe().all()
+	];
+	this._mLikeArray.onLoad = D.closure(this, this._like, this._mLikeArray);
+	this._mLikeArray.call();
+};
+
+D.CommentsItem.prototype._dislikeProfile = function(checkBoxes){
+	var uids = [];
+	for( var id in checkBoxes ){
+		if( checkBoxes.hasOwnProperty(id) && checkBoxes[id].value() ){
+			uids.push( id );
+		}
+	}
+	D.smallPopUp.close();
+	this._mDislikeArray = new DR.comments.DislikeArray();
+	this._mDislikeArray.type = this.comments.type;
+	this._mDislikeArray.id = this.comments.id;
+	this._mDislikeArray.cid = this.cid;
+	this._mDislikeArray.uids = uids;
+	this._mDislikeArray.select = [
+		new DR.comments.select.LikeRe().all()
+	];
+	this._mDislikeArray.onLoad = D.closure(this, this._like, this._mDislikeArray);
+	this._mDislikeArray.call();
+};
+
+D.CommentsItem.prototype.like = function() {
+	if( this.fid == D.ID ){
+		return;
+	}
+
+	if( this.iLike || !empty(this.likeProfiles) ){
+		this._cancelRate();
+		return;
+	}
+
+	this._mLike = new DR.comments.Like;
+	this._mLike.type = this.comments.type;
+	this._mLike.id = this.comments.id;
+	this._mLike.cid = this.cid;
+	this._mLike.uid = D.ID;
+	this._mLike.select = [
+		new DR.comments.select.LikeRe().all()
+	];
+	this._mLike.onLoad = D.closure(this, this._like, this._mLike);
+	this._mLike.call();
+};
+
+D.CommentsItem.prototype.dislike = function(){
+	if( this.fid == D.ID ){
+		return;
+	}
+
+	if( this.iDislike || !empty(this.dislikeProfiles) ){
+		this._cancelRate();
+		return;
+	}
+
+	this._mDislike = new DR.comments.Dislike;
+	this._mDislike.type = this.comments.type;
+	this._mDislike.id = this.comments.id;
+	this._mDislike.cid = this.cid;
+	this._mDislike.uid = D.ID;
+	this._mDislike.select = [
+		new DR.comments.select.LikeRe().all()
+	];
+	this._mDislike.onLoad = D.closure(this, this._like, this._mDislike);
+	this._mDislike.call();
+};
+
+/**
+ * @param {DR.comments.Like|DR.comments.Dislike|DR.comments.CancelRate|DR.comments.LikeArray|DR.comments.DislikeArray} method
+ * @private
+ */
+D.CommentsItem.prototype._like = function(method){
+	if( !method || method.error ){
+		return;
+	}
+	var re = method.re;
+	this._likesNode.innerHTML = re.likes;
+	this._likesNode.style.display = ( re.likes ? '' : 'none' );
+	this._dislikeNode.innerHTML = re.dislikes;
+	this._dislikeNode.style.display = ( re.dislikes ? '' : 'none' );
+	this.likeProfiles = re.likeProfiles || [];
+	this.dislikeProfiles = re.dislikeProfiles || [];
+	this.iLike = re.iLike;
+	this.iDislike = re.iDislike;
+	if( this.iLike || !empty(this.likeProfiles) ){
+		addClassName(this._likesButtonNode, 'active');
+	}else{
+		removeClassName(this._likesButtonNode, 'active');
+	}
+	if( this.iDislike || !empty(this.dislikeProfiles) ){
+		addClassName(this._dislikeButtonNode, 'active');
+	}else{
+		removeClassName(this._dislikeButtonNode, 'active');
+	}
+};
+
+D.CommentsItem.prototype._showLikes = function(){
+	var url = '/rq/like_modal.php?likeType=' + this.comments.likeType + '&likeId=' + this.cid;
+	(new D.Modal( { width:820 } ) ).open(url);
+};
+
+D.CommentsItem.prototype._showDislikes = function(){
+	var url = '/rq/like_modal.php?likeType=' + this.comments.dislikeType + '&likeId=' + this.cid;
+	(new D.Modal( { width:820 } )).open( url, { width:710 } );
+};
+
+D.CommentsItem.prototype._optReplyOnclick = function(){
+	if( this.comments._replyNode ){
+		this.comments._replyNode.innerHTML = D.Lang.get('reply');
+		if( this.comments._replyNode === this._optReplyNode ){
+			this.comments.customReply = false;
+			this.comments._form.append( this.comments.defaultFormPlace );
+			this.comments._form.cid = 0;
+			this.comments._replyNode = false;
+			return;
+		}
+	}
+	this.comments.customReply = true;
+	this.comments._replyNode = this._optReplyNode;
+	this._optReplyNode.innerHTML = D.Lang.get('cancel');
+	if( this.parent && this.comments.type != DR.comments.Get.TYPE_FORUMDEV ){
+		D.insertAfter( this.comments._form.node, this.node );
+	}else{
+		this.comments._form.append( this._childsNode );
+	}
+	this.comments._form.cid = this.cid;
+	this.comments._form.focus();
+};
+
+D.CommentsItem.prototype._showInThread = function(){
+	this._mPage = new DR.comments.Page;
+	this._mPage.type = this.comments.type;
+	this._mPage.id = this.comments.id;
+	this._mPage.cid = this.cid;
+	this._mPage.select = [
+		new DR.comments.select.PageRe().all()
+	];
+	this._mPage.onLoad = D.closure(this, this._showInThreadRe, this._mPage);
+	this._mPage.call();
+};
+
+/**
+ * @param {DR.comments.Page} method
+ * @private
+ */
+D.CommentsItem.prototype._showInThreadRe = function(method){
+	if( !method || method.error || !method.re.pg ){
+		return;
+	}
+	this.comments._lastCid = this.cid;
+	this.comments.pg = 0;
+	this.comments.showPage( method.re.pg );
+};
+
+D.CommentsItem.prototype.report = function(){
+	D.policeReport(this.cid, 'comments');
+};
+
+D.CommentsItem.prototype.del = function(){
+	D.confirmDelete( D.closure( this, this._delete ) );
+	return false;
+};
+
+D.CommentsItem.prototype._delete = function(){
+	D.loadingOverlay( this.node );
+	this._mDelete = new DR.comments.Delete;
+	this._mDelete.type = this.comments.type;
+	this._mDelete.id = this.comments.id;
+	this._mDelete.cid = this.cid;
+	this._mDelete.onLoad = D.closure(this, this._del);
+	this._mDelete.call();
+};
+
+/**
+ * @param {Boolean} realTime
+ * @private
+ */
+D.CommentsItem.prototype._del = function(realTime){
+	D.removeLoadingOverlay( this.node );
+	if( !this._mDelete && realTime !== true ){
+		return;
+	}
+	var onlyComment = !this.node.previousSibling && !this.node.nextSibling;
+	if( realTime === true || (this._mDelete && this._mDelete.re.ok) ){
+		this.node.remove();
+		if( !this.par.top ){
+			this.comments.showPage(onlyComment ? Math.max(1, this.comments.pg - 1) : this.comments.pg);
+		}
+	}
+};
+
+D.CommentsItem.prototype.showNew = function( animate ) {
+	animate = animate || true;
+	if( !this.comments.disableShowNewAnimation ){
+		this.node.style.backgroundColor = '#fefed3';
+		if ( animate ) {
+			$( this.node ).css( { backgroundColor:'#fefed3' } ).animate( { backgroundColor:'#FFFFFF' }, 3000, function(){
+				this.style.backgroundColor = '';
+			} );
+		} else {
+			this.node.style.backgroundColor = '#fefed3';
+		}
+	}
+};
+
+D.CommentsItem.prototype.drawImage = function(){
+	mkE({
+		tag: 'div',
+		els: [
+			{
+				tag: 'img',
+				className: 'uploadImage',
+				src: this.image.say,
+				prop: {
+					onclick: D.closure( this, this._openImage )
+				}
+			}
+		]
+	}).append( this._bodyNode );
+};
+
+D.CommentsItem.prototype._openImage = function(){
+	InfoBox.img( this.image.uber, {
+		closeParent: false,
+		modal: true
+	} );
+};
+
+D.CommentsItem.prototype.redrawGif = function(){
+	if( this.gifContainer ){
+		this.gifContainer.remove();
+	}
+	if( this.gif ){
+		this.drawGif();
+	}
+};
+
+D.CommentsItem.prototype.drawGif = function(){
+	if( !this.gif.tmpThumb ){
+		this.showGifPlayer();
+		return;
+	}
+	this.gifContainer = mkE({
+		tag: 'div',
+		className: 'videoTmpContainer',
+		els: [
+			{
+				tag: 'img',
+				className: 'uploadImage',
+				src: this.gif.tmpThumb,
+				attr: {
+					title: D.Lang.get('comments_video_processing')
+				}
+			}
+		]
+	}).append( this._bodyNode );
+};
+
+D.CommentsItem.prototype.showGifPlayer = function(){
+	this.gifContainer = mkE({
+		tag: 'div'
+	}).append( this._bodyNode );
+	this.onGifPlayer();
+};
+
+D.CommentsItem.prototype.onGifPlayer = function(){
+	var par = new D.GifPlayerPar();
+	par.src = this.gif.video;
+	par.poster = this.gif.thumb;
+	par.autoPlayOnScroll = D.AUTOPLAY;
+	par.onReady = function(){
+		$(window).trigger('scroll');
+	};
+	par.pool = 'comments';
+	this.gifPlayer = new D.GifPlayer(par);
+	this.gifPlayer.append(this.gifContainer);
+};
+
+D.CommentsItem.prototype.redrawVideo = function(){
+	if( this.videoContainer ){
+		this.videoContainer.remove();
+	}
+	if( this.video ){
+		this.drawVideo();
+	}
+};
+
+D.CommentsItem.prototype.drawVideo = function(){
+	if( !this.video.tmpThumb ){
+		this.showVideoPlayer();
+		return;
+	}
+	this.videoContainer = mkE({
+		tag: 'div',
+		className: 'videoTmpContainer',
+		els: [
+			{
+				tag: 'img',
+				className: 'uploadImage',
+				src: this.video.tmpThumb,
+				attr: {
+					title: D.Lang.get('comments_video_processing')
+				}
+			}
+		]
+	}).append( this._bodyNode );
+};
+
+D.CommentsItem.prototype.showVideoPlayer = function(){
+	this.videoContainer = mkE({
+		tag: 'div'
+	}).append( this._bodyNode );
+	this.onVideoPlayer();
+};
+
+D.CommentsItem.prototype.onVideoPlayer = function(){
+	var par = new D.VideoPlayerPar();
+	par.src = this.video.video;
+	par.poster = this.video.thumb;
+	par.autoPlayOnScroll = D.AUTOPLAY;
+	par.onReady = function(){
+		$(window).trigger('scroll');
+	};
+	this.videoPlayer = new D.VideoPlayer(par);
+	this.videoPlayer.append(this.videoContainer);
+};
+
+D.CommentsItem.prototype.drawEmbeds = function(){
+	if( empty(this.embeds) ){
+		return;
+	}
+	for( var link in this.embeds ){
+		if( !this.embeds.hasOwnProperty(link) ){
+			continue;
+		}
+		var regexp = '(^|\\s)(' + D.escapeRegExp(link) + ')($|\\s)';
+		D.replaceWithNode(this._bodyNode, new RegExp(regexp, 'g'), D.closure(this, this._embedReplace));
+	}
+};
+
+D.CommentsItem.prototype._embedReplace = function(matches){
+	var link = matches[2];
+	if( !this.embeds[link] ){
+		return matches[0];
+	}
+	/** @type {DR.gallery.struct.Embed} */
+	var embed = this.embeds[link];
+	var embedNode;
+	var node = mkE({
+		tag: 'div',
+		className: 'imageContainer',
+		els: [
+			embedNode = mkE({
+				tag: 'div',
+				els: [
+					{
+						tag: 'img',
+						src: embed.image.large
+					},
+					{
+						tag: 'div',
+						className: 'play'
+					}
+				]
+			})
+		]
+	});
+	embedNode.onclick = D.closure(this, this._showEmbed, link, embedNode);
+	return node;
+};
+
+D.CommentsItem.prototype._showEmbed = function(link, node){
+	if( !this.embeds[link] ){
+		return;
+	}
+	var w = node.offsetWidth;
+	var h = node.offsetHeight;
+	/** @type {DR.gallery.struct.Embed} */
+	var embed = this.embeds[link];
+	var url = new Get(embed.src);
+	url.add('autoplay', 1);
+	url.add('autostart', 1);
+	url = url.toUrl();
+	switch( embed.type ){
+		case 'youtube':
+		case 'vimeo':
+		case 'soundcloud':
+		case 'coub':
+		case 'slideshare':
+		case 'rutube':
+		case 'endomondo':
+			mkE({
+				tag: 'iframe',
+				src: url,
+				style: {
+					width: w + 'px',
+					height: h + 'px'
+				},
+				attr:{
+					frameborder: '0',
+					allowFullScreen: '',
+					webkitAllowFullScreen: '',
+					mozallowfullscreen: ''
+				}
+			}).replace(node);
+			break;
+		case 'vine':
+			mkE({
+				tag: 'div',
+				style: {
+					width: w + 'px',
+					height: h + 'px'
+				},
+				els: [
+					{
+						tag:'iframe',
+						attr:{
+							frameborder: '0',
+							width:'100%',
+							height:'100%',
+							src:url,
+							allowFullScreen:'',
+							webkitAllowFullScreen:'',
+							mozallowfullscreen:''
+						}
+					},
+					{
+						tag: 'script',
+						attr: {
+							src: '//platform.vine.co/static/scripts/embed.js',
+							async: true
+						}
+					}
+				]
+			}).replace(node);
+			break;
+		default:
+			return;
+	}
+};
+
+D.CommentsItem.prototype.drawYoutube = function(){
+	var domains = [
+		D.escapeRegExp('youtube.com'),
+		D.escapeRegExp('youtu.be')
+	];
+	var regexp = new RegExp('(.{0,1})(http(s?):\/\/[a-zA-Z0-9\.]*(' + domains.join('|') + ')[\/a-zA-Z0-9\?=\%\:\.\&;#_\-]*)(.{0,4})', 'ig');
+	D.replaceWithNode(this._bodyNode, regexp, D.closure(this, this._youtubeReplace));
+};
+
+D.CommentsItem.prototype._youtubeReplace = function(matches){
+	if( matches[1] == '"' || isset(matches[5][0]) && matches[5][0] == '"' || matches[5] == '</a>' ){
+		return matches[0];
+	}
+	var link = matches[2];
+	var youtubeID = this._youtubeID(link);
+	if( !youtubeID ){
+		return matches[0];
+	}
+	var src = '//img.youtube.com/vi/' + youtubeID + '/0.jpg';
+	var embedNode;
+	var node = mkE({
+		tag: 'div',
+		className: 'imageContainer',
+		els: [
+			embedNode = mkE({
+				tag: 'div',
+				els: [
+					{
+						tag: 'img',
+						src: src
+					},
+					{
+						tag: 'div',
+						className: 'play'
+					}
+				]
+			})
+		]
+	});
+	embedNode.onclick = D.closure(this, this._showYoutube, youtubeID, embedNode);
+	return node;
+};
+
+D.CommentsItem.prototype._youtubeID = function(link){
+	var regexp = new RegExp('(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})', 'i');
+	var matches = regexp.exec(link);
+	if( empty(matches) || empty(matches[1]) ){
+		return false;
+	}
+	return matches[1];
+};
+
+D.CommentsItem.prototype._showYoutube = function(id, node){
+	var w = node.offsetWidth;
+	var h = node.offsetHeight;
+	var url = '//www.youtube.com/embed/' + id + '/?autoplay=1';
+	mkE({
+		tag: 'iframe',
+		src: url,
+		style: {
+			width: w + 'px',
+			height: h + 'px'
+		},
+		attr:{
+			frameborder: '0',
+			allowFullScreen: '',
+			webkitAllowFullScreen: '',
+			mozallowfullscreen: ''
+		}
+	}).replace(node);
+};
+
+/**
+ * @class {D.CommentsItem.Editor}
+ * @extends {mkE.Base}
+ * @param {D.CommentsItem.Editor.Par} par
+ */
+D.CommentsItem.Editor = Class(
+	/**
+	 * @lends {D.CommentsItem.Editor#}
+	 */
+	{
+		/** @type {DR.comments.struct.Item|null} */
+		item: null,
+		firstFocus: true,
+
+		/**
+		 * @param {D.CommentsItem.Editor.Par} par
+		 * @constructs
+		 */
+		__construct: function(par){
+			this.par = par || new D.CommentsItem.Editor.Par();
+			this.item = par.item;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'CommentEdit'
+			});
+
+			if( this.par.editorPar ){
+				D.onLoad('Textarea', this._onTextarea);
+			}else{
+				D.onLoad('Say', this._onSay);
+			}
+		},
+
+		_onSay: function(){
+			this._drawContainer();
+
+			var ep = {
+				mentionListUp: true,
+				onFocus: this._onFocus,
+				onBlur: this._onBlur,
+				onCtrlEnter: this._add,
+				onChange: this._onChange,
+				disableSpaceSearch: true
+			};
+			this._editor = new D.SayEditor(ep);
+			this._editor.append(this._editorBorder);
+			this._defaultTextNode = mkE({
+				tag: 'div',
+				className: 'color2 SayEditorDefaulText',
+				text: this.par.placeholder ||  D.Lang.get('add_comment'),
+				onclick: this.focus
+			}).append( this._editor.node );
+			this._attachNode = mkE({
+				tag:'div',
+				className:'attach'
+			}).append(this._editorBorder);
+
+			if( this.par.comments.specialForm ){
+				this._attachNode.remove();
+				addClassName(this._editorBorder, 'radius3bottom');
+				var onScroll = D.closure(this, function(editor, e){
+					e = window.event || e;
+					e.stopPropagation();
+					var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+					if( isNaN(delta) ){
+						return;
+					}
+					editor._content.scrollTop = editor._content.scrollTop - delta * 20;
+				}, this._editor);
+				if( this._editor._content.addEventListener ){
+					this._editor._content.addEventListener("mousewheel", onScroll, false);
+					this._editor._content.addEventListener("DOMMouseScroll", onScroll, false);
+				} else {
+					this._editor._content.attachEvent("onmousewheel", onScroll);
+				}
+				this._editor._content.onscroll = onScroll;
+			}
+
+			this._editor.value(this.item.text);
+			this._editor.userReplace(this.item.users);
+			if( this.item.text ){
+				this._defaultTextNode.remove();
+			}
+		},
+
+		_onTextarea: function(){
+			this._drawContainer();
+			this.par.editorPar.onCtrlEnter = this._edit;
+			this.par.editorPar.onChange = this._onChange;
+			this._ta = new D.Textarea( this.par.editorPar );
+			removeClassName( this._ta.node, 'radius3' );
+			addClassName( this._ta.node, 'radius3top' );
+			removeClassName( this._editorBorder, 'formItemBorder' );
+			this._ta.append( this._editorBorder );
+			this._ta.value(this.item.text);
+		},
+
+		_drawContainer: function(){
+			this._sayFormEditor = mkE({
+				tag: 'div',
+				className: 'SayFormEditor radius3',
+				els: [
+					this._editorBorder = mkE({
+						tag: 'div',
+						className: 'formItemBorder radius3top editorTextContainer'
+					}),
+					this._editorBottom = mkE({
+						tag: 'div',
+						className: 'SayFormBottom formItemBorder radius3bottom'
+					})
+				]
+			}).append(this.node);
+
+			mkE({
+				tag: 'table',
+				els: [
+					{
+						tag: 'tbody',
+						els: [
+							{
+								tag: 'tr',
+								els: [
+									this._formBottomIconNode = mkE({
+										tag: 'td',
+										className: 'SayFormBottomIcon'
+									}),
+									this._buttonNode = mkE({
+										tag: 'td',
+										attr: {
+											align: 'right'
+										}
+									})
+								]
+							}
+						]
+					}
+				]
+			}).append(this._editorBottom);
+
+			this._drawIcons();
+			this._editButton = new T.Form.Button({
+				caption: D.Lang.get('edit'),
+				color: 'submit',
+				onclick: this._edit,
+				disabled: true
+			}).append(this._buttonNode);
+			new T.Form.Button({
+				caption: D.Lang.get('cancel'),
+				color: 'link',
+				onclick: this._cancelEdit
+			}).append(this._buttonNode);
+		},
+
+		_drawIcons: function(){
+			if( !this.par.editorPar ){
+				this._addSmileyIconNode = new T.SVGIcon( {
+					icon:'smaids',
+					onclick: this._addSmiley
+				} ).append(this._formBottomIconNode);
+			}
+		},
+
+		_addSmiley: function(){
+			D.insertSmiley({
+				onclick: this._addSmileyClick
+			});
+		},
+
+		_addSmileyClick: function(sm){
+			D.insertSmiley.close();
+			if( !this._editor._contentEditable ){
+				this._editor.insertHTML(sm + ' ');
+				return;
+			}
+			if( this.firstFocus ){
+				this._editor.setCursorAtEnd();
+			}
+			this._editor.insertHTML('<span id="saySmiley">' + htmlspecialchars(sm) + '</span>' + '&nbsp;');
+			var saySmileyNode = document.getElementById('saySmiley');
+			if( !saySmileyNode ){
+				return;
+			}
+			saySmileyNode.removeAttribute("id");
+			if( !saySmileyNode.previousSibling ){
+				this._onChange();
+				return;
+			}
+			var saySmileyNodePrev = saySmileyNode.previousSibling;
+			if( saySmileyNodePrev.nodeType == 3 && saySmileyNodePrev.nodeValue.length ){
+				var lastChar = saySmileyNodePrev.nodeValue.substr( saySmileyNodePrev.nodeValue.length - 1, 1 );
+				if( lastChar != ' ' && lastChar != D.SayEditor.SPACE ){
+					saySmileyNodePrev.nodeValue += ' ';
+				}
+			}
+			this._onChange();
+		},
+
+		_onFocus: function(){
+			this._defaultTextNode.remove();
+			addClassName( this._editorBorder, 'formItemFocus' );
+			this.firstFocus = false;
+		},
+
+		_onBlur: function(){
+			if( empty( this._editor.value() ) ){
+				this._defaultTextNode.append( this._editor.node );
+			}
+			removeClassName( this._editorBorder, 'formItemFocus' );
+		},
+
+		_onChange: function(){
+			if( this.empty() ){
+				this._editButton.disable(true);
+				return;
+			}
+			this._editButton.disable(false);
+		},
+
+		empty: function(){
+			if( !this.par.editorPar ){
+				return !(this._editor.len() || this._hasMedia());
+			}
+			return empty(this._ta.value());
+		},
+
+		_hasMedia: function(){
+			if( this.item.giphy ){
+				return true;
+			}
+			if( this.item.sound ){
+				return true;
+			}
+			if( this.item.image || this.item.gif || this.item.video ){
+				return true;
+			}
+			return false;
+		},
+
+		focus: function(){
+			if( this._ta ){
+				this._ta.focus();
+				return;
+			}
+			this._editor.focus();
+		},
+
+		getValue: function(){
+			if( this.par.editorPar ){
+				return this._ta.value();
+			}else{
+				return this._editor.value();
+			}
+		},
+
+		_edit: function(){
+			D.loadingOverlay(this.node);
+			this._mEditComment = new DR.comments.Edit();
+			this._mEditComment.type = this.par.comments.type;
+			this._mEditComment.id = this.par.comments.id;
+			this._mEditComment.cid = this.item.cid;
+			this._mEditComment.text = this.getValue();
+			this._mEditComment.select = [
+				new DR.comments.select.Item().all(),
+				new DR.comments.select.Image().say().uber(),
+				new DR.comments.select.Gif().thumb().video().tmpThumb(),
+				new DR.users.select.User().id().title().url().image().deleted(),
+				new DR.users.select.UserDefault().isFriend(),
+				new DR.users.select.Image().icon(),
+				new DR.gallery.select.Embed().all(),
+				new DR.gallery.select.EmbedImage().all()
+			];
+			this._mEditComment.onLoad = this._onEdit;
+			this._mEditComment.onError = this._onEdit;
+			this._mEditComment.call();
+		},
+
+		_onEdit: function(){
+			D.removeLoadingOverlay(this.node);
+			if( !this._mEditComment || this._mEditComment.error ){
+				return;
+			}
+			if( !this._mEditComment.re ){
+				return;
+			}
+			this.par.onEdit(this._mEditComment.re);
+		},
+
+		_cancelEdit: function(){
+			this.par.onEditCancel();
+		}
+	},
+	mkE.Base
+);
+
+/**
+ * @class {D.CommentsItem.Editor.Par}
+ */
+D.CommentsItem.Editor.Par = Class(
+	/**
+	 * @lends {D.CommentsItem.Editor.Par#}
+	 */
+	{
+		placeholder: '',
+		onEdit: D.doNothing,
+		onEditCancel: D.doNothing,
+		item: null,
+		editorPar: null,
+		comments: null
+	}
+);
+
+D.CommentsForm = Class( {
+
+	/** @type {D.Comments.Attach.Upl} */
+	_image:null,
+	/** @type {D.Comments.Attach} */
+	_giphy:null,
+	/** @type {D.Comments.Attach} */
+	_sound:null,
+
+	__construct:function( comments, par ){
+		this.cid = 0;
+		this.comments = comments;
+		this.onAdd = par.onAdd || function(){};
+		this.profiles = par.profiles || [];
+		this.fid = par.fid || 0;
+		this.node = mkE( {
+			tag:'div',
+			id:'addComment',
+			className:'item SayForm',
+			els:[
+				this._profileIcon = mkE({
+					tag:'div',
+					className:'profileSmallIcon',
+					style:{
+						backgroundImage:"url('" + D.me.image.icon + "')"
+					}
+				}),
+				this._sayFormEditor = mkE({
+					tag: 'div',
+					className: 'SayFormEditor radius3',
+					els: [
+						this._editorBorder = mkE({
+							tag: 'div',
+							className: 'formItemBorder radius3top editorTextContainer'
+						}), // .formItemBorder
+						this._attachNode = mkE( {
+							tag:'div',
+							className:'attach'
+						} ),
+						{
+							tag: 'div',
+							className: 'SayFormBottom formItemBorder radius3bottom',
+							els: [
+								this._bottom()
+							]
+						} // .SayFormBottom
+					]
+				})
+			]
+		} );
+		if( this.comments.editorPar ){
+			D.onLoad( 'Textarea', this._onTextareaReady );
+			this._editorBorder.style.minHeight = '229px';
+			return;
+		}
+		D.onLoad( 'Say', this.onSay );
+		if( !this.comments.editorPar ){
+			D.onLoad( 'Upload', this._uploadReady );
+		}
+		$(window).bind('beforeunload', this._onLeave);
+		if( D.Modal ){
+			D.Modal.beforeCloseEvents.push( this._canClose );
+		}
+		if( D.GalleryFS ){
+			D.GalleryFS.beforeCloseEvents.push( this._canClose );
+		}
+	},
+
+	empty:function(){
+		if( this._image && this._image.id ){
+			return false;
+		}
+		if( this._giphy ){
+			return false;
+		}
+		if( this._sound ){
+			return false;
+		}
+		if( this._ta && !empty( this._ta.value() ) ){
+			return false;
+		}
+		if( this._editor && !empty( this._editor.value() ) ){
+			return false;
+		}
+		return true;
+	},
+
+	_canClose:function(){
+		if( !document.body.contains(this.node) ){
+			return true;
+		}
+		var value;
+		if( this._ta ){
+			value = this._ta.value();
+		} else {
+			value = this._editor.value();
+		}
+		if( (empty(value) || value == '<br>') && !( this._image && this._image.id ) ){
+			return true;
+		}
+		var message = D.Lang.get('comment_form_not_empty');
+		return confirm(message);
+	},
+
+	_onLeave:function(e){
+		if( InfoBox.opened || (D.GalleryFS && D.GalleryFS.opened) ){
+			return;
+		}
+		if( !document.body.contains(this.node) ){
+			return;
+		}
+		var value;
+		if( this._ta ){
+			value = this._ta.value();
+		} else {
+			value = this._editor.value();
+		}
+		if( (empty(value) || value == '<br>') && !( this._image && this._image.id ) ){
+			return;
+		}
+		e = e || window.event;
+		var message = D.Lang.get('comment_form_not_empty');
+		if (e)
+		{
+			e.returnValue = message;
+		}
+		return message;
+	},
+
+	onSay:function(){
+		var ep = {
+			mentionListUp:true,
+			onFocus:this._onFocus,
+			onBlur:this._onBlur,
+			onCtrlEnter:this.add,
+			onChange:this._onChange,
+			//onMentionMenuShow:this._onMentionMenuShow,
+			disableSpaceSearch:true
+		};
+		this._editor = new D.SayEditor(ep);
+		this._editor.append( this._editorBorder );
+
+		var uid = D.ID;
+		if( this._profilesSelect ){
+			uid = this._profilesSelect.value();
+		}else if( this.sayProfileSelect && this.profile ){
+			uid = this.profile;
+		}
+
+		this._editor.uid = uid;
+
+		if( this.comments.specialForm ){
+			var onScroll = D.closure(this, function(editor, e){
+				e = window.event || e;
+				var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+				if( isNaN(delta) ){
+					return;
+				}
+				editor._content.scrollTop = editor._content.scrollTop - delta * 20;
+			}, this._editor);
+			if( this._editor._content.addEventListener ){
+				this._editor._content.addEventListener("mousewheel", onScroll, false);
+				this._editor._content.addEventListener("DOMMouseScroll", onScroll, false);
+			} else {
+				this._editor._content.attachEvent("onmousewheel", onScroll);
+			}
+			this._editor._content.onscroll = onScroll;
+		}
+
+		this._defaultTextNode = mkE( {
+			tag:'div',
+			className:'color2 SayEditorDefaulText',
+			text:this.comments.placeHolder ||  D.Lang.get('add_comment'),
+			prop:{
+				onclick:D.closure( this, function(editor){
+					editor.focus();
+				}, this._editor )
+			}
+		} ).append( this._editor.node ); // div.SayEditorDefaulText
+		if( this.comments.specialForm ){
+			this._attachNode.append( this._editorBorder );
+			this._addIconsNode = mkE({
+				tag: 'div',
+				className: 'inEditorIcons SayFormBottomIcon SIconHovered',
+				style: {
+					width: 'auto'
+				}
+			}).append( this._editorBorder );
+			this._addImageIconNode.append( this._addIconsNode );
+			this._addSmileyIconNode.append( this._addIconsNode );
+			if( this._addGiphyIconNode ){
+				this._addGiphyIconNode.append( this._addIconsNode );
+			}
+			if( this._addSoundIconNode ){
+				this._addSoundIconNode.append( this._addIconsNode );
+			}
+			this._formBottomIconNode.remove();
+			addClassName(this._editorBorder, 'radius3bottom');
+		}
+	},
+
+	_onTextareaReady:function(){
+		if( this._addImageIconNode ) {
+			this._addImageIconNode.onclick = D.closure(this, function () {
+				D.Textarea.tmp = this._ta;
+				var modal = new D.Modal({width: 600});
+				var get = new Get({});
+				if( this.comments.editorPar.gallery.size ) {
+					get.add('size', this.comments.editorPar.gallery.size);
+				}
+				if( this.comments.editorPar.gallery.uid ) {
+					get.add('uid', this.comments.editorPar.gallery.uid);
+				}
+				modal.iframe('/gallery/textarea.php' + get.toUrl());
+				this._ta.onFormat('image');
+			});
+			this.comments.editorPar.hideGallery = true;
+		}
+		if( this._addSmileyIconNode ) {
+			this.comments.editorPar.hideSmiley = true;
+		}
+		this.comments.editorPar.onCtrlEnter = this.add;
+		this.comments.editorPar.onFormat = this.onFormat;
+		this._ta = new D.Textarea( this.comments.editorPar );
+		removeClassName( this._ta.node, 'radius3' );
+		addClassName( this._ta.node, 'radius3top' );
+		removeClassName( this._editorBorder, 'formItemBorder' );
+		this._ta.append( this._editorBorder );
+	},
+
+	onFormat:function(action){
+		new RPC('/rq/app.php').send('groupEditorStats', {
+			topicId: this.comments.id,
+			action: action
+		});
+	},
+
+	append:function(parent){
+		this.node.append(parent);
+		return this;
+	},
+
+	focus:function(){
+		if( this._ta ){
+			this._ta.focus();
+			return;
+		}
+		this._editor.focus();
+	},
+
+	_onFocus:function(){
+		this._defaultTextNode.remove();
+		addClassName( this._editorBorder, 'formItemFocus' );
+		if( this.cid ){
+			return;
+		}
+		T.Sounds.tour( this._addSoundIconNode, {
+			text:'Tagad vari komentāram pievienot arī skaņas! (music)',
+			ad:626
+		} );
+	},
+
+	_onBlur:function(){
+		if( empty( this._editor.value() ) ){
+			this._defaultTextNode.append( this._editor.node );
+		}
+		removeClassName( this._editorBorder, 'formItemFocus' );
+	},
+
+	_onChange:function(){
+		if( this.comments.canTrack && !this.tracked ){
+			this.tracked = true;
+			var _mfq = _mfq || [];
+			(function()
+				{ var mf = document.createElement("script"); mf.type = "text/javascript"; mf.async = true; mf.src = "//cdn.mouseflow.com/projects/b2bd3064-e71b-4003-bee2-d80ca2e8f7f4.js"; document.getElementsByTagName("head")[0].appendChild(mf); }
+			)();
+			new RPC('/say/rq/app.php').send('mouseflow', {});
+		}
+		setNodeText(this._submitButton._form._captionTextNode, D.Lang.get('Add post button'));
+		this._submitButton._form.disable(false);
+		if( !this.comments.maxLength ){
+			return;
+		}
+		var l = this._editor.len();
+		var v = this.comments.maxLength - l;
+		if( v < 0 ){
+			this._spaceNode.innerHTML = '<span class="color1">' + String(-v) + ' ' + D.Lang.nget( -v, 'say text to long', 'xGlobal' ) + '</span>';
+			this._spaceNode.style.opacity = 1;
+			return;
+		}
+		this._spaceNode.innerHTML = v;
+		var showFrom = Math.round( this.comments.maxLength / 10 );
+		if( v > showFrom ){
+			this._spaceNode.style.opacity = 0;
+		} else {
+			this._spaceNode.style.opacity = ( showFrom - v ) / showFrom;
+		}
+		if( !this._image && this._editor.links[0] && this._link != this._editor.links[0] && this._editor.links[0].href != this._skipInfoLink ){
+			D.log( this._skipInfoLink, this._editor.links[0].href );
+			this._linkRq = 0;
+			this._link = this._editor.links[0];
+			this.addImage();
+		}
+	},
+
+	addImage:function(){
+		var extension = this._link.href.split(/#|\?/)[0].split('.').pop();
+		var validExtensions = {
+			gif: true,
+			jpg: true,
+			png: true
+		};
+		if(!validExtensions[extension]){
+			return;
+		}
+		this._image = new D.Comments.Attach.Upl;
+		this._image.append( this._attachNode );
+		this._image.onRemove = this._imageOnRemove;
+		this._submitButton._form.disable(true);
+		var method = new DR.comments.ImageFromUrl;
+		method.url = this._link.href;
+		method.rtKey = this.comments.rtKey;
+		method.type = this.comments.type;
+		method.select = [
+			new DR.comments.select.ImageFromUrlRe().all(),
+			new DR.comments.select.UploadedImageRe().all()
+		];
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				method
+			],
+			onLoad: D.closure(this, this.addImageRe, method),
+			context: this
+		} );
+		apiCall.call();
+	},
+
+	_imageOnRemove:function(){
+		this._image = null;
+	},
+
+	/**
+	 * @param {DR.comments.ImageFromUrl} method
+	 */
+	addImageRe:function(method){
+		if( !method || method.error ){
+			this._image.remove();
+			return;
+		}
+		this._skipInfoLink = this._link.href;
+		this._link.remove();
+		delete this._editor.links[0];
+		this._onUpload({data: D.JSON.stringify(method.re.data)});
+	},
+
+	_bottom:function(){
+		var profilesNode;
+		var re = {
+			tag:'table',
+			els:[
+				{
+					tag:'tbody',
+					els:[
+						{
+							tag:'tr',
+							els:[
+								this._formBottomIconNode = mkE({
+									tag:'td',
+									className:'SayFormBottomIcon SIconHovered',
+									els:[
+											this._addImageIconNode = new T.SVGIcon( {
+											icon:'foto'
+										} ),
+										this._addSmileyIconNode = new T.SVGIcon( {
+											icon:'smaids',
+											onclick:this._addSmiley
+										} )
+									]
+								}), // td
+								profilesNode = mkE( {
+									tag:'td'
+								} ),
+								this._spaceNode = mkE( {
+									tag:'td',
+									attr:{
+										align:'right'
+									}
+								} ),
+								{
+									tag:'td',
+									attr:{
+										align:'right'
+									},
+									els:[
+										this._submitButton = T.submitButton( {
+											caption:D.Lang.get('Add post button'),
+											onclick:this.add,
+											tabIndex:2
+										} )
+									]
+								} // td
+							]
+						} // tr
+					]
+				} // tbody
+			]
+		};
+		if( T.Giphy && T.Giphy.available() ){
+			this._addGiphyIconNode = new T.SVGIcon( {
+				icon:'gif',
+				onclick:this._addGiphy
+			} ).append( this._formBottomIconNode );
+		}
+		if( T.Sounds && T.Sounds.available() ){
+			this._addSoundIconNode = new T.SVGIcon( {
+				icon:'speaker',
+				onclick:this._addSound
+			} ).append( this._formBottomIconNode );
+		}
+		var $this = this;
+		if( empty( this.profiles ) ){
+			D.addCommentUid = false;
+			return re;
+		}
+		profilesNode.style.width = '200px';
+		this.profiles = [D.me].concat(this.profiles);
+		var k, l;
+		var profile = D.addCommentUid || this.fid;
+		var hasProfile = false;
+		for( k = 0, l = this.profiles.length; k < l; k++ ){
+			if( this.profiles[k].id == profile ){
+				hasProfile = true;
+				break;
+			}
+		}
+		if( !hasProfile ){
+			profile = D.ID;
+		}
+		if( this.comments.specialForm ){
+			var p = {
+				items:[],
+				changeCaption:true,
+				selectable:true,
+				onclick: function(){
+					$this._editor.uid = this._item.data.id;
+					this._item.comments.profile = this._item.data.id;
+					this._item.comments._profileIcon.style.backgroundImage = 'url("' + this._item.data.image.icon + '")';
+				},
+				relativeToWindow: true,
+				scroll: true
+			};
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				var r = this.profiles[k];
+				p.items.push( {
+					caption:r.title,
+					data:r,
+					comments: this,
+					selected: r.id == profile
+				} );
+				if( r.id == profile ){
+					this.profile = r.id;
+					this._profileIcon.style.backgroundImage = 'url("' + r.image.icon + '")';
+				}
+			}
+			T.ddMenu(p).append( profilesNode );
+			this.sayProfileSelect = true;
+		} else {
+			var sp = {
+				values:[],
+				value:profile,
+				onchange:this.onProfileChange,
+				_js: true
+			};
+			this._uidToIndex = {};
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				var user = this.profiles[k];
+				sp.values.push( {
+					caption:htmlspecialchars_decode( user.title ),
+					value:user.id
+				} );
+				this._uidToIndex[user.id] = k;
+			}
+			this._profilesSelect = new T.Form.Select(sp);
+			this._profilesSelectNode = this._profilesSelect._inputNode;
+			this._profilesSelectNode.append(profilesNode);
+			if( profile && this._uidToIndex[profile] && this.profiles[this._uidToIndex[profile]] ){
+				this._profileIcon.style.backgroundImage = 'url("' + this.profiles[this._uidToIndex[profile]].image.icon + '")';
+			}
+			if ( this.comments.hideProfiles ) {
+				this._profilesSelect.hide();
+			}
+		}
+		return re;
+	},
+
+	onProfileChange:function(){
+		this._editor.uid = this._profilesSelect.value();
+		this._profileIcon.style.backgroundImage = 'url("' + this.profiles[this._uidToIndex[this._profilesSelect.value()]].image.icon + '")';
+	},
+
+	_addSmiley:function(e){
+		D.stopPropagation(e);
+		var width = this.comments.specialForm ? 380 : null;
+		var cols = this.comments.specialForm ? 10 : null;
+		var height = this.comments.specialForm ? 205 : null;
+		D.insertSmiley( {
+			onclick:this._addSmileyClick,
+			cols: cols,
+			width: width,
+			height: height
+		} );
+	},
+
+	_addSmileyClick:function( sm ){
+		D.insertSmiley.close();
+		if( this._editor && !this._editor._contentEditable ){
+			this._editor.insertHTML( sm + ' ' );
+			return;
+		}
+		if( this._ta ) {
+			this._ta.insertHTML(D.smileyReplace(sm) + '&nbsp;'	);
+		} else {
+			this._editor.insertHTML('<span id="saySmiley">' + htmlspecialchars(sm) + '</span>' + '&nbsp;');
+		}
+		var saySmileyNode = document.getElementById('saySmiley');
+		if(!saySmileyNode){
+			return;
+		}
+		saySmileyNode.removeAttribute("id");
+		if( !saySmileyNode.previousSibling ){
+			this._onChange();
+			return;
+		}
+		var saySmileyNodePrev = saySmileyNode.previousSibling;
+		if( saySmileyNodePrev.nodeType == 3 && saySmileyNodePrev.nodeValue.length ){
+			var lastChar = saySmileyNodePrev.nodeValue.substr( saySmileyNodePrev.nodeValue.length - 1, 1 );
+			if( lastChar != ' ' && lastChar != D.SayEditor.SPACE ){
+				saySmileyNodePrev.nodeValue += ' ';
+			}
+		}
+		this._onChange();
+	},
+
+	_addGiphy:function(){
+		var p;
+		if( !this.comments.specialForm && !InfoBox.opened ){
+			p = {
+				parent:this._addGiphyIconNode,
+				arrow:{
+					top:false,
+					left:false
+				}
+			};
+		}
+		T.Giphy.insert( this._onGifChoose, p );
+	},
+
+	/**
+	 * @param {T.Giphy.Item} item
+	 */
+	_onGifChoose:function(item){
+		if( this._giphy ){
+			this._giphy.remove();
+		}
+		this._giphy = new D.Comments.Attach;
+		this._giphy.id = item.id;
+		this._giphy.append( this._attachNode );
+		this._giphy.setImage( item.data.gif );
+		this._giphy.onRemove = this._onGiphyRemove;
+	},
+
+	_onGiphyRemove:function(){
+		this._giphy = null;
+	},
+
+	_addSound:function(){
+		var p = {
+			addTitle:'Pievienot'
+		};
+		if( !this.comments.specialForm && !InfoBox.opened ){
+			p = {
+				addTitle:'Pievienot',
+				parent:this._addSoundIconNode,
+				arrow:{
+					top:false,
+					left:false
+				}
+			};
+		}
+		T.Sounds.insert( this._onSoundChoose, p );
+	},
+
+	/**
+	 * @param {T.Sounds.Item} item
+	 */
+	_onSoundChoose:function(item){
+		if( this._sound ){
+			this._sound.remove();
+		}
+		this._sound = new D.Comments.Attach;
+		this._sound.id = item.id;
+		this._sound.append( this._attachNode );
+		this._sound.setImage( item.data.icon );
+		this._sound.onRemove = this._onSoundRemove;
+	},
+
+	_onSoundRemove:function(){
+		this._sound = null;
+	},
+
+	add:function(){
+		var method = new DR.comments.Add;
+		method.type = this.comments.type;
+		method.id = this.comments.id;
+		method.cid = this.cid;
+		if( this._image ){
+			method.tmpId = this._image.id;
+			method.gif = this._image.gif;
+			method.video = this._image.video;
+			method.videoWidth = this._image.videoWidth;
+			method.videoHeight = this._image.videoHeight;
+		}
+		if( this._giphy ){
+			method.giphy = this._giphy.id;
+		}
+		if( this._sound ){
+			method.sound = this._sound.id;
+		}
+		if( this._ta ){
+			method.text = this._ta.value();
+		} else {
+			if( this.comments.maxLength && this._editor.len() > this.comments.maxLength ){
+				D.blink( {
+					node:this._spaceNode.firstChild,
+					type:'color',
+					color2:'#000'
+				} );
+				return;
+			}
+			method.text = this._editor.value();
+			if( !this._editor._contentEditable ){
+				method.text = nl2br( method.text );
+			}
+			if( this.empty() ){
+				D.blink( this._editorBorder );
+				return;
+			}
+		}
+		if( this._profilesSelectNode && this._profilesSelectNode.value ){
+			method.fid = Number( this._profilesSelectNode.value );
+		}
+		if( this.sayProfileSelect && this.profile ){
+			method.fid = Number( this.profile );
+		}
+		method.select = [
+			new DR.comments.select.AddRe().all(),
+			new DR.comments.select.Item().all(),
+			new DR.comments.select.Image().say().uber(),
+			new DR.comments.select.Gif().thumb().video().tmpThumb(),
+			new DR.users.select.User().id().title().url().image(),
+			new DR.users.select.Image().icon(),
+			new DR.gallery.select.Embed().all(),
+			new DR.gallery.select.EmbedImage().all()
+		];
+		D.loadingOverlay( this.node );
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				method
+			],
+			onLoad: function(){
+				this._add(method);
+			},
+			context: this
+		} );
+		apiCall.call();
+	},
+
+	/**
+	 * @param {DR.comments.Add} method
+	 * @private
+	 */
+	_add:function(method){
+		D.removeLoadingOverlay( this.node );
+		setNodeText(this._submitButton._form._captionTextNode, D.Lang.get('Add post button'));
+		this._submitButton._form.disable(false);
+		D.insertSmiley.close();
+		if( method && !method.error && method.re.item ){
+			if( this._editor ){
+				this._editor.blur();
+			}
+			this.onAdd(method.re);
+		}
+	},
+
+	clear:function(){
+		this.cid = 0;
+		if( this._ta ){
+			this._ta.value('');
+		} else {
+			this._editor.value('');
+			delete this._editor._savedRange;
+			this._editor.blur();
+		}
+		this._submitButton._form.disable(false);
+		if( this._image ){
+			this._image.remove();
+		}
+		if( this._giphy ){
+			this._giphy.remove();
+		}
+		if( this._sound ){
+			this._sound.remove();
+		}
+	},
+
+	_uploadReady:function(){
+		var p = new D.UploaderPar;
+		p.onGetUploadData = this._onGetUploadData;
+		p.onSelect = this._onUploadSelect;
+		p.onUploadCompleteData = this._onUpload;
+		p.onUploadProgress = this._onUploadProgress;
+		p.dropNode = this.node;
+		p.DS = this.comments.DS;
+		this._uploader = new Uploader(p);
+		this._uploader.append( this._addImageIconNode );
+	},
+
+	_onGetUploadData:function(file){
+		var videoExt = D.VIDEO_EXT;
+		var ext = last( file.name.split('.') );
+		ext = ext.toLowerCase();
+		if( ext == 'gif' ){
+			return {
+				url:D.VUPL + 'video/upload.php',
+				data:{
+					id:'tmp',
+					type: this.comments.type == 40 ? 22 : 15, // Video_Gif_GalComments|Video_Gif_Comments
+					rtKey: this.comments.rtKey
+				}
+			};
+		}else if( array_search( ext, videoExt ) !== false ){
+			return {
+				url:D.VUPL + 'video/upload.php',
+				data:{
+					id:'tmp',
+					type:this.comments.type == 40 ? 20 : 19, // Video_Comments_Gallery|Video_Comments
+					rtKey: this.comments.rtKey
+				}
+			}
+		}
+		return {
+			url:D.UPL + 'pic/upload.php',
+			data:{
+				id:'tmp',
+				type:138 // Pic_Comments
+			}
+		};
+	},
+
+	_onUploadSelect:function(){
+		if( this._image ){
+			this._image.remove();
+		}
+		this._image = new D.Comments.Attach.Upl;
+		this._image.append( this._attachNode );
+		this._image.onRemove = this._imageOnRemove;
+	},
+
+	_onUpload:function(file){
+		this._submitButton._form.disable(false);
+		var data = D.JSON.decode( file.data );
+		D.log(data);
+		if( data.error || (!data.id && !data.tmpId) ){
+			this._image.remove();
+			return;
+		}
+		if(data.gif){
+			data.urlIcon = data.tempImage.icon;
+			data.id = data.tmpId;
+			this._image.gif = true;
+			this._image.videoWidth = data.info.w;
+			this._image.videoHeight = data.info.h;
+		}else if(data.tempImage){
+			data.urlIcon = data.tempImage.icon;
+			data.id = data.tmpId;
+			this._image.video = true;
+			this._image.videoWidth = data.info.w;
+			this._image.videoHeight = data.info.h;
+		}
+		this._image.id = data.id;
+		this._image.setImage( data.urlIcon );
+		this._image.setProgress(0);
+	},
+
+	_onUploadProgress:function(par){
+		this._image.setProgress( par.percent );
+	}
+} );
+
+/**
+ * @class {D.Comments.Form}
+ * @extends {mkE.Base}
+ * @param {D.Comments.Form.Par} par
+ */
+D.Comments.Form = Class(
+	/**
+	 * @lends {D.Comments.Form#}
+	 */
+	{
+		cid: 0,
+
+		/** @type {D.Comments.Attach.Upl} */
+		_image:null,
+		/** @type {D.Comments.Attach} */
+		_giphy:null,
+		/** @type {D.Comments.Attach} */
+		_sound:null,
+
+		/**
+		 * @param {D.Comments.Form.Par} par
+		 * @constructs
+		 */
+		__construct: function(par){
+			par = par || new D.Comments.Form.Par;
+			this.par = par;
+			this.id = par.id;
+			this.type = par.type;
+			this.fid = par.fid || 0;
+			this.profiles = par.profiles || [];
+			this.onAdd = par.onAdd || D.doNothing;
+			this.maxLength = par.maxLength || 0;
+			this.rtKey = par.rtKey || '';
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'CommentsForm'
+			});
+
+			this._draw();
+		},
+
+		empty:function(){
+			if( this._image && this._image.id ){
+				return false;
+			}
+			if( this._giphy ){
+				return false;
+			}
+			if( this._sound ){
+				return false;
+			}
+			if( this._ta && !empty( this._ta.value() ) ){
+				return false;
+			}
+			if( this._editor && !empty( this._editor.value() ) ){
+				return false;
+			}
+			return true;
+		},
+
+		_draw: function(){
+			this._drawProfileImage();
+			this._drawBody();
+			if( this.editorPar ){
+				this._drawTextarea();
+			}else{
+				this._drawSayEditor();
+				this._drawUpload();
+			}
+		},
+
+		_drawProfileImage: function(){
+			this._profileImageNode = mkE({
+				tag: 'div',
+				className: 'profile-image radius3'
+			}).append(this.node);
+			this._setProfileImage(D.me.image.small);
+		},
+
+		_setProfileImage: function(image){
+			D.bgImage(this._profileImageNode, image);
+		},
+
+		_drawBody: function(){
+			this._sayFormEditor = mkE({
+				tag: 'div',
+				className: 'SayFormEditor radius3',
+				els: [
+					this._editorBorder = mkE({
+						tag: 'div',
+						className: 'formItemBorder radius3top editorTextContainer'
+					}),
+					this._editorBottom = mkE({
+						tag: 'div',
+						className: 'SayFormBottom formItemBorder radius3bottom'
+					})
+				]
+			}).append(this.node);
+			this._drawBottom();
+		},
+
+		_drawBottom: function(){
+			mkE({
+				tag: 'table',
+				els: [
+					{
+						tag: 'tbody',
+						els: [
+							{
+								tag: 'tr',
+								els: [
+									this._formBottomIconNode = mkE({
+										tag: 'td',
+										className: 'SayFormBottomIcon'
+									}),
+									this._profilesNode = mkE({
+										tag: 'td'
+									}),
+									this._spaceNode = mkE( {
+										tag: 'td',
+										attr: {
+											align: 'right'
+										}
+									}),
+									this._buttonNode = mkE({
+										tag: 'td',
+										attr: {
+											align: 'right'
+										}
+									})
+								]
+							}
+						]
+					}
+				]
+			}).append(this._editorBottom);
+
+			this._drawIcons();
+			this._submitButton = new T.Form.Button({
+				caption: D.Lang.get('Add post button'),
+				onclick: this._add,
+				color: 'submit',
+				tabIndex: 2
+			}).append(this._buttonNode);
+			this._drawProfiles();
+			D.addCommentUid = false;
+		},
+
+		_drawIcons: function(){
+			if( this.editorPar ){
+				return;
+			}
+			this._addImageIconNode = new T.SVGIcon( {
+				icon:'foto'
+			} ).append(this._formBottomIconNode);
+			this._addSmileyIconNode = new T.SVGIcon( {
+				icon:'smaids',
+				onclick: this._addSmiley
+			} ).append(this._formBottomIconNode);
+			if( T.Giphy && T.Giphy.available() ){
+				this._addGiphyIconNode = new T.SVGIcon( {
+					icon:'gif',
+					onclick:this._addGiphy
+				} ).append(this._formBottomIconNode);
+			}
+			if( T.Sounds && T.Sounds.available() ){
+				this._addSoundIconNode = new T.SVGIcon( {
+					icon:'speaker',
+					onclick:this._addSound
+				} ).append(this._formBottomIconNode);
+			}
+		},
+
+		_addSmiley: function(){
+			D.insertSmiley({
+				onclick: this._addSmileyClick
+			});
+		},
+
+		_addSmileyClick: function(sm){
+			D.insertSmiley.close();
+			if( !this._editor._contentEditable ){
+				this._editor.insertHTML(sm + ' ');
+				return;
+			}
+			this._editor.insertHTML('<span id="saySmiley">' + htmlspecialchars(sm) + '</span>' + '&nbsp;');
+			var saySmileyNode = document.getElementById('saySmiley');
+			if( !saySmileyNode ){
+				return;
+			}
+			saySmileyNode.removeAttribute("id");
+			if( !saySmileyNode.previousSibling ){
+				this._onChange();
+				return;
+			}
+			var saySmileyNodePrev = saySmileyNode.previousSibling;
+			if( saySmileyNodePrev.nodeType == 3 && saySmileyNodePrev.nodeValue.length ){
+				var lastChar = saySmileyNodePrev.nodeValue.substr( saySmileyNodePrev.nodeValue.length - 1, 1 );
+				if( lastChar != ' ' && lastChar != D.SayEditor.SPACE ){
+					saySmileyNodePrev.nodeValue += ' ';
+				}
+			}
+			this._onChange();
+		},
+
+		_addGiphy:function(){
+			T.Giphy.insert( this._onGifChoose, {
+				parent:this._addGiphyIconNode,
+				arrow:{
+					top:false,
+					left:false
+				}
+			} );
+		},
+
+		/**
+		 * @param {T.Giphy.Item} item
+		 */
+		_onGifChoose:function(item){
+			if( this._giphy ){
+				this._giphy.remove();
+			}
+			this._giphy = new D.Comments.Attach;
+			this._giphy.id = item.id;
+			this._giphy.append( this._attachNode );
+			this._giphy.setImage( item.data.gif );
+			this._giphy.onRemove = this._onGiphyRemove;
+			this.focus();
+		},
+
+		_onGiphyRemove:function(){
+			this._giphy = null;
+		},
+
+		_addSound:function(){
+			T.Sounds.insert( this._onSoundChoose, {
+				addTitle:'Pievienot',
+				parent:this._addSoundIconNode,
+				arrow:{
+					top:false,
+					left:false
+				}
+			} );
+		},
+
+		/**
+		 * @param {T.Sounds.Item} item
+		 */
+		_onSoundChoose:function(item){
+			if( this._sound ){
+				this._sound.remove();
+			}
+			this._sound = new D.Comments.Attach;
+			this._sound.id = item.id;
+			this._sound.append( this._attachNode );
+			this._sound.setImage( item.data.icon );
+			this._sound.onRemove = this._onSoundRemove;
+			this.focus();
+		},
+
+		_onSoundRemove:function(){
+			this._sound = null;
+		},
+
+		_drawProfiles: function(){
+			if( empty(this.profiles) ){
+				return;
+			}
+			this._profilesNode.style.width = '200px';
+			this.profiles = [D.me].concat(this.profiles);
+			var k, l;
+			var profile = D.addCommentUid || this.fid;
+			var hasProfile = false;
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				if( this.profiles[k].id == profile ){
+					hasProfile = true;
+					break;
+				}
+			}
+			if( !hasProfile ){
+				profile = D.ID;
+			}
+			var sp = {
+				values: [],
+				value: profile,
+				onchange: this._onProfileChange,
+				_js: true,
+				size: 'small'
+			};
+			this._uidToIndex = {};
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				var user = this.profiles[k];
+				sp.values.push({
+					caption: htmlspecialchars_decode(user.title),
+					value: user.id
+				});
+				this._uidToIndex[user.id] = k;
+			}
+			this._profilesSelect = new T.Form.Select(sp);
+			if( !this.par.hideProfiles ){
+				this._profilesSelect.append(this._profilesNode);
+			}
+			if( profile && this._uidToIndex[profile] && this.profiles[this._uidToIndex[profile]] ){
+				this._setProfileImage(this.profiles[this._uidToIndex[profile]].image.small);
+			}
+		},
+
+		_drawTextarea: function(){
+			D.onLoad('Textarea', this._onTextarea);
+		},
+
+		_onTextarea: function(){
+
+		},
+
+		_drawSayEditor: function(){
+			D.onLoad('Say', this._onSayEditor);
+		},
+
+		_onSayEditor: function(){
+			var ep = {
+				mentionListUp: true,
+				onFocus: this._onFocus,
+				onBlur: this._onBlur,
+				onCtrlEnter: this._add,
+				onChange: this._onChange,
+				disableSpaceSearch: true
+			};
+			this._editor = new D.SayEditor(ep);
+			this._editor.append(this._editorBorder);
+			this._defaultTextNode = mkE({
+				tag: 'div',
+				className: 'color2 SayEditorDefaulText',
+				text: this.par.placeholder ||  D.Lang.get('add_comment'),
+				onclick:this.focus
+			}).append( this._editor.node );
+			this._attachNode = mkE( {
+				tag:'div',
+				className:'attach'
+			} ).append( this._editorBorder );
+		},
+
+		_onFocus: function(){
+			this._defaultTextNode.remove();
+			addClassName( this._editorBorder, 'formItemFocus' );
+		},
+
+		_onBlur: function(){
+			if( empty( this._editor.value() ) ){
+				this._defaultTextNode.append( this._editor.node );
+			}
+			removeClassName( this._editorBorder, 'formItemFocus' );
+		},
+
+		_onChange: function(){
+			this._submitButton.caption(D.Lang.get('Add post button'));
+			this._submitButton.disable(false);
+
+			if( !this.maxLength ){
+				return;
+			}
+
+			var l = this._editor.len();
+			var v = this.maxLength - l;
+			if( v < 0 ){
+				clearNode(this._spaceNode);
+				mkE({
+					tag: 'span',
+					className: 'color1',
+					text: String(-v) + ' ' + D.Lang.nget( -v, 'say text to long', 'xGlobal' )
+				}).append(this._spaceNode);
+				this._spaceNode.style.opacity = 1;
+				return;
+			}
+			setNodeText(this._spaceNode, v);
+			var showFrom = Math.round( this.maxLength / 10 );
+			if( v > showFrom ){
+				this._spaceNode.style.opacity = 0;
+			} else {
+				this._spaceNode.style.opacity = ( showFrom - v ) / showFrom;
+			}
+			if( !this._image && this._editor.links[0] && this._link != this._editor.links[0] && this._editor.links[0].href != this._skipInfoLink ){
+				this._linkRq = 0;
+				this._link = this._editor.links[0];
+				this._addImage();
+			}
+		},
+
+		_onImageRemove:function(){
+			this._submitButton.disable(false);
+		},
+
+		_addImage: function(){
+			var extension = this._link.href.split(/#|\?/)[0].split('.').pop();
+			var validExtensions = [
+				'gif',
+				'jpg',
+				'png'
+			];
+			if( !in_array(extension, validExtensions) ){
+				return;
+			}
+			if( this._image ){
+				this._image.remove();
+			}
+			this._image = new D.Comments.Attach.Upl;
+			this._image.onRemove = this._onImageRemove;
+			this._image.append( this._attachNode );
+			this._submitButton.disable(true);
+			this._mImageFromUrl = new DR.comments.ImageFromUrl();
+			this._mImageFromUrl.url = this._link.href;
+			this._mImageFromUrl.rtKey = this.rtKey;
+			this._mImageFromUrl.select = [
+				new DR.comments.select.ImageFromUrlRe().all(),
+				new DR.comments.select.UploadedImageRe().all()
+			];
+			this._mImageFromUrl.onLoad = this._onAddImage;
+			this._mImageFromUrl.call();
+		},
+
+		_onAddImage: function(){
+			if( !this._mImageFromUrl || this._mImageFromUrl.error || !this._mImageFromUrl.re ){
+				this._image.remove();
+				return;
+			}
+			this._skipInfoLink = this._link.href;
+			this._link.remove();
+			delete this._editor.links[0];
+			this._onUpload({
+				data: D.JSON.stringify(this._mImageFromUrl.re.data)
+			});
+		},
+
+		_drawUpload: function(){
+			D.onLoad('Upload', this._onUploader);
+		},
+
+		_onUploader: function(){
+			var p = new D.UploaderPar;
+			p.onGetUploadData = this._onGetUploadData;
+			p.onSelect = this._onUploadSelect;
+			p.onUploadCompleteData = this._onUpload;
+			p.onUploadProgress = this._onUploadProgress;
+			p.dropNode = this.node;
+			this._uploader = new Uploader(p);
+			this._uploader.append(this._addImageIconNode);
+		},
+
+		_onGetUploadData: function(file){
+			var videoExt = D.VIDEO_EXT;
+			var ext = last( file.name.split('.') );
+			ext = ext.toLowerCase();
+			if( ext == 'gif' ){
+				return {
+					url: D.VUPL + 'video/upload.php',
+					data: {
+						id:'tmp',
+						type: this.type == 40 ? 22 : 15, // Video_Gif_GalComments|Video_Gif_Comments
+						rtKey: this.rtKey
+					}
+				};
+			}else if( array_search( ext, videoExt ) !== false ){
+				return {
+					url:D.VUPL + 'video/upload.php',
+					data:{
+						id:'tmp',
+						type:this.type == 40 ? 20 : 19, // Video_Comments_Gallery|Video_Comments
+						rtKey: this.rtKey
+					}
+				}
+			}
+			return {
+				url:D.UPL + 'pic/upload.php',
+				data:{
+					id: 'tmp',
+					type: 138 // Pic_Comments
+				}
+			};
+		},
+
+		_onUploadSelect: function(){
+			this._image = new D.Comments.Attach.Upl;
+			this._image.onRemove = this._onImageRemove;
+			this._image.append( this._attachNode );
+			this._submitButton.disable(true);
+		},
+
+		_onUpload: function(file){
+			this._submitButton.disable(false);
+			var data = D.JSON.decode( file.data );
+			D.log(data);
+			if( data.error || (!data.id && !data.tmpId) ){
+				this._delImage();
+				return;
+			}
+			if(data.gif){
+				data.urlIcon = data.tempImage.icon;
+				data.id = data.tmpId;
+				this._image.gif = true;
+				this._image.videoHeight = data.info.h;
+				this._image.videoWidth = data.info.w;
+			}else if(data.tempImage){
+				data.urlIcon = data.tempImage.icon;
+				data.id = data.tmpId;
+				this._image.video = true;
+				this._image.videoHeight = data.info.h;
+				this._image.videoWidth = data.info.w;
+			}
+			this._image.setImage( data.urlIcon );
+			this._image.id = data.id;
+			this._image.setProgress(0);
+		},
+
+		_onUploadProgress: function(par){
+			this._image.setProgress( par.percent );
+		},
+
+		_add: function(){
+			this._mAdd = new DR.comments.Add;
+			this._mAdd.type = this.type;
+			this._mAdd.id = this.id;
+			this._mAdd.cid = this.cid;
+			if( this._image ){
+				this._mAdd.tmpId = this._image.id;
+				this._mAdd.gif = this._image.gif;
+				this._mAdd.video = this._image.video;
+				this._mAdd.videoWidth = this._image.videoWidth;
+				this._mAdd.videoHeight = this._image.videoHeight;
+			}
+			if( this._giphy ){
+				this._mAdd.giphy = this._giphy.id;
+			}
+			if( this._sound ){
+				this._mAdd.sound = this._sound.id;
+			}
+			if( this._ta ){
+				this._mAdd.text = this._ta.value();
+			} else {
+				if( this.maxLength && this._editor.len() > this.maxLength ){
+					D.blink( {
+						node:this._spaceNode.firstChild,
+						type:'color',
+						color2:'#000'
+					} );
+					return;
+				}
+				this._mAdd.text = this._editor.value();
+				if( !this._editor._contentEditable ){
+					this._mAdd.text = nl2br( this._mAdd.text );
+				}
+				if( this.empty() ){
+					D.blink( this._editorBorder );
+					return;
+				}
+			}
+			if( this._profilesSelectNode && this._profilesSelectNode.value ){
+				this._mAdd.fid = Number( this._profilesSelectNode.value );
+			}
+			if( this.sayProfileSelect && this.profile ){
+				this._mAdd.fid = Number( this.profile );
+			}
+			if( this.par.addStats ){
+				this._mAdd.stats = this.par.addStats;
+			}
+			this._mAdd.select = [
+				new DR.comments.select.AddRe().all(),
+				new DR.comments.select.Item().all(),
+				new DR.comments.select.Image().say().uber(),
+				new DR.comments.select.Gif().thumb().video().tmpThumb(),
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon().small()
+			];
+			D.loadingOverlay( this.node );
+			this._mAdd.onLoad = this._onAdd;
+			this._mAdd.onError = this._onError;
+			this._mAdd.call();
+		},
+
+		_onAdd: function(){
+			D.removeLoadingOverlay(this.node);
+			this._submitButton.caption(D.Lang.get('Add post button'));
+			this._submitButton.disable(false);
+			D.insertSmiley.close();
+			if( !this._mAdd || this._mAdd.error || !this._mAdd.re.item ){
+				return;
+			}
+			if( this._editor ){
+				this._editor.blur();
+			}
+			this.onAdd(this._mAdd.re);
+			this.clear();
+		},
+
+		_onError: function(){
+			D.removeLoadingOverlay(this.node);
+			this._submitButton.caption(D.Lang.get('Add post button'));
+			this._submitButton.disable(false);
+		},
+
+		clear: function(){
+			this.cid = 0;
+			if( this._ta ){
+				this._ta.value('');
+			} else {
+				this._editor.value('');
+				delete this._editor._savedRange;
+				this._editor.blur();
+			}
+			if( this._image ){
+				this._image.remove();
+			}
+			if( this._giphy ){
+				this._giphy.remove();
+			}
+			if( this._sound ){
+				this._sound.remove();
+			}
+		},
+
+		setUid: function(uid){
+			this._profilesSelect.value(uid);
+			this._setProfileImage(this.profiles[this._uidToIndex[uid]].image.small);
+		},
+
+		focus: function(){
+			if( this._ta ){
+				this._ta.focus();
+				return;
+			}
+			this._editor.focus();
+		}
+	},
+	mkE.Base
+);
+
+/**
+ * @extends {mkE.Base}
+ */
+D.Comments.Attach = Class( {
+
+	id:null,
+	onRemove:null,
+
+	__construct:function(){
+		this.node = mkE( {
+			tag:'div',
+			className:'ComAttach radius3',
+			els:[
+				{
+					tag:'a',
+					className:'icon deleteIcon',
+					onclick:this.remove
+				},
+				this._progressNode = mkE( {
+					tag:'div',
+					style:{
+						display:'none'
+					},
+					els:[
+						this._progressCNode = mkE( {
+							tag:'div'
+						} )
+					]
+				} )
+			]
+		} );
+	},
+
+	remove:function(){
+		this.node.remove();
+		if( this.onRemove ){
+			this.onRemove();
+		}
+	},
+
+	setImage:function(url){
+		D.bgImage( this.node, url );
+	},
+
+	setProgress:function(v){
+		if(!v){
+			this._progressNode.style.display = 'none';
+			return;
+		}
+		this._progressNode.style.display = '';
+		this._progressCNode.style.width = v + '%';
+	}
+}, mkE.Base );
+
+/**
+ * @extends {D.Comments.Attach}
+ */
+D.Comments.Attach.Upl = Class( {
+	gif:false,
+	video:false,
+	videoWidth:0,
+	videoHeight:0,
+	tmpId:0
+}, D.Comments.Attach );
+
+/**
+ * @class {D.Comments.SmallForm}
+ * @extends {D.Comments.Form}
+ * @param {D.Comments.Form.Par}
+ */
+D.Comments.SmallForm = Class(
+	/**
+	 * @lends {D.Comments.SmallForm#}
+	 */
+	{
+		/**
+		 * @param {D.Comments.Form.Par} par
+		 * @constructs
+		 */
+		__construct: function(par){
+			PARENT.__construct(par);
+
+			addClassName(this.node, 'CommentsSmallForm');
+		},
+
+		_onSayEditor: function(){
+			PARENT._onSayEditor();
+			if( this._editor._content.addEventListener ){
+				this._editor._content.addEventListener("mousewheel", this._onScroll, false);
+				this._editor._content.addEventListener("DOMMouseScroll", this._onScroll, false);
+			} else {
+				this._editor._content.attachEvent("onmousewheel", this._onScroll);
+			}
+			this._editor._content.onscroll = this._onScroll;
+			this._addIconsNode = mkE({
+				tag: 'div',
+				className: 'inEditorIcons SayFormBottomIcon SIconHovered',
+				style: {
+					width: 'auto'
+				}
+			}).append(this._editorBorder);
+			this._addImageIconNode.append(this._addIconsNode);
+			this._addSmileyIconNode.append(this._addIconsNode);
+			this._formBottomIconNode.remove();
+			if( this._addGiphyIconNode ){
+				this._addGiphyIconNode.append( this._addIconsNode );
+			}
+			if( this._addSoundIconNode ){
+				this._addSoundIconNode.append( this._addIconsNode );
+			}
+			addClassName(this._editorBorder, 'radius3bottom');
+			this._editorBottom.style.display = 'none';
+		},
+
+		_onScroll: function(e){
+			e = window.event || e;
+			var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+			if( isNaN(delta) ){
+				return;
+			}
+			this._editor._content.scrollTop = this._editor._content.scrollTop - delta * 20;
+			D.stopPropagation(e);
+			if( e.preventDefault ){
+				e.preventDefault();
+			}
+		},
+
+		_onFocus: function(){
+			PARENT._onFocus();
+			this._editorBottom.style.display = '';
+		},
+
+		_drawProfiles: function(){
+			if( empty(this.profiles) ){
+				return;
+			}
+			this._profilesNode.style.width = '200px';
+			this.profiles = [D.me].concat(this.profiles);
+			var k, l;
+			var profile = D.addCommentUid || this.fid;
+			var hasProfile = false;
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				if( this.profiles[k].id == profile ){
+					hasProfile = true;
+					break;
+				}
+			}
+			if( !hasProfile ){
+				profile = D.ID;
+			}
+			var p = {
+				items: [],
+				changeCaption: true,
+				selectable: true,
+				onclick: this._onProfileChange,
+				relativeToWindow: true,
+				scroll: true
+			};
+			this._uidToIndex = {};
+			for( k = 0, l = this.profiles.length; k < l; k++ ){
+				var r = this.profiles[k];
+				p.items.push( {
+					caption: r.title,
+					id: r.id,
+					selected: r.id == profile
+				} );
+				if( r.id == profile ){
+					this.profile = r.id;
+					this._setProfileImage(r.image.small);
+				}
+				this._uidToIndex[r.id] = k;
+			}
+			var ddMenu = T.ddMenu(p);
+			if( !this.par.hideProfiles ){
+				ddMenu.append(this._profilesNode);
+			}
+			this.sayProfileSelect = true;
+		},
+
+		_onProfileChange: function(selected, item){
+			var user = this.profiles[this._uidToIndex[item.id]];
+			this._editor.uid = user.id;
+			this.profile = user.id;
+			this._setProfileImage(user.image.small);
+		},
+
+		setUid: function(uid){
+			this.profile = uid;
+			this._setProfileImage(this.profiles[this._uidToIndex[uid]].image.small);
+		}
+	},
+	D.Comments.Form
+);
+
+/**
+ * @class {D.Comments.Form.Par}
+ */
+D.Comments.Form.Par = Class(
+	/**
+	 * @lends {D.Comments.Form.Par#}
+	 */
+	{
+		fid: 0,
+		onAdd: D.doNothing,
+		profiles: [],
+		placeholder: '',
+		maxLength: 2000,
+		rtKey: '',
+		id: 0,
+		type: 0,
+		hideProfiles: false
+	}
+);
+
+D.loaded('Comments');

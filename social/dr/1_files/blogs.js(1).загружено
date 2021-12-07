@@ -1,0 +1,1777 @@
+DR.blogs = DR.blogs || {};
+DR.blogs.struct = DR.blogs.struct || {};
+DR.blogs.select = DR.blogs.select || {};
+/** @extends {DR._Base} */
+DR.blogs.struct.Category = function(par){
+	/** @private */
+	this._t = 1841;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.continent)) this.continent = String(par.continent||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.iFollow)) this.iFollow = Boolean(par.iFollow);
+	if(DR._Base.is(par.imageLarge)) this.imageLarge = String(par.imageLarge||'');
+	if(DR._Base.is(par.imageSmall)) this.imageSmall = String(par.imageSmall||'');
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.notifications)) this.notifications = Boolean(par.notifications);
+	if(DR._Base.is(par.posts)) this.posts = (parseInt(par.posts)||0);
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.type)) this.type = Number(par.type);
+};
+DR._Base._types[1841] = DR.blogs.struct.Category;
+DR.blogs.struct.Category.TYPE_DEFAULT = 0;
+DR.blogs.struct.Category.TYPE_COUNTRY = 1;
+DR.blogs.struct.Category.TYPE_APPLICATION = 2;
+DR.blogs.struct.Category.TYPE_MUSIC = 3;
+DR.blogs.struct.Category.TYPE_BIZ = 4;
+DR.blogs.struct.Category[__P] = new DR._Base;
+DR.blogs.struct.Category[__P][__C] = DR.blogs.struct.Category;
+/** @type {String} */
+DR.blogs.struct.Category.prototype.continent = null;
+/** @type {Number} */
+DR.blogs.struct.Category.prototype.id = null;
+/** @type {Boolean} */
+DR.blogs.struct.Category.prototype.iFollow = null;
+/** @type {String} */
+DR.blogs.struct.Category.prototype.imageLarge = null;
+/** @type {String} */
+DR.blogs.struct.Category.prototype.imageSmall = null;
+/** @type {String} */
+DR.blogs.struct.Category.prototype.name = null;
+/** @type {Boolean} */
+DR.blogs.struct.Category.prototype.notifications = null;
+/** @type {Number} */
+DR.blogs.struct.Category.prototype.posts = null;
+/** @type {String} */
+DR.blogs.struct.Category.prototype.title = null;
+/** @type {Number} */
+DR.blogs.struct.Category.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.blogs.select.Category = function(){
+	this._fields = {};
+};
+DR.blogs.select.Category[__CL] = "Blogs__Category";
+DR.blogs.select.Category[__P] = new DR._Select;
+DR.blogs.select.Category[__P][__C] = DR.blogs.select.Category;
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.continent = function(v){ this._fields.continent = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.iFollow = function(v){ this._fields.iFollow = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.imageLarge = function(v){ this._fields.imageLarge = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.imageSmall = function(v){ this._fields.imageSmall = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.notifications = function(v){ this._fields.notifications = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.posts = function(v){ this._fields.posts = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Category} */
+DR.blogs.select.Category.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Image = function(par){
+	/** @private */
+	this._t = 1926;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.large)) this.large = String(par.large||'');
+	if(DR._Base.is(par.type)) this.type = String(par.type||'');
+	if(DR._Base.is(par.video)) this.video = String(par.video||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[1926] = DR.blogs.struct.Image;
+DR.blogs.struct.Image[__P] = new DR._Base;
+DR.blogs.struct.Image[__P][__C] = DR.blogs.struct.Image;
+/** @type {Number} */
+DR.blogs.struct.Image.prototype.h = null;
+/** @type {Number} */
+DR.blogs.struct.Image.prototype.id = null;
+/** @type {String} */
+DR.blogs.struct.Image.prototype.large = null;
+/** @type {String} */
+DR.blogs.struct.Image.prototype.type = null;
+/** @type {String|null} */
+DR.blogs.struct.Image.prototype.video = null;
+/** @type {Number} */
+DR.blogs.struct.Image.prototype.w = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.SpotlightAuthor = function(par){
+	/** @private */
+	this._t = 1844;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.iFollow)) this.iFollow = Boolean(par.iFollow);
+	if(DR._Base.is(par.posts)) this.posts = (parseInt(par.posts)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[1844] = DR.blogs.struct.SpotlightAuthor;
+DR.blogs.struct.SpotlightAuthor[__P] = new DR._Base;
+DR.blogs.struct.SpotlightAuthor[__P][__C] = DR.blogs.struct.SpotlightAuthor;
+/** @type {Boolean} */
+DR.blogs.struct.SpotlightAuthor.prototype.iFollow = null;
+/** @type {Number} */
+DR.blogs.struct.SpotlightAuthor.prototype.posts = null;
+/** @type {DR.users.struct.User} */
+DR.blogs.struct.SpotlightAuthor.prototype.user = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Item = function(par){
+	/** @private */
+	this._t = 1877;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.blocksData)) this.blocksData = String(par.blocksData||'');
+	if(DR._Base.is(par.canEdit)) this.canEdit = Boolean(par.canEdit);
+	if(DR._Base.is(par.canEditContent)) this.canEditContent = Boolean(par.canEditContent);
+	if(DR._Base.is(par.categories)){
+		var tmp = [];
+		for( var k in par.categories ) tmp.push(DR._Base.cast(par.categories [k]));
+		this.categories = tmp;
+	}
+	if(DR._Base.is(par.comments)) this.comments = DR._Base.cast(par.comments);
+	if(DR._Base.is(par.commentsCount)) this.commentsCount = (parseInt(par.commentsCount)||0);
+	if(DR._Base.is(par.disableComments)) this.disableComments = Boolean(par.disableComments);
+	if(DR._Base.is(par.embeds)){
+		var tmp = {};
+		for( var k in par.embeds ) tmp[k] = DR._Base.cast(par.embeds [k]);
+		this.embeds = tmp;
+	}
+	if(DR._Base.is(par.favorite)) this.favorite = Boolean(par.favorite);
+	if(DR._Base.is(par.firstEmbed)){
+		var tmp = {};
+		for( var k in par.firstEmbed ) tmp[k] = DR._Base.cast(par.firstEmbed [k]);
+		this.firstEmbed = tmp;
+	}
+	if(DR._Base.is(par.following)) this.following = Boolean(par.following);
+	if(DR._Base.is(par.hasEmbeds)) this.hasEmbeds = Boolean(par.hasEmbeds);
+	if(DR._Base.is(par.hasImages)) this.hasImages = Boolean(par.hasImages);
+	if(DR._Base.is(par.href)) this.href = String(par.href||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.images)){
+		var tmp = {};
+		for( var k in par.images ) tmp[k] = DR._Base.cast(par.images [k]);
+		this.images = tmp;
+	}
+	if(DR._Base.is(par.introText)) this.introText = String(par.introText||'');
+	if(DR._Base.is(par.is18plus)) this.is18plus = Boolean(par.is18plus);
+	if(DR._Base.is(par.isDraft)) this.isDraft = Boolean(par.isDraft);
+	if(DR._Base.is(par.jsonText)) this.jsonText = String(par.jsonText||'');
+	if(DR._Base.is(par.like)) this.like = DR._Base.cast(par.like);
+	if(DR._Base.is(par.permissions)) this.permissions = DR._Base.cast(par.permissions);
+	if(DR._Base.is(par.publish)) this.publish = Number(par.publish);
+	if(DR._Base.is(par.readMore)) this.readMore = Boolean(par.readMore);
+	if(DR._Base.is(par.readTime)) this.readTime = (parseInt(par.readTime)||0);
+	if(DR._Base.is(par.rssLink)) this.rssLink = String(par.rssLink||'');
+	if(DR._Base.is(par.sayItem)) this.sayItem = DR._Base.cast(par.sayItem);
+	if(DR._Base.is(par.sayPid)) this.sayPid = (parseInt(par.sayPid)||0);
+	if(DR._Base.is(par.scheduled)) this.scheduled = Boolean(par.scheduled);
+	if(DR._Base.is(par.scheduleDate)) this.scheduleDate = String(par.scheduleDate||'');
+	if(DR._Base.is(par.scheduleHour)) this.scheduleHour = (parseInt(par.scheduleHour)||0);
+	if(DR._Base.is(par.scheduleMinute)) this.scheduleMinute = (parseInt(par.scheduleMinute)||0);
+	if(DR._Base.is(par.shortUrl)) this.shortUrl = String(par.shortUrl||'');
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+	if(DR._Base.is(par.unseen)) this.unseen = Boolean(par.unseen);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+	if(DR._Base.is(par.userInSpotlight)) this.userInSpotlight = Boolean(par.userInSpotlight);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+	if(DR._Base.is(par.views)) this.views = (parseInt(par.views)||0);
+};
+DR._Base._types[1877] = DR.blogs.struct.Item;
+DR.blogs.struct.Item.PUBLISH_NONE = 0;
+DR.blogs.struct.Item.PUBLISH_REQUESTED = 1;
+DR.blogs.struct.Item.PUBLISH_PUBLISHED = 2;
+DR.blogs.struct.Item.PUBLISH_REJECTED = 3;
+DR.blogs.struct.Item[__P] = new DR._Base;
+DR.blogs.struct.Item[__P][__C] = DR.blogs.struct.Item;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.blocksData = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.canEdit = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.canEditContent = null;
+/** @type {Array.<DR.blogs.struct.Category>} */
+DR.blogs.struct.Item.prototype.categories = null;
+/** @type {DR.comments.struct.Base} */
+DR.blogs.struct.Item.prototype.comments = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.commentsCount = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.disableComments = null;
+/** @type {Object.<String,DR.gallery.struct.Embed>} */
+DR.blogs.struct.Item.prototype.embeds = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.favorite = null;
+/** @type {Object.<String,DR.gallery.struct.Embed>} */
+DR.blogs.struct.Item.prototype.firstEmbed = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.following = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.hasEmbeds = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.hasImages = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.href = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.id = null;
+/** @type {DR.base.struct.Image|null} */
+DR.blogs.struct.Item.prototype.image = null;
+/** @type {Object.<String,DR.blogs.struct.Image>} */
+DR.blogs.struct.Item.prototype.images = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.introText = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.is18plus = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.isDraft = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.jsonText = null;
+/** @type {DR.like.struct.GetRe} */
+DR.blogs.struct.Item.prototype.like = null;
+/** @type {DR.base.struct.Permissions} */
+DR.blogs.struct.Item.prototype.permissions = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.publish = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.readMore = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.readTime = null;
+/** @type {String|null} */
+DR.blogs.struct.Item.prototype.rssLink = null;
+/** @type {DR.say.struct.Item} */
+DR.blogs.struct.Item.prototype.sayItem = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.sayPid = null;
+/** @type {Boolean|null} */
+DR.blogs.struct.Item.prototype.scheduled = null;
+/** @type {String|null} */
+DR.blogs.struct.Item.prototype.scheduleDate = null;
+/** @type {Number|null} */
+DR.blogs.struct.Item.prototype.scheduleHour = null;
+/** @type {Number|null} */
+DR.blogs.struct.Item.prototype.scheduleMinute = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.shortUrl = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.text = null;
+/** @type {String} */
+DR.blogs.struct.Item.prototype.title = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.ts = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.unseen = null;
+/** @type {DR.users.struct.User} */
+DR.blogs.struct.Item.prototype.user = null;
+/** @type {Boolean} */
+DR.blogs.struct.Item.prototype.userInSpotlight = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.blogs.struct.Item.prototype.users = null;
+/** @type {Number} */
+DR.blogs.struct.Item.prototype.views = null;
+ 
+/** @extends {DR._Select} */
+DR.blogs.select.Item = function(){
+	this._fields = {};
+};
+DR.blogs.select.Item[__CL] = "Blogs__Item";
+DR.blogs.select.Item[__P] = new DR._Select;
+DR.blogs.select.Item[__P][__C] = DR.blogs.select.Item;
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.blocksData = function(v){ this._fields.blocksData = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.canEdit = function(v){ this._fields.canEdit = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.canEditContent = function(v){ this._fields.canEditContent = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.categories = function(v){ this._fields.categories = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.comments = function(v){ this._fields.comments = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.commentsCount = function(v){ this._fields.commentsCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.disableComments = function(v){ this._fields.disableComments = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.embeds = function(v){ this._fields.embeds = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.favorite = function(v){ this._fields.favorite = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.firstEmbed = function(v){ this._fields.firstEmbed = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.following = function(v){ this._fields.following = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.hasEmbeds = function(v){ this._fields.hasEmbeds = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.hasImages = function(v){ this._fields.hasImages = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.href = function(v){ this._fields.href = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.images = function(v){ this._fields.images = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.introText = function(v){ this._fields.introText = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.is18plus = function(v){ this._fields.is18plus = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.isDraft = function(v){ this._fields.isDraft = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.jsonText = function(v){ this._fields.jsonText = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.like = function(v){ this._fields.like = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.permissions = function(v){ this._fields.permissions = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.publish = function(v){ this._fields.publish = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.readMore = function(v){ this._fields.readMore = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.readTime = function(v){ this._fields.readTime = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.rssLink = function(v){ this._fields.rssLink = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.sayItem = function(v){ this._fields.sayItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.sayPid = function(v){ this._fields.sayPid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.scheduled = function(v){ this._fields.scheduled = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.scheduleDate = function(v){ this._fields.scheduleDate = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.scheduleHour = function(v){ this._fields.scheduleHour = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.scheduleMinute = function(v){ this._fields.scheduleMinute = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.shortUrl = function(v){ this._fields.shortUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.text = function(v){ this._fields.text = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.ts = function(v){ this._fields.ts = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.unseen = function(v){ this._fields.unseen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.userInSpotlight = function(v){ this._fields.userInSpotlight = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.blogs.select.Item} */
+DR.blogs.select.Item.prototype.views = function(v){ this._fields.views = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Posts = function(par){
+	/** @private */
+	this._t = 1871;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.posts)){
+		var tmp = [];
+		for( var k in par.posts ) tmp.push(DR._Base.cast(par.posts [k]));
+		this.posts = tmp;
+	}
+};
+DR._Base._types[1871] = DR.blogs.struct.Posts;
+DR.blogs.struct.Posts[__P] = new DR._Base;
+DR.blogs.struct.Posts[__P][__C] = DR.blogs.struct.Posts;
+/** @type {Number|null} */
+DR.blogs.struct.Posts.prototype.count = null;
+/** @type {Boolean} */
+DR.blogs.struct.Posts.prototype.fullPg = null;
+/** @type {Array.<DR.blogs.struct.Item>} */
+DR.blogs.struct.Posts.prototype.posts = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.TravelCountry = function(par){
+	/** @private */
+	this._t = 1894;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.code)) this.code = String(par.code||'');
+	if(DR._Base.is(par.continent)) this.continent = String(par.continent||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+};
+DR._Base._types[1894] = DR.blogs.struct.TravelCountry;
+DR.blogs.struct.TravelCountry[__P] = new DR._Base;
+DR.blogs.struct.TravelCountry[__P][__C] = DR.blogs.struct.TravelCountry;
+/** @type {String} */
+DR.blogs.struct.TravelCountry.prototype.code = null;
+/** @type {String} */
+DR.blogs.struct.TravelCountry.prototype.continent = null;
+/** @type {Number} */
+DR.blogs.struct.TravelCountry.prototype.id = null;
+/** @type {String} */
+DR.blogs.struct.TravelCountry.prototype.name = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.TravelContinent = function(par){
+	/** @private */
+	this._t = 1895;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.code)) this.code = String(par.code||'');
+	if(DR._Base.is(par.countries)){
+		var tmp = [];
+		for( var k in par.countries ) tmp.push(DR._Base.cast(par.countries [k]));
+		this.countries = tmp;
+	}
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+};
+DR._Base._types[1895] = DR.blogs.struct.TravelContinent;
+DR.blogs.struct.TravelContinent[__P] = new DR._Base;
+DR.blogs.struct.TravelContinent[__P][__C] = DR.blogs.struct.TravelContinent;
+/** @type {String} */
+DR.blogs.struct.TravelContinent.prototype.code = null;
+/** @type {Array.<DR.blogs.struct.TravelCountry>} */
+DR.blogs.struct.TravelContinent.prototype.countries = null;
+/** @type {String} */
+DR.blogs.struct.TravelContinent.prototype.name = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Follower = function(par){
+	/** @private */
+	this._t = 1929;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.follow)) this.follow = Boolean(par.follow);
+	if(DR._Base.is(par.notify)) this.notify = Boolean(par.notify);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[1929] = DR.blogs.struct.Follower;
+DR.blogs.struct.Follower[__P] = new DR._Base;
+DR.blogs.struct.Follower[__P][__C] = DR.blogs.struct.Follower;
+/** @type {Boolean} */
+DR.blogs.struct.Follower.prototype.follow = null;
+/** @type {Boolean} */
+DR.blogs.struct.Follower.prototype.notify = null;
+/** @type {DR.users.struct.User} */
+DR.blogs.struct.Follower.prototype.user = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.BizFeed = function(par){
+	/** @private */
+	this._t = 1961;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+};
+DR._Base._types[1961] = DR.blogs.struct.BizFeed;
+DR.blogs.struct.BizFeed[__P] = new DR._Base;
+DR.blogs.struct.BizFeed[__P][__C] = DR.blogs.struct.BizFeed;
+/** @type {Number} */
+DR.blogs.struct.BizFeed.prototype.id = null;
+/** @type {String} */
+DR.blogs.struct.BizFeed.prototype.title = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.StatsItem = function(par){
+	/** @private */
+	this._t = 1971;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+	if(DR._Base.is(par.uid)) this.uid = (parseInt(par.uid)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[1971] = DR.blogs.struct.StatsItem;
+DR.blogs.struct.StatsItem[__P] = new DR._Base;
+DR.blogs.struct.StatsItem[__P][__C] = DR.blogs.struct.StatsItem;
+/** @type {DR.blogs.struct.Item|null} */
+DR.blogs.struct.StatsItem.prototype.item = null;
+/** @type {Number} */
+DR.blogs.struct.StatsItem.prototype.ts = null;
+/** @type {Number} */
+DR.blogs.struct.StatsItem.prototype.uid = null;
+/** @type {DR.users.struct.User} */
+DR.blogs.struct.StatsItem.prototype.user = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.ProfitPostsItem = function(par){
+	/** @private */
+	this._t = 1975;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.post)) this.post = DR._Base.cast(par.post);
+	if(DR._Base.is(par.price)) this.price = (parseFloat(par.price)||0);
+};
+DR._Base._types[1975] = DR.blogs.struct.ProfitPostsItem;
+DR.blogs.struct.ProfitPostsItem[__P] = new DR._Base;
+DR.blogs.struct.ProfitPostsItem[__P][__C] = DR.blogs.struct.ProfitPostsItem;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsItem.prototype.count = null;
+/** @type {DR.blogs.struct.Item|null} */
+DR.blogs.struct.ProfitPostsItem.prototype.post = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsItem.prototype.price = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.PayoutAction = function(par){
+	/** @private */
+	this._t = 2066;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.action)) this.action = (parseInt(par.action)||0);
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+};
+DR._Base._types[2066] = DR.blogs.struct.PayoutAction;
+DR.blogs.struct.PayoutAction[__P] = new DR._Base;
+DR.blogs.struct.PayoutAction[__P][__C] = DR.blogs.struct.PayoutAction;
+/** @type {Number} */
+DR.blogs.struct.PayoutAction.prototype.action = null;
+/** @type {String} */
+DR.blogs.struct.PayoutAction.prototype.text = null;
+/** @type {Number} */
+DR.blogs.struct.PayoutAction.prototype.ts = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Intro = function(par){
+	/** @private */
+	this._t = 1842;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.categories)){
+		var tmp = [];
+		for( var k in par.categories ) tmp.push(DR._Base.cast(par.categories [k]));
+		this.categories = tmp;
+	}
+	if(DR._Base.is(par.show)) this.show = Boolean(par.show);
+	if(DR._Base.is(par.suggestedCategories)){
+		var tmp = [];
+		for( var k in par.suggestedCategories ) tmp.push((parseInt(par.suggestedCategories [k])||0));
+		this.suggestedCategories = tmp;
+	}
+};
+DR._Base._types[1842] = DR.blogs.struct.Intro;
+DR.blogs.struct.Intro[__P] = new DR._Base;
+DR.blogs.struct.Intro[__P][__C] = DR.blogs.struct.Intro;
+/** @type {Array.<DR.blogs.struct.Category>} */
+DR.blogs.struct.Intro.prototype.categories = null;
+/** @type {Boolean} */
+DR.blogs.struct.Intro.prototype.show = null;
+/** @type {Array.<Number>} */
+DR.blogs.struct.Intro.prototype.suggestedCategories = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.SpotlightAuthors = function(par){
+	/** @private */
+	this._t = 1845;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.authors)){
+		var tmp = [];
+		for( var k in par.authors ) tmp.push(DR._Base.cast(par.authors [k]));
+		this.authors = tmp;
+	}
+};
+DR._Base._types[1845] = DR.blogs.struct.SpotlightAuthors;
+DR.blogs.struct.SpotlightAuthors[__P] = new DR._Base;
+DR.blogs.struct.SpotlightAuthors[__P][__C] = DR.blogs.struct.SpotlightAuthors;
+/** @type {Array.<DR.blogs.struct.SpotlightAuthor>} */
+DR.blogs.struct.SpotlightAuthors.prototype.authors = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.Categories = function(par){
+	/** @private */
+	this._t = 1847;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.categories)){
+		var tmp = [];
+		for( var k in par.categories ) tmp.push(DR._Base.cast(par.categories [k]));
+		this.categories = tmp;
+	}
+};
+DR._Base._types[1847] = DR.blogs.struct.Categories;
+DR.blogs.struct.Categories[__P] = new DR._Base;
+DR.blogs.struct.Categories[__P][__C] = DR.blogs.struct.Categories;
+/** @type {Array.<DR.blogs.struct.Category>} */
+DR.blogs.struct.Categories.prototype.categories = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.FollowRe = function(par){
+	/** @private */
+	this._t = 1891;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.following)) this.following = Boolean(par.following);
+	if(DR._Base.is(par.notify)) this.notify = Boolean(par.notify);
+};
+DR._Base._types[1891] = DR.blogs.struct.FollowRe;
+DR.blogs.struct.FollowRe[__P] = new DR._Base;
+DR.blogs.struct.FollowRe[__P][__C] = DR.blogs.struct.FollowRe;
+/** @type {Boolean} */
+DR.blogs.struct.FollowRe.prototype.following = null;
+/** @type {Boolean} */
+DR.blogs.struct.FollowRe.prototype.notify = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetFeed = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1872;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1872] = DR.blogs.GetFeed;
+DR.blogs.GetFeed[__CL] = "Blogs__GetFeed";
+DR.blogs.GetFeed[__P] = new DR._Method;
+DR.blogs.GetFeed[__P][__C] = DR.blogs.GetFeed;
+/** @type {Number|null} */
+DR.blogs.GetFeed.prototype.count = null;
+/** @type {Number} */
+DR.blogs.GetFeed.prototype.pg = null;
+/** @type {DR.blogs.struct.Posts} */
+DR.blogs.GetFeed.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.TravelCategories = function(par){
+	/** @private */
+	this._t = 1896;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.continents)){
+		var tmp = [];
+		for( var k in par.continents ) tmp.push(DR._Base.cast(par.continents [k]));
+		this.continents = tmp;
+	}
+};
+DR._Base._types[1896] = DR.blogs.struct.TravelCategories;
+DR.blogs.struct.TravelCategories[__P] = new DR._Base;
+DR.blogs.struct.TravelCategories[__P][__C] = DR.blogs.struct.TravelCategories;
+/** @type {Array.<DR.blogs.struct.TravelContinent>} */
+DR.blogs.struct.TravelCategories.prototype.continents = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.TravelCountries = function(par){
+	/** @private */
+	this._t = 1906;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.countries)){
+		var tmp = [];
+		for( var k in par.countries ) tmp.push(DR._Base.cast(par.countries [k]));
+		this.countries = tmp;
+	}
+};
+DR._Base._types[1906] = DR.blogs.struct.TravelCountries;
+DR.blogs.struct.TravelCountries[__P] = new DR._Base;
+DR.blogs.struct.TravelCountries[__P][__C] = DR.blogs.struct.TravelCountries;
+/** @type {Array.<DR.blogs.struct.TravelCountry>} */
+DR.blogs.struct.TravelCountries.prototype.countries = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.ProfitRe = function(par){
+	/** @private */
+	this._t = 1917;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.sum)) this.sum = (parseFloat(par.sum)||0);
+};
+DR._Base._types[1917] = DR.blogs.struct.ProfitRe;
+DR.blogs.struct.ProfitRe[__P] = new DR._Base;
+DR.blogs.struct.ProfitRe[__P][__C] = DR.blogs.struct.ProfitRe;
+/** @type {Number} */
+DR.blogs.struct.ProfitRe.prototype.count = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitRe.prototype.sum = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.UserInfoRe = function(par){
+	/** @private */
+	this._t = 1919;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.follow)) this.follow = Boolean(par.follow);
+	if(DR._Base.is(par.followers)) this.followers = (parseInt(par.followers)||0);
+	if(DR._Base.is(par.notify)) this.notify = Boolean(par.notify);
+};
+DR._Base._types[1919] = DR.blogs.struct.UserInfoRe;
+DR.blogs.struct.UserInfoRe[__P] = new DR._Base;
+DR.blogs.struct.UserInfoRe[__P][__C] = DR.blogs.struct.UserInfoRe;
+/** @type {Number} */
+DR.blogs.struct.UserInfoRe.prototype.count = null;
+/** @type {Boolean} */
+DR.blogs.struct.UserInfoRe.prototype.follow = null;
+/** @type {Number} */
+DR.blogs.struct.UserInfoRe.prototype.followers = null;
+/** @type {Boolean} */
+DR.blogs.struct.UserInfoRe.prototype.notify = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.SaveRe = function(par){
+	/** @private */
+	this._t = 1921;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[1921] = DR.blogs.struct.SaveRe;
+DR.blogs.struct.SaveRe[__P] = new DR._Base;
+DR.blogs.struct.SaveRe[__P][__C] = DR.blogs.struct.SaveRe;
+/** @type {Number} */
+DR.blogs.struct.SaveRe.prototype.id = null;
+/** @type {DR.blogs.struct.Item|null} */
+DR.blogs.struct.SaveRe.prototype.item = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.FollowersRe = function(par){
+	/** @private */
+	this._t = 1930;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[1930] = DR.blogs.struct.FollowersRe;
+DR.blogs.struct.FollowersRe[__P] = new DR._Base;
+DR.blogs.struct.FollowersRe[__P][__C] = DR.blogs.struct.FollowersRe;
+/** @type {Number} */
+DR.blogs.struct.FollowersRe.prototype.count = null;
+/** @type {Array.<DR.blogs.struct.Follower>} */
+DR.blogs.struct.FollowersRe.prototype.items = null;
+/** @type {Number} */
+DR.blogs.struct.FollowersRe.prototype.pgs = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.BizFeeds = function(par){
+	/** @private */
+	this._t = 1962;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.feeds)){
+		var tmp = [];
+		for( var k in par.feeds ) tmp.push(DR._Base.cast(par.feeds [k]));
+		this.feeds = tmp;
+	}
+};
+DR._Base._types[1962] = DR.blogs.struct.BizFeeds;
+DR.blogs.struct.BizFeeds[__P] = new DR._Base;
+DR.blogs.struct.BizFeeds[__P][__C] = DR.blogs.struct.BizFeeds;
+/** @type {Array.<DR.blogs.struct.BizFeed>} */
+DR.blogs.struct.BizFeeds.prototype.feeds = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.PostStatsRe = function(par){
+	/** @private */
+	this._t = 1972;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[1972] = DR.blogs.struct.PostStatsRe;
+DR.blogs.struct.PostStatsRe[__P] = new DR._Base;
+DR.blogs.struct.PostStatsRe[__P][__C] = DR.blogs.struct.PostStatsRe;
+/** @type {Array.<DR.blogs.struct.StatsItem>} */
+DR.blogs.struct.PostStatsRe.prototype.items = null;
+/** @type {Number} */
+DR.blogs.struct.PostStatsRe.prototype.pgs = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.ProfitPostsRe = function(par){
+	/** @private */
+	this._t = 1976;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.canWithdraw)) this.canWithdraw = Boolean(par.canWithdraw);
+	if(DR._Base.is(par.exp)) this.exp = (parseInt(par.exp)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.sum)) this.sum = (parseFloat(par.sum)||0);
+	if(DR._Base.is(par.withdraw)) this.withdraw = (parseInt(par.withdraw)||0);
+};
+DR._Base._types[1976] = DR.blogs.struct.ProfitPostsRe;
+DR.blogs.struct.ProfitPostsRe[__P] = new DR._Base;
+DR.blogs.struct.ProfitPostsRe[__P][__C] = DR.blogs.struct.ProfitPostsRe;
+/** @type {Boolean} */
+DR.blogs.struct.ProfitPostsRe.prototype.canWithdraw = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsRe.prototype.exp = null;
+/** @type {Array.<DR.blogs.struct.ProfitPostsItem>} */
+DR.blogs.struct.ProfitPostsRe.prototype.items = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsRe.prototype.pgs = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsRe.prototype.sum = null;
+/** @type {Number} */
+DR.blogs.struct.ProfitPostsRe.prototype.withdraw = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.FullStatsRe = function(par){
+	/** @private */
+	this._t = 2051;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[2051] = DR.blogs.struct.FullStatsRe;
+DR.blogs.struct.FullStatsRe[__P] = new DR._Base;
+DR.blogs.struct.FullStatsRe[__P][__C] = DR.blogs.struct.FullStatsRe;
+/** @type {Boolean} */
+DR.blogs.struct.FullStatsRe.prototype.fullPg = null;
+/** @type {Array.<DR.blogs.struct.StatsItem>} */
+DR.blogs.struct.FullStatsRe.prototype.items = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.PayoutInfo = function(par){
+	/** @private */
+	this._t = 2058;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.acceptedRules)) this.acceptedRules = Boolean(par.acceptedRules);
+	if(DR._Base.is(par.address)) this.address = String(par.address||'');
+	if(DR._Base.is(par.bankAccount)) this.bankAccount = String(par.bankAccount||'');
+	if(DR._Base.is(par.bankName)) this.bankName = String(par.bankName||'');
+	if(DR._Base.is(par.code)) this.code = String(par.code||'');
+	if(DR._Base.is(par.email)) this.email = String(par.email||'');
+	if(DR._Base.is(par.gross)) this.gross = (parseFloat(par.gross)||0);
+	if(DR._Base.is(par.incomeTax)) this.incomeTax = (parseFloat(par.incomeTax)||0);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.netto)) this.netto = (parseFloat(par.netto)||0);
+	if(DR._Base.is(par.nonTaxable)) this.nonTaxable = (parseFloat(par.nonTaxable)||0);
+	if(DR._Base.is(par.phone)) this.phone = String(par.phone||'');
+	if(DR._Base.is(par.status)) this.status = String(par.status||'');
+	if(DR._Base.is(par.surname)) this.surname = String(par.surname||'');
+	if(DR._Base.is(par.taxable)) this.taxable = (parseFloat(par.taxable)||0);
+	if(DR._Base.is(par.taxRate)) this.taxRate = (parseInt(par.taxRate)||0);
+};
+DR._Base._types[2058] = DR.blogs.struct.PayoutInfo;
+DR.blogs.struct.PayoutInfo.STATUS_UNREGISTERED = "unregistered";
+DR.blogs.struct.PayoutInfo.STATUS_PROCESSING = "processing";
+DR.blogs.struct.PayoutInfo.STATUS_CONFIRMED = "confirmed";
+DR.blogs.struct.PayoutInfo[__P] = new DR._Base;
+DR.blogs.struct.PayoutInfo[__P][__C] = DR.blogs.struct.PayoutInfo;
+/** @type {Boolean} */
+DR.blogs.struct.PayoutInfo.prototype.acceptedRules = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.address = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.bankAccount = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.bankName = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.code = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.email = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.gross = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.incomeTax = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.name = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.netto = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.nonTaxable = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.phone = null;
+/** @type {String} */
+DR.blogs.struct.PayoutInfo.prototype.status = null;
+/** @type {String|null} */
+DR.blogs.struct.PayoutInfo.prototype.surname = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.taxable = null;
+/** @type {Number|null} */
+DR.blogs.struct.PayoutInfo.prototype.taxRate = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.PayoutActions = function(par){
+	/** @private */
+	this._t = 2067;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.actions)){
+		var tmp = [];
+		for( var k in par.actions ) tmp.push(DR._Base.cast(par.actions [k]));
+		this.actions = tmp;
+	}
+};
+DR._Base._types[2067] = DR.blogs.struct.PayoutActions;
+DR.blogs.struct.PayoutActions[__P] = new DR._Base;
+DR.blogs.struct.PayoutActions[__P][__C] = DR.blogs.struct.PayoutActions;
+/** @type {Array.<DR.blogs.struct.PayoutAction>} */
+DR.blogs.struct.PayoutActions.prototype.actions = null;
+ 
+/** @extends {DR._Base} */
+DR.blogs.struct.BadgeRe = function(par){
+	/** @private */
+	this._t = 2175;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+};
+DR._Base._types[2175] = DR.blogs.struct.BadgeRe;
+DR.blogs.struct.BadgeRe[__P] = new DR._Base;
+DR.blogs.struct.BadgeRe[__P][__C] = DR.blogs.struct.BadgeRe;
+/** @type {Number} */
+DR.blogs.struct.BadgeRe.prototype.count = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetIntro = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1843;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1843] = DR.blogs.GetIntro;
+DR.blogs.GetIntro[__CL] = "Blogs__GetIntro";
+DR.blogs.GetIntro[__P] = new DR._Method;
+DR.blogs.GetIntro[__P][__C] = DR.blogs.GetIntro;
+/** @type {DR.blogs.struct.Intro} */
+DR.blogs.GetIntro.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.blogs.GetSpotlightAuthors = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1846;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1846] = DR.blogs.GetSpotlightAuthors;
+DR.blogs.GetSpotlightAuthors[__CL] = "Blogs__GetSpotlightAuthors";
+DR.blogs.GetSpotlightAuthors[__P] = new DR.base.Pg;
+DR.blogs.GetSpotlightAuthors[__P][__C] = DR.blogs.GetSpotlightAuthors;
+/** @type {DR.blogs.struct.SpotlightAuthors} */
+DR.blogs.GetSpotlightAuthors.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.SaveIntroCategories = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1853;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1853] = DR.blogs.SaveIntroCategories;
+DR.blogs.SaveIntroCategories[__CL] = "Blogs__SaveIntroCategories";
+DR.blogs.SaveIntroCategories[__P] = new DR._Method;
+DR.blogs.SaveIntroCategories[__P][__C] = DR.blogs.SaveIntroCategories;
+/** @type {Array.<Number>|null} */
+DR.blogs.SaveIntroCategories.prototype.categories = null;
+/** @type {Boolean|null} */
+DR.blogs.SaveIntroCategories.prototype.skip = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.SaveIntroCategories.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetCategories = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1855;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1855] = DR.blogs.GetCategories;
+DR.blogs.GetCategories[__CL] = "Blogs__GetCategories";
+DR.blogs.GetCategories[__P] = new DR._Method;
+DR.blogs.GetCategories[__P][__C] = DR.blogs.GetCategories;
+/** @type {DR.blogs.struct.Categories} */
+DR.blogs.GetCategories.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetCategory = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1856;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1856] = DR.blogs.GetCategory;
+DR.blogs.GetCategory[__CL] = "Blogs__GetCategory";
+DR.blogs.GetCategory[__P] = new DR._Method;
+DR.blogs.GetCategory[__P][__C] = DR.blogs.GetCategory;
+/** @type {Number} */
+DR.blogs.GetCategory.prototype.id = null;
+/** @type {DR.blogs.struct.Category} */
+DR.blogs.GetCategory.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Follow = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1857;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1857] = DR.blogs.Follow;
+DR.blogs.Follow[__CL] = "Blogs__Follow";
+DR.blogs.Follow[__P] = new DR._Method;
+DR.blogs.Follow[__P][__C] = DR.blogs.Follow;
+/** @type {Number} */
+DR.blogs.Follow.prototype.id = null;
+/** @type {Boolean} */
+DR.blogs.Follow.prototype.notify = null;
+/** @type {DR.blogs.struct.FollowRe} */
+DR.blogs.Follow.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Unfollow = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1858;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1858] = DR.blogs.Unfollow;
+DR.blogs.Unfollow[__CL] = "Blogs__Unfollow";
+DR.blogs.Unfollow[__P] = new DR._Method;
+DR.blogs.Unfollow[__P][__C] = DR.blogs.Unfollow;
+/** @type {Number} */
+DR.blogs.Unfollow.prototype.id = null;
+/** @type {DR.blogs.struct.FollowRe} */
+DR.blogs.Unfollow.prototype.re = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetUserPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1873;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1873] = DR.blogs.GetUserPosts;
+DR.blogs.GetUserPosts[__CL] = "Blogs__GetUserPosts";
+DR.blogs.GetUserPosts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetUserPosts[__P][__C] = DR.blogs.GetUserPosts;
+/** @type {Number|null} */
+DR.blogs.GetUserPosts.prototype.categoryId = null;
+/** @type {Boolean|null} */
+DR.blogs.GetUserPosts.prototype.skipDrafts = null;
+/** @type {Number} */
+DR.blogs.GetUserPosts.prototype.uid = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetFriendPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1874;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1874] = DR.blogs.GetFriendPosts;
+DR.blogs.GetFriendPosts[__CL] = "Blogs__GetFriendPosts";
+DR.blogs.GetFriendPosts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetFriendPosts[__P][__C] = DR.blogs.GetFriendPosts;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetCategoryPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1875;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1875] = DR.blogs.GetCategoryPosts;
+DR.blogs.GetCategoryPosts[__CL] = "Blogs__GetCategoryPosts";
+DR.blogs.GetCategoryPosts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetCategoryPosts[__P][__C] = DR.blogs.GetCategoryPosts;
+/** @type {Number} */
+DR.blogs.GetCategoryPosts.prototype.categoryId = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetFavoritePosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1876;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1876] = DR.blogs.GetFavoritePosts;
+DR.blogs.GetFavoritePosts[__CL] = "Blogs__GetFavoritePosts";
+DR.blogs.GetFavoritePosts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetFavoritePosts[__P][__C] = DR.blogs.GetFavoritePosts;
+ 
+/** @extends {DR._Method} */
+DR.blogs.AddFavorite = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1886;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1886] = DR.blogs.AddFavorite;
+DR.blogs.AddFavorite[__CL] = "Blogs__AddFavorite";
+DR.blogs.AddFavorite[__P] = new DR._Method;
+DR.blogs.AddFavorite[__P][__C] = DR.blogs.AddFavorite;
+/** @type {Number} */
+DR.blogs.AddFavorite.prototype.id = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.AddFavorite.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.RemoveFavorite = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1887;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1887] = DR.blogs.RemoveFavorite;
+DR.blogs.RemoveFavorite[__CL] = "Blogs__RemoveFavorite";
+DR.blogs.RemoveFavorite[__P] = new DR._Method;
+DR.blogs.RemoveFavorite[__P][__C] = DR.blogs.RemoveFavorite;
+/** @type {Number} */
+DR.blogs.RemoveFavorite.prototype.id = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.RemoveFavorite.prototype.re = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetMyPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1889;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1889] = DR.blogs.GetMyPosts;
+DR.blogs.GetMyPosts[__CL] = "Blogs__GetMyPosts";
+DR.blogs.GetMyPosts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetMyPosts[__P][__C] = DR.blogs.GetMyPosts;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetTravelCategories = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1897;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1897] = DR.blogs.GetTravelCategories;
+DR.blogs.GetTravelCategories[__CL] = "Blogs__GetTravelCategories";
+DR.blogs.GetTravelCategories[__P] = new DR._Method;
+DR.blogs.GetTravelCategories[__P][__C] = DR.blogs.GetTravelCategories;
+/** @type {DR.blogs.struct.TravelCategories} */
+DR.blogs.GetTravelCategories.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetTravelCountries = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1907;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1907] = DR.blogs.GetTravelCountries;
+DR.blogs.GetTravelCountries[__CL] = "Blogs__GetTravelCountries";
+DR.blogs.GetTravelCountries[__P] = new DR._Method;
+DR.blogs.GetTravelCountries[__P][__C] = DR.blogs.GetTravelCountries;
+/** @type {DR.blogs.struct.TravelCountries} */
+DR.blogs.GetTravelCountries.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Profit = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1918;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1918] = DR.blogs.Profit;
+DR.blogs.Profit[__CL] = "Blogs__Profit";
+DR.blogs.Profit[__P] = new DR._Method;
+DR.blogs.Profit[__P][__C] = DR.blogs.Profit;
+/** @type {Number|null} */
+DR.blogs.Profit.prototype.uid = null;
+/** @type {DR.blogs.struct.ProfitRe} */
+DR.blogs.Profit.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.UserInfo = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1920;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1920] = DR.blogs.UserInfo;
+DR.blogs.UserInfo[__CL] = "Blogs__UserInfo";
+DR.blogs.UserInfo[__P] = new DR._Method;
+DR.blogs.UserInfo[__P][__C] = DR.blogs.UserInfo;
+/** @type {Number|null} */
+DR.blogs.UserInfo.prototype.uid = null;
+/** @type {DR.blogs.struct.UserInfoRe} */
+DR.blogs.UserInfo.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Save = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1922;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1922] = DR.blogs.Save;
+DR.blogs.Save[__CL] = "Blogs__Save";
+DR.blogs.Save.IMAGETYPE_TMP = "tmp";
+DR.blogs.Save.IMAGETYPE_POSTS = "posts";
+DR.blogs.Save.IMAGETYPE_GALLERY = "gallery";
+DR.blogs.Save[__P] = new DR._Method;
+DR.blogs.Save[__P][__C] = DR.blogs.Save;
+/** @type {Number|null} */
+DR.blogs.Save.prototype.bizFeed = null;
+/** @type {Array.<Number>|null} */
+DR.blogs.Save.prototype.categories = null;
+/** @type {Array.<Number>|null} */
+DR.blogs.Save.prototype.countries = null;
+/** @type {Boolean} */
+DR.blogs.Save.prototype.disableComments = null;
+/** @type {Boolean|null} */
+DR.blogs.Save.prototype.draft = null;
+/** @type {Number|null} */
+DR.blogs.Save.prototype.id = null;
+/** @type {Number|null} */
+DR.blogs.Save.prototype.imageId = null;
+/** @type {String|null} */
+DR.blogs.Save.prototype.imageType = null;
+/** @type {Boolean|null} */
+DR.blogs.Save.prototype.importantUpdate = null;
+/** @type {Boolean|null} */
+DR.blogs.Save.prototype.is18plus = null;
+/** @type {DR.base.struct.Permissions} */
+DR.blogs.Save.prototype.permissions = null;
+/** @type {Boolean|null} */
+DR.blogs.Save.prototype.publicMusic = null;
+/** @type {Boolean|null} */
+DR.blogs.Save.prototype.publish = null;
+/** @type {String|null} */
+DR.blogs.Save.prototype.scheduleDate = null;
+/** @type {Number|null} */
+DR.blogs.Save.prototype.scheduleHour = null;
+/** @type {Number|null} */
+DR.blogs.Save.prototype.scheduleMinute = null;
+/** @type {String} */
+DR.blogs.Save.prototype.text = null;
+/** @type {String} */
+DR.blogs.Save.prototype.title = null;
+/** @type {Number} */
+DR.blogs.Save.prototype.uid = null;
+/** @type {DR.blogs.struct.SaveRe} */
+DR.blogs.Save.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetItem = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1923;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1923] = DR.blogs.GetItem;
+DR.blogs.GetItem[__CL] = "Blogs__GetItem";
+DR.blogs.GetItem[__P] = new DR._Method;
+DR.blogs.GetItem[__P][__C] = DR.blogs.GetItem;
+/** @type {Number} */
+DR.blogs.GetItem.prototype.id = null;
+/** @type {Boolean|null} */
+DR.blogs.GetItem.prototype.stats = null;
+/** @type {DR.blogs.struct.Item} */
+DR.blogs.GetItem.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.UserFollow = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1924;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1924] = DR.blogs.UserFollow;
+DR.blogs.UserFollow[__CL] = "Blogs__UserFollow";
+DR.blogs.UserFollow[__P] = new DR._Method;
+DR.blogs.UserFollow[__P][__C] = DR.blogs.UserFollow;
+/** @type {Boolean|null} */
+DR.blogs.UserFollow.prototype.notify = null;
+/** @type {Number} */
+DR.blogs.UserFollow.prototype.uid = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.UserFollow.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.UserUnfollow = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1925;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1925] = DR.blogs.UserUnfollow;
+DR.blogs.UserUnfollow[__CL] = "Blogs__UserUnfollow";
+DR.blogs.UserUnfollow[__P] = new DR._Method;
+DR.blogs.UserUnfollow[__P][__C] = DR.blogs.UserUnfollow;
+/** @type {Number} */
+DR.blogs.UserUnfollow.prototype.uid = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.UserUnfollow.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Followers = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1927;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1927] = DR.blogs.Followers;
+DR.blogs.Followers[__CL] = "Blogs__Followers";
+DR.blogs.Followers[__P] = new DR._Method;
+DR.blogs.Followers[__P][__C] = DR.blogs.Followers;
+/** @type {Number} */
+DR.blogs.Followers.prototype.pg = null;
+/** @type {Number} */
+DR.blogs.Followers.prototype.uid = null;
+/** @type {DR.blogs.struct.FollowersRe} */
+DR.blogs.Followers.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Delete = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1931;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1931] = DR.blogs.Delete;
+DR.blogs.Delete[__CL] = "Blogs__Delete";
+DR.blogs.Delete[__P] = new DR._Method;
+DR.blogs.Delete[__P][__C] = DR.blogs.Delete;
+/** @type {Number} */
+DR.blogs.Delete.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.Delete.prototype.re = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.Search = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1955;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1955] = DR.blogs.Search;
+DR.blogs.Search[__CL] = "Blogs__Search";
+DR.blogs.Search[__P] = new DR.blogs.GetFeed;
+DR.blogs.Search[__P][__C] = DR.blogs.Search;
+/** @type {Number|null} */
+DR.blogs.Search.prototype.blogId = null;
+/** @type {Number|null} */
+DR.blogs.Search.prototype.cat = null;
+/** @type {Boolean|null} */
+DR.blogs.Search.prototype.friends = null;
+/** @type {String} */
+DR.blogs.Search.prototype.query = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetBizFeeds = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1963;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1963] = DR.blogs.GetBizFeeds;
+DR.blogs.GetBizFeeds[__CL] = "Blogs__GetBizFeeds";
+DR.blogs.GetBizFeeds[__P] = new DR._Method;
+DR.blogs.GetBizFeeds[__P][__C] = DR.blogs.GetBizFeeds;
+/** @type {Number} */
+DR.blogs.GetBizFeeds.prototype.uid = null;
+/** @type {DR.blogs.struct.BizFeeds} */
+DR.blogs.GetBizFeeds.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.PostStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1973;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1973] = DR.blogs.PostStats;
+DR.blogs.PostStats[__CL] = "Blogs__PostStats";
+DR.blogs.PostStats[__P] = new DR._Method;
+DR.blogs.PostStats[__P][__C] = DR.blogs.PostStats;
+/** @type {Number} */
+DR.blogs.PostStats.prototype.pg = null;
+/** @type {Number} */
+DR.blogs.PostStats.prototype.pid = null;
+/** @type {DR.blogs.struct.PostStatsRe} */
+DR.blogs.PostStats.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.ProfitPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1977;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1977] = DR.blogs.ProfitPosts;
+DR.blogs.ProfitPosts[__CL] = "Blogs__ProfitPosts";
+DR.blogs.ProfitPosts[__P] = new DR._Method;
+DR.blogs.ProfitPosts[__P][__C] = DR.blogs.ProfitPosts;
+/** @type {Number} */
+DR.blogs.ProfitPosts.prototype.pg = null;
+/** @type {DR.blogs.struct.ProfitPostsRe} */
+DR.blogs.ProfitPosts.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.CanRequestSpotlight = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1981;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1981] = DR.blogs.CanRequestSpotlight;
+DR.blogs.CanRequestSpotlight[__CL] = "Blogs__CanRequestSpotlight";
+DR.blogs.CanRequestSpotlight[__P] = new DR._Method;
+DR.blogs.CanRequestSpotlight[__P][__C] = DR.blogs.CanRequestSpotlight;
+/** @type {DR.base.struct.Status} */
+DR.blogs.CanRequestSpotlight.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.RequestSpotlight = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1982;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1982] = DR.blogs.RequestSpotlight;
+DR.blogs.RequestSpotlight[__CL] = "Blogs__RequestSpotlight";
+DR.blogs.RequestSpotlight[__P] = new DR._Method;
+DR.blogs.RequestSpotlight[__P][__C] = DR.blogs.RequestSpotlight;
+/** @type {String} */
+DR.blogs.RequestSpotlight.prototype.text = null;
+/** @type {DR.base.struct.Status} */
+DR.blogs.RequestSpotlight.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Stats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1983;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1983] = DR.blogs.Stats;
+DR.blogs.Stats[__CL] = "Blogs__Stats";
+DR.blogs.Stats.KW_SLP_CLICK = "slp_click";
+DR.blogs.Stats.KW_SLPR_CLICK = "slpr_click";
+DR.blogs.Stats.KW_ASTES_CLICK = "astes_click";
+DR.blogs.Stats[__P] = new DR._Method;
+DR.blogs.Stats[__P][__C] = DR.blogs.Stats;
+/** @type {String} */
+DR.blogs.Stats.prototype.kw = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetSpotlightPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2006;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2006] = DR.blogs.GetSpotlightPosts;
+DR.blogs.GetSpotlightPosts[__CL] = "Blogs__GetSpotlightPosts";
+DR.blogs.GetSpotlightPosts[__P] = new DR._Method;
+DR.blogs.GetSpotlightPosts[__P][__C] = DR.blogs.GetSpotlightPosts;
+/** @type {Boolean|null} */
+DR.blogs.GetSpotlightPosts.prototype.checkBadge = null;
+/** @type {Number} */
+DR.blogs.GetSpotlightPosts.prototype.count = null;
+/** @type {DR.blogs.struct.Posts} */
+DR.blogs.GetSpotlightPosts.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetSimilarPosts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2012;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2012] = DR.blogs.GetSimilarPosts;
+DR.blogs.GetSimilarPosts[__CL] = "Blogs__GetSimilarPosts";
+DR.blogs.GetSimilarPosts[__P] = new DR._Method;
+DR.blogs.GetSimilarPosts[__P][__C] = DR.blogs.GetSimilarPosts;
+/** @type {Number} */
+DR.blogs.GetSimilarPosts.prototype.count = null;
+/** @type {Number} */
+DR.blogs.GetSimilarPosts.prototype.id = null;
+/** @type {DR.blogs.struct.Posts} */
+DR.blogs.GetSimilarPosts.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.FullStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2050;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2050] = DR.blogs.FullStats;
+DR.blogs.FullStats[__CL] = "Blogs__FullStats";
+DR.blogs.FullStats[__P] = new DR._Method;
+DR.blogs.FullStats[__P][__C] = DR.blogs.FullStats;
+/** @type {Number} */
+DR.blogs.FullStats.prototype.pg = null;
+/** @type {DR.blogs.struct.FullStatsRe} */
+DR.blogs.FullStats.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.LastVisitor = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2057;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2057] = DR.blogs.LastVisitor;
+DR.blogs.LastVisitor[__CL] = "Blogs__LastVisitor";
+DR.blogs.LastVisitor[__P] = new DR._Method;
+DR.blogs.LastVisitor[__P][__C] = DR.blogs.LastVisitor;
+/** @type {DR.blogs.struct.StatsItem} */
+DR.blogs.LastVisitor.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetPayoutInfo = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2059;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2059] = DR.blogs.GetPayoutInfo;
+DR.blogs.GetPayoutInfo[__CL] = "Blogs__GetPayoutInfo";
+DR.blogs.GetPayoutInfo[__P] = new DR._Method;
+DR.blogs.GetPayoutInfo[__P][__C] = DR.blogs.GetPayoutInfo;
+/** @type {DR.blogs.struct.PayoutInfo} */
+DR.blogs.GetPayoutInfo.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.AgreeToPayoutRules = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2060;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2060] = DR.blogs.AgreeToPayoutRules;
+DR.blogs.AgreeToPayoutRules[__CL] = "Blogs__AgreeToPayoutRules";
+DR.blogs.AgreeToPayoutRules[__P] = new DR._Method;
+DR.blogs.AgreeToPayoutRules[__P][__C] = DR.blogs.AgreeToPayoutRules;
+/** @type {DR.blogs.struct.PayoutInfo} */
+DR.blogs.AgreeToPayoutRules.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.ResetPayoutInfo = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2063;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2063] = DR.blogs.ResetPayoutInfo;
+DR.blogs.ResetPayoutInfo[__CL] = "Blogs__ResetPayoutInfo";
+DR.blogs.ResetPayoutInfo[__P] = new DR._Method;
+DR.blogs.ResetPayoutInfo[__P][__C] = DR.blogs.ResetPayoutInfo;
+/** @type {DR.blogs.struct.PayoutInfo} */
+DR.blogs.ResetPayoutInfo.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.RequestPayout = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2065;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2065] = DR.blogs.RequestPayout;
+DR.blogs.RequestPayout[__CL] = "Blogs__RequestPayout";
+DR.blogs.RequestPayout[__P] = new DR._Method;
+DR.blogs.RequestPayout[__P][__C] = DR.blogs.RequestPayout;
+/** @type {DR.base.struct.Status} */
+DR.blogs.RequestPayout.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetPayoutActions = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2068;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2068] = DR.blogs.GetPayoutActions;
+DR.blogs.GetPayoutActions[__CL] = "Blogs__GetPayoutActions";
+DR.blogs.GetPayoutActions[__P] = new DR._Method;
+DR.blogs.GetPayoutActions[__P][__C] = DR.blogs.GetPayoutActions;
+/** @type {DR.blogs.struct.PayoutActions} */
+DR.blogs.GetPayoutActions.prototype.re = null;
+ 
+/** @extends {DR.blogs.GetFeed} */
+DR.blogs.GetDrafts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2133;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2133] = DR.blogs.GetDrafts;
+DR.blogs.GetDrafts[__CL] = "Blogs__GetDrafts";
+DR.blogs.GetDrafts[__P] = new DR.blogs.GetFeed;
+DR.blogs.GetDrafts[__P][__C] = DR.blogs.GetDrafts;
+/** @type {Number|null} */
+DR.blogs.GetDrafts.prototype.uid = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.Badge = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2176;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2176] = DR.blogs.Badge;
+DR.blogs.Badge[__CL] = "Blogs__Badge";
+DR.blogs.Badge[__P] = new DR._Method;
+DR.blogs.Badge[__P][__C] = DR.blogs.Badge;
+/** @type {DR.blogs.struct.BadgeRe} */
+DR.blogs.Badge.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.blogs.GetNextUserPost = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3132;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3132] = DR.blogs.GetNextUserPost;
+DR.blogs.GetNextUserPost[__CL] = "Blogs__GetNextUserPost";
+DR.blogs.GetNextUserPost[__P] = new DR._Method;
+DR.blogs.GetNextUserPost[__P][__C] = DR.blogs.GetNextUserPost;
+/** @type {Number} */
+DR.blogs.GetNextUserPost.prototype.currentPostId = null;
+/** @type {Boolean|null} */
+DR.blogs.GetNextUserPost.prototype.stats = null;
+/** @type {Number|null} */
+DR.blogs.GetNextUserPost.prototype.statsRow = null;
+/** @type {DR.blogs.struct.Item} */
+DR.blogs.GetNextUserPost.prototype.re = null;
+ 
+D.loaded();
