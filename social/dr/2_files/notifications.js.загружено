@@ -1,0 +1,408 @@
+var DesktopNotify = function () {
+	this.init();
+};
+
+DesktopNotify.prototype = {
+	logging: D.DEV,
+	isSubscribed: null,
+	subscription: null,
+	/** @type RPC */
+	rpc: null,
+
+	init: function () {
+		if ( this.isSupported() ) {
+			this.rpc = new RPC('/notifications/rq/app.php');
+
+			var that = this;
+
+			navigator.serviceWorker.register('/service-worker.js').then(function (sw) {
+
+				that._log('[SW] Service worker registered');
+
+				navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {
+
+					serviceWorkerRegistration.pushManager.getSubscription().then(function ( subscription ) {
+						if ( !subscription ) {
+							that._log('[SWS] ready - no subscription');
+							that._onSubcriptionChange( false );
+							return;
+						}
+						that._log('[SWS] ready - has subscription');
+						that._updateSubscription( subscription );
+
+					}, function (e) {
+						that._error('[SWS] Error getSubscription()', e);
+					});
+				});
+			}, function (e) {
+				that._error('[SW] Service worker registration failed');
+			});
+		}
+	},
+	isSupported: function () {
+		if(typeof D === "undefined" || !D.ID) {
+			return false;
+		}
+		// chrome only
+		if(!window.chrome || !window.chrome.webstore) {
+			return false;
+		}
+		/*
+		if( !D.DEV ) {
+			return false;
+		}
+		*/
+		if(!D.LV) {
+			return false;
+		}
+		if(document.location.protocol !== 'https:') {
+			return false;
+		}
+		// Check if remember_me is set
+		if(!D.Cookie.read('a_auto')) {
+			return false;
+		}
+		// Check browser support
+		if (!('serviceWorker' in navigator)) {
+			return false;
+		}
+		if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+			return false;
+		}
+		if (!('PushManager' in window)) {
+			return false;
+		}
+		// If denied access, game over
+		if (Notification.permission === 'denied') {
+			return false;
+		}
+		return true;
+	},
+	waitingToAsk: false,
+	ask: function () {
+		/*
+		if( !D.DEV ) {
+			return false;
+		}
+		*/
+		try {
+			if( sessionStorage.getItem('desknotif_closed') ) {
+				return false;
+			}
+			if( localStorage.getItem('desknotif_dont_ask') ) {
+				return false;
+			}
+		} catch (e) {
+			return false;
+		}
+		if( this.isSubscribed !== false ) {
+			if( this.isSubscribed === null ) {
+				this._log('notify ask? waiting for worker');
+				this.waitingToAsk = true;
+			} else {
+				this._log('notify ask? is subscribed');
+			}
+			return false;
+		}
+		if( !this.isSupported() ) {
+			return false;
+		}
+
+		this._stats('desknotif_ask');
+
+		var OS = typeof BrowserDetect && BrowserDetect.OS && BrowserDetect.OS === 'Windows' ? 'Win' : 'Mac';
+
+		$('#desktopnotify-ask').remove();
+		var els = mkE({
+			tag: 'div',
+			id: 'desktopnotify-ask',
+			className: 'radius3',
+			els: [
+				{
+					tag: 'div',
+					className: 'header',
+					text: 'Saņem paziņojumus'
+				},
+				{
+					tag: 'div',
+					className: 'body',
+					els: [
+						{	tag: 'div',
+							className: 'bodyText',
+							els: [
+								'Tā Tu vienmēr uzzināsi par jaunu vēstuli un citus ',
+								{tag:'b', text:'profila jaunumus'},
+								' arī tad, ja tajā laikā nebūsi draugos!',
+							]
+						},
+						{
+							tag: 'div',
+							className: 'bodyImg bodyImg'+OS
+						}
+					]
+				},
+				{
+					tag: 'div',
+					className: 'footer',
+					els: [
+						new T.Form.Button({
+							caption: 'Jā, ieslēgt paziņojumus',
+							size: 'medium',
+							onclick: D.closure(this, this._askPrompt)
+						}),
+						new T.Form.Button({
+							caption: 'Nē',
+							color: 'link',
+							size: 'medium',
+							onclick: D.closure(this, function () {
+								$('#desktopnotify-ask').remove();
+								localStorage.setItem('desknotif_dont_ask', 1);
+								this._stats('desknotif_ask_no');
+							})
+						})
+					]
+				}
+			]
+		}).append($('#my-name')[0]);
+	},
+	_askPrompt: function () {
+		$('#desktopnotify-ask').remove();
+
+		this._stats('desknotif_ask_yes');
+
+		if( Notification.permission === 'granted' ) {
+			this._stats('desknotif_already_granted');
+			this._subscribe();
+			return;
+		}
+
+		if( Notification.permission !== 'granted' || Notification.permission !== 'denied' ) {
+			var userLang = navigator.language || navigator.userLanguage;
+			var isEnglish = userLang.search('en') === 0;
+			var allow = 'Atļaut';
+			var isFirefox = typeof InstallTrigger !== 'undefined';
+
+			if( !!window.chrome && !!window.chrome.webstore ) { //chrome
+				allow = isEnglish ? 'Allow' : 'Atļaut';
+			} else if ( isFirefox ) { //firefox
+				if( typeof BrowserDetect !== "undefined" && BrowserDetect.version >= 53 ) {
+					allow = isEnglish ? 'Allow Notifications' : 'Atļaut paziņojumus';
+				} else {
+					allow = isEnglish ? 'Always receive notifications' : 'Vienmēr saņemt paziņojumus';
+				}
+			}
+
+			mkE({
+				tag: 'div',
+				id: 'desktopnotify-confirm',
+				els: [
+					{
+						tag: 'div',
+						className: 'tourOverlay',
+						style: {
+							width: outermost.offsetWidth + 'px',
+							height: outermost.offsetHeight + 'px',
+							left: 0,
+							top: 0,
+							zIindex: 1001
+						}
+					},
+					{
+						tag: 'div',
+						className: 'text',
+						style: {
+							top: isFirefox ? '151px' : '91px'
+						},
+						els: [
+							"Spied ",
+							{tag: 'span', text: allow + ','},
+							{tag: 'br'},
+							"lai saņemtu paziņojumus"
+						]
+					}
+				]
+			}).append($('body')[0]);
+
+			Notification.requestPermission(D.closure(this, function (permission) {
+				$('#desktopnotify-confirm').remove();
+				if (permission === 'denied') {
+					this._stats('desknotif_denied');
+				} else if (permission === 'granted') {
+					this._stats('desknotif_granted');
+					this._subscribe();
+				} else {
+					this._stats('desknotif_closed');
+					sessionStorage.setItem('desknotif_closed', 1);
+				}
+			}));
+
+		}
+	},
+	_onSubcriptionChange: function ( state, subscription ) {
+		this.isSubscribed = state;
+		this.subscription = state ? subscription : false;
+
+		var ss_endpoint = sessionStorage.getItem('desknotif_endpoint');
+
+		if( this.isSubscribed ) {
+			var endpoint = this._getEndpoint( this.subscription );
+			if( ss_endpoint !== endpoint ) {
+				this.rpc.send('setCurrent', {endpoint: endpoint}, D.closure(this, function (re) {
+					if(re.id > 1) {
+						sessionStorage.setItem('desknotif_endpoint', endpoint);
+						localStorage.setItem('desknotif_ts', D.TIME);
+						localStorage.setItem('desknotif_uid', D.ID);
+						localStorage.setItem('desknotif_endpoint', endpoint);
+						this._log('[SWS] Subscription change to true ');
+					} else {
+						sessionStorage.setItem('desknotif_endpoint', -1);
+						this.subscription.unsubscribe();
+						this._log('[SWS] Subscription change was invalid ');
+					}
+				}));
+			} else {
+				this._log('[SWS] Subscription session maintained ');
+			}
+		} else {
+			if( +ss_endpoint !== -1 ) {
+				this.rpc.send('setCurrent', {endpoint: false});
+			}
+			sessionStorage.setItem('desknotif_endpoint', -1);
+			localStorage.removeItem('desknotif_ts');
+			localStorage.removeItem('desknotif_uid');
+			localStorage.removeItem('desknotif_endpoint');
+
+			if( this.waitingToAsk ) {
+				this.waitingToAsk = false;
+				this.ask();
+			}
+
+			this._log('[SWS] Subscription changed to false ');
+		}
+	},
+	_stats: function ( kw ) {
+		if( !!window.chrome && !!window.chrome.webstore ) { // Chrome
+			kw += '_cr';
+		} else if ( typeof InstallTrigger !== 'undefined' ) { // Firefox
+			kw += '_ff';
+		} else {
+			kw += '_ua';
+		}
+		this._log('[stats] ' + kw);
+		this.rpc.send('stats', {kw: kw});
+	},
+
+	_subscribe: function () {
+		var that = this;
+		navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {
+			serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
+				.then(function(subscription) {
+					that._log('[SWS] Acquired subscription');
+					that._saveSubscription(subscription);
+				});
+		});
+	},
+
+	unsubscribe: function (updateServer) {
+		var that = this;
+		if( this.isSubscribed && this.subscription ) {
+			var endpoint = this._getEndpoint( this.subscription );
+			if(updateServer) {
+				this.rpc.send('deleteSubcription', {endpoint: endpoint});
+			}
+			this.subscription.unsubscribe().then(function (success) {
+				if( success ) {
+					that.isSubscribed = false;
+					that._log('[SWS] Unsubscribe successful');
+					that._onSubcriptionChange(false);
+				} else {
+					that._error('[SWS] Unsubscribe unsuccessful');
+				}
+			});
+		}
+	},
+
+	_updateSubscription: function ( subscription ) {
+		var uid = +localStorage.getItem('desknotif_uid');
+		var stored_endpoint = localStorage.getItem('desknotif_endpoint');
+		var current_endpoint = this._getEndpoint( subscription );
+
+		if( uid && stored_endpoint ) {
+			if( uid !== D.ID ) {
+				this._log('[SWS] Invalid subscription');
+				subscription.unsubscribe();
+				this._onSubcriptionChange( false );
+			} else if ( current_endpoint === stored_endpoint ) {
+				this._log('[SWS] Same subscription');
+				this._onSubcriptionChange( true, subscription );
+			} else {
+				this.rpc.send('updateSubscription', {
+						old_endpoint: stored_endpoint,
+						endpoint: current_endpoint
+					},
+					D.closure( this, function ( re ) {
+						if( re.ok ) {
+							this._onSubcriptionChange( true, subscription );
+						} else {
+							this._onSubcriptionChange( false );
+						}
+						this._log('[SWS] Updated subscription');
+					})
+				);
+			}
+		} else {
+			// Check endpoint, if unknown, unsub
+			this._onSubcriptionChange( true, subscription );
+		}
+	},
+
+	_saveSubscription: function (subscription) {
+		this.rpc.send('saveSubcription', {
+				endpoint: this._getEndpoint( subscription )
+			},
+			D.closure( this, function ( re ) {
+				if( re.ok ) {
+					var notification = new Notification('', {
+						icon: '/notifications/img/draugiem-192.png',
+						body: 'Paldies, ka izvēlējies saņemt jaunumus no draugiem.lv!'
+					});
+					notification.onclick = function () {
+						window.open("/account/?tab=11");
+					};
+					this._onSubcriptionChange( true, subscription );
+				} else {
+					this._onSubcriptionChange( false );
+				}
+			})
+		);
+	},
+
+	_log: function () {
+		if( this.logging ) {
+			console.log.apply(console, arguments);
+		}
+	},
+
+	_error: function () {
+		if( this.logging ) {
+			console.log.apply(console, arguments);
+		}
+	},
+
+	_getEndpoint: function( subscription ) {
+		var endpoint = subscription.endpoint;
+		var subscriptionId = subscription.subscriptionId;
+		// fix Chrome < 45
+		if (subscriptionId && endpoint.indexOf(subscriptionId) === -1) {
+			endpoint += '/' + subscriptionId;
+		}
+		return endpoint;
+	}
+
+};
+
+if(window.chrome) {
+	window.addEventListener('DOMContentLoaded', function () {
+		D.DesktopNotify = new DesktopNotify();
+	});
+}

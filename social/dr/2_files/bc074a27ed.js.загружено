@@ -1,0 +1,4273 @@
+if ( typeof D == 'undefined' ) {
+	var D = {};
+}
+if ( ! D.Ads ) {
+	D.Ads = {
+		l: new D.Lang('xAds'),
+		rpc: new RPC('/banana/rq/mini.php'),
+		url: '//w.ifrype.com/cpm/',
+		url2: '/rq/cpmget.php',
+		adblock: false,
+		minReloadTime : 15, // reload time priekš reklāmu reload metodes ajaxīgiem brīnumiem
+		lastReload : 0, // laiks, kad pēdējo reizi reloadots
+		advertList: [],
+		previousAdvertList : [],
+		outsideLV: 0,
+		loadedList: [],
+		itemsList: [],
+		adPositions: {},
+
+		PLACE_INFOLOGS_VIDEO_WWW_MOB: 332,
+		PLACE_INFOLOGS_VIDEO_DOUBLE: 333,
+		PLACE_INFOLOGS_VIDEO_WWW_MOB_UNIQUE: 363
+	};
+}
+
+D.Ads.isDEV = function (){
+	//return 0;
+	return D.ID == 178429 || D.ID == 3125617 || D.DEV;
+};
+
+D.Ads.SET_SIZE = true;
+
+D.Ads.getSection = function (){
+	try{
+	return document.location.pathname.split('/')[1] || 'frontpage';
+	} catch(e){
+	}
+	return 'frontpage';
+};
+
+D.Ads.closeAd = function (node, ad_id, empty) {
+	if ( node ) {
+		if (typeof node == 'string') {
+			node = $('#'+node)[0];
+		}
+
+		if (empty) {
+			$(node).empty();
+		} else {
+			$(node).remove();
+		}
+	}
+
+	if (D.Ads.previewAD) {
+		return;
+	}
+
+	var close = document.createElement('img');
+	close.src = D.Ads.url + 'del?' + D.Ads.encodeAd(ad_id+'.'+ D.Ads.getUserID());
+	close.onerror = function() {
+		var close2 = document.createElement('img');
+		close2.src = D.Ads.url2 + '?r=del&p=' + encodeURIComponent( D.Ads.encodeAd(ad_id+'.'+ D.Ads.getUserID()) );
+	}
+};
+
+D.Ads.renderTopLink = function(item, placeId) {
+	var data = D.JSON.decode(item.js);
+
+	var link = data.link;
+	if ( data.link.indexOf('galv.hit.gemius.pl') ) {
+		var start = data.link.indexOf('url=') + 4;
+		link = data.link.substr( start, data.link.length - start );
+	}
+
+	var host = mkE({
+		tag: 'a',
+		href: link,
+		text: data.text,
+		target: data.target
+	});
+	if(host.host.length > 0) {
+		$('.sayMainTopItem').each(function() {
+			if($(this).children('.source:contains(' + host.host + ')').length > 0) {
+				$(this).hide();
+			}
+		});
+	}
+	var adNode = mkE({
+		tag: 'div',
+		className: 'sayMainTopItem'
+	}).append(document.getElementById('adv' + placeId));
+	var extIconNode = mkE({
+		tag: 'span',
+		className: 'external-icon',
+		els: [
+			T.svgIcon({
+				icon: 'external-link'
+			})
+		]
+	}).append(adNode);
+	if ( item.url ) {
+		mkE({
+			tag: 'a',
+			href: item.url,
+			target: data.target,
+			text: data.text
+		}).append( adNode );
+	} else {
+		mkE({
+			tag: 'span',
+			text: data.text
+		}).append( adNode );
+	}
+
+	T.clear().append(adNode);
+	var hostTxt = host.host.replace('www.', '');
+	if (hostTxt == "draugiem.lv") {
+		hostTxt = "";
+		data.icon = false;
+	}
+	var favNode = mkE(
+		{
+			tag: 'div',
+			className: 'source color2 icon', //<img class="favImg" width=14 height=14 src="' . $link->favicon . '" \>
+			text:hostTxt,
+			style: {
+				display: 'inline-block',
+				paddingLeft: 0
+			}
+		}
+	).append(adNode);
+	if (data.icon && data.icon.indexOf('//i.ifrype.com/say_fav/00/000/0.png') == -1) {
+		clearNode( extIconNode );
+		mkE({
+			tag: 'img',
+			className: 'favImg',
+			src: data.icon,
+			style: {
+				display: data.icon == '' ? 'none' : 'inline',
+				width: '16px',
+				height: '16px'
+			}
+		}).append( extIconNode );
+	}
+	mkE({
+		tag: 'span',
+		text: (hostTxt ? ' · ' : '') + D.Lang.get('Highlight post')
+	}).append(favNode);
+
+	new D.Ads.Options({ id: item.aid, type: 'cpm' }).append( favNode );
+
+	if ( data.stats ){
+		var stats_src = data.stats;
+		stats_src = stats_src.replace('[TIMESTAMP]', new Date().getTime());
+		mkE({
+			tag: 'img',
+			src: stats_src,
+			style:{
+				width:'1',
+				height:'1',
+				border:'0',
+				position: 'absolute',
+				top: 0,
+				left: 0
+			}
+		}).append(adNode);
+	}
+	$('#adv' + placeId).show();
+
+	if ( empty( item.aid ) ) {
+		D.scrollIntoView( document.getElementById('sayMainTop') );
+	}
+};
+
+D.Ads.loadItems = function(items) {
+	var pic_path = '';
+	var user_name = '';
+	var user_name_short = '';
+	var user_name_default = '';
+	var user_name_short_default = '';
+
+	if (typeof(D.me) != 'undefined') {
+		pic_path = D.me.image.small;
+		user_name = D.me.vtitle;
+		user_name_short = D.me.vname;
+		user_name_default = D.me.title;
+		user_name_short_default = D.me.name;
+	}
+
+	var ads = [];
+	var i;
+	var adSizes = D.store.get('adPlaceSizes');
+	var skipInscreen = [];
+
+	if (!adSizes) {
+		adSizes = {};
+	}
+
+	/*if (empty(items)) {
+		var is111 = (array_search(111, this.previousAdvertList));
+		if (is111 === false) {
+			//D.log(1);
+		} else {
+			//D.log(2);
+		}
+	}*/
+	for (i in items) {
+		(function(placeId) {
+			D.Ads.itemsList[parseInt(placeId)] = items[placeId].jsid;
+			try {
+				if(placeId == 17210 || placeId == 17213) {
+					D.Ads.renderTopLink(items[placeId], placeId);
+					return;
+				}
+				if (items[placeId].js.substring(0, 1) == "{") {
+					var url = items[placeId].url;
+					var data = D.JSON.decode(items[placeId].js);
+					data.url = url;
+					D.Ads.createAdFromJSON(data);
+					return;
+				}
+				if ( D.Ads.adblock && placeId == 272 ) {
+					items[placeId].js = D.Ads.replaceAssetUrl( items[placeId].js );
+				}
+				var url = items[placeId].url;
+				eval(items[placeId].js);
+				ads[placeId] = items[placeId].jsid;
+
+				adSizes[placeId] = $('#adv' + placeId).height();
+
+				// 5 sek video reklaamaam inscreenu izsauc manuaali no playera
+				if ( items[placeId].js.indexOf('inscreenPlay: true') != -1 ) {
+					skipInscreen.push(placeId);
+				}
+
+				if ( placeId == 99 ) {
+					$('#adv' + placeId).parent('.sideMenu').css({ overflow: 'visible' });
+				}
+
+				// options
+				if ( placeId == 366 ) { // blogu 728x90
+					new D.Ads.Options({
+						id: items[placeId].aid, type: 'cpm', canClose: true, onClose: function () {
+							removeNode(document.getElementById('adv366'));
+						}
+					}).append(document.getElementById('adv' + placeId));
+				} else if ( placeId != 4 && placeId != 367 ) {
+					var optPar = {
+						id: items[placeId].aid,
+						type: 'cpm'
+					};
+					if ( placeId == 51 || placeId == 54 ) {
+						optPar.top = 16; // lai neiet virsuu google reklaamu riikiem
+					}
+					new D.Ads.Options( optPar ).append(document.getElementById('adv' + placeId));
+				}
+				$('#adv' + placeId).trigger('adloaded');
+			} catch (err) {
+				if (D.DEV) {
+					//D.log('ads fail place id: ' + ad_id + ' ' + err.message);
+				}
+			}
+		})(i);
+	}
+
+	for (var j in ads) {
+		if (!ads.hasOwnProperty(j)) {
+			continue;
+		}
+		D.Ads.loadedList[parseInt(j)] = ads[j];
+	}
+
+	D.store.set('adPlaceSizes', adSizes);
+	D.Ads.onload();
+	for( var n = 0; n < skipInscreen.length; n++ ) {
+		delete ads[skipInscreen[n]];
+	}
+	D.Ads.inScreen.init(ads);
+
+	if (D.Ads.afterLoad) {
+		D.Ads.afterLoad(items);
+	}
+};
+
+D.Ads.getAdPosition = function( placeId ) {
+	if ( !this.adPositions[placeId] ) {
+		this.adPositions[placeId] = 1;
+	} else {
+		this.adPositions[placeId]++;
+	}
+	return this.adPositions[placeId];
+};
+
+D.Ads.customPassbackAd = function() {
+	if (window.addEventListener) {
+		window.addEventListener('message', D.Ads.processPassback, false);
+	} else {
+		window.attachEvent('onmessage', D.Ads.processPassback);
+	}
+};
+
+D.Ads.processPassback = function(event) {
+	if (event.data) {
+		if ( event.data.no_ad ) {
+			var evData = event.data.no_ad;
+			if ( D.ADMIN ) {
+				D.log('no ad ' + evData.placeId);
+			}
+			clearNode(document.getElementById('adv'+ evData.placeId));
+			var js_id = D.Ads.loadedList[evData.placeId];
+			if (!js_id) {
+				return;
+			}
+			var skipPlaces = D.store.get('adPlaceSkip');
+			var skipTime = D.store.get('adPlaceSkipTime');
+			if ( !skipTime ) {
+				skipTime = 0;
+			}
+			if (!skipPlaces || D.TIME - skipTime > 60 ) {
+				skipPlaces = [];
+			}
+			if ( skipPlaces.indexOf(js_id) === -1 ) {
+				skipPlaces.push(js_id);
+			}
+			D.store.set('adPlaceSkip', skipPlaces);
+			D.store.set('adPlaceSkipTime', D.TIME);
+			if (window.addEventListener) {
+				window.removeEventListener('message', D.Ads.processPassback, false)
+			} else {
+				window.detachEvent('onmessage', D.Ads.processPassback);
+			}
+			D.Ads.place(evData.placeId);
+			D.Ads.load();
+		} else if ( event.data.ad_change_size ) {
+			var evData = event.data.ad_change_size;
+			if ( evData.placeId != 366 && evData.placeId != 367 ) {
+				var h = parseInt( evData.h );
+				if ( h <= 0 || h > 620 ) {
+					return;
+				}
+				// var w = parseInt( evData.w );
+				// if ( w <= 0 || w > 1080 ) {
+				// 	return;
+				// }
+
+				$('iframe', document.getElementById('adv'+ evData.placeId)).height( h );
+				// $(document.getElementById('adv'+ D.Ads.cpAd)).width( w );
+			}
+		}
+	}
+};
+
+/**
+ * Reload adverts
+ * @param params.reloadTime min delays sekundēs starp reloadiem
+ */
+D.Ads.reload = function(params) {
+
+	params = params || {};
+
+	var reloadTime  = D.Ads.minReloadTime;
+	var currentTime = new D.Date().getTime();
+
+	if (typeof(params.reloadTime) != 'undefined') {
+		reloadTime = params.reloadTime;
+	}
+
+//	D.log('time passed: ' + (currentTime - D.Ads.lastReload));
+
+	if (currentTime - D.Ads.lastReload < reloadTime) {
+		return;
+	}
+
+	D.Ads.load(true);
+};
+
+D.Ads.placeHeight = function (place_id, v){
+	//var section = D.Ads.getSection();
+	var k = String(place_id);
+	var h = D.store.get('adsHeight') || {};
+	if(isset(v)){
+		h[k] = v;
+		D.store.set('adsHeight', h);
+		//D.log('set', k, v);
+		return v;
+	}
+	//D.log('get', k, h[k]);
+	return h[k] || null;
+};
+
+D.Ads.place = function(place_id) {
+	if(array_search(place_id, D.Ads.advertList)){
+		return;
+	}
+	D.Ads.advertList.push(place_id); // nelikt zemaak, jo ar sho veido adv nodes
+	var node = document.getElementById('adv' + place_id);
+	if (!node) {
+		return;
+	}
+	if ( D.me.adddata[120] ) {
+		node.style.display = 'none';
+		return;
+	}
+	if(D.Ads.SET_SIZE){
+		var height = D.Ads.placeHeight(place_id);
+		if(height){
+			node.style.minHeight = height + 'px';
+		} else {
+			//node.style.display = 'none';
+		}
+	} else {
+		var adSizes = D.store.get('adPlaceSizes');
+		if (adSizes) {
+			if (!adSizes[place_id]) {
+				node.style.display = 'none';
+			} else if (adSizes[place_id] > 0) {
+				//node.style.height = adSizes[place_id] + 'px';
+			}
+		}
+	}
+	clearNode(node);
+};
+
+D.Ads.remove = function(place_id, delete_node) {
+	if (D.Ads.advertList.indexOf(place_id) > 0) {
+		D.Ads.advertList.splice(D.Ads.advertList.indexOf(place_id), 1);
+	}
+	else if (D.Ads.previousAdvertList.indexOf(place_id) > 0) {
+		D.Ads.previousAdvertList.splice(D.Ads.previousAdvertList.indexOf(place_id), 1);
+	}
+	var node = document.getElementById('adv' + place_id);
+	if (node) {
+		if (delete_node) {
+			removeNode(node);
+		}
+		else {
+			clearNode(node);
+		}
+	}
+};
+
+D.Ads.lazyPlace = function( place_id ) {
+	if ( !isIntersectionObserverSupported() ) {
+		D.Ads.place( place_id );
+		D.Ads.load();
+		return;
+	}
+
+	var observer;
+	var options = {
+		root: null,
+		rootMargin: "0px 0px 200px 0px",
+		threshold: 0
+	};
+	observer = new IntersectionObserver(function(entries, observer) {
+		for ( var i = 0; i < entries.length; i++ ) {
+			var entry = entries[i];
+			if( entry.isIntersecting ) {
+				D.Ads.place( place_id );
+				D.Ads.load();
+				observer.unobserve( entry.target );
+			}
+		}
+	}, options);
+	observer.observe( document.getElementById( 'adv' + place_id) );
+};
+
+var isIntersectionObserverSupported = function() {
+	if ('IntersectionObserver' in window &&
+		'IntersectionObserverEntry' in window &&
+		'intersectionRatio' in window.IntersectionObserverEntry.prototype) {
+
+		// Minimal polyfill for Edge 15's lack of `isIntersecting`
+		if (!('isIntersecting' in window.IntersectionObserverEntry.prototype)) {
+			Object.defineProperty(window.IntersectionObserverEntry.prototype,
+				'isIntersecting', {
+					get: function () {
+						return this.intersectionRatio > 0;
+					}
+				});
+		}
+		return true;
+	}
+
+	return false;
+};
+
+D.Ads.getUserID = function() {
+	var id = D.ID;
+
+	if ( id ) {
+		return id;
+	}
+
+	var cid = parseInt( D.Cookie.read('my_last_id'), 10 );
+	if ( cid ) {
+		id = cid;
+	}
+
+	return id;
+};
+
+/**
+ * @param {boolean} [cached]
+ * @param {string} [params]
+ */
+D.Ads.load = function( cached, params ){
+	var list = [];
+
+	if (cached) {
+		list = D.Ads.previousAdvertList;
+	} else {
+		list = D.Ads.advertList;
+	}
+	var places = [];
+	for (var i = 0; i <= list.length - 1; i++) {
+		var place_id = list[i];
+		places.push(place_id);
+	}
+
+	var timestamp = new D.Date().getTime();
+
+	D.Ads.lastReload = timestamp;
+	var skip = D.store.get('adPlaceSkip');
+	var skipTime = D.store.get('adPlaceSkipTime');
+	if ( !skipTime ) {
+		skipTime = 0;
+	}
+
+	var id = D.Ads.getUserID();
+	if (places.length) {
+
+		var request = 'xx' + D.Ads.encodeAd(places.join(',') + '.' + id) + timestamp;
+		if (skip && !empty(skip) && D.TIME - skipTime <= 60) {
+			request += "&skip=" + skip.join(',');
+		}
+		if(params){
+			request += params;
+		}
+
+		if ( id ) {
+			mkE({
+				tag : 'script',
+				prop : {
+					type : 'text/javascript',
+					src : D.Ads.url + 'get?' + request
+				},
+				onerror: function() {
+					if ( places.indexOf(272) === -1 ) {
+						return;
+					}
+					var request2 = 'xx' + D.Ads.encodeAd(272 + '.' + id) + timestamp;
+					if (skip && !empty(skip) && D.TIME - skipTime <= 60) {
+						request2 += "&skip=" + skip.join(',');
+					}
+					if(params){
+						request2 += params;
+					}
+					mkE({
+						tag : 'script',
+						prop : {
+							type : 'text/javascript',
+							src : D.Ads.url2 + '?r=get&p=' + encodeURIComponent( request2 )
+						}
+					}).append(getHeadElement());
+					D.Ads.rpc.send('customStats', { v: 'cpm_get_blocked' }, function(re){}, this);
+					D.Ads.adblock = true;
+				}
+			}).append(getHeadElement());
+		} else {
+			if ( D.Ads.previewAD ) { // citaadi neielogotie neredz preview, piemeeram, /lapas/ sadaljaa gigas
+				D.Ads.loadItems();
+			} else {
+				// novaac tukshos konteinerus, ja nav, kam raadiit
+				for ( var n = 0; n < places.length; n++ ) {
+					var placeNode = document.getElementById('adv' + places[n]);
+					if ( placeNode ) {
+						placeNode.style.display = 'none';
+					}
+				}
+			}
+		}
+	}
+
+	if (!cached) {
+		D.Ads.previousAdvertList = [];
+		O2O(D.Ads.previousAdvertList, D.Ads.advertList);
+		D.Ads.advertList = [];
+	}
+};
+
+D.Ads.onload = function() {
+	if (D.Ads.previewAD) {
+		setTimeout(function(){
+			if (D.Ads.previewAD.loaded) {
+				return;
+			}
+			var pic_path = '';
+			var user_name = '';
+			var user_name_short = '';
+			var user_name_default = '';
+			var user_name_short_default = '';
+
+			if (typeof(D.me) != 'undefined') {
+				pic_path = D.me.image.small;
+				user_name = D.me.vtitle;
+				user_name_short = D.me.vname;
+				user_name_default = D.me.title;
+				user_name_short_default = D.me.name;
+			}
+			$('#adv'+D.Ads.previewAD.id).prev('.sep').remove();
+			$('#adv'+D.Ads.previewAD.id).empty().height('auto').show();
+			D.Ads.previewAD.loaded = true;
+			if(D.Ads.previewAD.id == 17210 || D.Ads.previewAD.id == 17213) {
+				D.Ads.renderTopLink(D.Ads.previewAD, D.Ads.previewAD.id);
+				return;
+			}
+			if ( D.Ads.previewAD.id == 99 ) {
+				$('#adv' + D.Ads.previewAD.id).parent('.sideMenu').css({ overflow: 'visible' });
+			}
+			if (D.Ads.previewAD.js.substring(0, 1) == "{") {
+				var url = D.Ads.previewAD.url;
+				var data = D.JSON.decode(D.Ads.previewAD.js);
+				data.url = url;
+				D.Ads.createAdFromJSON(data);
+				return;
+			}
+			eval(D.Ads.previewAD.js);
+
+			// options
+			if ( D.Ads.previewAD.id !== 4 ) {
+				new D.Ads.Options({ id: D.Ads.previewAD.aid, type: 'cpm' }).append(document.getElementById('adv' + D.Ads.previewAD.id));
+			}
+		},1000);
+	}
+
+	$('.adv, .advv').each(function () {
+		if (!$(this).children().length) {
+			$(this).hide();
+		}
+	});
+};
+
+D.Ads.createAdFromJSON = function(data, url) {
+	if (data.place_id == 316 || data.place_id == 314 || data.place_id == 315 || data.place_id == D.Ads.PLACE_INFOLOGS_VIDEO_WWW_MOB || data.place_id == D.Ads.PLACE_INFOLOGS_VIDEO_WWW_MOB_UNIQUE) {
+		this.createInfoBox(data);
+	}
+};
+
+D.Ads.createInfoBox = function(data) {
+	var node = document.getElementById('adv272');
+	clearNode(node);
+
+	$('#adv272').before('<div id="advFpage272" class="adWindow"><div id="advFPage272TopBar" class="adTopBar hidden"><a class="rklClose icon closeGrayIcon" onclick="D.Ads.closeAd(\'advFpage272\',['+data.ad_id+']);return false;" href="javascript:;"> '+D.Lang.get('close_ad')+' </a></div></div>');
+
+	new D.Ads.Options({id: data.ad_id, type: 'cpm', canClose: true, showLeft: true, onClose: function(){
+		D.Ads.closeAd('advFpage272',[data.ad_id]);
+	}}).append(document.getElementById('advFPage272TopBar'));
+
+	$('#advFpage272').append($('#adv272'));
+	if (data.type && data.type == "video") {
+		var videoPar = {
+			src: D.Ads.adblock ? D.Ads.replaceAssetUrl( data.src ) : data.src,
+			img: D.Ads.adblock ? D.Ads.replaceAssetUrl( data.img ) : data.img,
+			showMute: data.showMute,
+			width: 500,
+			height: 281,
+			url: data.url,
+			link: data.link,
+			target: data.target
+		};
+		if ( isset(data.file_id) && isset(data.video_type) ) {
+			videoPar.stats = {
+				uid: D.ID,
+				pid: data.file_id,
+				type: data.video_type
+			};
+		}
+		if ( isset(data.inscreen_play) ) {
+			videoPar.inscreenPlay = data.inscreen_play;
+		}
+		if ( isset(data.place_id) ) {
+			videoPar.placeId = data.place_id;
+		}
+		var vid = new D.Ads.VideoPlayer( videoPar );
+		vid.append(document.getElementById('adv272'));
+		$('#adv272').height('auto').show();
+	}
+	else if (data.html_href) {
+		mkE({
+			tag: 'iframe',
+			src: data.html_href,
+			prop: {
+				'scrolling': "no",
+				'frameBorder':0
+			},
+			style: {
+				border:0,
+				width:'500px',
+				height:'200px',
+				outline:'none',
+				overflow:'hidden'
+			}
+		}).append(node);
+		if ( data.url ) {
+			mkE({
+				tag: 'a',
+				href: data.url,
+				target: data.target,
+				style: {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: "500px",
+					height: "200px"
+				}
+			}).append(node);
+		} else {
+			mkE({
+				tag: 'div',
+				style: {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: "500px",
+					height: "200px"
+				}
+			}).append(node);
+		}
+	}
+	else if (data.img) {
+		var imgBannerEls = [{
+			tag: 'img',
+			src: D.Ads.adblock ? D.Ads.replaceAssetUrl( data.img ) : data.img,
+			prop: {
+				width: 500,
+				height: 200
+			},
+			style: {
+				'max-width':'100%'
+			}
+		}];
+
+		if ( data.url ) {
+			mkE({
+				tag: 'a',
+				href: data.url,
+				target: data.target,
+				els: imgBannerEls
+			}).append(node);
+		} else {
+			mkE({
+				tag: 'div',
+				els: imgBannerEls
+			}).append(node);
+		}
+
+		if (data.name && !empty(data.name)) {
+			var user_name = '';
+			var user_name_short = '';
+			var user_name_default = '';
+			var user_name_short_default = '';
+			if (typeof(D.me) != 'undefined') {
+				user_name = D.me.vtitle;
+				user_name_short = D.me.vname;
+				user_name_default = D.me.title;
+				user_name_short_default = D.me.name;
+			}
+			var name = '';
+			switch (data.name.name) {
+				case 'user_name':
+					name = user_name;
+					break;
+				case 'user_name_short':
+					name = user_name_short;
+					break;
+				case 'user_name_default':
+					name = user_name_default;
+					break;
+				case 'user_name_short_default':
+					name = user_name_short_default;
+					break;
+			}
+			mkE({
+				tag : 'div',
+				className : 'adv_name',
+				text : name + data.name.add_text,
+				style : data.name.style
+			}).append($('#adv272')[0]);
+		}
+	}
+	if ( data.stats ){
+		var stats_src = data.stats;
+		stats_src = stats_src.replace('[TIMESTAMP]', new Date().getTime());
+		mkE({
+			tag: 'img',
+			src: stats_src,
+			style:{
+				width:'1',
+				height:'1',
+				border:'0',
+				position: 'absolute',
+				top: 0,
+				left: 0
+			}
+		}).append(node);
+	}
+	node.style.display = 'block';
+	node.style.height = 'auto';
+	node.style.position = 'relative';
+};
+
+
+
+D.Ads.encodeAd = function(string) {
+	var encoded = '';
+	for(var i=0; i <= string.length - 1; i++) {
+		encoded += String.fromCharCode(string.charCodeAt(i)+33);
+	}
+	return encoded;
+};
+
+D.Ads.decodeAd = function(string) {
+	var encoded = '';
+	for(var i=0; i <= string.length - 1; i++) {
+		encoded += String.fromCharCode(string.charCodeAt(i)-33);
+	}
+	return encoded;
+};
+
+D.Ads.replaceAssetUrl = function ( str ){
+	return str.replace(/ad_v\//g, 'ad_z/');
+}
+
+D.Ads.interestsSearch = function(v){
+	var time = this.searchTime = new Date().getTime();
+	D.Ads.rpc.send(
+		'interests',
+		{
+			v: v
+		},
+		function(re){
+			if( this.searchTime != time ){
+				return;
+			}
+			var list = [];
+			if ( !re.bad_keyword ) {
+				list.push({
+					caption: 'Atslēgas vārds:',
+					type: 'title'
+				});
+				list.push({
+					caption: v,
+					value: v.replace( /,|\|/g, '' )
+				});
+			}
+			for( var k in re.items ){
+				list.push( re.items[k] );
+			}
+			if ( !list.length ) {
+				return;
+			}
+			this.setList(list);
+		},
+		this
+	);
+};
+
+D.Ads.regionsSearch = function(v){
+	var time = this.searchTime = new Date().getTime();
+	D.Ads.rpc.send(
+		'regions',
+		{
+			v:v
+		},
+		function(re){
+			if( this.searchTime != time ){
+				return;
+			}
+			this.setList( re.items );
+		},
+		this
+	);
+};
+
+D.Ads.updateRigaRegion = function( ac ) {
+	var v = ac.value();
+	var rigar = false;
+	for( var i = 0; i < v.length; ++i) {
+		if (v[i] == 7) {
+			rigar = true;
+		}
+	}
+	if (rigar) {
+		ac.removeValue(7);
+		var novadi = [
+			{"caption":"J\u016brmala","value":100003036},
+			{"caption":"Siguldas nov.","value":100015380},
+			{"caption":"Ik\u0161\u0137iles nov.","value":100015428},
+			{"caption":"Ropa\u017eu nov.","value":100015444},
+			{"caption":"Stopi\u0146u nov.","value":100015460},
+			{"caption":"Salaspils nov.","value":100015485},
+			{"caption":"\u0100da\u017eu nov.","value":100015493},
+			{"caption":"Garkalnes nov.","value":100015516},
+			{"caption":"S\u0113jas nov.","value":100015557},
+			{"caption":"In\u010dukalna nov.","value":100015565},
+			{"caption":"Baldones nov.","value":100015604},
+			{"caption":"Saulkrastu nov.","value":100015620},
+			{"caption":"Bab\u012btes nov.","value":100015725},
+			{"caption":"\u0136ekavas nov.","value":100015950},
+			{"caption":"M\u0101lpils nov.","value":100016011},
+			{"caption":"M\u0101rupes nov.","value":100016028},
+			{"caption":"Olaines nov.","value":100016077},
+			{"caption":"Carnikavas nov.","value":100015508}
+		];
+		for(var j = 0; j < novadi.length; ++j) {
+			ac.addValue(novadi[j]);
+		}
+	}
+};
+
+D.Ads.getMiniAudience = function(callback, formName) {
+	formName = formName || 'AdForm';
+	clearTimeout( this._getMiniAudienceT );
+	this._getMiniAudienceT = setTimeout( function(){
+		var form = D.ajaxPostData( document.forms[ formName ] );
+
+		var p = {
+			sex: false,
+			ageFrom: form['ad[target][age][from]'],
+			ageTo: form['ad[target][age][to]'],
+			keywords: [],
+			notKeywords:window.adsNotInterests ? adsNotInterests.value() : '',
+			loc:adsLoc.value(),
+			birthday:form['ad[target][bd]'] ? true : false,
+			active: true,
+			geo: form['ad[target][geo]']
+		};
+
+		var sex_cnt = $('input[name=ad\\[target\\]\\[sex\\]]:checked').length;
+		var act = $('input[name=ad\\[active\\]]');
+
+		if (act.length) {
+			p.active = parseInt(act.val(),10) ? true : false;
+		}
+
+		if (sex_cnt < 2) {
+			switch( form['ad[target][sex]'] ){
+				case 'M':
+					p.sex = 1;
+					break;
+				case 'F':
+					p.sex = 2;
+					break;
+			}
+		}
+		if ( window.adsInterests ) {
+			p.keywords = adsInterests.value();
+		}
+		var rtNode = document.getElementById('adTargetRetargeting');
+		if ( rtNode && parseInt( rtNode.value ) ) {
+			p.keywords.push( rtNode.value + '_retargeting' );
+
+			var rtLastSeen = document.getElementById('Forms_adTargetRetargetingSlider');
+			if ( rtLastSeen ) {
+				p.retargeting = {
+					id: rtNode.value,
+					days: rtLastSeen._form.value()
+				}
+			}
+		}
+		D.Ads.rpc.send(
+			'getAudience',
+			p,
+			function(re){
+				if( re && re.count ){
+					D.Ads.miniAudience = re.count;
+					$( '#AdTargetEstimate > b' ).html( '~ ' + re.countText );
+					$( '#AdTargetExpo > b' ).html( '~ ' + parseInt(re.count * 160.03).toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1 ") + ' ' );
+				} else {
+					D.Ads.miniAudience = 0;
+					$( '#AdTargetEstimate > b' ).html( '0 ' + D.Lang.nget( 0, 'user', 'xMiniAds' ) );
+				}
+
+				if (typeof(callback) == 'function') {
+					callback(re);
+				}
+			}
+		);
+	}, 100 );
+};
+
+D.Ads.miniHelp = function( title, kw ){
+	D.smallPopUp.open( false, {
+		title:title
+	}, D.Lang.get( kw, 'xMiniAds' ) );
+	return false;
+};
+
+D.Ads.openPoll = function(id, data) {
+	var parent = document.getElementById('pollBox');
+	if( parent._popover ){
+		parent._popover.hide();
+		delete parent._popover;
+		return;
+	}
+	var par = new T.Popover.Par().setParent(parent).setPosition('right top').setScrollIntoView(true).setOnClose(function(){
+		delete parent._popover;
+	}).setTitle(D.Lang.get('participate_in_poll'));
+	var popover = new T.Popover(par);
+	mkE({
+		tag: 'div',
+		className: 'PollPopover',
+		els: [
+			{
+				tag: 'div',
+				className: 'content',
+				els: [
+					{
+						tag: 'div',
+						className: 'img'
+					},
+					{
+						tag: 'h2',
+						text: data.text
+					},
+					{
+						tag: 'div',
+						className: 'buttons',
+						els: [
+							new T.Form.Button({
+								caption: D.Lang.get('start_poll'),
+								onclick: function(){
+									popover.hide();
+									InfoBox.iframe(data.url, {
+										withoutPadding:true,
+										overlayClose:false,
+										width:1024,
+										height:576,
+										onClose:D.reload
+									});
+								},
+								color: 'submit'
+							}),
+							new T.Form.Button({
+								caption: D.Lang.get('cancel_poll'),
+								href: data.closeUrl,
+								color: 'link'
+							})
+						]
+					}
+				]
+			}
+		]
+	}).append(popover.content);
+	popover.show();
+	parent._popover = popover;
+	$('#pollBox span.on').removeClass('on').addClass('off');
+	$.get('/ads/rq/poll.php', {open: id}, function() {});
+};
+
+D.Ads.openExtPoll = function( badgeId, polls ) {
+	var parent = document.getElementById('extPollBox');
+	if( parent._popover ){
+		parent._popover.hide();
+		delete parent._popover;
+		return;
+	}
+	var par = new T.Popover.Par().setParent(parent).setPosition('right top').setScrollIntoView(true).setOnClose(function(){
+		delete parent._popover;
+	}).setTitle(D.Lang.get('participate_in_poll'));
+	var popover = new T.Popover(par);
+	var popoverNode = mkE({
+		tag: 'div',
+		className: 'PollPopover'
+	}).append(popover.content);
+
+	for( var i = 0, l = polls.length; i < l; i++ ){
+		var pollData = polls[i];
+		D.Ads.drawExPoll(popover, pollData).append(popoverNode);
+	}
+
+	popover.show();
+	parent._popover = popover;
+	$('#extPollBox span.on').removeClass('on').addClass('off');
+
+	if ( badgeId ) {
+		var rpc = new RPC('/main/rq/app.php');
+		rpc.send('extPollOpen', { id: badgeId }, function(){} );
+	}
+};
+
+D.Ads.drawExPoll = function(popover, poll){
+	return mkE({
+		tag: 'div',
+		className: 'MainPopoverPoll MainActualItem',
+		els: [
+			{
+				tag: 'div',
+				className: 'img'
+			},
+			{
+				tag: 'h2',
+				text: poll.text
+			},
+			{
+				tag: 'div',
+				className: 'buttons',
+				els: [
+					new T.Form.Button({
+						caption: D.Lang.get('start_poll'),
+						onclick: function(){
+							popover.hide();
+							window.open('/ads/external_polls/fpage.php?poll=' + poll.poll_id + '&click=' + poll.id + '&lang=' + poll.lang, '_blank')
+						},
+						color: 'submit'
+					}),
+					new T.Form.Button({
+						caption: D.Lang.get('cancel_poll'),
+						href: '/ads/external_polls/fpage.php?close=' + poll.poll_id,
+						color: 'link'
+					})
+				]
+			}
+		]
+	});
+};
+
+D.Ads.checkMiniAudience = function(){
+	//	var checked = $('#AdTargetBd').is(':checked');
+	//	if ( D.Ads.miniAudience < 500 && !checked && !D.MiniAds.MINIADS_ADMIN ) {
+
+	var hasRetargeting = $('#adTargetRetargeting').length && $('#adTargetRetargeting').val() > 0;
+	var minAudience = 1000;
+	if ( hasRetargeting ) {
+		minAudience = 50;
+	}
+	if ( !D.Ads.miniAudience || D.Ads.miniAudience < minAudience ) {
+		D.messageBox( {
+			title:D.Lang.get( 'audience', 'xMiniAds' ),
+			text:D.Lang.get( 'Audience to small', 'xMiniAds' ).replace('%s', minAudience),
+			type:'OK'
+		} );
+		return false;
+	}
+	return true;
+};
+D.Ads.isValidMiniLocation = function( values ) {
+	var design_type = $( 'input[name="ad[design][type]"]:checked' ).val();
+	if ( !values.length ) {
+		return true;
+	}
+
+	var vals = [];
+	for( var n = 0, len = values.length; n < len; n++ ) {
+		if ( values[n] != 'lv' ) {
+			vals.push( values[n] );
+		}
+	}
+	var val = '' + vals.join('');
+
+	if ( ( design_type == 'highlight' || design_type == 'highlight_custom' || design_type == 'page_follow' ) && !/^[0-9]*$/.test( val ) ) {
+		return false;
+	}
+	return true;
+};
+
+D.Ads.getAdProvider = function() {
+	return 'tvnet';
+	// var d = new Date();
+	// var n = d.getDate();
+	//
+	// let g = new Get();
+	// if ( g.v('tvnet') || n < 30 ) {
+	// 	return 'tvnet';
+	// }
+	// return 'setupad';
+};
+
+D.Ads.RTBLeft = function(node) {
+	return;
+
+	if (!node) {
+		return;
+	}
+
+	mkE({
+		tag: 'div',
+		prop: {
+			id: 'advRTB_left'
+		},
+		style: {
+			'text-align': 'center',
+			margin: '10px 0'
+		}
+	}).append( node );
+	// if ( D.Ads.getAdProvider() === 'tvnet' ) {
+	// 	var ad = "$('#advRTB_left').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:160px;height:600px\" src=\"//i.ifrype.com/ads_external.html?document.write%28%27%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%20async%20src%3D%22https%3A%2F%2Fsecurepubads.g.doubleclick.net%2Ftag%2Fjs%2Fgpt.js%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3Cdiv%20id%3D%5C%27draugiem-tower-3%5C%27%20style%3D%22text-align%3A%20center%3B%22%3E%20%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%3E%20window.googletag%20%3D%20window.googletag%20%7C%7C%20%7Bcmd%3A%20%5B%5D%7D%3B%20googletag.cmd.push%28function%28%29%20%7B%20googletag%20.defineSlot%28%5C%27%2F84367975%2Fdraugiem.lv%2F41%5C%27%2C%20%5B160%2C%20600%5D%2C%20%5C%27draugiem-tower-3%5C%27%29%20.setTargeting%28%5C%27ad_position%5C%27%2C%20%5B%5C%271%5C%27%5D%29%20.addService%28googletag.pubads%28%29%29%3B%20googletag.enableServices%28%29%3B%20googletag.display%28%5C%27draugiem-tower-3%5C%27%29%3B%20%7D%29%3B%20%27%2Bunescape%28%27%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3C%2Fdiv%3E%27%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();";
+	// } else {
+	// 	var ad = "$('#advRTB_left').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:160px;height:600px\" src=\"//i.ifrype.com/ads_external.html?%2F%2A%20%28c%29AdOcean%202003-2015%20%2A%2F%2F%2A%20PLACEMENT%3A%20Setup.Draugiem.lv.5.%20draugiem_160x600_left_sidebar%20%2A%2Fif%28location.protocol.substr%280%2C4%29%3D%3D%27http%27%29document.write%28unescape%28%27%253C%27%29%2B%27script%20id%3D%22Setup.Draugiem.lv.5.%20draugiem_160x600_left_sidebar%22%20src%3D%22%27%2Blocation.protocol%2B%27%2F%2Flv.adocean.pl%2F_%27%2B%28new%20Date%28%29%29.getTime%28%29%2B%27%2Fad.js%3Fid%3DU971uAopjYdcIs7KK8TZcdelE7IA5PJsmsEWTQDZ2NH.s7%2Fx%3D%27%2Bscreen.width%2B%27%2Fy%3D%27%2Bscreen.height%2B%27%22%20type%3D%22text%2Fjavascript%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();";
+	// }
+	// eval(ad);
+};
+
+D.Ads.RTBGigaNonGallery = function(node) {
+	return;
+
+	if (!node) {
+		return;
+	}
+
+	mkE({
+		tag: 'div',
+		id: 'advRTB_nonGallery',
+		style: {
+			'text-align': 'center'
+		}
+	}).append( node );
+	// if ( D.Ads.getAdProvider() === 'tvnet' ) {
+	// 	var ad = "$('#advRTB_nonGallery').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:980px;height:200px\" src=\"https://www.draugiem.lv/ads/external/custom.html?document.write%28%27%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%20async%20src%3D%22https%3A%2F%2Fsecurepubads.g.doubleclick.net%2Ftag%2Fjs%2Fgpt.js%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3Cdiv%20id%3D%5C%27draugiem-giga-1%5C%27%3E%20%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%3E%20window.googletag%20%3D%20window.googletag%20%7C%7C%20%7Bcmd%3A%20%5B%5D%7D%3B%20googletag.cmd.push%28function%28%29%20%7B%20googletag%20.defineSlot%28%5C%27%2F84367975%2Fdraugiem.lv%2F662%5C%27%2C%20%5B%5B980%2C%20200%5D%2C%20%5B728%2C%2090%5D%2C%20%5B970%2C%20250%5D%5D%2C%20%5C%27draugiem-giga-1%5C%27%29%20.setTargeting%28%5C%27ad_position%5C%27%2C%20%5B%5C%271%5C%27%5D%29%20.addService%28googletag.pubads%28%29%29%3B%20googletag.enableServices%28%29%3B%20googletag.display%28%5C%27draugiem-giga-1%5C%27%29%3B%20%7D%29%3B%20%27%2Bunescape%28%27%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3C%2Fdiv%3E%27%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();"
+	// } else {
+	// 	var ad = "$('#advRTB_nonGallery').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:970px;height:250px\" src=\"//i.ifrype.com/ads_external.html?if%28location.protocol.substr%280%2C4%29%3D%3D%27http%27%29document.write%28unescape%28%27%253C%27%29%2B%27script%20id%3D%22Setup.Draugiem.lv.draugiem.lv_970x250_nongallery%22%20src%3D%22%27%2Blocation.protocol%2B%27%2F%2Flv.adocean.pl%2F_%27%2B%28new%20Date%28%29%29.getTime%28%29%2B%27%2Fad.js%3Fid%3Dk1CXqTpsNy1cA.tI2AjeZIvVz6j_fo9qPk2x02wOne3.y7%2Fx%3D%27%2Bscreen.width%2B%27%2Fy%3D%27%2Bscreen.height%2B%27%22%20type%3D%22text%2Fjavascript%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();";
+	// }
+	// eval(ad);
+};
+
+D.Ads.RTBSayHighlight = function(node) {
+	return;
+
+	if (!node) {
+		return;
+	}
+	mkE({
+		tag: 'div',
+		prop: {
+			id: 'advRTB_sayhighlight'
+		},
+		style: {
+			'text-align': 'center',
+			margin: '10px 0'
+		}
+	}).append( node );
+	// if ( D.Ads.getAdProvider() === 'tvnet' ) {
+	// 	var ad = "$('#advRTB_sayhighlight').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:300px;height:250px\" src=\"//i.ifrype.com/ads_external.html?document.write%28%27%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%20async%20src%3D%22https%3A%2F%2Fsecurepubads.g.doubleclick.net%2Ftag%2Fjs%2Fgpt.js%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3Cdiv%20id%3D%5C%27draugiem-square-1%5C%27%3E%20%27%2Bunescape%28%27%253C%27%29%2B%27script%27%2B%27%3E%20window.googletag%20%3D%20window.googletag%20%7C%7C%20%7Bcmd%3A%20%5B%5D%7D%3B%20googletag.cmd.push%28function%28%29%20%7B%20googletag%20.defineSlot%28%5C%27%2F84367975%2Fdraugiem.lv%2F41%5C%27%2C%20%5B300%2C%20250%5D%2C%20%5C%27draugiem-square-1%5C%27%29%20.setTargeting%28%5C%27ad_position%5C%27%2C%20%5B%5C%271%5C%27%5D%29%20.addService%28googletag.pubads%28%29%29%3B%20googletag.enableServices%28%29%3B%20googletag.display%28%5C%27draugiem-square-1%5C%27%29%3B%20%7D%29%3B%20%27%2Bunescape%28%27%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%2B%27%20%3C%2Fdiv%3E%27%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();";
+	// } else {
+	// 	var ad = "$('#advRTB_sayhighlight').html('<iframe marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" scrolling=\"no\" style=\"width:300px;height:250px\" src=\"//i.ifrype.com/ads_external.html?if%28location.protocol.substr%280%2C4%29%3D%3D%27http%27%29document.write%28unescape%28%27%253C%27%29%2B%27script%20id%3D%22Setup.Draugiem.lv.6.%20draugiem_300x250_middle_news%22%20src%3D%22%27%2Blocation.protocol%2B%27%2F%2Flv.adocean.pl%2F_%27%2B%28new%20Date%28%29%29.getTime%28%29%2B%27%2Fad.js%3Fid%3DzQNMcuOBPbsLUE8K.8xPMZ6yDXFxQacMINSIZWkdb1j.E7%2Fx%3D%27%2Bscreen.width%2B%27%2Fy%3D%27%2Bscreen.height%2B%27%22%20type%3D%22text%2Fjavascript%22%27%2Bunescape%28%27%253E%253C%27%29%2B%27%2Fscript%27%2Bunescape%28%27%253E%27%29%29%3B\" class=\"ads_external_iframe\"></iframe>').height('auto').show();";
+	// }
+	// eval(ad);
+};
+
+if ( ! D.Ads.MiniAds ) {
+	D.Ads.MiniAds = {
+		PENDING: 0,
+		MINI_DOMAIN: '//tw.ifrype.com/',
+		CLOSED: false,
+		_init: false,
+		items: {},
+		_eventsBound: false,
+		_hasResized: false,
+		skipList: [],
+		lang: new D.Lang('xGlobal')
+	};
+}
+
+// censhas seciigi ielaadeet reklaamas, lai vareetu kontroleet, ka nav vienaadas vienaa skataa
+D.Ads.MiniAds.Worker = {
+	queue: []
+};
+D.Ads.MiniAds.Worker.push = function( item ) {
+	this.queue.push( item );
+
+	if ( this.queue.length == 1 ) {
+		this.queue[0].load();
+	}
+};
+D.Ads.MiniAds.Worker.pop = function( item ) {
+	var toRemove = -1;
+	for( var i = 0, len = this.queue.length; i < len; i++ ) {
+		if ( this.queue[i] == item ) {
+			toRemove = i;
+		}
+	}
+	if ( toRemove != -1 ) {
+		this.queue.splice( toRemove, 1 );
+	}
+	if ( this.queue.length > 0 ) {
+		this.queue[0].load();
+	}
+};
+
+
+D.Ads.MiniAds.init = function(par) {
+	if ( D.Ads.MiniAds.CLOSED || D.Ads.MiniAds._init ) {
+		return;
+	}
+
+	par = par || {};
+
+	D.Ads.MiniAds._h = par.h;
+	D.Ads.MiniAds._cbN = 0;
+	D.Ads.MiniAds._init = true;
+
+	D.Ads.MiniAds.setup();
+};
+D.Ads.MiniAds.setup = function() {
+	if ( empty(D.Ads.MiniAds.items) ) {
+		return;
+	}
+
+	for ( var k in D.Ads.MiniAds.items ) {
+		D.Ads.MiniAds.items[k].setup();
+	}
+	if ( ! D.Ads.MiniAds._eventsBound && D.Ads.getUserID() ) {
+		D.Ads.MiniAds._eventsBound = true;
+
+		$(window).on( {
+			"resize.miniAds": function() {
+				D.Ads.MiniAds._hasResized = true;
+				D.Ads.MiniAds.onWindowChange();
+			},
+			"scroll.miniAds": D.Ads.MiniAds.onWindowChange
+		} );
+	}
+};
+D.Ads.MiniAds.createItem = function( par ) {
+	var item = this.items[ par.id ];
+	if ( typeof item !== 'object' ) {
+		this.items[ par.id ] = new D.MiniAdItem(par);
+		if (par.lateInit || par.previewData.length) {
+			D.Ads.MiniAds.setup();
+		}
+	} else {
+		item.attachToContainer();
+		if ( ! item._invisible ) {
+			if ( item.placeId == 2 || item.placeId == 10 ) {
+				D.Ads.MiniAds.Worker.push( item );
+			} else {
+				item.load();
+			}
+		}
+	}
+};
+D.Ads.MiniAds.newIsOnScreen = function( item ) {
+	var position = D.position( item._containerNode );
+	var windowHeight = $(window).height();
+	var containerHeight = $( item._containerNode ).height();
+	var scrollTop;
+	var visible = false;
+	if ( item.placeId === 7 ) {
+		var frame = ( InfoBox._ && InfoBox._.node ) ? InfoBox._.node : document;
+		scrollTop = $(frame).scrollTop();
+	} else {
+		scrollTop = $(document).scrollTop();
+	}
+
+	if ( position.top - (windowHeight + scrollTop) >= (containerHeight / 3) * 2 ) {
+		visible = true;
+	}
+
+	return visible;
+};
+D.Ads.MiniAds.isOnScreen = function(item) {
+	var nodePosition = D.position( item._containerNode );
+	var visible = false;
+
+	if ( ! nodePosition.top ) {
+		return false;
+	}
+
+	var wndHeight;
+	if ( D.browser.mobile ) {
+		// mobile meedz nestraadaat korekti $(window).height()
+		wndHeight = window.innerHeight || $(window).height();
+	} else {
+		wndHeight = $(window).height();
+	}
+
+	if (item.placeId === 7) {
+		visible = nodePosition.top - ( InfoBox._ && InfoBox._.node ? $(InfoBox._ && InfoBox._.node).scrollTop() : $(document).scrollTop() ) < wndHeight;
+	} else {
+		visible = nodePosition.top - $(document).scrollTop() < wndHeight;
+	}
+
+	return visible;
+};
+D.Ads.MiniAds._browserWidth = function() {
+	if ( window.innerWidth ) {
+		return window.innerWidth;
+	} else if ( document.documentElement.clientWidth ) {
+		return document.documentElement.clientWidth;
+	} else {
+		return document.body.clientWidth;
+	}
+};
+D.Ads.MiniAds.onWindowChange = function() {
+	window.clearTimeout( D.Ads.MiniAds._wChangeTimeout );
+	D.Ads.MiniAds._wChangeTimeout = window.setTimeout( function() {
+		for ( var j in D.Ads.MiniAds.items) {
+			var item = D.Ads.MiniAds.items[j];
+			if ( item._invisible && (D.Ads.MiniAds.isOnScreen(item) || item.previewData.length) ) {
+				item._invisible = false;
+
+				item.attachToContainer();
+				item.setup();
+				// continue;
+			}
+
+			/*if ( D.browser.mobile ) { // uz mobile neslīdz līdz
+				continue;
+			}
+
+			if (
+				!item._setup ||
+				$.inArray(item.placeId, [1, 2, 7, 9, 19, 20]) >= 0 ||
+				( item.placeId == 27 && item.placeType === 'frontpagehc3') ||
+				item.containerTheme === 'application' ||
+				item.placeType === 'business' ||
+				item.containerTheme === 'events' ||
+				item.containerTheme === 'biz' ||
+				item.par && item.par.skipFixed
+			) { // daži bloki neslīd līdzi
+				continue;
+			} else {
+				addClassName( item._containerNode, 'stickyA' );
+			}
+
+			var scrollTop = ( item.placeId === 7 ? ( InfoBox._ && InfoBox._.node ? $(InfoBox._ && InfoBox._.node).scrollTop() : $(document).scrollTop() ) : $(document).scrollTop() );
+			var footerOffsetTop = 0;
+			if ( item.placeId == 5 || item.placeId == 26 ) {
+				var msgConvFooter = $('.MsgConvFooter');
+				if ( msgConvFooter.length ) {
+					footerOffsetTop = msgConvFooter.offset().top;
+				}
+			} else if ( item.placeId == 10 && $('#leftFooter').length && !$('.MsgConvFooter').length ) { // saakumlapaa, labaa puse
+				footerOffsetTop = $('#leftFooter').offset().top + $('#leftFooter').height() + 20;
+			} else if ( item.placeType == 'groups' && $('#madFooter').length ) {
+				footerOffsetTop = $('#madFooter').offset().top;
+			} else if ( $('#leftFooter').length ) {
+				footerOffsetTop = $('#leftFooter').offset().top;
+			} else {
+				footerOffsetTop = $('#footer').offset().top;
+			}
+			var menuOffset = existsClassName( document.getElementById('menuWrap'), 'menuFixed' ) ? 55 : 10;
+			var container = $(item._containerNode);
+			var containerHeight = container.outerHeight(true);
+			var floatingPositionTopOffset = scrollTop + containerHeight + menuOffset;
+
+			// ja abas reklaamas ir augstaakas par ekraana augstumu, tad slidina liidzi peedeejo, nevis visu bloku
+			// overraido, ka konteineris ir peedeejaas reklaamas konteineris, nevis visa bloka konteineris
+			var cOffsetTop = parseInt( container.offset().top, 10 );
+			if ( D.Ads.MiniAds._hasResized ) {
+				item._containerNode._cantFit = false;
+				D.Ads.MiniAds._hasResized = false;
+			}
+			var lastMini = $(item._containerNode).find('.lastMini');
+			if (
+				lastMini.length &&
+				(
+					item._containerNode._cantFit ||
+					(
+						(cOffsetTop - scrollTop < menuOffset) &&
+						(floatingPositionTopOffset > footerOffsetTop - 20)
+					)
+				)
+			) {
+				container.removeClass('mAdsFixedPosition');
+				container.css('top', 0);
+				container = lastMini;
+				container.css({ width: $(item._containerNode).width() + 'px' });
+				item._containerNode._cantFit = true;
+			}
+
+			var containerOffsetTop = parseInt( container.offset().top, 10 );
+			    containerHeight = container.outerHeight(true);
+			var containerOffsetBottom = containerOffsetTop + containerHeight;
+			var currentContainerTopPosition = parseInt( container.css('top') );
+			var browserWidth = D.Ads.MiniAds._browserWidth();
+			    floatingPositionTopOffset = scrollTop + containerHeight + menuOffset;
+
+			if ( ! container.hasClass('mAdsFixedPosition') ) { // ja elements vēl neplūst līdzi saturam
+				if ( browserWidth >= 980 && containerOffsetTop - scrollTop < menuOffset ) { // ja bloka attālums no pārlūka loga augšējās malas ir mazāks par 55 pikseļiem
+					if ( floatingPositionTopOffset < footerOffsetTop - 20 ) { // lai netirinaas paari footerim
+						container.addClass('mAdsFixedPosition');
+						container.css('top', menuOffset);
+					}
+				}
+			} else { // ja elements plūst līdzi saturam šobrīd
+				var containerTopOffset = container.offset().top,
+					visibleSiblings = container.prevAll(':visible'),
+					stackElement = visibleSiblings.length === 1 ? $(  visibleSiblings[0] ) : container.parent();
+
+				if ( !stackElement ) {
+					continue;
+				}
+
+				var spaceBetweenClosestSibling = containerTopOffset - (stackElement.offset().top + stackElement.outerHeight(true));
+				if ( spaceBetweenClosestSibling < menuOffset || browserWidth < 980 ) { // ja bloks iet pāris tā blakus elementam
+					container.removeClass('mAdsFixedPosition');
+					container.css('top', 0);
+				} else {
+					if (floatingPositionTopOffset > footerOffsetTop - 20) { // ja bloks iet pāri footer, ja tas būtu pozicionēts 55px (menuOffset) no pārlūka loga augšējās malas
+						var correctTopPosition = (containerOffsetBottom - footerOffsetTop) + 20;
+						container.css('top', currentContainerTopPosition - correctTopPosition);
+					} else {
+						container.css('top', menuOffset);
+					}
+				}
+			}*/
+		}
+	}, 10 );
+};
+
+D.Ads.MiniAds.showHidePlaceId = function( placeId, action ) {
+	for ( var id in D.Ads.MiniAds.items ) {
+		var item = D.Ads.MiniAds.items[id];
+		if ( item.placeId === placeId && !item.previewData.length ) {
+			if ( action == 'hide' ) {
+				item.hide();
+			} else if ( action == 'show' ) {
+				item.show();
+			}
+			break;
+		}
+	}
+};
+
+D.Ads.MiniAds.doURI = function( uri ) {
+	if ( D.LANG == 'en' ) {
+		uri = '/stats/click.php?key=miniads_en_click&url=' + encodeURIComponent( uri );
+	}
+
+	return uri;
+};
+
+D.MiniAdItem = function(par) {
+	par = par || {};
+	this.id = par.id;
+	this.containerTheme = par.containerTheme || "default";
+	this.itemCount = par.itemCount || 2;
+	this.placeId = par.placeId;
+	this.placeType = par.placeType || 'other';
+	par.classNames = par.classNames || "";
+	this.par = par;
+	this._invisible = this._setup = this.content = false;
+	this.previewData = par.previewData || [];
+	this.previewScrollInto = par.previewScrollInto || false;
+	this.ribbon = par.ribbon || '';
+	this.needSep = par.needSep || false;
+
+	this.showAddAd = true;
+	if ( typeof par.showAddAd != 'undefined' ) {
+		this.showAddAd = par.showAddAd;
+	}
+
+	// hopefully fix
+	if (this.previewData.length && !D.Ads.MiniAds._init) {
+		D.Ads.MiniAds.init();
+	}
+
+	this.attachToContainer();
+	if ( this.placeType !== 'galleries' &&  ! D.Ads.MiniAds.isOnScreen(this) ) {
+		this._invisible = true;
+		if ( D.Ads.MiniAds._init ) {
+			D.Ads.MiniAds.init();
+		}
+	} else {
+		if ( D.Ads.MiniAds._init ) {
+			this.setup();
+		}
+	}
+
+	if ( this.previewData.length && this.previewScrollInto ) {
+		if ( empty( D.Ads.MiniAds.tourShown ) ) {
+			var tourText = 'Reklāma būs šajā pozīcijā.';
+			if ( this.placeId == 2 || this.placeId == 10 ) {
+				tourText = 'Šī ir viena no pozīcijām, kur atrodas reklāma.';
+			}
+			T.tour.cropl( this._containerNode, {
+				onclickClose: true,
+				tourText: tourText,
+				width: 240,
+				miniadsHeightHack: true,
+				withoutBG: true,
+				animate: false
+			});
+			D.Ads.MiniAds.tourShown = true;
+		}
+	}
+};
+D.MiniAdItem.prototype = {
+	hide: function() {
+		if ( ! this._setup ) {
+			return;
+		}
+		if ( this._containerNode ) {
+			addClassName( this._containerNode, 'mAdsHidden' );
+		}
+	},
+
+	show: function() {
+		if ( ! this._setup ) {
+			return;
+		}
+		if ( this._containerNode ) {
+			removeClassName( this._containerNode, 'mAdsHidden' );
+		}
+	},
+
+	setup: function() {
+		if (this._setup || this._invisible) {
+			return;
+		}
+
+		if ( this.placeId == 2 || this.placeId == 10 ) {
+			D.Ads.MiniAds.Worker.push( this );
+		} else {
+			this.load();
+		}
+		this._setup = true;
+
+
+	},
+
+	attachToContainer: function() {
+		this._containerNode = document.getElementById( this.id );
+		if ( ! this._containerNode ) {
+			return;
+		}
+		if ( ! empty(this.par.classNames) ) {
+			addClassName(this._containerNode, this.par.classNames);
+		}
+		if ( this.needSep && !this._containerNode.beforeSep ) {
+			var sep = T.sep();
+			D.insertBefore( sep, this._containerNode );
+			this._containerNode.beforeSep = sep;
+		}
+		D.Ads.MiniAds.onWindowChange();
+		if ( ! this._invisible && this.content ) {
+			this.content.append(this._containerNode);
+		}
+	},
+
+	load: function( callback ) {
+		if ( !D.Ads.getUserID() && !this.previewData.length ) {
+			removeNode(this._containerNode);
+			return;
+		}
+		clearNode(this._containerNode);
+
+		var cb = "_cb" + String( ++ D.Ads.MiniAds._cbN );
+		var get = new Get( {
+			place: this.placeId,
+			count: this.itemCount,
+			cb: "D.Ads.MiniAds." + cb,
+			h: '' + D.Ads.MiniAds._h
+		} );
+		get.add(new Date().getTime() , "");
+		if ( this.placeType === 'business' ) {
+			get.add( "pic", 1);
+		}
+		if ( this.containerTheme === 'events' ) {
+			get.add( "t", 5 );
+		}
+		if ( this.containerTheme === 'biz' ) {
+			get.add( "t", 6 );
+		}
+		if ( D.Ads.MiniAds.skipList.length ) {
+			get.add( "skip", D.Ads.MiniAds.skipList.join(',') );
+		}
+
+		var self = this;
+		D.Ads.MiniAds[cb] = function( data ) {
+			// ja izbeidzaas reklaamas, tad reseto skip listi
+			if ( ( self.placeId == 2 || self.placeId == 10 ) && (empty( data ) || (!empty( data[0] ) && empty( data[0].isPreview ))) && D.Ads.MiniAds.skipList.length ) {
+				D.Ads.MiniAds.skipList = [];
+				removeNode( self._scriptNode );
+				D.Ads.MiniAds.Worker.pop( self );
+				D.Ads.MiniAds.Worker.push( self );
+				return false;
+			}
+
+			if ( ( self.containerTheme == 'frontpage' || self.containerTheme == 'events' || self.containerTheme == 'biz' ) && empty( data ) ) {
+				self._containerNode.style.display = 'none';
+			}
+			if ( empty(data) && self._containerNode.beforeSep ) {
+				self._containerNode.beforeSep.style.display = 'none';
+			}
+
+			if ( empty(data) ) {
+				if ( self.placeId === 9 ) {
+					self._makeSelfPromotion();
+				}
+
+				if ( self.containerTheme == 'application' && self.placeType == 'application' ) {
+					$('.miniadsApplicationContainer').remove();
+				}
+
+				return false;
+			}
+
+			for ( var x in data ) {
+				if ( !isset(data[x]) ) {
+					return false;
+				}
+
+				data[x].json = !empty(data[x].json) ? D.JSON.decode( data[x].json ) : {};
+
+				// piestoreejam, kas paraadiiti
+				if ( empty( data[x].isPreview ) && ( self.placeId == 2 || self.placeId == 10 ) ) {
+					if ( D.Ads.MiniAds.skipList.length > 10 ) {
+						D.Ads.MiniAds.skipList.shift();
+					}
+					D.Ads.MiniAds.skipList.push( data[x].id );
+				}
+			}
+
+			switch ( self.containerTheme ) {
+				case 'frontpage':
+					self._makeFrontpage( data );
+					break;
+				case 'application':
+					self._makeApplication( data );
+					break;
+				case 'events':
+					self._makeEvent( data );
+					break;
+				case 'hc3':
+					self._makeHighlightCustom3( data );
+					break;
+				default:
+					self._makeDefault( data );
+					break;
+			}
+
+			// run external stats
+			for ( var x in data ) {
+				if ( !empty( data[x].isPreview ) ) {
+					continue;
+				}
+				if ( !empty( data[x].json.external_stats ) ) {
+					var stats_src = data[x].json.external_stats;
+					stats_src = stats_src.replace('[TIMESTAMP]', new Date().getTime());
+					mkE({
+						tag: 'img',
+						src: stats_src,
+						style:{
+							width:'1',
+							height:'1',
+							border:'0',
+							position: 'absolute',
+							top: 0,
+							left: 0
+						}
+					}).append( self._containerNode );
+				}
+			}
+
+			if ( !empty( self.ribbon ) ) {
+				mkE({
+					tag:'img',
+					className: 'status',
+					src: self.ribbon
+				} ).append( self._containerNode );
+			}
+
+			if ( typeof callback === "function" ) {
+				callback( self );
+			}
+
+			if ( empty( data[0].isPreview ) ) {
+				removeNode( self._scriptNode );
+				if (self.placeId !== 7 && self.placeId !== 9) {
+					clearTimeout( self._refreshTimer );
+					self._refreshTimer = setTimeout( function() {
+						if ( self.placeId == 2 || self.placeId == 10 ) {
+							D.Ads.MiniAds.Worker.push( self );
+						} else {
+							self.load();
+						}
+					}, Math.round( (Math.random() * (3 - 1) + 1) ) * 60000 );
+				}
+			}
+
+			if ( self.placeId == 2 || self.placeId == 10 ) {
+				D.Ads.MiniAds.Worker.pop( self );
+			}
+
+			if (
+				D.browser.mobile ||
+				!self._setup ||
+				$.inArray(self.placeId, [1, 2, 7, 9, 19, 20]) >= 0 ||
+				( self.placeId == 27 && self.placeType === 'frontpagehc3') ||
+				self.containerTheme === 'application' ||
+				self.placeType === 'business' ||
+				self.containerTheme === 'events' ||
+				self.containerTheme === 'biz' ||
+				self.par && self.par.skipFixed
+			) { // daži bloki neslīd līdzi
+				//
+			} else {
+				addClassName( self._containerNode, 'stickyA' );
+			}
+
+			$(window).trigger('resize'); // izsauc resize, nevis scroll, lai _cantFit resetotos
+		};
+
+		if ( this.previewData.length ) {
+			eval('D.Ads.MiniAds._cb' + D.Ads.MiniAds._cbN + '( this.previewData );');
+		} else {
+			this._scriptNode = mkE( {
+				tag: "script",
+				prop: {
+					type: "text/javascript",
+					src: ( D.Ads.MiniAds.MINI_DOMAIN + "get/" + D.Ads.getUserID() + '/' + get.toUrl() )
+				}
+			} ).append( document.getElementsByTagName("head")[0] );
+		}
+	},
+
+	_makeApplication: function ( data ) {
+		addClassName(this._containerNode, 'mAdsApplicationBox');
+		clearNode(this._containerNode);
+
+		var els = [];
+		var i = 0;
+		for ( var k in data ) {
+			if ( i && i != this.count ) {
+				els.push( {
+					tag: 'td',
+					className: 'mAdBorder',
+					els: [ {tag: 'img', src: D.PIMG + 'i/px.gif'} ]
+				} );
+			}
+			els.push( {
+				tag: 'td',
+				className: 'mAdTableCol',
+				els: [ this._drawDefaultItem( data[k], { target: '_blank' } ) ]
+			} );
+			i++;
+		}
+		this.content = mkE( {
+			tag: 'div',
+			els: [
+				{
+					tag: 'table',
+					className: 'mAdTable',
+					els: [ {tag: 'tbody', els: [ {tag: 'tr', els: els} ]} ]
+				}
+			],
+			style: {
+				overflow: 'hidden'
+			}
+		} ).append(this._containerNode);
+
+		if ( this.showAddAd ) {
+			this._makeAddButton().append(this._containerNode);
+		}
+	},
+
+	_makeFrontpage: function( data ) {
+		clearNode(this._containerNode);
+
+		var els = [];
+		var i = 0;
+		var style = false;
+		for ( var k in data ) {
+			if ( !empty( data[k].json['style'] ) ) {
+				style = data[k].json['style'];
+			} else if ( !empty(data[k].json['highlight_custom2']) && this.placeId == 20 ) {
+				style = 'mAdsHighlightCustom2';
+			} else if ( !empty( data[k].json['highlight_custom'] ) ) {
+				style = 'mAdsHighlightCustom';
+				var hcBorderValue = data[k].json['highlight_custom'].border_color && data[k].json['highlight_custom'].border_color != 'transparent' ? '#' + data[k].json['highlight_custom'].border_color : 'transparent';
+			} else if ( !empty( data[k].json['page_follow2'] ) && this.placeId == 20 ) {
+				style = 'mAdsPageFollow2';
+			} else if ( !empty( data[k].json['page_follow'] ) ) {
+				style = 'mAdsPageFollow';
+				var pfBackgroundValue = data[k].json['page_follow'].bg_color && data[k].json['page_follow'].bg_color != 'transparent' ? '#' + data[k].json['page_follow'].bg_color : 'transparent';
+			}
+
+			var last = false;
+			if ( i ++ ) {
+				els.push( {
+					tag: 'td',
+					className: 'mAdBorder',
+					els: [ {tag: 'img', src: D.PIMG + 'i/px.gif'} ]
+				} );
+				last = true;
+			}
+
+			var tdEls = [];
+			tdEls.push( this._drawFrontpageItem( data[k] ) );
+			if ( !empty( data[k].json['page_follow2'] ) && this.placeId == 20 ) {
+				tdEls.push(
+					mkE({
+						tag: 'a',
+						className: 'pf2FollowBtn',
+						href: 'javascript:',
+						text: D.Ads.MiniAds.lang.get('follow', 'xGlobal'),
+						prop: {
+							onclick: function(e) {
+								D.stopPropagation(e);
+								var uri = (empty( data[k].isPreview ) ? D.Ads.MiniAds.MINI_DOMAIN : '') + data[k].l;
+								uri = D.Ads.MiniAds.doURI( uri );
+								var pageId = data[k].json['page_follow'].bid;
+								if ( !empty( data[k].json['drpfad'] ) && empty( data[k].isPreview ) && isset(drpfadData) ) {
+									pageId = drpfadData.bid;
+									uri = '/stats/click.php?key=miniads_click_'+ data[k].id +'&url=' + encodeURIComponent( '/'+ drpfadData.exturl +'/admin/pageads/quiz/' );
+								}
+								D.smallPopUp.open('/ads/mini/rq/page_follow.php?page_id=' + pageId + '&uri=' + encodeURIComponent( uri ), {'title':''});
+								return false;
+							}
+						},
+						els: [
+							{
+								tag: 'img',
+								src: '/ads/mini/img/follow_plus.png'
+							}
+						]
+					})
+				)
+			} else if ( !empty( data[k].json['page_follow'] ) ) {
+				var buttonPar = new T.Form.ButtonPar();
+				buttonPar.caption = D.Ads.MiniAds.lang.get('follow', 'xGlobal');
+				buttonPar.icon = 'plus';
+				buttonPar.className = 'followBtn';
+				buttonPar.onclick = function(e) {
+					D.stopPropagation(e);
+					var uri = (empty( data[k].isPreview ) ? D.Ads.MiniAds.MINI_DOMAIN : '') + data[k].l;
+					uri = D.Ads.MiniAds.doURI( uri );
+					var pageId = data[k].json['page_follow'].bid;
+					if ( !empty( data[k].json['drpfad'] ) && empty( data[k].isPreview ) && isset(drpfadData) ) {
+						pageId = drpfadData.bid;
+						uri = '/stats/click.php?key=miniads_click_'+ data[k].id +'&url=' + encodeURIComponent( '/'+ drpfadData.exturl +'/admin/pageads/quiz/' );
+					}
+					D.smallPopUp.open('/ads/mini/rq/page_follow.php?page_id=' + pageId + '&uri=' + encodeURIComponent( uri ), {'title':''});
+					return false;
+				};
+				tdEls.push(
+					new T.Form.Button( buttonPar )
+				)
+			}
+			els.push( {
+				tag: 'td',
+				className: 'mAdTableCol' + ( ! last ? ' mAdTableColFirst' : ' mAdTableColLast'),
+				els: tdEls
+			} );
+		}
+
+		this.content = mkE( {
+			tag: 'div',
+			els: [
+				{
+					tag: 'table',
+					className: 'mAdTable',
+					els: [ {tag: 'tbody', els: [ {tag: 'tr', els: els} ]} ]
+				}
+			],
+			className: 'mAdContent',
+			style: {
+				overflow: 'hidden'
+			}
+		} ).append(this._containerNode);
+
+		var creditNoteText = false;
+		if ( !empty( data[k].json['credit_note'] ) ) {
+			creditNoteText = htmlspecialchars_decode( data[k].json['credit_note'] );
+		} else if ( !this.showAddAd ) {
+			creditNoteText = '';
+		}
+		if ( creditNoteText !== false ) {
+			mkE({
+				tag: 'div',
+				text: creditNoteText,
+				className: 'mAdCreditNote'
+			}).append( this._containerNode );
+		}
+
+		var className = 'mAds front';
+		if( this.par.classNames ){
+			className += ' ' + this.par.classNames;
+		}
+		if( this.placeId != 20 ){
+			className += ' mAdsFrontpageBox';
+		}
+		if( creditNoteText !== false ){
+			className += ' mAdsWithNote';
+		}
+		className += ' ' + (style || 'orange');
+		$( this._containerNode ).attr('class', className );
+		var hasImage = false;
+		if ( !empty(data[k].json['highlight_custom2']) && this.placeId == 20 ) {
+			if ( isset( data[k].json['highlight_custom2'].img_version ) ) {
+				var idFolder = String( data[k].id ).substr( 0, 2 );
+				var hcImg = D.idPicDomain( data[k].id ) + 'miniads_hc2/' + idFolder + '/v' + data[k].json['highlight_custom2'].img_version + '/' + data[k].id + '.jpg';
+			} else {
+				var hcImg = '/ads/mini/img/hc2_blue_pattern.gif';
+			}
+
+			$( this.content ).css( 'background', 'url('+ hcImg +')' );
+
+			if ( !empty(data[k].json['highlight_custom2'].overlay ) ) {
+				$( this.content ).addClass('overlay');
+			}
+			hasImage = true;
+		} else if ( !empty( data[k].json['highlight_custom'] ) ) {
+			$( this.content ).css( 'borderColor', hcBorderValue );
+			if ( hcBorderValue == 'transparent') {
+				addClassName( this._containerNode, 'woBorder' );
+			}
+
+			if ( isset( data[k].json['highlight_custom'].img_version ) ) {
+				var idFolder = String( data[k].id ).substr( 0, 2 );
+				var hcImg = D.idPicDomain( data[k].id ) + 'miniads_special/' + idFolder + '/v' + data[k].json['highlight_custom'].img_version + '/' + data[k].id + '.jpg';
+			} else {
+				var hcImg = '/ads/mini/img/hc2_blue_pattern.gif';
+			}
+			$( this.content ).css( 'background', 'url('+ hcImg +')' );
+			hasImage = true;
+		} else if ( !empty( data[k].json['page_follow2'] ) && this.placeId == 20 ) {
+			// predefineetie gradienti
+			var gradient = data[k].json['page_follow2'].gradient;
+			if ( empty( gradient ) && this.showAddAd ) {
+				gradient = getRandomInt(1, 13);
+			}
+			$( this.content ).addClass('gradient' + gradient);
+
+			// custom gradient
+			if ( !empty( data[k].json['page_follow2'].gradient_c1 ) ) {
+				// custom gradienti
+				var color1 = '#' + data[k].json['page_follow2'].gradient_c1;
+				var color2 = '#' + data[k].json['page_follow2'].gradient_c2;
+
+				var styleNode = this.content.style;
+				styleNode.background = 'linear-gradient(to bottom, ' + color1 + ' 0%,' + color2 + ' 100%)'; /* W3C */
+				styleNode.background = '-o-linear-gradient(top, ' + color1 + ' 0%,' + color2 + ' 100%)'; /* Opera 11.10+ */
+				styleNode.background = '-moz-linear-gradient(top, ' + color1 + ' 0%, ' + color2 + ' 100%)'; /* FF3.6+ */
+				styleNode.background = '-webkit-gradient(linear, left top, left bottom, color-stop(0%,' + color1 + '), color-stop(100%,' + color2 + '))'; /* Chrome,Safari4+ */
+				styleNode.background = '-webkit-linear-gradient(top, ' + color1 + ' 0%,' + color2 + ' 100%)'; /* Chrome10+,Safari5.1+ */
+				styleNode.background = '-ms-linear-gradient(top, ' + color1 + ' 0%,' + color2 + ' 100%)'; /* IE10+ */
+				if ( styleNode.background.indexOf('gradient') == -1 ) {
+					styleNode['filter'] = "progid:DXImageTransform.Microsoft.gradient( startColorstr='" + color1 + "', endColorstr='" + color2 + "',GradientType=0 )"; /* IE6-9 */
+					styleNode.background = color1;
+				}
+			}
+			hasImage = true;
+		} else if ( !empty( data[k].json['page_follow'] ) ) {
+			$( this.content ).css( 'background-color', pfBackgroundValue );
+		} else {
+			$( this._containerNode ).css( 'background', '' );
+
+			// hacks, lai itemu listee neraadiitu visaa platumaa parastaas reklaamas
+			if ( !this.showAddAd && this.placeId == 1 ) {
+				// vecaas highlight reklaamas raadiit visaa platumaa, iznjemot green & gray
+				if ( !isset( data[k].json.style ) || data[k].json.style == 'green' || data[k].json.style == 'gray' ) {
+					this._containerNode.style.width = '250px';
+				}
+			}
+		}
+		if( hasImage ){
+			addClassName(this.content, 'mAdWithImage');
+		}
+
+		if ( this.showAddAd ) {
+			this._makeAddButton().append(this._containerNode);
+		}
+
+		if (D.Ads.MiniAds.ADMIN && D.Ads.MiniAds.PENDING && empty(data[k].isPreview) ) {
+			this._makePendingAdsBadge().append(this._containerNode);
+		}
+
+		if ( !this.showAddAd ) {
+			var existsCreditNote = false;
+			for ( var k in data ) {
+				if ( !empty( data[k].json.credit_note ) ) {
+					existsCreditNote = true;
+					break;
+				}
+			}
+
+			if ( !existsCreditNote ) {
+				if ( existsClassName( this._containerNode, 'radius3top' ) ) {
+					removeClassName( this._containerNode, 'radius3top' );
+					addClassName( this._containerNode, 'radius3' );
+				}
+				if ( existsClassName( this.content, 'radius3top' ) ) {
+					removeClassName( this.content, 'radius3top' );
+					addClassName( this.content, 'radius3' );
+				}
+			}
+		}
+	},
+
+	_makeSelfPromotion: function() {
+		clearNode(this._containerNode);
+		removeClassName( this._containerNode, 'mAdsPopularGal' );
+		addClassName( this._containerNode, 'mAdSelfPromotion mAdsDefaultBox' );
+
+		this.content = mkE( {
+			tag: 'div',
+			els: [ {
+				tag: 'a',
+				href: '/special/link.php?url=' + encodeURIComponent('/ads/mini/?tab=1&f=brivavieta'),
+				className: 'mAd',
+				els: [
+					{
+						tag: 'div',
+						className: 'mAdSelfPromotionIcon'
+					},
+					{
+						tag: 'h3',
+						className: 'mAdTitle',
+						text: 'Brīva vieta jūsu reklāmai'
+					}
+				]
+			} ]
+		} ).append( this._containerNode );
+	},
+
+	_makeDefault: function( data ) {
+		if ( ! existsClassName(this._containerNode, 'mAdsDefaultBox') ) {
+			addClassName(this._containerNode, 'mAdsDefaultBox');
+		}
+		if ( ! existsClassName(this._containerNode, 'mAdsNewDefault') ) {
+			addClassName(this._containerNode, 'mAdsNewDefault');
+		}
+
+		clearNode(this._containerNode);
+
+		data.sort( function(a, b) { // reklāmas ar bildēm pirmās, ar tekstu pēctam
+			return empty(a.image) && ! empty(b.image) ? 1 : -1;
+		} );
+		var els = [];
+		var i = 1;
+		for ( var k in data ) { // json decode un katras reklāmas konstrukcija
+			if (this.placeId === 9) {
+				delete data[k].image;
+			}
+
+			var itm = mkE({
+				tag: 'div'
+			});
+
+			this._drawDefaultItem( data[k], {
+				loadedItemCount: data.length
+			}).append( itm );
+
+			var creditNoteText = false;
+			if ( !empty( data[k].json['credit_note'] ) ) {
+				creditNoteText = htmlspecialchars_decode( data[k].json['credit_note'] );
+			} else if ( !this.showAddAd ) {
+				creditNoteText = '';
+			}
+			if ( creditNoteText !== false ) {
+				mkE({
+					tag: 'div',
+					text: creditNoteText,
+					className: 'mAdCreditNote'
+				}).append( itm );
+			}
+
+			if ( i % 2 !== 0 && data.length > 1 ) {
+				mkE({
+					tag: 'div',
+					className: 'mAdsSmartDefaultSeperator'
+				}).append( itm );
+			}
+
+			if ( i === data.length ) {
+				if ( this.showAddAd ) {
+					this._makeAddButton().append( itm );
+				}
+				itm.className = 'lastMini';
+			}
+
+			els.push( itm );
+
+			++i;
+		}
+
+		this.content = mkE( {
+			tag: 'div',
+			els: els
+		} ).append(this._containerNode);
+	},
+
+	_makeHighlightCustom3: function( data ) {
+		clearNode(this._containerNode);
+		addClassName(this._containerNode, 'mAd mAdsHighlightCustom3');
+
+		var els = [];
+		for ( var k in data ) { // json decode un katras reklāmas konstrukcija
+			var img;
+			var titleNode;
+			var textNode;
+			var a;
+
+			var adHref = data[k].l;
+			if ( empty( data[k].isPreview ) ) {
+				adHref = D.Ads.MiniAds.MINI_DOMAIN + adHref;
+			}
+			adHref = D.Ads.MiniAds.doURI( adHref );
+
+			var hc3Cont = mkE({
+				tag: 'div',
+				className: 'miniadsHC3Item mAdWithImage',
+				els: [
+					a = mkE({
+						tag: 'a',
+						prop: {
+							target: '_blank'
+						},
+						href: adHref,
+						className: 'hcAction',
+						els:[
+							img = mkE({
+								tag: 'div',
+								className: 'img radius3top'
+							}),
+							{
+								tag: 'div',
+								className: 'footer',
+								els:[
+									titleNode = mkE({
+										tag: 'div',
+										className: 'mAdTitle',
+										text: htmlspecialchars_decode(data[k].title)
+									}),
+									textNode = mkE({
+										tag: 'div',
+										className: 'mAdText',
+										text: htmlspecialchars_decode(data[k].text)
+									})
+								]
+							}
+						]
+					})
+				]
+			});
+			els.push( hc3Cont );
+
+			if ( !empty( data[k].json['highlight_custom3'].overlay ) ) {
+				mkE({
+					tag: 'span',
+					className: 'overlay'
+				}).append( a );
+			}
+
+			// set image
+			if ( !empty(data[k].json['highlight_custom3'].img_version) ) {
+				var idFolder = String( data[k].id ).substr( 0, 2 );
+				img.style.backgroundImage = 'url('+ D.idPicDomain( data[k].id ) + 'miniads_hc3/' + idFolder + '/v' + data[k].json['highlight_custom3'].img_version + '/' + data[k].id + '.jpg' +')';
+			} else {
+				img.style.backgroundImage = 'url(/ads/mini/img/hc2_blue_pattern.gif)';
+			}
+
+			if ( !empty( data[k].json['highlight_custom3'] ) ) {
+				titleNode.style.color = '#' + data[k].json['highlight_custom3'].title_color;
+				textNode.style.color = '#' + data[k].json['highlight_custom3'].text_color;
+			}
+
+			var creditNoteText = false;
+			if ( !empty( data[k].json['credit_note'] ) ) {
+				creditNoteText = htmlspecialchars_decode( data[k].json['credit_note'] );
+			} else if ( !this.showAddAd ) {
+				creditNoteText = '';
+			}
+			if ( creditNoteText !== false ) {
+				els.push({
+					tag: 'div',
+					text: creditNoteText,
+					className: 'mAdCreditNote'
+				});
+			} else {
+				if ( existsClassName( img, 'radius3top' ) ) {
+					removeClassName( img, 'radius3top' );
+					addClassName( img, 'radius3' );
+				}
+			}
+			if ( empty( data[k].isPreview ) ) {
+				this._makeCloseButton(data[k]).append( hc3Cont );
+			}
+
+			if (D.Ads.MiniAds.ADMIN) {
+				mkE({
+					'tag': 'a',
+					'className': 'mAdInfo icon informationIcon',
+					'href': '/ads/mini/?aid=' + data[k].id
+				}).append( hc3Cont );
+			}
+		}
+
+		this.content = mkE( {
+			tag: 'div',
+			els: els
+		} ).append(this._containerNode);
+
+		if ( this.showAddAd ) {
+			//this._makeAddButton().append(this._containerNode);
+		}
+	},
+
+	_makePendingAdsBadge: function() {
+		return mkE( {
+			tag: 'a',
+			className: 'mAdPendingAds',
+			href: '/ads/miniadmin/',
+			els: [
+				{ tag: 'span', className: 'badge on mAdPendingBadge', text: 'Reklāmas apstiprināšanā: ' + D.Ads.MiniAds.PENDING }
+			]
+		} );
+	},
+
+	_makeAddButton: function() {
+		return mkE( {
+			tag: 'a',
+			className: 'own',
+			href: '/stats/click.php?url=' + encodeURIComponent( ( D.LANG == 'en' ? 'https://www.draugiem.lv' : '' ) + '/ads/mini/?utm_source=draugiem&utm_medium=miniads&utm_campaign=' + this.placeType ),
+			els: [
+				{
+					tag: 'span',
+					els: [
+						T.svgIcon({
+							icon: 'add-10'
+						})
+					]
+				},
+				D.Lang.get('add_own_ad')
+			]
+		} );
+	},
+
+	_makeCloseButton: function( data, par ) {
+		par = par || {};
+		/**
+		 * @type D.Ads.OptionsPar
+		 */
+		var optionsPar = {};
+		optionsPar.canClose = true;
+		optionsPar.targetingInfo = true;
+		optionsPar.id = data.id;
+		optionsPar.type = D.Ads.OptionsPar.TYPE_MINIADS;
+		optionsPar.onClose = D.closure( this, function(data, event) {
+			D.stopPropagation(event);
+			this._miniCloseNew(data);
+			return false;
+		}, data );
+		/*if (D.Ads.MiniAds.ADMIN) {
+			optionsPar.additionOptions = [];
+			optionsPar.additionOptions.push({
+				caption: 'Ad info',
+				onclick: function() {
+					Section.navigate('/ads/mini/?aid=' + data.id)
+				}
+			});
+		}*/
+		if (par.color == 'dark') {
+			optionsPar.color = '#565656';
+			optionsPar.backgroundOverlay = 'transparent';
+		}
+		return new D.Ads.Options(optionsPar);
+	},
+
+	showMiniAdsVideo: function( item ) {
+		if (item.id) {
+			var uri = (empty( item.isPreview ) ? D.Ads.MiniAds.MINI_DOMAIN : '') + item.l;
+			uri = D.Ads.MiniAds.doURI( uri );
+			InfoBox.open( '/ads/mini/rq/video.php?id=' + item.id + '&l=' + encodeURIComponent( uri ), {
+				width: 520,
+				modal: true,
+				withoutPadding: true
+			} );
+		}
+	},
+
+	_applyCityTpl: function( data, text ) {
+		if ( empty( data.json['city_tpl'] ) ) {
+			return text;
+		}
+
+		var keys = [];
+		for ( var k in D.me.lvCitiesLocative ) {
+			keys.push( parseInt(k) );
+		}
+
+		var cities = [];
+		var s = data.json['city_tpl'];
+		for( var i = 0; i < s.length; i++ ) {
+			for(var j = 0; j < keys.length; j++) {
+				if( keys[j] == s[i] ) {
+					cities.push( parseInt( s[i] ) );
+				}
+			}
+		}
+
+		var city = '';
+		if ( cities.length ) {
+			city = D.me.lvCitiesLocative[ cities[ Math.floor( Math.random() * cities.length ) ] ];
+		}
+
+		return text.replace( 'CITY_TPL', city );
+	},
+
+	_drawDefaultItem: function( data, par ) {
+		par = par || {};
+		var $miniads = this;
+		var childs = [];
+		var target = '_blank';
+		if ( par.target ) {
+			target = par.target;
+		} else if ( !empty( data.vlink ) && ( data.vlink === 'www.draugiem.lv' || data.vlink.substr( 0, 11 ) === 'draugiem.lv' ) ) {
+			target = '_self';
+		}
+		// zip'a ifreimaa vienmeer _blank
+		if ( this.placeId == 19 ) {
+			target = '_blank';
+		}
+
+		var titleElements = [ htmlspecialchars_decode( this._applyCityTpl( data, data.title ) ) ];
+		/*if (target === '_blank') {
+		 titleElements.push( { tag: 'span', className: 'mAdLinkExternal' } );
+		 }*/
+		if (D.Ads.MiniAds.ADMIN) {
+			titleElements.push( {
+				'tag': 'a',
+				'className': 'mAdInfo icon informationIcon',
+				'href': '/ads/mini/?aid=' + data.id
+			} );
+		}
+		if ( ! empty( data.image ) ) {
+			var maxImgWidth = '240px';
+			if ( existsClassName( this._containerNode, 'mAdsRightCol' ) ) {
+				if ( existsClassName( this._containerNode, 'mAdsZipIframe' ) ) {
+					maxImgWidth = '220px';
+				} else {
+					maxImgWidth = '300px';
+				}
+			}
+			childs.push(
+				{
+					tag: 'figure',
+					className: 'mAdContent',
+					els: [
+						{
+							tag: 'div',
+							className: 'mAdImage',
+							prop: {
+								alt: htmlspecialchars_decode(data.title)
+							},
+							style: {
+								maxWidth: maxImgWidth,
+								backgroundImage: 'url(' + data.image.replace('http:', '') + ')'
+							}
+						},
+						{
+							tag: 'div',
+							className: 'click',
+							els: [
+								{
+									tag: 'div',
+									className: 'play'
+								}
+							],
+							style: {
+								display: ( empty( data.json['video'] ) && empty(data.json['embed']) ? 'none' : '' )
+							},
+							prop: {
+								onclick: function(e) {
+									D.stopPropagation(e);
+									$miniads.showMiniAdsVideo(data);
+									return false;
+								},
+								onmousedown: function(e) {
+									D.stopPropagation(e);
+									return false;
+								}
+							}
+						},
+						{
+							tag: 'figcaption',
+							els: [
+								{
+									tag: 'h3',
+									className: 'mAdTitle',
+									els: titleElements
+								},
+								{
+									tag: 'div',
+									className: 'mAdText',
+									text: htmlspecialchars_decode( this._applyCityTpl( data, data.text ) )
+								}
+
+							]
+						}
+					]
+				}
+			);
+		} else {
+			var contentElements = [];
+			contentElements.push(
+				{
+					tag: 'h3',
+					className: 'mAdTitle',
+					els: titleElements
+				},
+				{
+					tag: 'p',
+					className: 'mAdText',
+					text: htmlspecialchars_decode( this._applyCityTpl( data, data.text ) )
+				}
+			);
+			if ( ! empty( data.json['alcohol'] ) ) {
+				contentElements.push( {
+					tag: 'small',
+					text: D.Ads.MiniAds.lang.get('mad_alcohol_note', 'xGlobal'),
+					className: 'mAdNote'
+				} );
+			}
+			childs.push( {
+				tag: 'div',
+				className: 'mAdContent',
+				els: contentElements
+			} );
+		}
+
+		if ( empty( data.isPreview ) ) {
+			var optionPar = {};
+			if (empty(data.image)) {
+				optionPar.color = 'dark';
+			}
+			childs.push( this._makeCloseButton( data, optionPar ) );
+		}
+
+		var adHref = data.l;
+		if ( empty( data.isPreview ) ) {
+			adHref = D.Ads.MiniAds.MINI_DOMAIN + adHref;
+		}
+		if ( !empty( data.json['video'] || !empty(data.json['embed']) )) {
+			adHref = '/stats/click.php?key=miniads_video_title_click&url=' + encodeURIComponent( adHref );
+		}
+		adHref = D.Ads.MiniAds.doURI( adHref );
+		var className = 'mAd';
+		if( !empty(data.json['credit_note']) ){
+			className += ' mAdWithNote';
+		}
+		if( !empty(data.image) ){
+			className += ' mAdWithImage';
+		}
+		if( !empty(data.json['extra']) ){
+			className += ' ' + data.json['extra'];
+		}
+		var mAd = {
+			tag: 'a',
+			href: adHref,
+			className: className,
+			prop: {
+				target: target
+			},
+			els: childs
+		};
+		if ( empty( adHref ) ) {
+			mAd.href = 'javascript:';
+			mAd.prop.style = {
+				cursor: 'default'
+			};
+		}
+		if ( this.placeId === 9 ) {
+			mAd['style'] = {
+				height: ( 100 / par.loadedItemCount ) + '%'
+			};
+		}
+		return mkE( mAd );
+	},
+
+	_drawFrontpageItem: function( data ) {
+		var $miniads = this,
+			target = ( !empty( data.vlink ) && ( data.vlink == 'www.draugiem.lv' || data.vlink.substr( 0, 11 ) == 'draugiem.lv' ) ? '_self' : '_blank' ),
+			childs = [],
+			mAdTitleNode = null,
+			mAdTextNode = null;
+		var titleText = '';
+
+		var pageFollow2Place = !empty( data.json['page_follow2'] ) && this.placeId == 20;
+		if ( pageFollow2Place ) {
+			titleText = data.json['page_follow2'].title;
+		} else {
+			titleText = this._applyCityTpl( data, data.title );
+		}
+
+		mAdTitleNode = mkE({
+			tag: 'h2',
+			className: 'mAdTitle',
+			els: [
+				htmlspecialchars_decode( titleText ),
+				(D.Ads.MiniAds.ADMIN ? { 'tag': 'a', 'className': 'mAdInfo icon informationIcon', 'href': '/ads/mini/?aid=' + data.id } : '' )
+			]
+		});
+
+		if ( pageFollow2Place ) {
+			childs.push(
+				mkE({
+					tag: 'div',
+					className: 'titleWrapper',
+					els: [ mAdTitleNode ]
+				})
+			);
+		} else {
+			childs.push( mAdTitleNode );
+		}
+
+		// evo gaming hacks
+		if ( data.id == 36329 && this.placeId == 1 ) {
+			data.text = data.text.replace(' -', ':');
+			data.json['highlight_custom'].margin_right = 310;
+		}
+
+		childs.push(
+			mAdTextNode = mkE({
+				tag: 'p',
+				className: 'mAdText',
+				text: htmlspecialchars_decode( this._applyCityTpl( data, data.text ) )
+			})
+		);
+
+		var closeButton = this._makeCloseButton(data);
+		if ( empty( data.isPreview ) ) {
+			childs.push( closeButton );
+		}
+
+		var pageFollowAudienceHack = false;
+		if ( !empty( data.json['highlight_custom2'] ) && this.placeId == 20 ) {
+			mAdTitleNode.style.color = '#' + data.json['highlight_custom2'].title_color;
+			mAdTextNode.style.color = '#' + data.json['highlight_custom2'].text_color;
+			// nav vairs aktuaali aizveershanas kraasa - kaut kad vajag satiiriit
+			// if ( !empty( data.json['highlight_custom2'].dark ) ) {
+			// 	addClassName( closeButton, 'light' );
+			// }
+		} else if ( !empty( data.json['highlight_custom'] ) ) {
+			mAdTitleNode.style.color = '#' + data.json['highlight_custom'].title_color;
+			mAdTextNode.style.color = '#' + data.json['highlight_custom'].text_color;
+			mAdTextNode.style.marginRight = data.json['highlight_custom'].margin_right + 'px';
+			// if ( !empty( data.json['highlight_custom'].dark ) ) {
+			// 	addClassName( closeButton, 'light' );
+			// }
+		} else if ( !empty( data.json['page_follow2'] ) && this.placeId == 20 ) {
+			var idFolder = String( data.id ).substr( 0, 2 );
+			var pfImg;
+			if ( !empty( data.json['drpfad'] ) && !data.isPreview && typeof drpfadData != 'undefined' ) {
+				pfImg = drpfadData.img;
+				pageFollowAudienceHack = true;
+			} else {
+				var bidImg = isset( data.json['page_follow2'].bid_img ) ? data.json['page_follow2'].bid_img : data.json['page_follow2'].bid;
+				pfImg = bidImg ? D.imgUrl('business', bidImg, 20, 'icon') : '//ifrype.com/business/img/50.png';
+			}
+			childs.push({
+				tag: 'div',
+				className: 'mAdPageImg',
+				els: [{
+					tag: 'img',
+					src: pfImg
+				}]
+			});
+			if ( !empty( data.json['page_follow2'].official ) ) {
+				mkE({
+					tag: 'span',
+					className: 'official'
+				} ).append( mAdTitleNode );
+			}
+		} else if ( !empty( data.json['page_follow'] ) ) {
+			mAdTitleNode.style.color = '#' + data.json['page_follow'].title_color;
+			mAdTextNode.style.color = '#' + data.json['page_follow'].text_color;
+
+			var idFolder = String( data.id ).substr( 0, 2 );
+			var pfImg;
+			if ( !empty( data.json['drpfad'] ) && !data.isPreview && isset(drpfadData) ) {
+				pfImg = drpfadData.img;
+				pageFollowAudienceHack = true;
+			} else if ( !empty( data.json['page_follow'].img_version ) ) {
+				pfImg = D.idPicDomain( data.id ) + 'miniads_special_pf/' + idFolder + '/v' + data.json['page_follow'].img_version + '/' + data.id + '.jpg';
+			} else {
+				var bidImg = isset( data.json['page_follow'].bid_img ) ? data.json['page_follow'].bid_img : data.json['page_follow'].bid;
+				pfImg = bidImg ? D.imgUrl('business', bidImg, 20, 'icon') : '//ifrype.com/business/img/50.png';
+			}
+			childs.push({
+				tag: 'div',
+				className: 'mAdPageImg',
+				els: [{
+					tag: 'img',
+					src: pfImg
+				}]
+			});
+		}
+
+		if ( ! empty( data.json['alcohol'] ) ) {
+			childs.push( {
+				tag: 'small',
+				text: D.Ads.MiniAds.lang.get('mad_alcohol_note', 'xGlobal'),
+				className: 'mAdNote'
+			} );
+		}
+
+		var adHref = data.l;
+		if ( empty( data.isPreview ) ) {
+			adHref = D.Ads.MiniAds.MINI_DOMAIN + adHref;
+		}
+		adHref = D.Ads.MiniAds.doURI( adHref );
+		if ( pageFollowAudienceHack ) {
+			adHref = '/stats/click.php?key=miniads_click_'+ data.id +'&url=' + encodeURIComponent( '/'+ drpfadData.exturl +'/admin/pageads/quiz/' );
+		}
+		var mAd = {
+			tag: 'a',
+			prop:{
+				target: target,
+				href: adHref,
+				className: 'mAd' + ( ! empty(data.json['extra']) ? ' ' + data.json['extra'] : '' )
+			},
+			els: childs
+		};
+		if ( empty( adHref ) ) {
+			mAd.href = 'javascript:';
+			mAd.prop.style = {
+				cursor: 'default'
+			};
+		}
+		return mkE( mAd );
+	},
+
+	_miniCloseWithReason: function( item, reason ) {
+		D.smallPopUp.close();
+		D.Ads.rpc.send( 'close', {
+			aid: item.id,
+			reason: reason
+		}, D.closure(this, function() {
+			this.load();
+		} ) );
+	},
+
+	_miniCloseNew: function( item ) {
+		D.smallPopUp.open( false, {
+			title: D.Ads.MiniAds.lang.get('close_ad_why')
+		} );
+		var smallPopUpContent = D.smallPopUp.content;
+		T.Forms.radio( {
+			caption: D.Ads.MiniAds.lang.get('close_ad_not_interested'),
+			value: '1',
+			onclick: D.closure(this, this._miniCloseWithReason, item, 1)
+		} ).append( smallPopUpContent );
+		T.Forms.radio( {
+			caption: D.Ads.MiniAds.lang.get('close_ad_is_repeating'),
+			value: '2',
+			onclick: D.closure(this, this._miniCloseWithReason, item, 2)
+		} ).append( smallPopUpContent );
+		T.Forms.radio( {
+			caption: D.Ads.MiniAds.lang.get('close_ad_seen'),
+			value: '3',
+			onclick: D.closure(this, this._miniCloseWithReason, item, 3)
+		} ).append( smallPopUpContent );
+
+		var otherRadio = T.Forms.radio( {
+			caption: D.Ads.MiniAds.lang.get('close_ad_other'),
+			value: '4',
+			onclick: function() {
+				otherRadio.node.style.display = 'none';
+				otherButton.style.display = '';
+				otherInput.node.style.display = '';
+				otherInput.focus();
+			}
+		} ).append( smallPopUpContent );
+		var otherInput = T.Forms.input( {} ).append( smallPopUpContent );
+		var otherButton = T.submitButton( {
+			caption: D.Ads.MiniAds.lang.get('close'),
+			stretch: true,
+			onclick: D.closure( this, function(item) {
+				if ( empty(otherInput.value) ) {
+					D.blink( {
+						node: otherInput
+					} );
+					return false;
+				}
+				D.smallPopUp.close();
+				D.Ads.rpc.send( 'close', {
+					aid: item.id,
+					reason: 4,
+					text: otherInput.value
+				}, D.closure(this, function() {
+					this.load();
+				} ) );
+			}, item )
+		} ).append( smallPopUpContent );
+		otherInput.node.style.display = 'none';
+		otherButton.style.display = 'none';
+	},
+
+	_makeEvent: function( data ) {
+		var item = data[0];
+		if ( !isset( item.json['event_ad'] ) ) {
+			return;
+		}
+
+		addClassName( this._containerNode, 'mAdsEventsBox' );
+		addClassName( this._containerNode, 'mAd' );
+		this._containerNode.style.display = 'block';
+		clearNode( this._containerNode );
+
+		var idFolder = String( item.id ).substr( 0, 2 );
+		var img = D.idPicDomain( item.id ) + 'miniads_event/' + idFolder + '/v' + item.json['event_ad'].img_version + '/' + item.id + '.jpg';
+
+		var uri = empty( item.isPreview ) ? '/stats/click.php?key=miniads_event_click&url=' + encodeURIComponent( D.Ads.MiniAds.MINI_DOMAIN + item.l ) : item.l;
+		uri = D.Ads.MiniAds.doURI( uri );
+		this.content = mkE({
+			tag: 'a',
+			target: '_blank',
+			href: uri,
+			className: 'mAdContent',
+			style: {
+				backgroundImage: 'url("' + img + '")'
+			}
+		} ).append( this._containerNode );
+
+		this._makeAddButton().append( this._containerNode );
+
+		if ( empty( item.isPreview ) ) {
+			this._makeCloseButton( item ).append( this._containerNode );
+		}
+
+		if (D.Ads.MiniAds.ADMIN) {
+			mkE({
+				'tag': 'a',
+				'className': 'mAdInfo icon informationIcon',
+				'href': '/ads/mini/?aid=' + item.id
+			} ).append( this._containerNode );
+		}
+	}
+};
+
+D.Ads.removeAppBadge = function( appId, badgeNode ) {
+	D.smallPopUp.open( false, {} );
+	mkE( {
+		tag: 'p',
+		text: 'Vai vēlies noņemt šo ikonu no savas profila bildes?'
+	} ).append( D.smallPopUp.content );
+	T.Forms.footer( {
+		els: [
+			T.submitButton( {
+				caption: 'Noņemt',
+				onclick: D.closure( this, this._removeAppBadge, appId, badgeNode )
+			} ),
+			T.submitButton( {
+				caption: 'Atcelt',
+				color: 'link',
+				onclick: function() {
+					D.smallPopUp.close();
+					return false;
+				}
+			} )
+		]
+	} ).append( D.smallPopUp.content );
+
+	return false;
+};
+D.Ads._removeAppBadge = function( appId, badgeNode ) {
+	this.rpc.send( 'removeAppBadge', {
+		appId: appId
+	}, function() {
+		D.smallPopUp.close();
+		removeNode( badgeNode );
+	} );
+	return false;
+};
+
+var Marquee = {
+	content: null,
+	start: function (imghtml) {
+		if (!imghtml) {
+			return false;
+		}
+		if (document.getElementById || document.all) {
+			// lai straadaatu preview, novaac noserveeto
+			var oldMarquee = document.getElementById('marquee');
+			if ( oldMarquee ) {
+				removeNode( oldMarquee );
+				window.Marquee.content = null;
+			}
+
+			var step = 1;
+			var left = 0;
+			var div = document.createElement('div');
+			addClassName(div, 'marquee_a');
+			var adjust = function () {
+				var outermost = document.getElementById('outermost');
+				div.style.right = outermost.offsetWidth - outermost.clientWidth + 'px';
+			};
+			var position = 'fixed';
+			var iterate = function () {
+				if (window.Marquee.content) {
+					left = parseInt(window.Marquee.content.style.left);
+					window.Marquee.content.style.left = left - step + 'px';
+					if (Math.abs(left) >= 800) {
+						window.Marquee.content.style.left = (-step) + 'px';
+					}
+				} else {
+					window.Marquee.content = document.getElementById('m_content');
+				}
+			};
+			$(div).attr('id', 'marquee')
+				.hover(
+				function () {
+					step = 0;
+				},
+				function () {
+					step = 1;
+				}
+			).html('<table style="left: 0px;" id="m_content"><tr><td>' + imghtml + imghtml + imghtml + '</td></tr></table>')
+			document.body.appendChild(div);
+			adjust();
+			Marquee.interval = setInterval(iterate, 50);
+			return true
+		}
+		return false
+	}
+};
+
+D.Ads.scrollAds = {
+	element : {},
+	container_position: {},
+
+	init : function (obj) {
+		$(window).scroll(D.Ads.scrollAds.scrollHandler);
+		D.Ads.scrollAds.element = obj;
+		D.Ads.scrollAds.container_position = $(obj).parent().offset();
+		D.Ads.scrollAds.scrollHandler({});
+	},
+
+	getTopFromScreen : function (obj) {
+		if (!obj) {
+			obj = D.Ads.scrollAds.element;
+		}
+
+		var top = $(obj).offset().top + $(obj).height();
+		return top - $(window).scrollTop();
+	},
+
+	scrollHandler : function (event) {
+
+		var element = $(D.Ads.scrollAds.element);
+
+		if (element.css('position') == 'static') {
+			if ($(window).height() - D.Ads.scrollAds.getTopFromScreen() > 0 ) {
+				element.css(
+					{
+						'position':'fixed',
+						'left':D.Ads.scrollAds.container_position.left+'px',
+						'bottom': 0,
+						'margin' : 0,
+						'z-index': 20
+					}
+				);
+			}
+		} else {
+
+			var container = $('#container');
+			var position = element.offset();
+
+			if (position.top <= D.Ads.scrollAds.container_position.top) {
+				element.css('position','static');
+			}
+
+			var current_bottom = position.top + element.height() + parseInt(element.css('bottom'));
+			var container_bottom = container.offset().top + container.height();
+
+			if (current_bottom >= container_bottom) {
+
+				var bottom_offset =  $(document).height() - container_bottom; // offset from container bottom to page bottom
+
+				bottom_offset -= ($(document).height() - ($(window).height() + $(window).scrollTop())); // removing bottom scroll offset
+
+				element.css('bottom',bottom_offset+'px');
+			} else if(element.css('bottom') != 0) {
+				element.css(
+					{
+						'bottom': 0
+					}
+				);
+			}
+		}
+	}
+};
+
+D.Ads.Finding = {
+	element : {
+		height : 70,
+		width : 70
+	},
+
+	places : {
+		'firstpage' : ['#pymk','#eventserverList', '#lt .picture', '#lt .sideMenu:first'],
+		'messages' : ['#mailContainer', '#lt .sideMenu:first'],
+		'visitors' : ['#ct'],
+		'friends' : ['#onlineBox', '#lt .sideMenu:first'],
+		'gallery' : ['#ct'],
+		'groups' : ['#ct'],
+		'group' : ['#lt'],
+		'pic' : ['#galleryLargePictureCenter'],
+		'temp_beach' : ['#picContent']
+	},
+
+	init : function ( params ) {
+		if (!params.container) {
+			params.container = "#container";
+		}
+
+		if (!params.href || !params.img|| !params.section) {
+			D.console.info('D.Ads.Finding: wrong params');
+			return;
+		}
+
+		if (!D.Ads.Finding.places[params.section]) {
+			D.console.info('D.Ads.Finding: wrong section');
+			return;
+		}
+
+		params.element_height = params.element_height || D.Ads.Finding.element.height;
+		params.element_width = params.element_width || D.Ads.Finding.element.width;
+
+		var selector = D.Ads.Finding.places[params.section][Math.floor((Math.random()*D.Ads.Finding.places[params.section].length))];
+
+		var max_top = $(params.container+' '+selector).height() -  params.element_height;
+		var max_left = $(params.container+' '+selector).width() - params.element_width;
+
+		var top = Math.floor((Math.random()*max_top)+1);
+		var left = Math.floor((Math.random()*max_left)+1);
+
+		var html = '<a style="position:absolute;top:'+top+'px;left:'+left+'px;z-index:3;" href="'+params.href+'" onClick="'+params.onclick+'"><img src="'+params.img+'"/></a>';
+
+		$(params.container+' '+ selector).css('position', 'relative').append(html);
+	}
+};
+
+D.Ads.VideoAd = {
+	active : false,
+	activeBefore : false,
+	videoID : '',
+	videoURL : '',
+	videoPIC : '',
+	videoLink : '',
+	target : '_blank',
+	init : false,
+
+	adStart : function() {
+//		$.get('/special/link.php?url=special_videoad_start');
+		$.get('/ads/rq/special_links.php?videoadbefore_status=1');
+	},
+	adMiddle : function() {
+//		$.get('/special/link.php?url=special_videoad_middle');
+		$.get('/ads/rq/special_links.php?videoadbefore_status=2');
+	},
+	adEnd : function() {
+//		$.get('/special/link.php?url=special_videoad_end');
+		$.get('/ads/rq/special_links.php?videoadbefore_status=3');
+	},
+	adClick : function() {
+		if ( !D.Ads.VideoAd.videoLink ) {
+			return;
+		}
+
+		if (D.Ads.VideoAd.target == '_blank') {
+			window.open(D.Ads.VideoAd.videoLink);
+		} else {
+			document.location = D.Ads.VideoAd.videoLink;
+		}
+
+	},
+	swfInit : function() {
+		this.init = true;
+		this.loadAd();
+	},
+	adClose : function() {
+		$.get('/ads/rq/special_links.php?close_videoad=1');
+		D.Ads.VideoAd.videoComplete = function () {};
+	},
+	loadAd : function() {
+		if (this.activeBefore && this.init) {
+			$.get('/ads/rq/special_links.php?videoad_status', function (response) {
+				if (!parseInt(response,10)) {
+					$('#'+D.Ads.VideoAd.videoID)[0].loadAdvertBefore(D.Ads.VideoAd.videoURL,D.Ads.VideoAd.videoPIC,D.Ads.VideoAd.videoLink?'javascript:D.Ads.VideoAd.adClick();':'');
+				}
+				else {
+					$('#'+D.Ads.VideoAd.videoID)[0].loadAdvertBefore("","","");
+				}
+			});
+		}
+	},
+	videoComplete : function(id) {
+		if (D.Ads.VideoAd.active) {
+			$.get('/ads/rq/special_links.php?videoad_status', function (response) {
+				if (!parseInt(response,10)) {
+					$('#'+D.Ads.VideoAd.videoID)[0].setAdvertParams(D.Ads.VideoAd.videoURL,D.Ads.VideoAd.videoPIC,D.Ads.VideoAd.videoLink?'javascript:D.Ads.VideoAd.adClick();':'');
+				} else {
+					$('#'+D.Ads.VideoAd.videoID)[0].setAdvertParams("","","");
+				}
+			});
+		} else {
+			$('#'+D.Ads.VideoAd.videoID)[0].setAdvertParams("","","");
+		}
+	}
+};
+
+$(window).on("message", function(e) {
+	if (e.originalEvent && e.originalEvent.data && e.originalEvent.data.ads_error) {
+		$.post('/ads/rq/error.php',{data: e.originalEvent.data});
+	}
+});
+
+
+D.Ads.inScreen = {
+	adPlaces : [],
+	processingInScreen : [],
+	processed : [],
+
+	init : function (places) {
+		this.ad_places = places;
+		this.processed = [];
+		$(document).scroll(D.closure(this, this.onViewportChange));
+		$(window).resize(D.closure(this, this.onViewportChange));
+		this.onViewportChange();
+	},
+
+	registerSeen : function (adList) {
+
+		var i;
+		var inScreen = this.onViewportChange();
+		var processed = [];
+
+		//D.log('inscreen ', inScreen);
+
+		for (i = 0; i <= adList.length - 1; i++) {
+			var place_id = adList[i];
+			if ($.inArray(place_id, this.processed) === -1 && $.inArray(place_id, inScreen) >= 0) {
+				this.processed.push(place_id);
+				processed.push(this.ad_places[place_id]);
+			}
+
+			var pos = array_search(place_id, this.processingInScreen);
+
+			if (pos !== false) {
+				this.processingInScreen.splice(pos, 1);
+			}
+		}
+
+		if (processed.length) {
+			var request = document.createElement('img');
+			request.src = D.Ads.url + 'ins?' + D.Ads.encodeAd(processed.join(',')+'.'+ D.Ads.getUserID());
+			request.onerror = function() {
+				var request2 = document.createElement('img');
+				request2.src = D.Ads.url2 + '?r=ins&p=' + encodeURIComponent( D.Ads.encodeAd(processed.join(',')+'.'+ D.Ads.getUserID()) );
+			}
+		}
+	},
+
+	onViewportChange : function () {
+		var isElementInViewport = function (el) {
+			if ( !el.length ) {
+				return false;
+			}
+
+			el = el[0];
+
+			if (!el) {
+				return false;
+			}
+
+			var rect = el.getBoundingClientRect();
+
+			return (
+				rect.top >= 0 &&
+				rect.left >= 0 &&
+				rect.bottom - $(el).height() / 2 <= (window.innerHeight || document.documentElement.clientHeight) &&
+				rect.right - $(el).width() / 2 <= (window.innerWidth || document.documentElement.clientWidth)
+			);
+		};
+
+		var inScreen = [];
+		var inScreenRegistering = [];
+
+		for (var place_id in this.ad_places) {
+			if (isElementInViewport($('#adv'+place_id)) || (place_id == 4 && isElementInViewport($('#marquee'))) ) {
+				inScreen.push(place_id);
+
+				if ($.inArray(place_id, this.processingInScreen) === -1 && $.inArray(place_id, this.processed) === -1) {
+					inScreenRegistering.push(place_id);
+					this.processingInScreen.push(place_id);
+				}
+			}
+		}
+
+		if (inScreenRegistering.length) {
+			setTimeout(D.closure(this, this.registerSeen, inScreenRegistering), 1000);
+		}
+
+		return inScreen;
+	}
+};
+
+D.Ads.setMailAdvert = function(par) {
+	if ( par.banner ) {
+		var node = $('#adv130');
+		if( !node.length ){
+			node = mkE( {
+				tag:'div',
+				id:'adv130'
+			} ).append( $('#header')[0] );
+		}
+		else {
+			node.empty();
+		}
+	} else {
+		mkE({
+			tag: 'span',
+
+			id: 'adv374'
+		}).append(document.getElementById('skinTop'));
+	}
+
+	if (!D.Ads.prevSkin) {
+		D.Ads.prevSkin = $("link[title='Skin']").attr('href');
+	}
+	$("link[title='Skin']").attr('href', par.skin_path);
+	var weatherNode = document.getElementById('weather-skin-temp');
+	if (weatherNode) {
+		removeNode(weatherNode);
+	}
+	$('.skin-extra-item').remove();
+
+	setTimeout(D.closure(this, function(){
+		if (!par.top) {
+			par.top = parseInt($('#skinTop').css('padding-top'));
+		}
+
+		// show giga
+		if ( par.banner ) {
+			var extension = par.banner.toLowerCase().split('.').pop();
+			if (extension == "swf") {
+				var so130 = new SWFObject(par.banner,'swf130',par.width,par.height,9,'#ffffff');
+				so130.addParam('wmode','transparent');
+				so130.addVariable(par.link);
+				so130.write('adv130');
+			} else if (extension == "png" || extension == "jpg" || extension == "gif") {
+				mkE({
+					tag: 'a',
+					prop: {
+						href: par.link,
+						target: '_blank'
+					},
+					els: [
+						{
+							tag: 'img',
+							src: par.banner
+						}
+					]
+				}).append(document.getElementById('adv130'));
+			} else if (par.banner.length > 0) {
+				mkE({
+					tag: 'iframe',
+					src: par.banner,
+					prop: {
+						'scrolling': "no"
+					},
+					style: {border:0,width:'1080px', height:'150px', outline:'none', overflow:'hidden'}
+				}).append(document.getElementById('adv130'));
+				$('#adv130').css({'height':"150px",'display':'block', position: 'relative'});
+				mkE({
+					tag: 'a',
+					prop: {
+						href: par.link,
+						target: "_blank"
+					},
+					style: {
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: "1080px",
+						height: "150px"
+					}
+				}).append(document.getElementById('adv130'));
+			} else {
+				$('#adv130').css({'height':"0",'display':'block', position: 'relative'});
+			}
+			$("#adv130").show();
+			// speelju akcijas reklaamaam neraadam gigu
+			if ( par.ad_id == 179709 || par.ad_id == 179723 || par.ad_id == 179724 || par.ad_id == 179725 || par.ad_id == 179726 || par.ad_id == 185015 ) {
+				$("#adv130").hide();
+			}
+		}
+
+
+		var vwidth = $(window).width();
+		var vheight = $(window).height();
+		mkE({
+			tag: 'a',
+			id: 'adinaTopClick',
+			className: 'skin-extra-item',
+			prop: {
+				'target': '_blank',
+				'href' : par.link
+			},
+			style: {
+				position: 'absolute',
+				top: '0',
+				left: '0',
+				width: vwidth + 'px',
+				height: par.top + 'px'
+			}
+		}).append(document.getElementById('skinTop'));
+		if (vwidth >= 1102) {
+			mkE({
+				tag: 'a',
+				id: 'adinaLeftClick',
+				className: 'skin-extra-item',
+				prop: {
+					'target': '_blank',
+					'href' : par.link
+				},
+				style: {
+					position: 'absolute',
+					top: par.top + 'px',
+					left: '0',
+					width: ((vwidth - 1100) / 2) + 'px',
+					height: vheight + 'px'
+				}
+			}).append(document.getElementById('skinTop'));
+			mkE({
+				tag: 'a',
+				id: 'adinaRightClick',
+				className: 'skin-extra-item',
+				prop: {
+					'target': '_blank',
+					'href' : par.link
+				},
+				style: {
+					position: 'absolute',
+					top: par.top + 'px',
+					right: '0',
+					width: ((vwidth - 1100) / 2) + 'px',
+					height: vheight + 'px'
+				}
+			}).append(document.getElementById('skinTop'));
+		}
+		this.mailAdvert = true;
+		$( window ).resize( function(){
+			var vwidth = $(window).width();
+			var vheight = $(window).height();
+			$("#adinaLeftClick").css('width', (vwidth >= 1102 ? ((vwidth - 1100) / 2) : 0) + 'px');
+			$("#adinaRightClick").css('width', (vwidth >= 1102 ? ((vwidth - 1080) / 2) : 0) + 'px');
+		});
+		if (par.stats && !D.Ads.previewAD) {
+			mkE({
+				tag: 'img',
+				src: par.stats.replace('[TIMESTAMP]', new Date().getTime()),
+				style: { width:'1', height:'1', border:'0' }
+			}).append( document.body );
+		}
+		mkE({
+			tag: 'div',
+			className: 'set-friend-skin',
+			id: 'removeAdinaCont',
+			els: [
+				{
+					tag: 'a',
+					text: D.Lang.get('close_ad'),
+					style: {
+						'z-index': 100
+					},
+					onclick: function(){
+						if (par.ad_id) {
+							if ( par.banner ) {
+								D.Ads.closeAd('adv130', par.ad_id, true);
+							} else {
+								D.Ads.closeAd('adv374', par.ad_id);
+							}
+						}
+						$("link[title='Skin']").attr('href', D.Ads.prevSkin);
+						removeNode(document.getElementById('adinaTopClick'));
+						removeNode(document.getElementById('adinaLeftClick'));
+						removeNode(document.getElementById('adinaRightClick'));
+						removeNode(document.getElementById('removeAdinaCont'));
+
+						if ( par.banner ) {
+							D.Ads.place(130);
+							setTimeout(function(){
+								D.Ads.load();
+							}, 500);
+						}
+					}
+				}
+			]
+		}).append(document.getElementById('skinTop'));
+	}), 100);
+
+};
+
+//
+// +++ D.Ads.VideoPlayer +++
+//
+D.Ads.VideoPlayer = function(par) {
+	this.par = par || {};
+	this.src = this.par.src;
+	this.node = null;
+	this.muted = true;
+	this.autoplay = true;
+	this.showMute = true;
+	this.showPause = true;
+	this.width = par.width;
+	this.height = par.height;
+	this.img = par.img || '';
+	this.url = par.url || '';
+	this.link = par.link || '';
+	this.target = par.target || '_blank';
+	this.stats = par.stats || null;
+	/**
+	 * speelee tikai, kad redzams inscreenaa
+	 * @type {boolean}
+	 */
+	this.inscreenPlay = par.inscreenPlay || false;
+	this.statsMethod = null;
+	this.placeId = par.placeId || 0;
+
+	if (isset(par.muted)) {
+		this.muted = par.muted;
+	}
+	if (isset(par.autoplay)) {
+		this.autoplay = par.autoplay;
+	}
+	if (isset(par.showMute)) {
+		this.showMute = par.showMute;
+	}
+	if (isset(par.showPause)) {
+		this.showPause = par.showPause;
+	}
+	this.draw();
+	D.Ads.VideoPlayer.videos.push(this);
+};
+D.Ads.VideoPlayer.prototype.statsSeconds = {};
+D.Ads.VideoPlayer.prototype.initialized = false;
+D.Ads.VideoPlayer.prototype.previousSecond = null;
+D.Ads.VideoPlayer.prototype.isPlaying = null;
+D.Ads.VideoPlayer.prototype.duration = null;
+D.Ads.VideoPlayer.prototype.metadataLoaded = false;
+D.Ads.VideoPlayer.prototype.ended = false;
+D.Ads.VideoPlayer.prototype.inscreenCounted = false;
+D.Ads.VideoPlayer.prototype.startPlayTime = 0;
+D.Ads.VideoPlayer.prototype.placeId = 0;
+
+D.Ads.VideoPlayer.prototype.draw = function() {
+	this.node = mkE({
+		tag: 'div',
+		className: 'videoAd',
+		style: {
+			position: 'relative',
+			width: this.width + 'px',
+			height: this.height + 'px'
+		}
+	});
+	this.video = mkE({
+		tag: 'video',
+		attr: {
+			muted: this.muted,
+			poster: this.img
+		},
+		prop: {
+			onended: D.closure(this, this.onEnd),
+			ontimeupdate: D.closure(this, this.onTimeUpdate),
+			onloadedmetadata: D.closure(this, this.onMetadata)
+		},
+		style: {
+			width: this.width + 'px',
+			height: this.height + 'px',
+			position: 'relative'
+		},
+		els: [{
+			tag: 'source',
+			prop: {
+				src : this.src,
+				type: 'video/mp4'
+			}
+		}]
+	}).append(this.node);
+	if (this.img) {
+		mkE({
+			tag: 'img',
+			prop: {
+				src: this.img
+			}
+		}).append(this.video);
+	}
+
+	if (this.url) {
+		if (!this.link || this.link != "https://www.draugiem.lv/") {
+			this.linkNode = mkE({
+				tag: 'a',
+				prop: {
+					href: this.url,
+					target: this.target
+				},
+				style: {
+					width: this.width+'px',
+					height: this.height+'px',
+					top: 0,
+					left: 0,
+					position: 'absolute'
+				}
+			}).append(this.node);
+		}
+	}
+	if (this.showMute) {
+		this.muteButton = mkE({
+			tag: 'div',
+			className: 'muteBtn',
+			style: {
+				width: '25px',
+				height: '25px',
+				position: 'absolute',
+				bottom: '10px',
+				left: '20px',
+				cursor: 'pointer'
+			},
+			prop: {
+				onclick: D.closure(this, this.mute)
+			}
+		}).append(this.node);
+		if (this.muted) {
+			addClassName(this.muteButton, 'muted');
+		}
+	}
+	this.video.pause();
+};
+
+D.Ads.VideoPlayer.prototype.append = function(node) {
+	if (typeof node == 'string') {
+		node = document.getElementById(par.node);
+	}
+	this.node.append(node);
+};
+
+D.Ads.VideoPlayer.prototype.initPlay = function(scroll){
+	scroll = scroll === true || false;
+	if( this.initialized ){
+		this.play();
+		return;
+	}
+	this.initialized = true;
+	var testElement = document.createElement('video');
+	var isHTML5Video = (typeof(testElement.canPlayType) != 'undefined');
+	if( !isHTML5Video || !testElement.canPlayType('video/mp4') ){
+		this.error = true;
+		return;
+	}
+	this.play();
+};
+
+D.Ads.VideoPlayer.prototype.play = function(){
+	if( !this.video ){
+		return;
+	}
+	if( window.Promise ){
+		var promise = this.video.play();
+		if( promise ){
+			promise.then(D.closure( this, function() {
+				this.onPlay();
+			}));
+		} else {
+			this.onPlay();
+		}
+	}else{
+		this.video.play();
+		this.onPlay();
+	}
+};
+
+D.Ads.VideoPlayer.prototype.onPlay = function(){
+	this.isPlaying = true;
+	if( this.stats ) {
+		this.statsTimeout();
+	}
+	this.startPlayTime = (new Date()).getTime();
+};
+D.Ads.VideoPlayer.prototype.pause = function(){
+	if( this.metadataLoaded ){
+		this.video.pause();
+	}
+	this.onPause();
+};
+D.Ads.VideoPlayer.prototype.onPause = function(){
+	if( this.stats ){
+		this.sendStats();
+		clearTimeout(this._statsTimeout);
+	}
+	this.isPlaying = false;
+};
+
+D.Ads.VideoPlayer.prototype.statsTimeout = function(){
+	if( this._statsTimeout ){
+		clearTimeout(this._statsTimeout);
+	}
+	this._statsTimeout = setTimeout(D.closure(this, this.sendStats), 1000);
+};
+
+D.Ads.VideoPlayer.prototype.sendStats = function(){
+	if( this._statsTimeout ){
+		clearTimeout(this._statsTimeout);
+	}
+	if( empty(this.statsSeconds) ){
+		this.statsTimeout();
+		return;
+	}
+	var seconds = [];
+	for( var k in this.statsSeconds ){
+		if( !this.statsSeconds.hasOwnProperty(k) ){
+			continue;
+		}
+		seconds.push(k);
+	}
+	this.statsSeconds = {};
+	if( this.par.statsMethod && typeof this.par.statsMethod == 'function' ){
+		this.par.statsMethod({
+			uid: this.stats.uid,
+			id: this.stats.pid,
+			type: this.stats.type,
+			seconds: seconds
+		});
+	} else {
+		//D.log('send stats:', '//tw.ifrype.com/say/video/' + this.stats.uid + '/' + this.stats.pid + ':' + this.stats.type + '/' + seconds.join(','));
+		if ( !D.Ads.previewAD || D.Ads.previewAD.id != this.placeId ) {
+			$.ajax({
+				url: '//tw.ifrype.com/say/video/' + this.stats.uid + '/' + this.stats.pid + ':' + this.stats.type + '/' + seconds.join(','),
+				crossDomain: true,
+				dataType: 'jsonp'
+			});
+		}
+	}
+	this.statsTimeout();
+};
+
+D.Ads.VideoPlayer.prototype.onEnd = function(){
+	this.onTimeUpdate();
+	this.onPause();
+
+	this.ended = true;
+	this.video.play();
+};
+D.Ads.VideoPlayer.prototype.onTimeUpdate = function(){
+	if( this.stats ){
+		var second = Math.floor(this.video.currentTime);
+		if( this.previousSecond !== second && second <= this.duration && !this.ended ){
+			this.previousSecond = second;
+			this.statsSeconds[second] = true;
+
+			// pieskaitiit ins tad, ja nav preview
+			if ( !D.Ads.previewAD || D.Ads.previewAD.id != this.placeId ) {
+				if ( this.inscreenPlay && !this.inscreenCounted && ((new Date()).getTime()) - this.startPlayTime >= 5000 ) {
+					this.inscreenCounted = true;
+
+					var placeId = this.placeId;
+					if ( placeId == D.Ads.PLACE_INFOLOGS_VIDEO_WWW_MOB || placeId == D.Ads.PLACE_INFOLOGS_VIDEO_DOUBLE || placeId == D.Ads.PLACE_INFOLOGS_VIDEO_WWW_MOB_UNIQUE ) {
+						placeId = 272;
+					}
+					// D.log('count inscreen: ', D.Ads.itemsList, D.Ads.itemsList[ placeId ], this.placeId, placeId );
+					var request = document.createElement('img');
+					request.src = D.Ads.url + 'ins?' + D.Ads.encodeAd( D.Ads.itemsList[ placeId ] + '.' + D.Ads.getUserID());
+					request.onerror = function() {
+						var request2 = document.createElement('img');
+						request2.src = D.Ads.url2 + '?r=ins&p=' + encodeURIComponent( D.Ads.encodeAd( D.Ads.itemsList[ placeId ] + '.' + D.Ads.getUserID()) );
+					}
+				}
+			}
+		}
+	}
+};
+D.Ads.VideoPlayer.prototype.onMetadata = function(){
+	this.duration = this.video.duration;
+	this.metadataLoaded = true;
+	this.video.muted = this.muted;
+
+	if ( this.autoplay ) {
+		D.Ads.VideoPlayer.handleScroll();
+	}
+};
+
+D.Ads.VideoPlayer.prototype.mute = function() {
+	this.muted = !this.muted;
+	this.video.muted = this.muted;
+	if (this.muted) {
+		addClassName(this.muteButton, 'muted');
+	} else {
+		removeClassName(this.muteButton, 'muted');
+	}
+};
+
+D.Ads.VideoPlayer.videos = [];
+D.Ads.VideoPlayer.handleScroll = function(){
+	function isElementVisible(el) {
+		var vpWidth = window.innerWidth || document.documentElement.clientWidth;
+		var vpHeight = window.innerHeight || document.documentElement.clientHeight;
+
+		if (typeof el.getBoundingClientRect === 'function') {
+			var rec = el.getBoundingClientRect();
+			var tViz = rec.top >= 0 && rec.top < vpHeight;
+			var bViz = rec.bottom > 0 && rec.bottom <= vpHeight;
+			var lViz = rec.left >= 0 && rec.left < vpWidth;
+			var rViz = rec.right > 0 && rec.right <= vpWidth;
+			var vVisible = tViz && bViz;
+			var hVisible = lViz && rViz;
+
+			return vVisible && hVisible;
+		}
+		return false;
+	}
+	var canPlayVideo = true;
+	for( var i in D.Ads.VideoPlayer.videos ){
+		if( !D.Ads.VideoPlayer.videos.hasOwnProperty(i) ){
+			continue;
+		}
+		var video = D.Ads.VideoPlayer.videos[i];
+		var visible = isElementVisible(video.node);
+		if( visible && video.isPlaying ){
+			canPlayVideo = false;
+		}else if( visible && !video.isPlaying && canPlayVideo ){
+			video.initPlay(true);
+			video.scrollPlay = true;
+			canPlayVideo = false;
+		}else if( !visible && video.isPlaying ){
+			if ( video.inscreenPlay ) {
+				video.pause();
+			}
+		}
+	}
+};
+
+//
+// --- D.Ads.VideoPlayer ---
+//
+
+
+D.Ads.OptionsPar = function(){};
+D.Ads.OptionsPar.prototype = {};
+D.Ads.OptionsPar.prototype.id = 0;
+D.Ads.OptionsPar.prototype.type = '';
+D.Ads.OptionsPar.prototype.top = 8;
+D.Ads.OptionsPar.prototype.right = 8;
+D.Ads.OptionsPar.prototype.targetingInfo = true;
+D.Ads.OptionsPar.prototype.canClose = false;
+D.Ads.OptionsPar.prototype.showTop = false;
+D.Ads.OptionsPar.prototype.showLeft = false;
+D.Ads.OptionsPar.prototype.color = '#ffffff';
+D.Ads.OptionsPar.prototype.backgroundOverlay = 'rgba(0,0,0,.5)';
+D.Ads.OptionsPar.prototype.onClose = function(){};
+D.Ads.OptionsPar.prototype.onTargeting = function(){};
+D.Ads.OptionsPar.prototype.additionOptions = [];
+D.Ads.OptionsPar.TYPE_CPM = 'cpm';
+D.Ads.OptionsPar.TYPE_SAY = 'say';
+D.Ads.OptionsPar.TYPE_MINIADS = 'miniads';
+
+/**
+* var a = new D.Ads.Options({id: 1, type: 'cpm', canClose: true, onClose: function(){$('#adv272').remove()}}).append(document.getElementById('adv272'));
+*/
+
+D.Ads.Options = Class(
+	{
+		id: 0,
+		targetingInfo: true,
+		canClose: false,
+
+		__construct: function(par) {
+			if( par && !(par instanceof(D.Ads.OptionsPar)) ){
+				this.par = new D.Ads.OptionsPar();
+				O2O(this.par, par);
+			}else{
+				this.par = par || new D.Ads.OptionsPar();
+			}
+			this.node = mkE({
+				tag: 'div',
+				className: 'rInfoOptionsWrapper',
+				style: {
+					top: this.par.top + 'px',
+					right: this.par.right + 'px'
+				},
+				onclick: this.showOptions,
+				onmousedown: this._onmousedown,
+				els: [
+					this.arrowPointerNode = mkE({
+						tag: 'div',
+						className: 'rInfoOptions',
+						style: {
+							backgroundColor: this.par.backgroundOverlay
+						},
+						els: [
+							T.svgIcon({
+								icon: 'pointer-ddw',
+								color: this.par.color
+							})
+						]
+					})
+				]
+			});
+		},
+
+		showOptions: function(event) {
+			D.stopPropagation(event);
+			if( this._optionsDropDown ){
+				this._optionsDropDown.toggle( this.node );
+				return false;
+			}
+			var par = {};
+			if (this.par.showTop) {
+				par.top = true;
+			}
+			if ( this.par.showLeft ) {
+				par.left = true;
+			}
+			this._optionsDropDown = new T.Options(par);
+			var opt;
+			if (this.par.canClose) {
+				opt = new T.Options.Item( {
+					caption: D.Lang.get('close'),
+					onclick: this._optClose
+				} );
+				this._optionsDropDown.addItem(opt);
+			}
+			if (this.par.targetingInfo) {
+				opt = new T.Options.Item( {
+					caption: D.Lang.get('Why am I seeing this ad'),
+					onclick: this._optTargeting
+				} );
+				this._optionsDropDown.addItem(opt);
+			}
+			if (!empty(this.par.additionOptions)) {
+				for (var i in this.par.additionOptions) {
+					opt = new T.Options.Item( {
+						caption: this.par.additionOptions[i].caption,
+						onclick: this.par.additionOptions[i].onclick
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+			}
+			this._optionsDropDown.append(this.node);
+			this._optionsDropDown.openUp(this.par.showTop);
+			return false;
+		},
+
+		_onmousedown: function(event) {
+			D.stopPropagation(event);
+			return false;
+		},
+
+		_optTargeting: function() {
+			if ( !this.par.id || !this.par.type ) {
+				return;
+			}
+
+			new D.Ads.TargetingInfo({
+				id: this.par.id,
+				type: this.par.type
+			});
+		},
+
+		_optClose: function() {
+			this.par.onClose();
+		}
+	},
+	mkE.Base
+);
+
+D.Ads.TargetingInfo = Class(
+	{
+		id: 0,
+		type: '',
+		onTargeting: function() {},
+
+		__construct: function(par) {
+			if ( !par.id ) {
+				return;
+			}
+			this.id = par.id;
+			if ( !par.type ) {
+				return;
+			}
+			this.type = par.type;
+			if ( par.onTargeting ) {
+				this.onTargeting = par.onTargeting;
+			}
+
+			this._getInfo();
+		},
+
+		_getInfo: function() {
+			D.onLoad(['DR.ads'], D.closure(this, function() {
+				this._mGetReasons = new DR.ads.GetDisplayReasons();
+				this._mGetReasons.id = this.id;
+				this._mGetReasons.type = this.type;
+				this._mGetReasons.onLoad = D.closure(this, function() {
+					this._showTargetingInfoPopup( this._mGetReasons.re.reasons );
+					this.onTargeting();
+				});
+				this._mGetReasons.call();
+			}));
+		},
+
+		_showTargetingInfoPopup: function( reasons ) {
+			var els = [];
+			for ( var i = 0; i < reasons.length; i++ ) {
+				els.push(							{
+					tag: 'li',
+					els: [
+						{
+							tag: 'strong',
+							text: reasons[i].label + ': '
+						},
+						reasons[i].text
+					]
+				});
+			}
+
+			InfoBox.els(
+				[
+					{
+						tag: 'p',
+						text: D.Lang.get('you_see_this_ad_because') + ':'
+					},
+					{
+						tag: 'ul',
+						className: 'simpleList',
+						els: els
+					},
+					{
+						tag: 'a',
+						href: '/account/?tab=1&sub=13',
+						text: D.Lang.get('manage_ad_settings')
+					},
+					new T.Form.Footer({
+						els: [
+							new T.Form.Button({
+								caption: D.Lang.get('close'),
+								onclick: function() {
+									InfoBox.close();
+								}
+							})
+						]
+					})
+				],
+				{
+					title: D.Lang.get('Why am I seeing this ad'),
+					width: 468,
+					className: 'rTargetingInfoBox'
+				}
+			);
+		}
+	},
+	mkE.Base
+);
+
+/**
+ * @class
+ */
+D.Ads.ADX = Class(
+	/**
+	 * @lends {D.Ads.ADX#}
+	 */
+	{
+		adNode: null,
+		placeId: 0,
+		environment: 'production',
+
+		/** @constructs */
+		__construct: function ( par ) {
+			this.adNode = par.adNode;
+			this.placeId = par.placeId;
+			if ( par.environment ) {
+				this.environment = par.environment;
+			}
+			if(D.Ads.SET_SIZE){
+				var height = D.Ads.placeHeight(this.placeId);
+				if(height){
+					this.adNode.style.minHeight = height + 'px';
+					this.adNode.style.display = 'block';
+				}
+			}
+			this._init();
+		},
+
+		_init: function() {
+			D.addJS('https://securepubads.g.doubleclick.net/tag/js/gpt.js', this._onGPTLoad, {
+				async: true
+			});
+		},
+
+		_onGPTLoad: function() {
+			var pageUrl = window.location.href.replace(/^https?\:\/\//i, "");
+			var urlSplit = pageUrl.split('/');
+			var section = 'frontpage';
+			if ( urlSplit.length >= 1 && urlSplit[1] && urlSplit[1].indexOf('?') === -1 ) {
+				section = urlSplit[1];
+			}
+			var gender = 'female';
+			if ( D.ID && D.me.sex === 1 ) {
+				gender = 'male';
+			}
+
+			window.googletag = window.googletag || {cmd: []};
+			googletag.cmd.push(D.closure( this, function() {
+				var slot = null;
+				if ( this.placeId === 51 ) {
+					slot = googletag.defineSlot('/84367975/draugiem.lv/662', [[1000, 250], [970, 250], [970, 90], [1000, 200], [728, 90], [980, 200], [1000, 300]]).setTargeting('ad_position', ['1']).addService(googletag.pubads());
+				} else if ( this.placeId === 54 ) {
+					slot = googletag.defineSlot('/84367975/draugiem.lv/41', [[300, 300], [300, 380], [300, 600], [160, 600], [300, 250]]).setTargeting('ad_position', ['1']).addService(googletag.pubads());
+				} else if ( this.placeId === 377 ) {
+					slot = googletag.defineSlot('/84367975/draugiem.lv/41', [[300, 300], [300, 380], [300, 600], [160, 600], [300, 250]]).setTargeting('ad_position', ['2']).addService(googletag.pubads());
+				}
+				if ( slot ) {
+					this.adNode.id = slot.getSlotElementId();
+				}
+
+				googletag.pubads().addEventListener('slotRenderEnded', D.closure( this, function(event) {
+					this.adNode.style.minHeight = '';
+					if ( !event.isEmpty ) {
+						this.adNode.style.display = 'block';
+						addClassName( this.adNode, 'gpt');
+						D.Ads.placeHeight(this.placeId, this.adNode.offsetHeight);
+
+						if ( D.ID % 10 === 6 ) {
+							new D.Ads.AnalyzeGPT({
+								iframe: this.adNode.querySelector('iframe')
+							});
+						}
+					} else {
+						//this.adNode.style.display = 'none';
+						D.Ads.placeHeight(this.placeId, 0);
+					}
+				}));
+
+				var adsNonPersonalized = 0;
+				if( !D.CookieAlert.has(D.CookieAlert.MARKETING) ) {
+					adsNonPersonalized = 1;
+				}
+
+				googletag.pubads().enableSingleRequest();
+				googletag.pubads().collapseEmptyDivs();
+				googletag.pubads()
+					.setTargeting('environment', [ this.environment ])
+					.setTargeting('section', [ section ])
+					.setTargeting('draugiem_random', ["" + Math.floor(Math.random() * 10)])
+					.setTargeting('gender', gender);
+				googletag.pubads().setRequestNonPersonalizedAds( adsNonPersonalized ); // 0 for personalized ads, 1 for non-personalized ads.
+				D.Ads.rpc.send('customStats', { v: 'adx_pers_' + adsNonPersonalized }, function(re){}, this);
+
+				googletag.enableServices();
+			}));
+
+			googletag.cmd.push( D.closure( this, function() {
+				googletag.display( this.adNode.id );
+			}));
+		}
+	}
+);
+
+D.Ads.AnalyzeGPT = Class(
+	/**
+	 * @lends {D.Ads.AdSense#}
+	 */
+	{
+		iframe: null,
+
+		__construct: function ( par ) {
+			this.iframe = par.iframe;
+			if ( !this.iframe ) {
+				return;
+			}
+
+			// D.log('iframe', this.iframe);
+			if ( this.iframe.getAttribute('data-is-safeframe') ) {
+				this.processSafeframe();
+			} else {
+				setTimeout(D.closure(this, function(){
+					this.processDocument();
+				}), 1000);
+			}
+		},
+
+		processSafeframe: function() {
+			var regexs = [
+				/clickurl_check = "([^"]+)";/m,
+				/destinationUrl: '([^']+)'/m,
+				/<iframe(?:[a-zA-Z0-9"\s_=]*)src="([^"]+)"/m,
+				/src="(https:\/\/www.?\.smartadserver\.com[^"]+)"/m,
+				/(https:\/\/adssettings\.google\.com\/whythisad)/m,
+				/(https:\/\/ads\.eu\.criteo\.com\/delivery)/m
+			];
+
+			var found = false;
+			for ( var i = 0; i < regexs.length; i++ ) {
+				var m = regexs[i].exec( this.iframe.name );
+				// D.log('SF matches ('+ regexs[i] +'):', m);
+				if ( m ) {
+					this.postAdUrl( m[1] );
+					found = true;
+					break;
+				}
+			}
+			if ( !found && this.iframe.name ) {
+				this.logUnknown('safeframe', this.iframe.name);
+			}
+		},
+
+		processDocument: function() {
+			try {
+				// var d = this.iframe.contentWindow.document;
+				// D.log('content window document', d);
+
+				var found = false;
+				var a = this.iframe.contentWindow.document.querySelector('a');
+				// D.log('A', a);
+				if ( a ) {
+					var g = new Get( a.href );
+					var adurl = g.v('adurl');
+					if ( adurl ) {
+						this.postAdUrl( adurl );
+						found = true;
+					}
+				} else {
+					var b = this.iframe.contentWindow.document.querySelector('iframe');
+					// D.log('IFR', b);
+					if ( b ) {
+						this.postAdUrl( b.src );
+						found = true;
+					}
+				}
+				if ( !found ) {
+					var regexs = [
+						/<script data-adfscript="([^"]+)"/gm, // <!-- Adform publisher tag -->
+						/(https:\/\/adssettings\.google\.com\/whythisad)/m,
+						/&amp;adurl=([^']+)'\)/m,
+						/<a href="(https:\/\/track.adform.net\/C\/\?bn=[0-9]+);/m,
+						/&adurl=(http[^;]+);/m
+					];
+					for ( var i = 0; i < regexs.length; i++ ) {
+						var m = regexs[i].exec( this.iframe.contentWindow.document.body.innerHTML );
+						// D.log('IFR matches ('+ regexs[i] +'):', m);
+						if ( m ) {
+							this.postAdUrl( m[1] );
+							found = true;
+							break;
+						}
+					}
+				}
+
+				if ( !found ) {
+					this.logUnknown('doc', this.iframe.contentWindow.document.body.innerHTML);
+				}
+			} catch (e) {
+				// D.log('CATCH', e);
+				var error = e.toString();
+				if (
+					error == 'TypeError: Cannot read properties of null (reading \'document\')' ||
+					error == 'TypeError: this.iframe.contentWindow is null' ||
+					error == 'TypeError: Cannot read property \'document\' of null'
+				) {
+					return;
+				}
+				this.logUnknown('catch', e.toString());
+			}
+		},
+
+		postAdUrl: function( url ) {
+			// D.log('POST URL:', url);
+
+			D.Ads.rpc.send('gptUrl', {
+				url: url
+			}, function(re){}, this);
+		},
+
+		logUnknown: function( type, text ) {
+			// D.log('LOG UNKNOWN');
+
+			D.Ads.rpc.send('gptLogUnknown', {
+				type: type,
+				text: text
+			}, function(re){}, this);
+		}
+	}
+)
+
+
+/**
+ * @class
+ */
+D.Ads.AdSense = Class(
+	/**
+	 * @lends {D.Ads.AdSense#}
+	 */
+	{
+		adNode: null,
+		placeId: 0,
+		adSlot: '',
+		adLayoutKey: '',
+		adFormat: '',
+		styleDisplay: '',
+		styleWidth: '',
+		styleheight: '',
+
+		/** @constructs */
+		__construct: function ( par ) {
+			this.adNode = par.adNode;
+			this.placeId = par.placeId;
+			this.adSlot = par.adSlot;
+			if ( par.adLayoutKey ) {
+				this.adLayoutKey = par.adLayoutKey;
+			}
+			if ( par.adFormat ) {
+				this.adFormat = par.adFormat;
+			}
+			if ( par.styleDisplay ) {
+				this.styleDisplay = par.styleDisplay;
+			}
+			if ( par.styleWidth ) {
+				this.styleWidth = par.styleWidth;
+			}
+			if ( par.styleHeight ) {
+				this.styleHeight = par.styleHeight;
+			}
+			this._init();
+		},
+
+		_init: function() {
+			D.addJS('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', this._onGLoad, {
+				async: true
+			});
+			var adsNonPersonalized = 0;
+			if( !D.CookieAlert.has(D.CookieAlert.MARKETING) ) {
+				adsNonPersonalized = 1;
+			}
+			(adsbygoogle=window.adsbygoogle||[]).requestNonPersonalizedAds = adsNonPersonalized;
+		},
+		_onGLoad: function() {
+			this.adNode.style.display = this.placeId == 367 || this.placeId == 380 ? 'flex' : 'block';
+
+			var adEl = document.createElement("ins");
+			adEl.classList.add("adsbygoogle");
+			adEl.dataset.adClient = "ca-pub-7602985072722221";
+			adEl.dataset.adSlot = this.adSlot;
+			if ( this.styleDisplay ) {
+				adEl.style.display = this.styleDisplay;
+			}
+			if ( this.styleWidth ) {
+				adEl.style.width = this.styleWidth;
+			}
+			if ( this.styleHeight ) {
+				adEl.style.height = this.styleHeight;
+			}
+			if ( this.adFormat ) {
+				adEl.dataset.adFormat = this.adFormat;
+			}
+			if ( this.adLayoutKey ) {
+				adEl.dataset.adLayoutKey = this.adLayoutKey;
+			}
+			this.adNode.appendChild(adEl);
+
+			(adsbygoogle = window.adsbygoogle || []).push({});
+		}
+	}
+);
+
+
+$(window).on('DOMContentLoaded.videoAd load.videoAd resize.videoAd scroll.videoAd', D.Ads.VideoPlayer.handleScroll);
+
+D.loaded('Ads');

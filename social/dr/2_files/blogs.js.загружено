@@ -1,0 +1,1111 @@
+/**
+ * @constructor
+ * @extends {Section}
+ */
+var SectionBlogsBase = Class(
+	/**
+	 * @lends {SectionBlogsBase#}
+	 */
+	{
+		__NAME: 'SectionBlogsBase',
+		cacheBack:true,
+		gemiusKey:'zZ.rq6OUrMi5J_rYiiYdn6QP3y5i40ekHI.C3gxcAk..Q7',
+
+		__construct:function(){
+			addClassName( this.layout.node, 'Blogs' );
+		},
+
+		ready: function(){
+			var drawAds = !this.isReady;
+			PARENT.ready();
+			if(drawAds){
+				this.drawAds();
+			}
+			var get = new Get();
+			if( isset( get.v('tourStep_') ) ){
+				setTimeout( function(){
+					T.tour.show( 'blogs', get.v('tourStep_') );
+				}, 1000 );
+			}
+
+			if ( this._feed && this._feed.items.length > 3 ) {
+				try {
+					var adNode = mkE({
+						tag: 'div',
+						style: {
+							justifyContent: 'center',
+							marginTop: '20px',
+							marginBottom: '20px'
+						}
+					});
+					D.insertAfter( adNode, this._feed.items[2].node );
+					new D.Ads.AdSense({
+						adNode: adNode,
+						adSlot: 6434006326,
+						placeId: 380,
+						styleDisplay: 'block',
+						styleWidth: '728px',
+						styleHeight: '90px'
+					});
+				} catch( e ) {
+					if( D.DEV ) {
+						console.error(e);
+					}
+				}
+			}
+		},
+
+		draw: function(){
+			// #expire 2016-07-27 andris
+			if( D.TIME < 1469480400 ){
+				this.addRefererStats();
+			}
+			// #expire
+			D.onLoad( 'blogs', this._drawBase );
+		},
+
+		_drawBase: function(){
+			this.title = D.blogs.l.get('Raksti');
+			this.layout.sectionTitle(this.title);
+			this._ctNode = mkE( {
+				tag:'div'
+			} ).append( this.layout.ct() );
+			if( !D.ID && !(this instanceof SectionBlogsPost || this instanceof SectionBlogs.Categories || this instanceof SectionBlogs.Travel) ){
+
+				Section.navigate('/blogs/categories');
+				return;
+			}
+			this.drawTower = false;
+			this._topMenu();
+			this._draw();
+		},
+
+		_topMenu: function(){
+			/** @type {Array.<T.TopMenuItem>} */
+			this._tmItems = {};
+
+			var topMenuItems = [
+				this._tmItems.home = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_home') )
+						.setHref('/blogs')
+				),
+				this._tmItems.friends = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_friends') )
+						.setHref('/blogs/friends')
+				),
+				this._tmItems.travel = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_travel') )
+						.setHref('/blogs/travel')
+				),
+				this._tmItems.categories = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_topics') )
+						.setHref('/blogs/categories')
+				),
+				this._tmItems.favorite = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_favorite') )
+						.setHref('/blogs/favorite')
+				),
+				this._tmItems.my = new T.TopMenuItem(	new T.TopMenuItem.Par()
+						.setCaption( D.blogs.l.get('menu_my') )
+						.setHref('/blogs/my')
+				)
+			];
+
+			if( !D.ID ){
+				topMenuItems = topMenuItems.slice(2, 4);
+			}
+
+			var topMenuPar = new T.TopMenu.Par().setItems( topMenuItems );
+			if( D.ID && !( this instanceof SectionBlogs.Add ) ){
+				var addButton = new T.Form.Button({
+					caption: D.blogs.l.get('blogs_new'),
+					onclick: this._onAddClick
+				});
+				topMenuPar = topMenuPar.setButton(addButton);
+			}
+			this._tm = new T.TopMenu( topMenuPar );
+			if( D.ENV == 'WWW' ){
+				this._tm.node.append( this.layout.tt() );
+			}
+		},
+
+		_onAddClick: function(){
+			Section.navigate('/blogs/add');
+		},
+
+		_rtAuthors:function(){
+			new D.blogs.SpotlightAuthors(
+					new D.blogs.SpotlightAuthors.Par().setApiCall( this.apiCall )
+				).node.append(this.layout.rt());
+		},
+
+		_rtCategory:function(){
+			var cat = new D.blogs.CategorySpotlight( { apiCall:this.apiCall } );
+			cat.node.append( this.layout.rt() );
+		},
+
+		_rtSpotlightRequest:function(){
+			var rq = new D.blogs.SpotlightRequest( { apiCall:this.apiCall } );
+			rq.node.append( this.layout.rt() );
+		},
+
+		_rtSpotlightPosts:function(){
+			var rq = new D.blogs.SpotlightPosts(
+				new D.blogs.SpotlightPosts.Par().setApiCall( this.apiCall )
+			);
+			rq.node.append( this.layout.rt() );
+		},
+
+		_rtLastVisitor:function(){
+			new D.blogs.Stats.LastVisitor( this.apiCall ).append( this.layout.rt() );
+		},
+
+		_rtAdsTower: function() {
+			this.drawTower = true;
+		},
+
+		/**
+		 * @abstract
+		 * @protected
+		 */
+		_draw: function(){}, // override
+
+		drawAds:function(){
+			if( D.ENV != 'WWW' ){
+				return;
+			}
+			/** @this {SectionBlogsBase} */
+			var adsReady = function(){
+				if( !this.miniAdsNode && this.layout.rtNode ){
+					if( this.layout.rtNode.firstChild ){
+						T.sep().append( this.layout.rt() );
+					}
+					this.miniAdsNode = mkE( {
+						tag:'div',
+						id:'msgMiniAdsCont',
+						className:'mAds mAdsRightCol mAdsDefaultBox mAdsNewDefault'
+					} ).append( this.layout.rt() );
+				}
+				if ( this.drawTower && !D.Ads.outsideLV ) {
+					T.sep().append( this.layout.rt() );
+					mkE({
+						tag: 'div',
+						id: 'adv54',
+						className: 'stickyA'
+					}).append( this.layout.rt() );
+					D.Ads.place(54);
+				}
+				if (!D.Ads.outsideLV && D.LANG == "lv") {
+					this.layout.megaGiga(51);
+					D.Ads.place(51);
+					D.Ads.load();
+				}
+				if( this.miniAdsNode ){
+					delete D.Ads.MiniAds.items.msgMiniAdsCont;
+					D.Ads.MiniAds.createItem({
+						id: 'msgMiniAdsCont',
+						placeId: 27,
+						containerTheme: 'hc3',
+						itemCount: 1,
+						lateInit: true,
+						previewData: [],
+						previewScrollInto: false,
+						skipFixed: true
+					});
+					D.Ads.MiniAds.setup();
+				}
+			};
+			D.onLoad( "Ads", D.closure( this, adsReady ) );
+		},
+
+		//onBack:function(){
+		//	if( this.miniAdsNode ){ // gļuko pozīcija
+		//		this.miniAdsNode.remove();
+		//	}
+		//},
+
+		/**
+		 * @param {D.blogs.Search.Par} par
+		 */
+		_drawSearch:function(par){
+			this._search = new D.blogs.Search( par || new D.blogs.Search.Par() );
+			this._search.onSearch = this._onSearch;
+			this._search.onCancel = this._onSearchCancel;
+			D.insertBefore( this._search.node, this._ctNode );
+		},
+
+		_onSearch:function(){
+			this._ctNode.style.display = 'none';
+		},
+
+		_onSearchCancel:function(){
+			this._ctNode.style.display = '';
+		}
+	},
+	Section
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+var SectionBlogs = Class(
+	/**
+	 * @lends {SectionBlogs#}
+	 */
+	{
+		__NAME: 'SectionBlogs',
+
+		pid: 0,
+
+		route: function(){
+			if( this.url.get.v('p') ){
+				return new SectionBlogsPost;
+			}
+			var part = this.url.shift();
+			switch(part){
+				case 'add':
+					return new SectionBlogs.Add;
+				case 'friends':
+					return new SectionBlogs.Friends;
+				case 'travel':
+					return new SectionBlogs.Travel;
+				case 'categories':
+					return new SectionBlogs.Categories;
+				case 'favorite':
+					return new SectionBlogs.Favorite;
+				case 'my':
+					return new SectionBlogs.My;
+				case 'post':
+					return new SectionBlogsPost;
+				case 'stats':
+					return new SectionBlogs.Stats;
+				default:
+
+			}
+		},
+
+		ready:function(){
+			if( D.LV && this._mGetIntro && this._mGetIntro.re.show ){
+				this.showTour = true;
+				var s = new SectionBlogs.Intro( this._mGetIntro, this );
+				this._mGetIntro.re.show = false;
+				s.url = this.url;
+				s.replace();
+				this.isReady = true;
+				return;
+			}
+			$('#menu a[rel=blogs] .badge').remove();
+			/** @var {SectionBlogsBase} PARENT */
+			PARENT.ready();
+			if( this.showTour ){
+				setTimeout( function(){
+					T.tour.show('blogs');
+				}, 1000 );
+			}
+		},
+
+		_draw: function(){
+			// intro
+			this._mGetIntro = new DR.blogs.GetIntro;
+			this._mGetIntro.select = [
+				new DR.blogs.select.Category().id().title().posts().imageSmall()
+			];
+			this.apiCall.addMethod( this._mGetIntro );
+			// other
+			this._tmItems.home.selected(true);
+			this._drawSearch(
+				new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search') )
+			);
+
+			this._spotlightPost();
+
+			this._titleNode = mkE({
+				tag: 'h1',
+				text: D.blogs.l.get('latest_posts')
+			}).append(this._ctNode);
+			this._feed = new D.blogs.Feed(
+				new D.blogs.Feed.Par()
+					.setType('all')
+					.setApiCall( this.apiCall)
+					.setTitleNode(this._titleNode)
+					.setPg(this.url.get.v('pg'))
+			);
+			this._feed.node.append(this._ctNode);
+			this._rtCategory();
+			this._rtAuthors();
+			this._rtSpotlightPosts();
+			this._rtAdsTower();
+			this.apiCall.call();
+		},
+
+		_spotlightPost: function(){
+			var badge = $('#menu a[rel=blogs] .badge');
+			if( badge && badge.text() ){
+				return;
+			}
+			this._mGetSpotlightPost = new DR.blogs.GetSpotlightPosts();
+			this._mGetSpotlightPost.count = 1;
+			this._mGetSpotlightPost.select = [
+				new DR.blogs.select.Item().all(),
+				new DR.blogs.select.Category().id().title().type(),
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.Image().small(),
+				new DR.like.select.GetRe().id().type().canLike().count().liked(),
+				new DR.say.select.Item().id().canRecommend().recommended().recCount().user(),
+				new DR.base.select.Image().w().h().original()
+			];
+			this._mGetSpotlightPost.onLoad = this._onLikeItem;
+			this.apiCall.addMethod(this._mGetSpotlightPost);
+		},
+
+		_onLikeItem: function(){
+			if( !this._mGetSpotlightPost.re || empty( this._mGetSpotlightPost.re.posts ) ){
+				return;
+			}
+			D.blogs.spotlightPost = reset(this._mGetSpotlightPost.re.posts).id;
+			var item = new D.blogs.FeedItem(
+				reset(this._mGetSpotlightPost.re.posts),
+				new D.blogs.FeedItem.Par().setClickStats( DR.blogs.Stats.KW_SLP_CLICK )
+			);
+			var sep = T.sep();
+			addClassName(sep, 'blogs-sep');
+			sep.prepend(this._ctNode);
+			mkE({
+				tag: 'div',
+				className: 'blogs-feed blogs-feed-recommend',
+				els: [
+					{
+						tag: 'div',
+						className: 'blogs-feed-items',
+						els: [
+							item.node
+						]
+					}
+				]
+			}).prepend(this._ctNode);
+			mkE({
+				tag: 'h1',
+				text: D.blogs.l.get('you_may_like')
+			}).prepend(this._ctNode);
+		},
+
+		onBack: function(){
+			if( this._feed ){
+				this._feed.onBack();
+			}
+		}
+
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @class
+ * @extends {Section}
+ */
+SectionBlogs.Intro = Class(
+	/**
+	 * @lends {window.SectionBlogs.Intro#}
+	 */
+	{
+		__NAME:'SectionBlogs.Intro',
+
+		/** @type {SectionBlogs} */
+		section:null,
+
+		__construct:function( mGetIntro, section ){
+			addClassName( this.layout.ct(), 'Blogs' );
+			this.intro = new D.blogs.Intro( mGetIntro.re, this._onIntro );
+			this.intro.node.append( this.layout.ct() );
+			this.section = section;
+		},
+
+		_onIntro:function(){
+			this.section.replace();
+		}
+	},
+	Section
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Add = Class(
+	/**
+	 * @lends {SectionBlogs.Add#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Add',
+		cacheBack:false,
+
+		_draw: function(){
+			D.onLoad('TEditor', this._onEditor);
+		},
+
+		_onEditor: function(){
+			var ac = this.apiCall;
+			this._mGetUser = new DR.users.Get();
+			this._mGetUser.uids = [
+				D.ID
+			];
+			this._mGetUser.select = [
+				new DR.users.select.GetRe().all(),
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.Image().small()
+			];
+			ac.addMethod(this._mGetUser);
+
+			this._mGetCategories = new DR.blogs.GetCategories();
+			this._mGetCategories.select = [
+				new DR.blogs.select.Category().id().title()
+			];
+			ac.addMethod(this._mGetCategories);
+
+			this._mGetTravelCountries = new DR.blogs.GetTravelCountries();
+			ac.addMethod(this._mGetTravelCountries);
+
+			ac.onLoad = this._onApiData;
+			ac.call();
+		},
+
+		_onApiData: function(){
+			var par = new D.blogs.Form.Par();
+			par.user = reset(this._mGetUser.re.users);
+			par.categories = this._mGetCategories.re.categories;
+			par.travelCountries = this._mGetTravelCountries.re.countries;
+			if( this.url.get.v('sayText') ){
+				par.value = this.url.get.v('sayText');
+			}
+
+			this._form = new D.blogs.Form(par);
+			this._form.append(this._ctNode);
+
+			this.ready();
+		},
+
+		onLeave: function(){
+			if( this._form ){
+				this._form.onLeave();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Friends = Class(
+	/**
+	 * @lends {SectionBlogs.Friends#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Friends',
+
+		_draw: function(){
+			this._tmItems.friends.selected(true);
+			this._drawSearch(
+				new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search friends') ).setFriends(true)
+			);
+			this._feed = new D.blogs.Feed(
+				new D.blogs.Feed.Par()
+					.setType('friends')
+					.setApiCall( this.apiCall )
+					.setPg(this.url.get.v('pg'))
+			);
+			this._feed.node.append(this._ctNode);
+			this._rtCategory();
+			this._rtAuthors();
+			this._rtAdsTower();
+			this.apiCall.call();
+		},
+
+		onBack: function(){
+			if( this._feed ){
+				this._feed.onBack();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Travel = Class(
+	/**
+	 * @lends {SectionBlogs.Travel#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Travel',
+
+		route: function(){
+			this.countryId = Number(this.url.shift());
+		},
+
+		_draw: function(){
+			this._tmItems.travel.selected(true);
+
+			//@todo cleanup 20190603
+			if( D.DATE_TODAY <= 20190602 ) {
+				mkE({
+					tag: 'a',
+					href: '/stats/click.php?key=blogs_ad_270519&url=' + encodeURIComponent('https://skaties.lv/izklaide/raibumi/celotprieks/sliktakaja-gadijuma-aiziesim-ar-kajam-kristaps-talbergs-kazahstana-paliek-bez-masinas/?utm_source=draugiem&utm_medium=banner&utm_campaign=celojumi'),
+					target: '_blank',
+					attr: {
+						rel: 'noref'
+					},
+					style: {
+						display: 'block',
+						margin: '0 0 16px',
+						width: '760px',
+						height: '250px'
+					},
+					els: [{tag: 'img', 'src': '//ifrype.com/blogs/img/ad/27052019.jpg'}]
+				}).prepend(this.layout.ct());
+				$.get('/stats/ping.php', {key:'blogs_ad_seen_270519'});
+			}
+
+			var ac = this.apiCall;
+			if( this.countryId ){
+				this._drawSearch(
+					new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search in country') ).setCat(2)
+				);
+				this._travelHeader = new D.blogs.TravelHeader(
+					new D.blogs.TravelHeader.Par().setId(this.countryId).setApiCall(ac)
+				);
+				this._travelHeader.node.append(this._ctNode);
+				this._categoryFeed = new D.blogs.Feed(
+					new D.blogs.Feed.Par()
+						.setType('travel')
+						.setId(this.countryId).setApiCall(ac)
+						.setPg(this.url.get.v('pg' ))
+				);
+				this._categoryFeed.node.append(this._ctNode);
+			} else {
+				this._drawSearch(
+					new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search travel') ).setCat(2)
+				);
+				this._travelHeader = new D.blogs.TravelHeader(
+					new D.blogs.TravelHeader.Par().setApiCall(ac)
+				);
+				this._travelHeader.node.append(this._ctNode);
+
+				this._categoryFeed = new D.blogs.Feed(
+					new D.blogs.Feed.Par()
+						.setType('travel')
+						.setId(2)
+						.setApiCall(ac)
+						.setPg(this.url.get.v('pg' ))
+				);
+				this._categoryFeed.node.append(this._ctNode);
+			}
+			ac.onLoad = this._onData;
+			if( !D.ID ){
+				this._rtSpotlightPosts();
+			}else{
+				this._rtAuthors();
+				this._rtAdsTower();
+			}
+			this.layout.rt();
+			ac.call();
+		},
+
+		_onData: function(){
+			this.ready();
+			if( this.countryId ){
+				D.scrollIntoView(this._categoryFeed.node);
+			}
+		},
+
+		onBack: function(){
+			if( this._categoryFeed ){
+				this._categoryFeed.onBack();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Categories = Class(
+	/**
+	 * @lends {SectionBlogs.Categories#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Categories',
+
+		route: function(){
+			this.categoryId = Number(this.url.shift());
+		},
+
+		_draw: function(){
+			this._tmItems.categories.selected(true);
+			var ac = this.apiCall;
+			if( this.categoryId ){
+				this._drawSearch(
+					new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search in category') ).setCat( this.categoryId )
+				);
+				this._categoryHeader = new D.blogs.Header(
+					new D.blogs.Header.Par().setType('category').setId(this.categoryId).setApiCall(ac)
+				);
+				this._categoryHeader.node.append(this._ctNode);
+
+				this._categoryFeed = new D.blogs.Feed(
+					new D.blogs.Feed.Par()
+						.setType('category')
+						.setId(this.categoryId).setApiCall(ac)
+						.setPg(this.url.get.v('pg'))
+				);
+				this._categoryFeed.node.append(this._ctNode);
+			}else{
+				this._drawSearch(
+					new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search') )
+				);
+				this._categoriesList = new D.blogs.Categories();
+				this._categoriesList.node.append(this._ctNode);
+			}
+			if( D.ID ){
+				this._rtAuthors();
+				this._rtAdsTower();
+			}else{
+				this._rtSpotlightPosts();
+			}
+			ac.call();
+		},
+
+		onBack: function(){
+			if( this._categoryFeed ){
+				this._categoryFeed.onBack();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Favorite = Class(
+	/**
+	 * @lends {SectionBlogs.Favorite#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Favorite',
+
+		_draw: function(){
+			this._tmItems.favorite.selected(true);
+			var ac = this.apiCall;
+			this._feed = new D.blogs.Feed(
+				new D.blogs.Feed.Par()
+					.setType('favorite')
+					.setApiCall(ac)
+					.setPg(this.url.get.v('pg' ))
+			);
+			this._feed.node.append(this._ctNode);
+			ac.call();
+		},
+
+		onBack: function(){
+			if( this._feed ){
+				this._feed.onBack();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.My = Class(
+	/**
+	 * @lends {SectionBlogs.My#}
+	 */
+	{
+		__NAME: 'SectionBlogs.My',
+
+		route:function(){
+			switch( this.url.shift() ){
+				/*case 'profit':
+					return new SectionBlogs.Profit;
+					break;*/
+				case 'payout':
+					return new SectionBlogs.Payout;
+					break;
+			}
+		},
+
+		_draw: function(){
+			this._tmItems.my.selected(true);
+			this._drawSearch(
+				new D.blogs.Search.Par().setPlaceHolder( D.blogs.l.get('Search my') ).setUid( D.ID )
+			);
+			this._feed = new D.blogs.Feed(
+				new D.blogs.Feed.Par()
+					.setType('my')
+					.setApiCall( this.apiCall )
+					.setPg(this.url.get.v('pg' ))
+			);
+			this._feed.node.append(this._ctNode);
+			if( D.LV ){
+				//this._rtSpotlightRequest();
+			}
+			this._rtLastVisitor();
+			//this._rtProfit();
+			this._rtAuthors();
+			this._rtAdsTower();
+			this.apiCall.call();
+		},
+
+		_rtProfit:function(){
+			new D.blogs.ProfitBlock(
+				new D.blogs.ProfitBlock.Par().setApiCall( this.apiCall )
+			).append( this.layout.rt() );
+		},
+
+		onBack: function(){
+			if( this._feed ){
+				this._feed.onBack();
+			}
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogsPost = Class(
+	/**
+	 * @lends {SectionBlogsPost#}
+	 */
+	{
+		__NAME: 'SectionBlogsPost',
+		id: 0,
+		action: null,
+
+		_loadMore: false,
+		/** @type D.blogs.Item[] */
+		_items: [],
+		_getNextNoMore: false,
+		_currentIdx: 0,
+
+		route:function(){
+			var id = this.url.shift();
+			if( isNaN(id) ){
+				var parts = id.split('_');
+				var count = parts.length;
+				if( count >= 2 && parseInt(parts[count - 1]) ){
+					this.id = parseInt(parts[count - 1]);
+				}
+			} else {
+				this.id = Number(id);
+			}
+			if( !this.id && this.url.get.v('p') ){
+				this.id = parseInt(this.url.get.v('p'))
+			}
+			this.action = this.url.shift();
+			if( !this.id ){
+				Section.navigate('/blogs');
+			}
+		},
+
+		_inScreen: function (node) {
+			if( !node.offsetHeight ){
+				return false;
+			}
+			var $elem = $(node);
+			var $window = $(window);
+			var center = $window.scrollTop() + $window.height() / 2;
+			var elemTop = $elem.offset().top;
+			var elemBottom = elemTop + $elem.height();
+			return elemTop <= center && elemBottom >= center;
+		},
+
+		onScroll:function(){
+			if( this.getCurrent() ){
+				this.getCurrent().onScroll();
+
+				if(this._loadMore) {
+					// Center of screen is current post
+					for(var i in this._items) {
+						if(this._inScreen(this._items[i].node)) {
+							this.setCurrent(+i);
+							break;
+						}
+					}
+					// Bottom of last item, load next
+					if(this._items[this._items.length-1] && D.inScreenBottom(this._items[this._items.length-1]._content)) {
+						this._getNext(this._items[this._items.length-1]);
+					}
+				}
+			}
+		},
+
+		/**
+		 * @param (int) idx
+		 */
+		setCurrent: function (idx) {
+			if(this._currentIdx !== idx) {
+				this.getCurrent().resetScroll();
+				this._currentIdx = idx;
+				this.title = document.title = this.getCurrent().data.title + ' - ' + D.blogs.l.get('Raksti');
+				Url.replace('/blogs/post/' + D.blogs.seoUrl(this.getCurrent().data.title) + '_' + this.getCurrent().data.id);
+			}
+		},
+
+		/**
+		 * @return {D.blogs.Item}
+		 */
+		getCurrent: function () {
+			return this._items[this._currentIdx];
+		},
+
+		onLeave:function(){
+			if( this.getCurrent() ){
+				this.getCurrent().onLeave();
+			}
+		},
+
+		_draw: function(){
+			var ac = this.apiCall;
+			this._mGetItem = new DR.blogs.GetItem;
+			this._mGetItem.id = this.id;
+			this._mGetItem.stats = true;
+			this._mGetItem.select = [
+				new DR.blogs.select.Category().id().title().type(),
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.Image().small(),
+				new DR.like.select.GetRe().id().type().canLike().count().liked(),
+				new DR.say.select.Item().id().canRecommend().recommended().recCount().user(),
+				new DR.base.select.Image().w().h().original()
+			];
+			ac.addMethod(this._mGetItem);
+			switch( this.action ){
+				case 'edit':
+					this.cacheBack = false;
+					this._mGetItem.select.push(
+						new DR.blogs.select.Item().all()
+					);
+					this._mGetCategories = new DR.blogs.GetCategories();
+					this._mGetCategories.select = [
+						new DR.blogs.select.Category().id().title()
+					];
+					ac.addMethod(this._mGetCategories);
+
+					this._mGetTravelCountries = new DR.blogs.GetTravelCountries();
+					ac.addMethod(this._mGetTravelCountries);
+					ac.onLoad = this._showForm;
+					break;
+				default:
+					D.blogs.itemAction = null;
+					if( this.action == 'comment' || this.action == 'comments' ){
+						D.blogs.itemAction = this.action;
+					}
+					this._mGetItem.select.push(
+						new DR.blogs.select.Item().all()
+					);
+					this._mGetItem.select.push(
+						new DR.gallery.select.Embed().all().html(false)
+					);
+					this._mGetItem.select.push(
+						new DR.gallery.select.EmbedImage().uber()
+					);
+					setTimeout(D.closure(this, function () {
+						this._loadMore = true;
+					}), 1000);
+					ac.onLoad = this._showItem;
+					break;
+			}
+			ac.call();
+		},
+
+		/**
+		 * @param {D.blogs.Item} item
+		 */
+		_getNext: function (item) {
+			if(this._getNextNoMore || (this._mGetNextPost && this._mGetNextPost.processing)) {
+				return;
+			}
+			if(!this._mGetNextPost) {
+				this._mGetNextPost = new DR.blogs.GetNextUserPost();
+				this._mGetNextPost.stats = true;
+				this._mGetNextPost.statsRow = 0;
+				this._mGetNextPost.select = this._mGetItem.select;
+				this._mGetNextPost.onLoad = this._onGetNext;
+			}
+			this._mGetNextPost.currentPostId = item.id;
+			this._mGetNextPost.statsRow++;
+			this._mGetNextPost.call();
+		},
+
+		_onGetNext: function () {
+			if( !this._mGetNextPost.re.id ){
+				this._getNextNoMore = true;
+				return;
+			}
+			var item = new D.blogs.Item(
+				new D.blogs.Item.Par().setItem( this._mGetNextPost.re ).setFromInfScroll(true)
+			);
+			this._items.push(item);
+			if( item._backButtonContainer ) {
+				item._backButtonContainer.remove();
+			}
+			mkE({tag:'div',className:'blogs-item-sep'}).append(this._ctNode);
+			if ( D.Ads && !D.Ads.outsideLV ) {
+				var el = document.getElementById('adv367');
+				if( !el || el.adLoaded === true ){
+					if( el ){
+						el.setAttribute('data-id', el.id);
+						el.removeAttribute('id');
+					}
+					var adNode = mkE({
+						tag: 'div',
+						id: 'adv367',
+						style: {
+							display: 'flex',
+							justifyContent: 'center',
+							marginLeft: 'auto',
+							marginRight: 'auto'
+						}
+					});
+					adNode.append(this._ctNode);
+					$(adNode).on('adloaded', this._onAdLoad);
+					D.Ads.place(367);
+					D.Ads.load();
+					mkE({tag:'div',className:'blogs-item-sep'}).append(this._ctNode);
+				}
+			}
+			item.node.append(this._ctNode);
+		},
+
+		_onAdLoad: function(){
+			var el = document.getElementById('adv367');
+			if( !el ){
+				return;
+			}
+			el.adLoaded = true;
+		},
+
+		_showItem: function(){
+			if( !this._mGetItem.re ){
+				Section.navigate('/blogs');
+				return;
+			}
+			this.title = this._mGetItem.re.title + ' - ' + D.blogs.l.get('Raksti');
+			if( isset(this.url.get.v('comment')) ){
+				D.addComment = true;
+				if( this.url.get.v('comment') ){
+					D.addCommentUid = Number(this.url.get.v('comment'));
+				}
+			}
+			var item = new D.blogs.Item(
+				new D.blogs.Item.Par().setItem( this._mGetItem.re )
+			);
+			this._items.push(item);
+			item.node.append(this._ctNode);
+			this.ready();
+		},
+
+		_showForm: function(){
+			D.onLoad(['TEditor', 'Upload', 'FabricJS', 'Farbtastic', 'Cropper', 'GalleryApi'], this._onEditor);
+		},
+
+		_onEditor: function(){
+			if( !this._mGetItem.re.canEditContent || this._mGetItem.error ){
+				Section.navigate('/blogs');
+				return;
+			}
+			this._form = new D.blogs.Form(
+				new D.blogs.Form.Par()
+					.setItem(this._mGetItem.re)
+					.setUser(this._mGetItem.re.user)
+					.setCategories(this._mGetCategories.re.categories)
+					.setTravelCountries(this._mGetTravelCountries.re.countries)
+			);
+			this._form.append(this._ctNode);
+			this.ready();
+		}
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Profit = Class(
+	/**
+	 * @lends {SectionBlogs.Profit#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Profit',
+
+		_draw: function(){
+			this._tmItems.my.selected(true);
+			this.layout.rt();
+			new D.blogs.ProfitPosts( this.apiCall ).append( this.layout.ct() );
+			this.apiCall.call();
+		}
+
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Stats = Class(
+	/**
+	 * @lends {SectionBlogs.Stats#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Stats',
+
+		_draw: function(){
+			this.layout.rt();
+			mkE( {
+				tag:'h1',
+				text:D.blogs.l.get('stats_title')
+			} ).append( this.layout.ct() );
+			new D.blogs.Stats.Full( this.apiCall ).append( this.layout.ct() );
+			this.apiCall.call();
+		}
+
+	},
+	SectionBlogsBase
+);
+
+/**
+ * @constructor
+ * @extends {SectionBlogsBase}
+ */
+SectionBlogs.Payout = Class(
+	/**
+	 * @lends {SectionBlogs.Payout#}
+	 */
+	{
+		__NAME: 'SectionBlogs.Payout',
+
+		_draw: function(){
+			this._tmItems.my.selected(true);
+			this.layout.rt();
+			new D.blogs.Payout( this.apiCall ).append( this.layout.ct() );
+			this.apiCall.call();
+		}
+
+	},
+	SectionBlogsBase
+);

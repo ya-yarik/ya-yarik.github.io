@@ -1,0 +1,8289 @@
+// +++ blogs.js +++ 
+D.blogs = {
+
+	l: new D.Lang('xBlogs'),
+
+	intro: true,
+
+	formatPostCount: function(posts){
+		return posts;
+	},
+
+	seoUrl: function(string){
+		string = D.translit(string);
+		string = string.replace(new RegExp('[^a-z0-9]', 'ig'), '-');
+		string = string.replace(new RegExp('-+', 'g'), '-');
+		return string.substr(0, 50).replace(/^-|-$/g, '');
+	},
+
+	payoutRules: function(){
+		var m = new D.Modal({
+			title: 'Noteikumi'
+		});
+		m.html();
+		var rules = mkE({
+			tag: 'div'
+		});
+		mkE({
+			tag: 'h3',
+			text: 'Kā pelnīt naudu ar saviem rakstiem?'
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			text: 'Par katru Tava raksta reklāmas skatījumu*, Tu nopelnīsi 0,053 centus jeb 0,00053 EUR. Raksta peļņa izriet no reklāmas, ko mēs atrādām pie Tava raksta, skatījumu daudzuma un ieņēmumiem. Nopelnīto naudu varēsi izlietot draugiem.lv pakalpojumu apmaksai vai pārskaitīt uz savu bankas kontu, ja nopelnītā summa bus vismaz 15,00 EUR. Tu esi atbildīgs par satura atbilstību noteikumiem. Ja mēs dzēsīsim Tavu saturu par pārkāpumiem, tiks dzēsta arī nopelnītā summa.'
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'em',
+					text: '* Lai izvairītos no krāpnieciskas un negodīgas raksta reklāmas skatījumu palielināšanas, esam izveidojuši speciālu sistēmu, kas rēķinās unikālos reklāmu skatījumus konkrētam rakstam no katra unikālā lietotāja (ar laika intervālu uz 24h, pēc kurām skaitīšana atkal atsāksies).'
+				}
+			]
+		}).append(rules);
+		mkE({
+			tag: 'h3',
+			text: 'Kā saņemt nopelnīto naudu?'
+		}).append(rules);
+		mkE({
+			tag: 'ol',
+			className: 'MultiLevel',
+			els: [
+				{
+					tag: 'li',
+					text: 'Ja Tavā kontā ir vismaz € 15,00, spied uz pogas – Izmaksāt nopelnīto naudu;'
+				},
+				{
+					tag: 'li',
+					text: 'Izlasi noteikumus un ieliec ķeksīti, ka tiem piekrīti;'
+				},
+				{
+					tag: 'li',
+					text: 'Lai mēs varētu Tavā kontā ieskaitīt nopelnīto naudu, mums nepieciešams apstiprinājums, ka konts, ko norādīsi, ir Tavs. Lai mēs par to pārliecinātos Tev no šsava konta mūsu kontā jāieskaita 0,01 EUR.'
+				},
+				{
+					tag: 'li',
+					text: 'Ja Tev vēl nav 18 gadu, autoratlīdzības līgumu var slēgt mamma, tētis vai cita persona, kam likums ļauj Tevi pārstāvēt;'
+				},
+				{
+					tag: 'li',
+					text: 'Pārskaitījumu mēs veiksim 20 dienu laikā.'
+				}
+			]
+		}).append(rules);
+		mkE({
+			tag: 'br'
+		}).append(rules);
+		mkE({
+			tag: 'h3',
+			text: 'Autoratlīdzības līguma noteikumi'
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				'Termini:',
+				{
+					tag: 'br'
+				},
+				{
+					tag: 'strong',
+					text: 'Sabiedrība'
+				},
+				' - SIA “Draugiem”, reģ. Nr. 40003737497, juridiskā adrese: Krasta iela 44, Rīga, LV-1003;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Autors'
+				},
+				' - fiziska persona, kura izteikusi vēlmi noslēgt šo Līgumu ar Sabiedrību elektroniskā veidā par Autordarba radīšanu un Autoratlīdzības izmaksu, iesniedzot pieteikumu mājas lapā www.draugiem.lv. Ja Autors ir nepilngadīga persona, Autora vārdā līgumu slēdz Autora vecāki vai likumiskie aizbildņi, tādējādi uzņemoties saistības Autora vārdā;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Mājas lapa'
+				},
+				' - Sabiedrības interneta mājas lapa www.draugiem.lv;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Pieteikums'
+				},
+				' - elektroniskā veidā, izmantojot Mājas lapu, Autora iesniegtais gribas apliecinājums Sabiedrībai par vēlmi noslēgt Līgumu, izstrādāt Autordarbu un saņemt Autoratlīdzību;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Autoratlīdzības reģistrācijas maksājums'
+				},
+				' - maksājums vismaz € 0,01 apmērā, ko saskaņā ar Līguma 2.2. punktu Autors samaksā Sabiedrībai par Autoratlīdzības saņemšanas pieteikuma reģistrēšanu;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Autoratlīdzība'
+				},
+				' - maksājums/-i, ko saskaņā ar šī līguma noteikumiem Sabiedrība izmaksā Autoram par Autordarbu pārdošanu Mājas lapā;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Autordarbs'
+				},
+				' - saskaņā ar Autortiesību likumu noteikts autortiesību objekts, kas materializēts kā Mājas lapas noformējuma aplikācija, kuru Autors izveidojis, izmantojot savas radošās spējas un speciālu Sabiedrības izveidotu tehnisko risinājumu;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'p',
+			els: [
+				{
+					tag: 'strong',
+					text: 'Līgums'
+				},
+				' - šis starp Autoru un Sabiedrību noslēgtais līgums;'
+			]
+		}).append(rules);
+		mkE({
+			tag: 'ol',
+			className: 'MultiLevel',
+			els: [
+				{
+					tag: 'li',
+					els: [
+						'Līguma priekšmets',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Sabiedrība saskaņā ar Līguma noteikumiem izmaksā Autoram Autoratlīdzību par Autora radīto Autordarbu izveidošanu un pārdošanu Mājas lapā.'
+								},
+								{
+									tag: 'li',
+									text: 'Autoratlīdzības lielums tiek noteikts Mājas lapā un Sabiedrībai ir tiesības vienpusēji mainīt Autoratlīdzības apmēru, izvietojot attiecīgu paziņojumu Mājas lapā. Sabiedrībai arī ir tiesības vienpusēji grozīt un/vai papildināt Līguma noteikumus, veicot atbilstošas izmaņas Mājas lapā publicētajā Līguma redakcijā.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Autoratlīdzības pieprasījums',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Lai pieteiktos Autoratlīdzības saņemšanai, Autoram jāreģistrējas Mājas lapā.'
+								},
+								{
+									tag: 'li',
+									els: [
+										'Lai Sabiedrība varētu identificēt Autoru reģistrācijas procesa laikā, Autors no sava personīgā bankas norēķinu konta pārskaita uz Sabiedrības kontu Autoratlīdzības reģistrācijas maksājumu, maksājuma mērķī norādot: “',
+										{
+											tag: 'strong',
+											style: {
+												color: 'red'
+											},
+											text: 'Piekrītu autoratlīdzības līguma noteikumiem. Lietotāja ID – ' + D.ID + '.'
+										},
+										'”.'
+									]
+								},
+								{
+									tag: 'li',
+									text: 'Autoratlīdzības reģistrācijas komisija Autoram netiek atgriezta.'
+								},
+								{
+									tag: 'li',
+									text: 'Reģistrējoties Autoratlīdzības saņemšanai, Autors apliecina, ka Autors ir iepazinies ar Līguma noteikumiem un ka tie saskan ar Autora gribu. Autors apliecina, ka Autora sniegtās ziņas ir patiesas. Autors apzinās tiesiskās sekas par nepatiesu ziņu sniegšanu.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Līguma izpildes kārtība',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Lai nodrošinātu Līguma izpildi un sazinātos ar Autoru, Sabiedrībai ir tiesības veikt Sabiedrības rīcībā esošo Autora personas datu apstrādi, kā arī izmantot Autora personas datus tiesisko attiecību nodibināšanai, grozīšanai, izpildīšanai un/vai izbeigšanai ar Sabiedrību.'
+								},
+								{
+									tag: 'li',
+									text: 'Līgums ir noslēgts elektroniskā formā un stājas spēkā ar brīdi, kad Autors ir samaksājis Sabiedrībai Autoratlīdzības reģistrācijas maksājumu.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Autora apliecinājumi',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Autors apliecina un garantē, ka visi materiāltehniskie līdzekļi, foto attēli, grafiskie attēli, zīmējumi, datorprogrammas u.tml., kas izmantoti Autordarba radīšanai, ir tiesiskas (legālas) izcelsmes un Autoram ir visas tiesības vai atbilstošas licences to izmantošanai, tai skaitā, Autordarba radīšanai.'
+								},
+								{
+									tag: 'li',
+									text: 'Autors apliecina un garantē, ka Autordarbs, kas radīts Līguma ietvaros, ir Autora personiskā un radošā darba rezultāts, tas ir oriģināldarbs un nav plaģiāts, kā arī nav nevienas trešās personas, kurai būtu jebkādas tiesības uz Autordarbu vai uz jebkuru tā daļu.'
+								},
+								{
+									tag: 'li',
+									text: 'Ja pret Sabiedrību tiek celtas prasības vai pretenzijas no trešo personu puses saistībā ar Līguma 4.1. - 4.2. punktā noteikto, Autors neatsaucami un bez ierunām tās risinās patstāvīgi uz sava rēķina un riska, neaizskarot Sabiedrības uz Līguma pamata iegūtās tiesības, kā arī Autors segs visus Sabiedrībai un/vai trešajai personai radītos zaudējumus saistībā ar Autordarbu, ja tādi radīsies.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Autoratlīdzības samaksas kārtība',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Autoram ir tiesības saņemt Autoratlīdzību saskaņā ar Līgumu un Mājas lapā publicētajiem noteikumiem par Autordarba radīšanu, kuros noteikts minimālais Autordarbu pārdošanas apmērs Mājas lapā, sākot no kura Autoram ir tiesības pieteikt Autoratlīdzību.'
+								},
+								{
+									tag: 'li',
+									text: 'Autoratlīdzība tiek izmaksāta 20 (divdesmit) dienu laikā no brīža, kad Autors ir veicis izmaksas pieprasījumu un samaksājis Autoratlīdzības reģistrācijas maksājumu (nauda ir ieskaitīta Sabiedrības bankas norēķinu kontā).'
+								},
+								{
+									tag: 'li',
+									text: 'Autoratlīdzības izmaksas brīdī Sabiedrība ietur visus normatīvajos aktos noteiktos nodokļus, ar ko tiek aplikta Autoratlīdzība un kuri saskaņā ar normatīvo aktu prasībām ir jāietur Sabiedrībai.'
+								},
+								{
+									tag: 'li',
+									text: 'Autoratlīdzības izmaksas brīdī Sabiedrība ietur iedzīvotāju ienākuma nodokli no izmaksājamās summas atbilstoši likuma “Par iedzīvotāju ienākuma nodokli” noteiktajam, papildus piemērojot noteikumus par attaisnotajiem izdevumiem no Autoratlīdzības saskaņā ar likumu “Par iedzīvotāju ienākuma nodokli”.'
+								},
+								{
+									tag: 'li',
+									text: 'Sabiedrībai ir tiesības neizmaksāt Autoratlīdzību Autoram, ja Autors ir pārkāpis kādu no Līguma noteikumiem vai apliecinājumiem. Tāpat Sabiedrībai ir tiesības vienpusēji izbeigt Līgumu un/vai atteikties no viena vai vairākiem Autordarbiem, ja tie neatbilst Mājas lapas lietošanas noteikumiem, Līguma noteikumiem un/vai normatīvo aktu prasībām.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Izmantošanas tiesības',
+						{
+							tag: 'ol',
+							className: 'MultiLevel',
+							els: [
+								{
+									tag: 'li',
+									text: 'Sabiedrība iegūst neierobežotas Autordarba izmantošanas tiesības uz Autora radīto Autordarbu ar brīdi, kas tas ir izveidots un ievietots Mājas lapā.'
+								},
+								{
+									tag: 'li',
+									text: 'Vienlaicīgi ar Līguma apstiprināšanu Autors bez atsevišķu juridisku darbību veikšanas un bez papildus atlīdzības nodod Sabiedrībai uz neierobežotu laiku visas Autora mantiskās tiesības uz Autordarbu. Autors saglabā visas neatsavināmās autortiesības (autora personiskās tiesības).'
+								},
+								{
+									tag: 'li',
+									text: 'Vienlaicīgi ar Līguma apstiprināšanu Autors piešķir Sabiedrībai tiesības bez papildus saskaņošanas ar Autoru un bez papildus atlīdzības lietot un izmantot Autordarbu.'
+								},
+								{
+									tag: 'li',
+									text: 'Autors piešķir Sabiedrībai un Mājas lapas lietotājiem neekskluzīvu, vispasaules, pārvedamu, nepārtrauktu, neatsaucamu, trešajām personām nododamu licenci un tiesības rīkoties ar (t.sk., bet ne tikai publicēt, pārpublicēt, izvietot, nodot, dzēst utt.) Autordarbu, kā arī atsakās celt pretenzijas un/vai prasības pret Sabiedrību un personām, kas likumīgi lieto Mājas lapu un ar to saistītos resursus.'
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'li',
+					els: [
+						'Strīdu risināšana',
+						{
+							tag: 'p',
+							style: {
+								paddingTop: '0.6em'
+							},
+							text: 'Strīdi starp Sabiedrību un Autoru vispirms tiek risināti pārrunu ceļā. Jebkuri strīdi, domstarpības vai prasījumi, kas var rasties saistībā ar Līgumu, tā pārkāpšanu, izbeigšanu vai spēkā neesamību, kurus nav iespējams atrisināt starp pusēm pārrunu ceļā, tiks galīgi izšķirti Latvijas Republikas tiesā pēc piekritības saskaņā ar Latvijas Republikas normatīvajiem aktiem.'
+						}
+					]
+				}
+			]
+		}).append(rules);
+
+		rules.append(m.content);
+	},
+
+	astesClick: function(){
+		var m = new DR.blogs.Stats();
+		m.kw = 'astes_click';
+		m.call();
+	}
+};
+
+/**
+ * @class
+ * @param {D.blogs.ProfitBlock.Par} par
+ * @return {D.blogs.ProfitBlock}
+ */
+D.blogs.ProfitBlock = function(par){
+	/**
+	 * @lends {D.blogs.ProfitBlock}
+	 */
+	return {
+		__NAME:'D.blogs.ProfitBlock',
+		/**
+ 		 * @param {D.blogs.ProfitBlock.Par} par
+		 */
+		__construct:function(par){
+			this.node = mkE( {
+				tag:'div',
+				className:'block ProfitBlock'
+			} );
+			this._mProfit = new DR.blogs.Profit;
+			this._mProfit.onLoad = this._mProfitRe;
+			if( par.apiCall ){
+				par.apiCall.addMethod( this._mProfit );
+			} else {
+				this._mProfit.call();
+			}
+		},
+
+		_mProfitRe:function(){
+			if( !this._mProfit.re.count || !Math.floor( this._mProfit.re.sum ) ){
+				this.node.remove();
+				return;
+			}
+			var els = [
+				mkE( {
+					tag:'h3',
+					text:'Mani ienākumi'
+				} ),
+				mkE( {
+					tag:'b',
+					els:[
+						'€',
+						( this._mProfit.re.sum / 100 ).toFixed(2)
+					]
+				} ),
+				new T.Form.Button( {
+					color:'submit',
+					caption:D.Lang.get('more'),
+					onclick:function(){
+						Section.navigate('/blogs/my/profit');
+					}
+				} )
+			];
+			mkE.appendTypeElement( this.node, els );
+		}
+		
+	};
+};
+Class( D.blogs.ProfitBlock, mkE.Base );
+
+/**
+ * @class
+ */
+D.blogs.ProfitBlock.Par = function(){
+	/**
+	 * @lends {D.blogs.ProfitBlock.Par#}
+	 */
+	return {
+		/** @type {DR.ApiCall} */
+		apiCall:null,
+		/**
+		 * @param {DR.ApiCall} v
+		 * @return {D.blogs.ProfitBlock.Par}
+		 */
+		setApiCall:function(v){
+			this.apiCall = v;
+			return this;
+		}
+	}
+};
+
+/**
+ * @class
+ * @param {D.blogs.UserInfo.Par} par
+ */
+D.blogs.UserInfo = function(par){
+	/**
+	 * @lends {D.blogs.UserInfo#}
+	 */
+	return {
+		__NAME:'D.blogs.UserInfo',
+
+		uid:0,
+
+		/**
+		 * @param {D.blogs.UserInfo.Par} par
+		 */
+		__construct:function(par){
+			this.uid = par.uid;
+			this.node = mkE({
+				tag:'div',
+				className:'BlogsUserInfo',
+				els:[
+					{
+						tag:'h2',
+						text:'Autora raksti'
+					},
+					{
+						tag:'div',
+						className:'color2',
+						els:[
+							'Raksti ',
+							this._postCountNode = mkE(''),
+							' · ',
+							{
+								tag:'a',
+								onclick:this._showFollowers,
+								els:[
+									'Sekotāji ',
+									this._followersNode = mkE('')
+								]
+							}
+						]
+					},
+					this._buttonsNode = mkE( {
+						tag:'div',
+						className:'buttons'
+					} )
+				]
+			});
+			this._mUserInfo = new DR.blogs.UserInfo;
+			this._mUserInfo.uid = this.uid;
+			this._mUserInfo.onLoad = this._mUserInfoRe;
+			if( par.apiCall ){
+				par.apiCall.addMethod(this._mUserInfo);
+			} else if( par.data ){
+				this._mUserInfo.re = par.data;
+				this._mUserInfo.onLoad();
+			} else {
+				this._mUserInfo.call();
+			}
+		},
+
+		_mUserInfoRe:function(){
+			setNodeText( this._postCountNode, this._mUserInfo.re.count );
+			setNodeText( this._followersNode, this._mUserInfo.re.followers );
+			this._following = this._mUserInfo.re.follow;
+			this._notify = this._mUserInfo.re.notify;
+			if( D.ID == this.uid ){
+				return;
+			}
+			this._drawButtons();
+		},
+
+		_follow:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._following = true;
+			this._notify = false;
+			++ this._followersNode.nodeValue;
+			var m = new DR.blogs.UserFollow;
+			m.uid = this.uid;
+			m.notify = false;
+			m.onLoad = this._drawButtons;
+			m.call();
+		},
+
+		_unfollow:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._following = false;
+			-- this._followersNode.nodeValue;
+			var m = new DR.blogs.UserUnfollow;
+			m.uid = this.uid;
+			m.onLoad = this._drawButtons;
+			m.call();
+		},
+
+		_notifyOff:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._notify = false;
+			var m = new DR.blogs.UserUnfollow;
+			m.uid = this.uid;
+			m.notify = false;
+			m.onLoad = this._drawButtons;
+			m.call();
+		},
+
+		_notifyOn:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._notify = true;
+			var m = new DR.blogs.UserFollow;
+			m.uid = this.uid;
+			m.notify = true;
+			m.onLoad = this._drawButtons;
+			m.call()
+		},
+
+		_drawButtons:function(){
+			clearNode( this._buttonsNode );
+			if( this._following ){
+				new T.Form.Button( {
+					size:'large',
+					caption:D.blogs.l.get('you_follow'),
+					color:'link',
+					icon:'checkGrayNew',
+					onclick:this._unfollow
+				} ).append( this._buttonsNode );
+				if( this._notify ){
+					new T.Form.Button({
+						size:'large',
+						color:'link',
+						icon:'notify',
+						onclick:this._notifyOff
+					}).append(this._buttonsNode);
+				} else {
+					new T.Form.Button({
+						size:'large',
+						color:'link',
+						icon:'notifyOff',
+						onclick:this._notifyOn
+					}).append(this._buttonsNode);
+				}
+			} else {
+					new T.Form.Button( {
+						size:'large',
+						caption:D.blogs.l.get('follow'),
+						color:'link',
+						icon:'grayPlus',
+						onclick:this._follow
+					} ).append( this._buttonsNode );
+			}
+		},
+
+		_showFollowers:function(){
+			D.blogs.Followers.show( this.uid );
+		}
+
+	};
+};
+Class(D.blogs.UserInfo);
+
+/**
+ * @class
+ */
+D.blogs.UserInfo.Par = Class(
+	/**
+	 * @lends {D.blogs.UserInfo.Par#}
+	 */
+	{
+		/** @type {DR.ApiCall} */
+		apiCall:null,
+		/**
+		 * @param {DR.ApiCall} v
+		 * @return {D.blogs.UserInfo.Par}
+		 */
+		setApiCall:function(v){
+			this.apiCall = v;
+			return this;
+		},
+
+		/** @type {number} */
+		uid:0,
+		/**
+		 * @param {number} v
+		 * @return {D.blogs.UserInfo.Par}
+		 */
+		setUid:function(v){
+			this.uid = v;
+			return this;
+		},
+
+		/** @type {DR.blogs.struct.UserInfoRe} */
+		data:null,
+		/**
+		 * @param {DR.blogs.struct.UserInfoRe} v
+		 * @return {D.blogs.UserInfo.Par}
+		 */
+		setData:function(v){
+			this.data = v;
+			return this;
+		}
+	}
+);
+
+// +++ test +++
+/**
+ * @class
+ */
+D.blogs.Test = function(){
+	/**
+	 * @lends {D.blogs.Test}
+	 */
+	return {
+
+		__NAME:'D.blogs.Test',
+
+		__construct:function(){
+			this.node = mkE( {
+				tag:'div',
+				className:'Test radius3',
+				onclick:D.stopPropagation
+			} );
+		},
+
+		TK:10,
+
+		steps:[
+			{
+				text:'Izvēlies tēmas, kas Tevi varētu interesēt un spied “Turpināt”!',
+				q:'Vai tēmu izvēle bija saprotama?'
+			},
+			{
+				text:'Sākumskatā Tu redzi savu draugu ierakstus un rakstus no tēmām, kurām Tu seko.',
+				q:'Vai Tev patīk jaunais sadaļas izkārtojums?'
+			},
+			{
+				text:'Atver sadaļu “Tēmas” augšējā izvēlnē un tad atver kādu no piedāvātajām tēmām!',
+				q:'Vai Tev patīk iespēja sekot konkrētai tēmai?'
+			},
+			{
+				text:'Atver kādu no tēmas rakstiem!',
+				q:'Vai raksta lasīšana tev šķiet ērta?'
+			},
+			{
+				text:'Pamēģini pievienot jaunu rakstu un izmantot dažādas formatēšanas iespējas!',
+				q:'Vai raksta pievienošana šķiet ērta un saprotama?'
+			},
+			{
+				q:'Vai Tev kopumā patīk Rakstu sadaļa? Ko Tu par to domā?'
+			}
+		],
+
+		clear:function(){
+			this.node.remove();
+			D.blogs.Test.inst = null;
+		},
+
+		show:function(){
+			if( D.blogs.Test.inst ){
+				return;
+			}
+			D.blogs.Test.inst = this;
+			this.step = D.store.get('blogsTest');
+			if( this.step === null ){
+				var rpc = new RPC('/messages/rq/app.php');
+				rpc.send(
+					'voteStep',
+					{},
+					this._showRe,
+					this
+				);
+				return;
+			}
+			this._showRe();
+		},
+
+		_showRe:function(re){
+			if(re){
+				this.step = re.step + 1;
+				D.store.set( 'blogsTest', this.step );
+			}
+			this.step = this.step || 0;
+			var step = this.steps[ this.step ];
+			if(!step){
+				return;
+			}
+			if( !step.text ){
+				this._addQuest();
+				this.node.append( D.chat.wins.main._win._headerNode );
+				return;
+			}
+			this.node.append( D.chat.wins.main._win._headerNode );
+			this.showStep();
+		},
+
+		remove:function(){
+			this.node.remove();
+		},
+
+		showStep:function(){
+			this._prevQuest = false;
+			this.node.style.display = '';
+			clearNode( this.node );
+			var pNode = mkE( {
+				tag:'p',
+				text:this.steps[ this.step ].text
+			} ).append( this.node );
+			clearTimeout( this._addQuestTO );
+			this._addQuestTO = setTimeout( this._addQuest, 1000 * this.TK );
+			//if( this.step == 0 ){
+				var overlay = mkE( {
+					tag:'div',
+					style:{
+						backgroundColor:'rgba(0,0,0,0.5)',
+						position:'fixed',
+						top:0,
+						left:0,
+						right:0,
+						bottom:0
+					},
+					prop:{
+						onclick:function(){
+							overlay.remove();
+						}
+					}
+				} ).append( document.body );
+				setTimeout( function(){
+					overlay.remove();
+				}, this.step == 0 ? 5000 : 2500 );
+				/*
+				D.blink( {
+					node:this.node,
+					type:'color',
+					color1:'',
+					color2:'#f60'
+				} );
+				*/
+		//	}
+		},
+
+		_addQuest:function(){
+			if( this._prevQuest ){
+				clearNode( this.node );
+			} else {
+				T.sep().append( this.node );
+			}
+			this._prevQuest = true;
+			mkE( {
+				tag:'p',
+				els:[
+					this.steps[ this.step ].q,
+					{
+						tag:'div',
+						className:'buttons',
+						els:[
+							this._yesNode = mkE( {
+								tag:'div',
+								className:'yes radius3',
+								onclick:this._yes,
+								els:[
+									{
+										tag:'span',
+										text:'Jā'
+									}
+								]
+							} ),
+							this._noNode = mkE( {
+								tag:'div',
+								className:'no radius3',
+								onclick:this._no,
+								els:[
+									{
+										tag:'span',
+										text:'Nē'
+									}
+								]
+							} )
+						]
+					} // .button
+				]
+			} ).append( this.node );
+			this._input = new T.Form.TextArea( {
+				placeholder:'Ieraksti savu komentāru',
+				onkeydown:D.closure( this, function(e){
+					if( D.checkCtrlEnter(e) ){
+						this._send();
+					}
+				} )
+			} ).append( this.node );
+			this._sendButton = new T.Form.Button( {
+				caption:'Iesūtīt atsauksmi',
+				stretch:true,
+				onclick:this._send
+			} ).append( this.node );
+			this._input.hide();
+			this._sendButton.hide();
+		},
+
+		_yes:function(){
+			this.value = 'Y';
+			addClassName( this._yesNode, 'sel' );
+			removeClassName( this._noNode, 'sel' );
+			this._input.show();
+			this._sendButton.show();
+			this._save();
+		},
+
+		_no:function(){
+			this.value = 'N';
+			removeClassName( this._yesNode, 'sel' );
+			addClassName( this._noNode, 'sel' );
+			this._input.show();
+			this._sendButton.show();
+			this._save();
+		},
+
+		_save:function(){
+			var rpc = new RPC('/messages/rq/app.php');
+			rpc.send(
+				'vote',
+				{
+					step:this.step,
+					vote:this.value,
+					text:this._input.value()
+				},
+				D.doNothing
+			);
+		},
+
+		_send:function(){
+			this._save();
+			//this.clear();
+			this._next();
+		},
+
+		_next:function(){
+			++ this.step;
+			D.store.set( 'blogsTest', this.step );
+			var step = this.steps[ this.step ];
+			if(!step){
+				this._thx();
+				return;
+			}
+			if( !step.text ){
+				this._addQuest();
+				return;
+			}
+			this.node.style.display = 'none';
+			setTimeout( this.showStep, 200 * this.TK );
+		},
+
+		_thx:function(){
+			clearNode( this.node );
+			mkE( {
+				tag:'div',
+				className:'thx',
+				text:'Liels paldies'
+			} ).append( this.node );
+			setTimeout( this.remove, 1000 * this.TK );
+		}
+	}
+};
+Class(D.blogs.Test);
+
+/**
+ * @class
+ * @param {object} par
+ */
+D.blogs.CategorySpotlight = function(par){
+	/**
+	 * @lends {D.blogs.CategorySpotlight#}
+	 */
+	return {
+		__NAME:'D.blogs.CategorySpotlight',
+		/** @type {Node} */
+		node:null,
+
+		__construct:function(par){
+			this.node = mkE( {
+				tag:'div',
+				className:'block',
+				els:[
+					{
+						tag:'h3',
+						className: 'sidebarTitle',
+						text:D.blogs.l.get('Tēma, ko apskatīt')
+					}
+				]
+			} );
+			this._mGetCategory = new DR.blogs.GetCategory;
+			this._mGetCategory.id = getRandomInt(1,18);
+			this._mGetCategory.onLoad = this._mGetCategoryRe;
+			this._mGetCategory.select = [
+				new DR.blogs.select.Category().id().title().posts().iFollow().notifications().imageSmall()
+			];
+			par.apiCall.addMethod( this._mGetCategory );
+		},
+
+		_mGetCategoryRe:function(){
+			var cat = new D.blogs.Categories.Category( this._mGetCategory.re );
+			cat.node.append( this.node );
+		}
+	};
+};
+Class(D.blogs.CategorySpotlight);
+
+
+/**
+ * @class
+ * @param {D.blogs.Followers.Par} par
+ * @extends {mkE.Base}
+ */
+D.blogs.Followers = function(par){
+	/**
+	 * @lends {D.blogs.Followers#}
+	 */
+	return {
+
+		__NAME:'D.blogs.Followers',
+
+		/**
+		 * @param {D.blogs.Followers.Par} par
+		 */
+		__construct:function(par){
+			this.node = mkE( {
+				tag:'div',
+				className:'BlogsFollowers',
+				els:[
+					this._itemsNode = mkE( {
+						tag:'div'
+					} )
+				]
+			} );
+			this._mFollowers = new DR.blogs.Followers;
+			this._mFollowers.uid = par.uid;
+			this._mFollowers.pg = 1;
+			this._mFollowers.onLoad = this._mFollowersRe;
+			this._mFollowers.select = [
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon()
+			];
+			this._mFollowers.call();
+			D.loadingOverlay( this.node );
+		},
+
+		_mFollowersRe:function(){
+			D.removeLoadingOverlay( this.node );
+			clearNode( this._itemsNode );
+			for( var k in this._mFollowers.re.items ){
+				new D.blogs.Followers.Item( this._mFollowers.re.items[k] ).append( this._itemsNode );
+			}
+			if( this._mFollowers.re.pgs > 1 ){
+				if( this._pg ){
+					this._pg.remove();
+				}
+				this._pg = new T.Pg( {
+					pg:this._mFollowers.pg,
+					pgs:this._mFollowers.re.pgs,
+					callback:this._setPg
+				} ).append( this.node );
+			}
+		},
+
+		_setPg:function(pg){
+			if( this._mFollowers.processing ){
+				return false;
+			}
+			D.loadingOverlay( this.node );
+			this._mFollowers.pg = pg;
+			this._mFollowers.call();
+		}
+
+	};
+};
+Class( D.blogs.Followers, mkE.Base );
+
+/**
+ * @static
+ */
+D.blogs.Followers.show = function(uid){
+	InfoBox.els(
+		[
+			new D.blogs.Followers( new D.blogs.Followers.Par().setUid(uid) )
+		],
+		{
+			title:'Sekotāji',
+			width:450
+		}
+	);
+};
+
+/**
+ * @class
+ */
+D.blogs.Followers.Par = Class(
+	/**
+	 * @lends {D.blogs.Followers.Par#}
+	 */
+	{
+		/** @type {number} */
+		uid:0,
+		/**
+		 * @param {number} v
+		 * @return {D.blogs.Followers.Par}
+		 */
+		setUid:function(v){
+			this.uid = v;
+			return this;
+		}
+	}
+);
+
+/**
+ * @constructor
+ * @param {DR.blogs.struct.Follower} data
+ * @extends {mkE.Base}
+ */
+D.blogs.Followers.Item = function(data){
+	/**
+	 * @lends {D.blogs.Followers.Item}
+	 */
+	return {
+
+		__NAME:'D.blogs.Followers.Item',
+
+		/**
+		 * @param {DR.blogs.struct.Follower} data
+		 */
+		__construct:function(data){
+			this.uid = data.user.id;
+			this._following = data.follow;
+			this.node = mkE( {
+				tag:'div',
+				className:'item',
+				els:[
+					this._imgNode = mkE( {
+						tag:'a',
+						className:'radius3 pic'
+					} ),
+					{
+						tag:'a',
+						className:'user',
+						text:data.user.title,
+						href:data.user.url
+					},
+					this._buttonsNode = mkE( {
+						tag:'div',
+						className:'buttons'
+					} )
+				]
+			} );
+			D.bgImage( this._imgNode, data.user.image.icon );
+			if( data.user.id != D.ID ){
+				this._drawButtons();
+			}
+		},
+
+		_drawButtons:function(){
+			clearNode(this._buttonsNode);
+			if( this._following ){
+				new T.Form.Button( {
+					caption:D.blogs.l.get('you_follow'),
+					color:'link',
+					icon:'checkGrayNew',
+					onclick:this._unfollow
+				} ).append( this._buttonsNode );
+			} else {
+				new T.Form.Button( {
+					caption:D.blogs.l.get('follow'),
+					color:'link',
+					icon:'grayPlus',
+					onclick:this._follow
+				} ).append( this._buttonsNode );
+			}
+		},
+
+		_follow:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._following = true;
+			var m = new DR.blogs.UserFollow;
+			m.uid = this.uid;
+			m.onLoad = this._drawButtons;
+			m.call();
+		},
+
+		_unfollow:function(){
+			D.loadingOverlay( this._buttonsNode );
+			this._following = false;
+			var m = new DR.blogs.UserUnfollow;
+			m.uid = this.uid;
+			m.onLoad = this._drawButtons;
+			m.call();
+		}
+	}
+};
+Class( D.blogs.Followers.Item, mkE.Base );
+
+/**
+ * @class
+ * @param {number} pid
+ * @extends {mkE.Base}
+ */
+D.blogs.Stats = function(pid){
+	/**
+	 * @lends {D.blogs.Stats#}
+	 */
+	return {
+		__NAME:'D.blogs.Stats',
+
+			id:0,
+			pg:1,
+
+		/**
+		 * @param {number} pid
+		 */
+		__construct:function(pid){
+			this.id = pid;
+			this.node = mkE( {
+				tag:'div',
+				className:'BlogsStats',
+				els:[
+					this._itemsNode = mkE( {
+						tag:'div'
+					} )
+				]
+			} );
+			D.loadingOverlay( this.node );
+			this._mPostStats = new DR.blogs.PostStats;
+			this._mPostStats.pid = this.id;
+			this._mPostStats.pg = this.pg;
+			this._mPostStats.onLoad = this._mPostStatsRe;
+			this._mPostStats.select = D.blogs.Stats.SELECT;
+			this._mPostStats.call();
+		},
+
+		_mPostStatsRe:function(){
+			D.removeLoadingOverlay( this.node );
+			clearNode( this._itemsNode );
+			if( !this._mPostStats.re.pgs ){
+				T.info( D.blogs.l.get('no_stats') ).append( this._itemsNode );
+				return;
+			}
+			for( var k in this._mPostStats.re.items ){
+				new D.blogs.Stats.Item( this._mPostStats.re.items[k] ).append( this._itemsNode );
+			}
+			if( !this._pg && this._mPostStats.re.pgs > 1 ){
+				this._pg = new T.Pg( {
+					pg:this.pg,
+					pgs:this._mPostStats.re.pgs,
+					callback:this._setPg
+				} ).append( this.node );
+			}
+		},
+		
+		_setPg:function(pg){
+			if( this._mPostStats.processing ){
+				return;
+			}
+			D.loadingOverlay( this.node );
+			this.pg = pg;
+			this._mPostStats.pg = pg;
+			this._mPostStats.call();
+		}
+	};
+};
+Class( D.blogs.Stats, mkE.Base );
+
+D.blogs.Stats.SELECT = [
+	new DR.users.select.User().title().image().url(),
+	new DR.users.select.UserDefault().isFriend(),
+	new DR.users.select.Image().icon(),
+	new DR.blogs.select.Item().id().title().href()
+];
+
+/**
+ * @static
+ * @param {number} pid
+ */
+D.blogs.Stats.show = function(pid){
+	InfoBox.els( new D.blogs.Stats(pid), { width:750, title:D.blogs.l.get('stats_title') } );
+};
+
+/**
+ * @class
+ * @extends {mkE.Base}
+ */
+D.blogs.Stats.Full = Class(
+	/**
+	 * @lends {D.blogs.Stats.Full#}
+	 */
+	{
+		__NAME:'D.blogs.Stats.Full',
+
+		/**
+		 * @param {DR.ApiCall} [apiCall]
+		 * @private
+		 */
+		__construct:function(apiCall){
+			this.node = mkE( {
+				tag:'div',
+				className:'BlogsStats',
+				els:[
+					this._itemsNode = mkE( {
+						tag:'div'
+					} )
+				]
+			} );
+			D.loadingOverlay( this.node );
+			this._mFullStats = new DR.blogs.FullStats;
+			this._mFullStats.pg = 1;
+			this._mFullStats.onLoad = this._mFullStatsRe;
+			this._mFullStats.select = D.blogs.Stats.SELECT;
+			if(apiCall){
+				apiCall.addMethod( this._mFullStats );
+			} else {
+				this._mFullStats.call();
+			}
+		},
+		
+		_mFullStatsRe:function(){
+			D.removeLoadingOverlay( this.node );
+			for( var k in this._mFullStats.re.items ){
+				var item = new D.blogs.Stats.Item( this._mFullStats.re.items[k] );
+				item.append( this._itemsNode );
+			}
+			if( this._more ){
+				this._more.reset();
+			}
+			if( this._mFullStats.re.fullPg ){
+				if( !this._more ){
+					this._more = new T.More( {
+						onLoad:this._onLoadMore,
+						node:this.node
+					} );
+				}
+			} else if( this._more ){
+				this._more.remove();
+			}
+		},
+
+		_onLoadMore:function(){
+			// if( this._mFullStats.processing ){
+			// 	return;
+			// }
+			++ this._mFullStats.pg;
+			this._mFullStats.call();
+		}
+	},
+	mkE.Base
+);
+
+/**
+ * @class
+ * @param {DR.blogs.struct.StatsItem} data
+ * @extends {mkE.Base}
+ */
+D.blogs.Stats.Item = function(data){
+	/**
+	 * @lends {D.blogs.Stats.Item#}
+	 */
+	return {
+		__NAME:'D.blogs.Stats.Item',
+
+		/**
+		 * @param {DR.blogs.struct.StatsItem} data
+		 */
+		__construct:function(data){
+			this.node = mkE( {
+				tag:'div',
+				className:'item',
+				els:[
+					this._imageNode = mkE( {
+						tag:'a',
+						className:'radius3 pic',
+						href:data.user.url
+					} ),
+					mkE( {
+						tag:'a',
+						className:'user' + ( DR.users.struct.UserDefault && data.user.isFriend ? ' fr' : '' ),
+						text:data.user.title,
+						href:data.user.url
+					} ),
+					{
+						tag:'br'
+					},
+					mkE( {
+						tag:'span',
+						text:D.ddate2( data.ts )
+					} )
+				]
+			} );
+			if( data.item ){
+				mkE( {
+					tag:'br'
+				} ).append( this.node );
+				mkE( {
+					tag:'a',
+					className:'title cut',
+					text:data.item.title,
+					title:data.item.title,
+					href:data.item.href
+				} ).append( this.node );
+			}
+			D.bgImage( this._imageNode, data.user.image.icon );
+		}
+	};
+};
+Class( D.blogs.Stats.Item, mkE.Base );
+
+/**
+ * @class
+ * @extends {mkE.Base}
+ */
+D.blogs.Stats.LastVisitor = Class(
+	/**
+	 * @lends {D.blogs.Stats.LastVisitor#}
+	 */
+	{
+		/**
+		 * @param {DR.ApiCall} apiCall
+		 */
+		__construct:function(apiCall){
+			this.node = mkE( {
+				tag:'div',
+				className:'block BlogsStats',
+				els:[
+					{
+						tag:'h3',
+						className: 'sidebarTitle',
+						text:D.blogs.l.get('Last visitor')
+					}
+				]
+			} );
+			this._mLastVisitor = new DR.blogs.LastVisitor;
+			this._mLastVisitor.select = D.blogs.Stats.SELECT;
+			this._mLastVisitor.onLoad = this._mLastVisitorRe;
+			apiCall.addMethod( this._mLastVisitor );
+		},
+
+		_mLastVisitorRe:function(){
+			if( !this._mLastVisitor.re ){
+				this.remove();
+				return;
+			}
+			new D.blogs.Stats.Item( this._mLastVisitor.re ).append( this.node );
+			new T.Form.Button( {
+				caption:D.Lang.get('Show all'),
+				href:'/blogs/stats/',
+				stretch:true,
+				onclick:function(){
+					Section.navigate('/blogs/stats/');
+					return false;
+				}
+			} ).append( this.node );
+		}
+	},
+	mkE.Base
+);
+
+
+/**
+ * @class
+ * @param {DR.ApiCall} ac
+ * @extends {mkE.Base}
+ */
+D.blogs.ProfitPosts = function(ac){
+	/**
+	 * @lends {D.blogs.ProfitPosts#}
+	 */
+	return {
+		__NAME:'D.blogs.ProfitPosts',
+
+		/**
+		 * @param {DR.ApiCall} ac
+		 */
+		__construct:function(ac){
+			this.node = mkE( {
+				tag:'div',
+				els:[
+					{
+						tag:'h2',
+						text:'Mani ienākumi'
+					},
+					{ tag:'br' },
+					this._itemsNode = mkE( {
+						tag:'div'
+					} )
+				]
+			} );
+			this._mProfitPosts = new DR.blogs.ProfitPosts;
+			this._mProfitPosts.pg = 1;
+			this._mProfitPosts.onLoad = this._mProfitPostsRe;
+			this._mProfitPosts.onError = this._mProfitPostsRe;
+			this._mProfitPosts.select = [
+				new DR.blogs.select.Item().id().title()
+			];
+			ac.addMethod( this._mProfitPosts );
+
+			this._mGetPayoutActions = new DR.blogs.GetPayoutActions;
+			this._mGetPayoutActions.onLoad = this._mGetPayoutActionsRe;
+			ac.addMethod( this._mGetPayoutActions );
+		},
+
+		_mProfitPostsRe:function(){
+			if( !this._mProfitPosts.re ){
+				Section.navigate('/blogs/my');
+				return;
+			}
+			clearNode( this._itemsNode );
+			if( this._mProfitPosts.re.withdraw ){
+				mkE( {
+					tag:'p',
+					els:[
+						'Pēdējo reizi nauda izņemta ',
+						D.ddate2( this._mProfitPosts.re.withdraw )
+					]
+				} ).append( this._itemsNode );
+			}
+			var table = new T.Table( {
+				simple:true,
+				rows:[
+					new T.TableRow( {
+						header:true,
+						cells:[
+							'Raksta nosaukums',
+							'Ekspozīcijas',
+							'Cena par 1000 eks.',
+							'Summa'
+						]
+					} )
+				]
+			} ).append( this._itemsNode );
+			for( var k in this._mProfitPosts.re.items ){
+				/** @type {DR.blogs.struct.ProfitPostsItem} */
+				var r = this._mProfitPosts.re.items[k];
+				var row = new T.TableRow( [
+					[
+						{
+							tag:'a',
+							text:( r.post ? r.post.title : '' ),
+							href:( r.post ? '/blogs/post/' + r.post.id : null )
+						}
+					],
+					r.count,
+					[ '€ ', r.price * 10 ],
+					[ '€ ', ( Math.round( r.count * r.price ) / 100 ).toFixed(2) ]
+				] );
+				table.addRow(row);
+			}
+			var row = new T.TableRow( [
+				{
+					tag:'b',
+					text:'Kopā'
+				},
+				this._mProfitPosts.re.exp,
+				'',
+				{
+					tag:'b',
+					els:[ '€ ', ( Math.round( this._mProfitPosts.re.sum ) / 100 ).toFixed(2) ]
+				}
+			] );
+			table.addRow(row);
+			if( this._mProfitPosts.re.pgs > 1 ){
+				this._pg = new T.Pg( {
+					pg:this._mProfitPosts.pg,
+					pgs:this._mProfitPosts.re.pgs,
+					callback:this._setPg
+				} ).append( this._itemsNode );
+			}
+			mkE( {
+				tag:'div',
+				style:{
+					textAlign:'right',
+					paddingTop:'8px'
+				},
+				els:[
+					new T.Form.Button( {
+						color:'buy',
+						caption:'Pieprasīt izmaksu',
+						disabled:!this._mProfitPosts.re.canWithdraw,
+						onclick:this._requestPayout
+					} )
+				]
+			} ).append( this._itemsNode );
+		},
+
+		_setPg:function(pg){
+			if( this._mProfitPosts.processing ){
+				return false;
+			}
+			D.loadingOverlay( this._itemsNode );
+			this._mProfitPosts.pg = pg;
+			this._mProfitPosts.call();
+		},
+
+		_requestPayout:function(){
+			Section.navigate('./payout');
+		},
+
+		_mGetPayoutActionsRe: function(){
+			var re = this._mGetPayoutActions.re;
+			if( !re || empty(re.actions) ){
+				return;
+			}
+			var node = mkE({
+				tag: 'div',
+				els: [
+					{
+						tag: 'h3',
+						text: 'Darbību vēsture'
+					}
+				]
+			});
+			var actions = mkE({
+				tag: 'table',
+				className: 'simpleTable'
+			});
+			for( var i = 0, l = re.actions.length; i < l; i++ ){
+				var action = re.actions[i];
+				mkE({
+					tag: 'tr',
+					els: [
+						{
+							tag: 'td',
+							text: action.text
+						},
+						{
+							tag: 'td',
+							text: D.ddate(action.ts)
+						}
+					]
+				}).append(actions);
+			}
+			actions.append(node);
+			node.append(this.node);
+		}
+
+	};
+};
+Class( D.blogs.ProfitPosts, mkE.Base );
+// --- blogs.js --- 
+// +++ intro.js +++ 
+/**
+ * @class
+ */
+D.blogs.Intro = Class(
+	/**
+	 * @lends {D.blogs.Intro#}
+	 */
+	{
+
+		__NAME: 'D.blogs.Intro',
+
+		onSave: null,
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Intro} data
+		 * @param {Function} onSave
+		 */
+		__construct: function(data, onSave){
+			this.onSave = onSave;
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-intro'
+			});
+			this.drawText();
+			this.drawCategories(data);
+			this._categoryChanged();
+			$( window ).on('scroll', this._onScroll);
+			setTimeout(this._onScroll, 100);
+		},
+
+		drawText: function(){
+			mkE({
+				tag: 'div',
+				className: 'blogs-wrapper',
+				els: [
+					{
+						tag: 'h2',
+						text: D.blogs.l.get('intro-title')
+					},
+					{
+						tag: 'p',
+						text: D.blogs.l.get('intro-text')
+					}
+				]
+			}).append(this.node);
+		},
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Intro} data
+		 */
+		drawCategories: function(data){
+			this.categories = [];
+			if( !empty(data.suggestedCategories) ){
+				mkE({
+					tag: 'div',
+					className: 'suggested-categories suggested-' + data.suggestedCategories.length,
+					els: [
+						{
+							tag: 'h3',
+							text: D.blogs.l.get('intro-suggested-title')
+						},
+						this.suggestedCategoriesContainer = mkE({
+							tag: 'div',
+							className: 'blogs-intro-categories blogs-categories'
+						}),
+						T.clear()
+					]
+				}).append(this.node);
+			}
+			mkE({
+				tag: 'div',
+				els: [
+					{
+						tag: 'h3',
+						text: D.blogs.l.get(empty(data.suggestedCategories) ? 'intro-you-might-like' : 'intro-other-categories')
+					},
+					this.categoriesContainer = mkE({
+						tag: 'div',
+						className: 'blogs-intro-categories blogs-categories'
+					}),
+					T.clear()
+				]
+			}).append(this.node);
+			this._footerContainer = mkE({
+				tag: 'div',
+				className: 'footerContainer',
+				els: [
+					this._footer = mkE({
+						tag: 'div',
+						className: 'footer',
+						els: [
+							this._categoriesText = mkE({
+								tag: 'div',
+								className: 'categoriesText'
+							}),
+							mkE({
+								tag: 'div',
+								className: 'intro-save-container',
+								els: [
+									this._continueButton = new T.Form.Button({
+										onclick: this.skipCategories,
+										size: 'large',
+										color: 'link',
+										caption: D.Lang.get('skip')
+									}),
+									this._saveButton = new T.Form.Button({
+										onclick: this.saveCategories,
+										disabled: true,
+										size: 'large',
+										color: 'submit',
+										caption: D.Lang.get('continue')
+									})
+								]
+							})
+						]
+					})
+				]
+			}).append(this.node);
+			for( var i = 0, l = data.categories.length; i < l; i++ ){
+				/** @type {DR.blogs.struct.Category} */
+				var categoryData = data.categories[i];
+				var category = new D.blogs.Intro.Category(categoryData, this._categoryChanged);
+				if( in_array(categoryData.id, data.suggestedCategories) ){
+					category.node.append(this.suggestedCategoriesContainer);
+					category._select(true);
+				}else{
+					category.node.append(this.categoriesContainer);
+				}
+				this.categories.push(category);
+			}
+		},
+
+		saveCategories: function(){
+			var selectedCategories = [];
+			for( var i = 0, l = this.categories.length; i < l; i++ ){
+				var category = this.categories[i];
+				if( category.selected ){
+					selectedCategories.push(category.id);
+				}
+			}
+			D.loadingOverlay(this.node);
+			this._mSaveIntroCategories = new DR.blogs.SaveIntroCategories;
+			this._mSaveIntroCategories.categories = selectedCategories;
+			this._mSaveIntroCategories.onLoad = this.onSaveCategories;
+			this._mSaveIntroCategories.call();
+		},
+
+		skipCategories: function(){
+			D.loadingOverlay(this.node);
+			this._mSaveIntroCategories = new DR.blogs.SaveIntroCategories;
+			this._mSaveIntroCategories.categories = [];
+			this._mSaveIntroCategories.skip = true;
+			this._mSaveIntroCategories.onLoad = this.onSaveCategories;
+			this._mSaveIntroCategories.call();
+		},
+
+		onSaveCategories: function(){
+			$( window ).off('scroll', this._onScroll);
+			this.onSave();
+		},
+
+		_categoryChanged: function(){
+			var selected = 0;
+			for( var i = 0, l = this.categories.length; i < l; i++ ){
+				if( this.categories[i].selected ){
+					selected++;
+				}
+			}
+			this._saveButton.disable(selected == 0);
+			clearNode(this._categoriesText);
+			if( selected == 0 ){
+				mkE({
+					tag: 'span',
+					className: 'intro-no-categories',
+					text: D.blogs.l.get('intro_need_categories')
+				}).append(this._categoriesText);
+				return;
+			}
+			mkE({
+				tag: 'span',
+				className: 'checkIcon'
+			}).append(this._categoriesText);
+			mkE({
+				tag: 'span',
+				className: 'categories-info-text',
+				els: [
+					D.blogs.l.nget(selected, 'interests_selected') + ' ',
+					{
+						tag: 'strong',
+						text: D.blogs.l.nget(selected, 'categories')
+					}
+				]
+			}).append(this._categoriesText);
+		},
+
+		_onScroll: function(){
+			var pos = D.position(this._footerContainer);
+			var scrollOffset = document.body.scrollTop || document.documentElement.scrollTop || 0;
+			var chat = document.getElementById('chatContent');
+			if( pos.top - scrollOffset + 60 > window.innerHeight ){
+				addClassName(this._footer, 'fixed');
+				if( chat ){
+					chat.style.display = 'none';
+				}
+			}else{
+				removeClassName(this._footer, 'fixed');
+				if( chat ){
+					chat.style.display = '';
+				}
+			}
+		}
+	}
+);
+
+D.blogs.Intro.Category = Class(
+	/**
+	 * @lends {D.blogs.Intro.Category#}
+	 */
+	{
+
+		__NAME: 'D.blogs.Intro.Category',
+		selected: false,
+		id: null,
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Category} category
+		 * @param {Function} onclick
+		 */
+		__construct: function(category, onclick){
+			this.id = category.id;
+			this.onclick = onclick;
+			this.node = mkE({
+				tag: 'div',
+				className: 'category',
+				style: {
+					backgroundImage: 'url(' + category.imageSmall + ')'
+				},
+				els: [
+					{
+						tag: 'div',
+						className: 'overlay',
+						els: [
+							{
+								tag: 'div',
+								className: 'check',
+								attr: {
+									title: D.blogs.l.get('intro_click_here')
+								}
+							}
+						]
+					},
+					{
+						tag: 'div',
+						className: 'category-info',
+						els: [
+							{
+								tag: 'div',
+								className: 'category-title',
+								text: D.shorten(category.title, 30, '...')
+							},
+							{
+								tag: 'div',
+								className: 'category-data',
+								els: [
+									{
+										tag: 'span',
+										className: 'text',
+										text: D.blogs.formatPostCount(category.posts) + ' ' + D.blogs.l.nget(category.posts, 'posts')
+									}
+								]
+							}
+						]
+					}
+				],
+				onclick: this._onclick
+			});
+		},
+
+		_onclick: function(){
+			this._select(!this.selected);
+			this.onclick();
+		},
+
+		_select: function(v){
+			if( v ){
+				this.selected = true;
+				addClassName(this.node, 'selected');
+				return;
+			}
+			this.selected = false;
+			removeClassName(this.node, 'selected');
+		}
+	}
+);// --- intro.js --- 
+// +++ categories.js +++ 
+D.blogs.Categories = Class(
+	/**
+	 * @lends {D.blogs.Categories#}
+	 */
+	{
+		/**
+		 *
+		 * @param {DR.ApiCall|null} ac
+		 */
+		__construct: function(ac){
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-category-list',
+				els: [
+					{
+						tag: 'p',
+						text: D.blogs.l.get('topics_list_descr')
+					},
+					this._topics = mkE({
+						tag: 'div',
+						className: 'blogs-categories'
+					})
+				]
+			});
+			this._mGetCategories = new DR.blogs.GetCategories();
+			this._mGetCategories.select = [
+				new DR.blogs.select.Category().id().title().posts().iFollow().notifications().imageSmall()
+			];
+			this._mGetCategories.onLoad = this.drawCategories;
+			if( ac instanceof DR.ApiCall ){
+				ac.addMethod(this._mGetCategories);
+			}else{
+				this._mGetCategories.call();
+			}
+		},
+
+		drawCategories: function(){
+			var re = this._mGetCategories.re;
+			for( var i = 0, l = re.categories.length; i < l; i++ ){
+				new D.blogs.Categories.Category(re.categories[i]).node.append(this._topics);
+			}
+		}
+	}
+);
+
+D.blogs.Categories.Category = Class(
+	/**
+	 * @lends {D.blogs.Categories.Category#}
+	 */
+	{
+
+		__NAME: 'D.blogs.Categories.Category',
+		selected: false,
+		id: null,
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Category} category
+		 */
+		__construct: function(category){
+			this.id = category.id;
+			this.url = '/blogs/categories/' + this.id;
+			this.node = mkE({
+				tag: 'a',
+				className: 'category',
+				href:this.url,
+				style: {
+					backgroundImage: 'url(' + category.imageSmall + ')',
+					display:'block'
+				},
+				els: [
+					{
+						tag: 'div',
+						className: 'overlay'
+					},
+					{
+						tag: 'div',
+						className: 'category-info',
+						els: [
+							{
+								tag: 'div',
+								className: 'category-title',
+								text: D.shorten(category.title, 30, '...')
+							},
+							this._categoryData = mkE({
+								tag: 'div',
+								className: 'category-data',
+								els: [
+									/*{
+										tag: 'span',
+										className: 'text',
+										text: D.blogs.formatPostCount(category.posts) + ' ' + D.blogs.l.nget(category.posts, 'posts')
+									}*/
+								]
+							})
+						]
+					}
+				],
+				onclick: this._onclick
+			});
+			if( category.iFollow ){
+				mkE({
+					tag: 'span',
+					className: 'text you-follow',
+					text: /*' · ' + */D.blogs.l.get('you_follow')
+				}).append(this._categoryData);
+			}
+		},
+
+		_onclick: function(){
+			/*if( this.id == 2 ){
+				Section.navigate('/blogs/travel');
+				return;
+			}*/
+			Section.navigate(this.url);
+			return false;
+		}
+	}
+);// --- categories.js --- 
+// +++ spotlight_authors.js +++ 
+D.blogs.SpotlightAuthors = Class(
+	/**
+	 * @lends {D.blogs.SpotlightAuthors#}
+	 */
+	{
+		/**
+		 *
+		 * @param {D.blogs.SpotlightAuthors.Par} par
+		 */
+		__construct: function(par){
+			this.node = mkE({
+				tag: 'div',
+				className: 'block blogs-spotlight-authors',
+				els: [
+					{
+						tag: 'h3',
+						className: 'sidebarTitle',
+						text: D.blogs.l.get('spotlight_authors')
+					},
+					this._authors = mkE({
+						tag: 'div',
+						className: 'authors'
+					})
+				]
+			});
+			this._mGetSpotlightAuthors = new DR.blogs.GetSpotlightAuthors();
+			this._mGetSpotlightAuthors.pg = par.pg;
+			this._mGetSpotlightAuthors.count = par.count;
+			this._mGetSpotlightAuthors.select = [
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.Image().small()
+			];
+			this._mGetSpotlightAuthors.onLoad = this.onGetAuthors;
+			if( par.ac ){
+				par.ac.addMethod(this._mGetSpotlightAuthors);
+				return;
+			}
+			this._mGetSpotlightAuthors.call();
+		},
+
+		onGetAuthors: function(){
+			var re = this._mGetSpotlightAuthors.re;
+			if( !re || empty(re.authors) ){
+				this.node.remove();
+				return;
+			}
+			this.node.style.display = 'block';
+			for( var i = 0, l = re.authors.length; i < l; i++ ){
+				var author = new D.blogs.SpotlightAuthor(re.authors[i]);
+				author.node.append(this._authors);
+			}
+		}
+	}
+);
+
+D.blogs.SpotlightAuthors.Par = Class(
+	/**
+	 * @lends {D.blogs.SpotlightAuthors.Par#}
+	 */
+	{
+		ac: null,
+		pg: 1,
+		count: 5,
+
+		/**
+		 *
+		 * @param {DR.ApiCall} ac
+		 * @returns {D.blogs.SpotlightAuthors.Par}
+		 */
+		setApiCall: function(ac){
+			this.ac = ac;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Number} v
+		 * @returns {D.blogs.SpotlightAuthors.Par}
+		 */
+		setCount: function(v){
+			this.count = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Number} v
+		 * @returns {D.blogs.SpotlightAuthors.Par}
+		 */
+		setPg: function(v){
+			this.pg = v;
+			return this;
+		}
+	}
+);
+
+D.blogs.SpotlightAuthor = Class(
+	/**
+	 * @lends {D.blogs.SpotlightAuthor#}
+	 */
+	{
+		/**
+		 *
+		 * @param {DR.blogs.struct.SpotlightAuthor} data
+		 */
+		__construct: function(data){
+			this.data = data;
+			var user = data.user;
+			this.node = mkE({
+				tag: 'div',
+				className: 'spotlight-author',
+				els: [
+					{
+						tag: 'a',
+						className: 'image',
+						href: user.url + (user.type == D.USER_TYPE_BIZ ? 'news' : 'blog'),
+						els: [
+							{
+								tag: 'img',
+								src: user.image.small
+							}
+						],
+						attr: {
+							title: user.title
+						}
+					},
+					{
+						tag: 'div',
+						className: 'info',
+						els: [
+							{
+								tag: 'a',
+								href: user.url + (user.type == D.USER_TYPE_BIZ ? 'news' : 'blog'),
+								text: user.title,
+								attr: {
+									title: user.title
+								}
+							},
+							{
+								tag: 'div',
+								text: D.blogs.formatPostCount(data.posts) + ' ' + D.blogs.l.nget(data.posts, 'posts')
+							}
+						]
+					}
+				]
+			});
+			if( !data.iFollow ){
+				mkE({
+					tag: 'div',
+					className: 'follow',
+					els: [
+						this._followButton = new T.Form.Button({
+							color: 'link',
+							icon: 'grayPlus',
+							onclick: this._follow
+						})
+					]
+				}).append(this.node);
+				this._followButton._buttonNode.setAttribute('title', D.blogs.l.get('follow_author'));
+			}
+		},
+
+		_follow: function(){
+			if( this._mFollow ){
+				return;
+			}
+			this._mFollow = new DR.blogs.UserFollow();
+			this._mFollow.uid = this.data.user.id;
+			this._mFollow.notify = false;
+			this._mFollow.onLoad = this._onFollow;
+			this._mFollow.call();
+		},
+
+		_onFollow: function(){
+			removeClassName(this._followButton._captionTextNode, 'grayPlusIcon');
+			addClassName(this._followButton._captionTextNode, 'checkGrayNewIcon');
+			setTimeout(this._hideButton, 2000);
+		},
+
+		_hideButton: function(){
+			this._followButton.node.style.opacity = 0;
+			setTimeout(this._removeButton, 500);
+		},
+
+		_removeButton: function(){
+			this._followButton.remove();
+		}
+	}
+);// --- spotlight_authors.js --- 
+// +++ header.js +++ 
+D.blogs.Header = Class(
+	/**
+	 * @lends {D.blogs.Header#}
+	 */
+	{
+		/** @type {D.blogs.Header.Par} */
+		par: null,
+		/** @type {string} */
+		type: 'category',
+		/** @type {number|null} */
+		id: null,
+
+		/**
+		 *
+		 * @param {D.blogs.Header.Par} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.id = par.id;
+			this.type = par.type;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-header'
+			});
+
+			switch( this.type ){
+				case 'category':
+					new D.blogs.Header.Category(this.id, par.apiCall).node.append(this.node);
+					break;
+				default:
+					this.node.style.display = 'none';
+			}
+		}
+	}
+);
+
+D.blogs.Header.Par = Class(
+	/**
+	 * @lends {D.blogs.Header.Par#}
+	 */
+	{
+		type: 'category',
+		/** @type {number|null} */
+		id: null,
+		/** @type {DR.ApiCall} */
+		apiCall: null,
+
+		/**
+		 *
+		 * @param {string} v
+		 * @returns {D.blogs.Header.Par}
+		 */
+		setType: function(v){
+			this.type = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {number} v
+		 * @returns {D.blogs.Header.Par}
+		 */
+		setId: function(v){
+			this.id = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {DR.ApiCall} v
+		 * @returns {D.blogs.Header.Par}
+		 */
+		setApiCall: function(v){
+			this.apiCall = v;
+			return this;
+		}
+	}
+);
+
+D.blogs.Header.Category = Class(
+	/**
+	 * @lends {D.blogs.Header.Category#}
+	 */
+	{
+		/**
+		 *
+		 * @param {number} id
+		 * @param {DR.ApiCall|null} apiCall
+		 */
+		__construct: function(id, apiCall){
+			this.id = id;
+			this.node = mkE({
+				tag: 'div'
+			});
+			this._mGetCategory = new DR.blogs.GetCategory();
+			this._mGetCategory.id = this.id;
+			this._mGetCategory.select= [
+				new DR.blogs.select.Category().id().title().posts().iFollow().notifications().imageLarge()
+			];
+			this._mGetCategory.onLoad = this._draw;
+			if( apiCall ){
+				apiCall.addMethod(this._mGetCategory);
+			}else{
+				this._mGetCategory.call();
+			}
+		},
+
+		_draw: function(){
+			var re = this._mGetCategory.re;
+			if( !re ){
+				return;
+			}
+			mkE({
+				tag: 'div',
+				className: 'category-header',
+				style: {
+					backgroundImage: 'url(' + re.imageLarge + ')'
+				},
+				els: [
+					{
+						tag: 'div',
+						className: 'overlay'
+					},
+					{
+						tag: 'div',
+						className: 'info',
+						els: [
+							{
+								tag: 'h2',
+								text: re.title
+							},
+							{
+								tag: 'div',
+								text: D.blogs.formatPostCount(re.posts) + ' ' + D.blogs.l.nget(re.posts, 'posts')
+							}
+						]
+					},
+					this._follow = mkE({
+						tag: 'div',
+						className: 'follow'
+					})
+				]
+			}).append(this.node);
+			this.drawFollow(re.iFollow, re.notifications);
+		},
+
+		drawFollow: function(following, notify){
+			if( following ){
+				this._drawUnfollow(notify);
+			}else{
+				this._drawFollow();
+			}
+		},
+
+		_drawUnfollow: function(notify){
+			clearNode(this._follow);
+			new T.Form.Button({
+				caption: D.blogs.l.get('stop_following'),
+				color: 'link',
+				size: 'large',
+				onclick: this.unfollow,
+				icon: 'checkGrayNew'
+			}).append(this._follow);
+			var button = new T.Form.Button({
+				icon: notify ? 'notify' : 'notifyOff',
+				color: 'link',
+				size: 'large',
+				onclick: notify ? this._disableNotify : this._notify
+			}).append(this._follow);
+			button._buttonNode.setAttribute('title', notify ? D.blogs.l.get('disable_notifications') : D.blogs.l.get('enable_notifications'));
+		},
+
+		unfollow: function(){
+			if( this._mUnfollow && this._mUnfollow.processing ){
+				return;
+			}
+			this._mUnfollow = new DR.blogs.Unfollow();
+			this._mUnfollow.id = this.id;
+			this._mUnfollow.onLoad = this._onUnfollow;
+			this._mUnfollow.call();
+		},
+
+		_onUnfollow: function(){
+			if( this._mUnfollow.re ){
+				this.drawFollow(this._mUnfollow.re.following, this._mUnfollow.re.notify);
+			}
+		},
+
+		_drawFollow: function(){
+			clearNode(this._follow);
+			new T.Form.Button({
+				caption: D.blogs.l.get('follow'),
+				color: 'link',
+				size: 'large',
+				onclick: this.follow,
+				icon: 'grayPlus'
+			}).append(this._follow);
+		},
+
+		follow: function(){
+			if( this._mFollow && this._mFollow.processing ){
+				return;
+			}
+			this._mFollow = new DR.blogs.Follow();
+			this._mFollow.id = this.id;
+			this._mFollow.notify = false;
+			this._mFollow.onLoad = this._onFollow;
+			this._mFollow.call();
+		},
+
+		_onFollow: function(){
+			if( this._mFollow.re ){
+				this.drawFollow(this._mFollow.re.following, this._mFollow.re.notify);
+			}
+		},
+
+		_notify: function(){
+			if( this._mFollow && this._mFollow.processing ){
+				return;
+			}
+			this._mFollow = new DR.blogs.Follow();
+			this._mFollow.id = this.id;
+			this._mFollow.notify = true;
+			this._mFollow.onLoad = this._onFollow;
+			this._mFollow.call();
+		},
+
+		_disableNotify: function(){
+			if( this._mFollow && this._mFollow.processing ){
+				return;
+			}
+			this._mFollow = new DR.blogs.Follow();
+			this._mFollow.id = this.id;
+			this._mFollow.notify = false;
+			this._mFollow.onLoad = this._onFollow;
+			this._mFollow.call();
+		}
+	}
+);
+
+D.blogs.TravelHeader = Class(
+	/**
+	 * @lends {D.blogs.TravelHeader#}
+	 */
+	{
+		/** @type {D.blogs.TravelHeader.Par} */
+		par: null,
+		/** @type {number|null} */
+		id: null,
+
+		/**
+		 *
+		 * @param {D.blogs.TravelHeader.Par} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.id = par.id;
+
+			this.ac = par.apiCall || new DR.ApiCall();
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-travel-header'
+			});
+
+			if( this.id ){
+				this._mGetCategory = new DR.blogs.GetCategory();
+				this._mGetCategory.id = this.id;
+				this._mGetCategory.select = [
+					new DR.blogs.select.Category().id().title().continent().name()
+				];
+				this._mGetCategory.onLoad = this.onGetCategory;
+				this.ac.addMethod(this._mGetCategory);
+			}
+
+			this._mGetTravelCategories = new DR.blogs.GetTravelCategories();
+			this._mGetTravelCategories.onLoad = this.onTravelCategories;
+			this.ac.addMethod(this._mGetTravelCategories);
+
+			if( !this.par.apiCall ){
+				this.ac.call();
+			}
+		},
+
+		onGetCategory: function(){
+			this.category = this._mGetCategory.re;
+		},
+
+		onTravelCategories: function(){
+			var re = this._mGetTravelCategories.re;
+			/** @type {Array.<DR.blogs.struct.TravelContinent>} */
+			var continents = re.continents;
+			var items = [];
+			for( var i = 0, l = continents.length; i < l; i++ ){
+				var continent = continents[i];
+				var item = {
+					caption: continent.name,
+					iconUrl: D.PIMG + 'i/icons/32/continent_' + continent.code + '.png',
+					selected: this.category && this.category.continent == continent.code
+				};
+				if( continent.code == 'lv' ){
+					item.href = '/blogs/travel/1095';
+					item.onclick = function(){
+						Section.navigate('/blogs/travel/1095');
+						return false;
+					};
+				}
+				if( !empty(continent.countries) && continent.code != 'lv' ){
+					item.childs = [];
+					for( var j = 0, l2 = continent.countries.length; j < l2; j++ ){
+						var country = continent.countries[j];
+						var child = {
+							caption: country.name,
+							href: '/blogs/travel/' + country.id,
+							onclick: D.closure(this, function(id){
+								Section.navigate('/blogs/travel/' + id);
+								return false;
+							}, country.id),
+							selected: this.category && this.category.name == country.code,
+							iconUrl: D.PIMG + 'i/flags/' + country.code + '.png'
+						};
+						item.childs.push(child);
+					}
+				}
+				items.push(item);
+			}
+			var p = new T.CategoryFilter.Par();
+			this._categoryFilter = new T.CategoryFilter(items, p);
+			this._categoryFilter.node.append(this.node);
+		}
+	}
+);
+
+D.blogs.TravelHeader.Par = Class(
+	/**
+	 * @lends {D.blogs.TravelHeader.Par#}
+	 */
+	{
+		/** @type {number|null} */
+		id: null,
+		/** @type {DR.ApiCall} */
+		apiCall: null,
+
+		/**
+		 *
+		 * @param {number} v
+		 * @returns {D.blogs.TravelHeader.Par}
+		 */
+		setId: function(v){
+			this.id = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {DR.ApiCall} v
+		 * @returns {D.blogs.TravelHeader.Par}
+		 */
+		setApiCall: function(v){
+			this.apiCall = v;
+			return this;
+		}
+	}
+);// --- header.js --- 
+// +++ feed.js +++ 
+/**
+ * @class
+ * @param {D.blogs.Feed.Par} par
+ * @extends {mkE.Base}
+ */
+D.blogs.Feed = function(par){
+	/**
+	 * @lends {D.blogs.Feed#}
+	 */
+	return {
+		__NAME:'D.blogs.Feed',
+
+		/** @type {D.blogs.Feed.Par} */
+		par: null,
+		/** @type {string} */
+		type: 'all',
+		/** @type {number|null} */
+		id: null,
+		onLoad:D.doNothing,
+		_mGetPosts:null,
+		newPostsHeader: false,
+		allPostsHeader: false,
+		items: [],
+
+		/**
+		 * @param {D.blogs.Feed.Par} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.type = par.type;
+			this.id = par.id;
+			this.pg = Number(par.pg) || 1;
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-feed',
+				els: [
+					this._itemsNode = mkE({
+						tag: 'div',
+						className: 'blogs-feed-items'
+					})
+				]
+			});
+			switch( this.type ){
+				case 'all':
+					this._mGetPosts = new DR.blogs.GetFeed();
+					break;
+				case 'travel':
+				case 'category':
+					this._mGetPosts = new DR.blogs.GetCategoryPosts();
+					this._mGetPosts.categoryId = this.id;
+					break;
+				case 'user':
+					this._mGetPosts = new DR.blogs.GetUserPosts();
+					this._mGetPosts.uid = this.id;
+					break;
+				case 'friends':
+					this._mGetPosts = new DR.blogs.GetFriendPosts();
+					break;
+				case 'favorite':
+					this._mGetPosts = new DR.blogs.GetFavoritePosts();
+					break;
+				case 'my':
+					this._mGetPosts = new DR.blogs.GetMyPosts();
+					break;
+				case 'search':
+					this._mGetPosts = new DR.blogs.Search();
+					this._mGetPosts.query = this.id;
+					break;
+				default:
+					this._mGetPosts = new DR.blogs.GetFeed();
+					break;
+			}
+			if( par.method ){
+				this._mGetPosts = par.method;
+			}
+			this._mGetPosts.pg = this.pg;
+			this._mGetPosts.select = D.blogs.Feed.SELECT;
+			this._mGetPosts.onLoad = this.showPosts;
+			if( this.par.apiCall ){
+				this.par.apiCall.addMethod( this._mGetPosts );
+			} else if( par.data ){
+				this._mGetPosts.re = par.data;
+				this._mGetPosts.onLoad();
+			} else {
+				this._mGetPosts.call();
+			}
+		},
+
+		showPosts: function(){
+			/** @type {DR.blogs.struct.Posts} */
+			var posts = this._mGetPosts.re;
+			if( this.pg == 1 && empty(posts.posts) ){
+				if( this.type == 'favorite' ){
+					mkE({
+						tag: 'div',
+						className: 'empty-favorites',
+						els: [
+							{
+								tag: 'h2',
+								text: D.blogs.l.get('empty-favorites-title')
+							},
+							{
+								tag: 'p',
+								text: D.blogs.l.get('empty-favorites-text')
+							}
+						]
+					}).append(this._itemsNode);
+					return;
+				}
+				T.info(D.blogs.l.get('empty_feed_' + this.type)).append(this._itemsNode);
+				return;
+			}
+			if( this._pg ){
+				clearNode(this._itemsNode);
+			}
+			for( var i = 0, l = posts.posts.length; i < l; i++ ){
+				if( this.type == 'all' ){
+					this._allFeedHeader(posts.posts[i]);
+				}
+				var item = new D.blogs.FeedItem(posts.posts[i]);
+				this.items.push(item);
+				item.node.append(this._itemsNode);
+			}
+			if( this._pg ){
+				D.scrollIntoView(this._itemsNode);
+			}
+			if( !posts.fullPg ){
+				if( this._more ){
+					this._more._moreButton.remove();
+				}
+				return;
+			}
+			if( this.type != 'my' && this.type != 'user' && !this._more ){
+				this._more = new T.More({
+					pg:this.pg,
+					load: this.loadPosts,
+					node: this.node,
+					caption: D.blogs.l.get('load_more')
+				});
+			}else if( this.par.paginator && (this.type == 'my' || this.type == 'user') && !this._pg ){
+				this._pg = new T.Pg({
+					pg: this.pg,
+					pgs: Math.ceil(posts.count / 10),
+					callback: this._paginatorChanged
+				}).append(this.node);
+			}
+			this.onLoad();
+		},
+
+		loadPosts: function(){
+			if( this._mGetPosts.processing ){
+				return false;
+			}
+			this.pg++;
+			this._mGetPosts.pg = this.pg;
+			this._mGetPosts.call();
+		},
+
+		_paginatorChanged: function(page){
+			if( this._mGetPosts.processing ){
+				return false;
+			}
+			this.pg = page - 1;
+			this.loadPosts();
+		},
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Item} item
+		 * @private
+		 */
+		_allFeedHeader: function(item){
+			if( this.newPostsHeader && this.allPostsHeader ){
+				return;
+			}
+			if( !this.newPostsHeader && item.unseen ){
+				if( this.par.titleNode ){
+					this.par.titleNode.remove();
+				}
+				mkE({
+					tag: 'h1',
+					text: D.blogs.l.get('new_posts')
+				}).append(this._itemsNode);
+				this.newPostsHeader = true;
+				return;
+			}
+			if( !this.allPostsHeader && !item.unseen ){
+				if( this.par.titleNode ){
+					this.par.titleNode.remove();
+				}
+				if( this.newPostsHeader ){
+					var sep = T.sep();
+					addClassName(sep, 'blogs-sep');
+					sep.append(this._itemsNode);
+					if( sep.previousSibling ){
+						addClassName(sep.previousSibling, 'last-item');
+					}
+				}
+				mkE({
+					tag: 'h1',
+					text: D.blogs.l.get('all_posts')
+				}).append(this._itemsNode);
+				this.newPostsHeader = true;
+				this.allPostsHeader = true;
+			}
+		},
+
+		onBack: function(){
+			for( var i = 0, l = this.items.length; i < l; i++ ){
+				this.items[i].onBack();
+			}
+		}
+	};
+};
+Class( D.blogs.Feed, mkE.Base );
+
+D.blogs.Feed.SELECT = [
+	new DR.blogs.select.Item().all().blocksData(false).embeds(false).images(false),
+	new DR.blogs.select.Category().id().title().type(),
+	new DR.users.select.User().id().title().url().image().type(),
+	new DR.users.select.Image().small(),
+	new DR.like.select.GetRe().id().type().canLike().count().liked(),
+	new DR.say.select.Item().id().canRecommend().recommended().recCount().user(),
+	new DR.base.select.Image().w().h().original(),
+	new DR.gallery.select.Embed().all().html(false),
+	new DR.gallery.select.EmbedImage().uber()
+];
+
+/**
+ * @class
+ */
+D.blogs.Feed.Par = Class(
+	/**
+	 * @lends {D.blogs.Feed.Par#}
+	 */
+	{
+		type: 'all',
+		/** @type {number|null} */
+		id: null,
+		/** @type {DR.ApiCall} */
+		apiCall: null,
+		/** @type {DR.blogs.struct.Posts} */
+		data:null,
+		pg:1,
+		paginator:true,
+		titleNode:null,
+
+		/**
+		 *
+		 * @param {string} v
+		 * @returns {D.blogs.Feed.Par}
+		 */
+		setType: function(v){
+			this.type = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {number} v
+		 * @returns {D.blogs.Feed.Par}
+		 */
+		setId: function(v){
+			this.id = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {DR.ApiCall} v
+		 * @returns {D.blogs.Feed.Par}
+		 */
+		setApiCall: function(v){
+			this.apiCall = v;
+			return this;
+		},
+
+		/**
+		 * @param {DR.blogs.struct.Posts} v
+		 * @return {D.blogs.Feed.Par}
+		 */
+		setData:function(v){
+			this.data = v;
+			return this;
+		},
+
+		/**
+		 * @param {number} v
+		 * @return {D.blogs.Feed.Par}
+		 */
+		setPg:function(v){
+			this.pg = v;
+			return this;
+		},
+		/** @type {DR._Method} */
+		method:null,
+		/**
+		 * @param {DR._Method} v
+		 * @return {D.blogs.Feed.Par}
+		 */
+		setMethod:function(v){
+			this.method = v;
+			return this;
+		},
+		/**
+		 * @param {bool} v
+		 * @return {D.blogs.Feed.Par}
+		 */
+		setPaginator:function(v){
+			this.paginator = v;
+			return this;
+		},
+		/**
+		 *
+		 * @param {Node} v
+		 * @returns {D.blogs.Feed.Par}
+		 */
+		setTitleNode:function(v){
+			this.titleNode = v;
+			return this;
+		}
+	}
+);// --- feed.js --- 
+// +++ feed_item.js +++ 
+D.blogs.FeedItem = Class(
+	/**
+	 * @lends {D.blogs.FeedItem#}
+	 */
+	{
+		/** @type {DR.blogs.struct.Item} */
+		data: null,
+		/** @type {D.blogs.FeedItem.Par} */
+		par:null,
+		onRemove:D.doNothing,
+		/**
+		 *
+		 * @param {DR.blogs.struct.Item} data
+		 * @param {D.blogs.FeedItem.Par} [par]
+		 */
+		__construct: function( data, par ){
+			this.id = data.id;
+			this.par = par || new D.blogs.FeedItem.Par;
+			this.data = data;
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-feed-item',
+				attr:{
+					'data-id':data.id
+				}
+			});
+			this._drawHeader();
+			this._drawContent();
+			this._drawFooter();
+		},
+
+		_drawHeader: function(){
+			this._header = mkE({
+				tag: 'div',
+				className: 'header'
+			}).append(this.node);
+
+			var userUrl = this.data.user.url;
+			switch(this.data.user.type){
+				case D.USER_TYPE_DEFAULT:
+					userUrl += 'blog';
+					break;
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					userUrl += 'news';
+					break;
+				case D.USER_TYPE_API:
+					userUrl = '/applications/' + this.data.user.id + '/updates';
+			}
+
+			mkE({
+				tag: 'a',
+				className: 'image',
+				href: userUrl,
+				els: [
+					{
+						tag: 'img',
+						src: this.data.user.image.small
+					}
+				]
+			}).append(this._header);
+
+			mkE({
+				tag: 'div',
+				className: 'info',
+				els: [
+					this._authorInfo = mkE({
+						tag: 'div',
+						els: [
+							{
+								tag: 'a',
+								className: 'user',
+								href: userUrl,
+								text: this.data.user.title
+							}
+						]
+					}),
+					this._timeNode = mkE({
+						tag: 'div',
+						className: 'time',
+						els: [
+							{
+								tag: 'span',
+								className: 'created',
+								text: D.ddate(this.data.ts)
+							},
+							this.data.readTime ? ' · ' + D.blogs.l.get('time_to_read') + ' ' + this.data.readTime + ' ' + D.blogs.l.get('min_to_read') : ''
+						]
+					})
+				]
+			}).append(this._header);
+			if( D.ENV == 'INSP' && this.data.userInSpotlight ){
+				mkE( {
+					tag:'b',
+					text:' (izcelts)'
+				} ).append( this._authorInfo );
+			}
+			if( this.data.canEdit ){
+				switch(this.data.publish){
+					case DR.blogs.struct.Item.PUBLISH_REQUESTED:
+						mkE({
+							tag: 'span',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									text: D.blogs.l.get('waiting_approval')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_REJECTED:
+						mkE({
+							tag: 'span',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									className: 'colorDs',
+									text: D.blogs.l.get('publish_rejected')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_PUBLISHED:
+						mkE({
+							tag: 'span',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									className: 'colorOk',
+									text: D.blogs.l.get('published')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+				}
+			}
+			if( this.data.unseen && D.LV ){
+				mkE({
+					tag: 'span',
+					className: 'badge sayDayPhoto',
+					text: 'Jauns'
+				}).append(this._timeNode);
+			}
+
+			if( !empty(this.data.categories) ) {
+				var headerCategories = this.getHeaderCategories();
+				if( !empty(headerCategories) ){
+					mkE({
+						tag: 'span',
+						els: [
+							' ' + D.blogs.l.get('in_category') + ' ',
+							{
+								tag: 'span',
+								className: 'categories',
+								els: headerCategories
+							}
+						]
+					}).append(this._authorInfo);
+				}
+			}
+
+			this._headerRight = mkE({
+				tag: 'div',
+				className: 'right'
+			}).append(this._header);
+
+			this.favoriteNode = mkE({
+				tag: 'a',
+				className: 'SIcon bookmarkSIcon' + (!this.data.favorite ? '' : ' on'),
+				onclick: this.toggleFavorite,
+				attr: {
+					title: this.data.favorite ? D.blogs.l.get('remove_from_favorites') : D.blogs.l.get('add_to_favorites')
+				}
+			}).append(this._headerRight);
+
+			mkE({
+				tag: 'a',
+				className: 'SIcon options2SIcon',
+				onclick: this._optionsShow
+			}).append(this._headerRight);
+
+			if( (this.data.isDraft || this.data.permissions.value == 0) && this.data.canEdit ){
+				mkE({
+					tag: 'span',
+					els: [
+						' · ',
+						{
+							tag: 'span',
+							className: 'color1',
+							text: D.blogs.l.get('draft')
+						}
+					]
+				}).append(this._timeNode);
+			}
+
+			if( this.data.scheduled ){
+				this._onScheduleText({
+					date: this.data.scheduleDate,
+					hour: this.data.scheduleHour,
+					minute: this.data.scheduleMinute
+				});
+			}
+
+			if( this.data.is18plus ) {
+				mkE( {
+					tag:'span',
+					className:'badge',
+					text:'18+',
+					style:{
+						backgroundColor:'#F24D42',
+						margin: '0 15px'
+					}
+				} ).append( this._timeNode );
+			}
+
+			T.clear().append(this._header);
+		},
+
+		_drawContent: function(){
+			for( var i = 0, l = this.data.categories.length; i < l; i++ ){
+				if( this.data.categories[i].id == 3 ){
+					var parts = this.data.introText.split("\n");
+					parts = parts.slice(0, 6);
+					this.data.introText = parts.join("\n");
+					break;
+				}
+			}
+
+			var postUrl = this.postUrl();
+
+			this._content = mkE({
+				tag: 'div',
+				className: 'content',
+				els: [
+					{
+						tag: 'div',
+						className: 'title',
+						els: [
+							this._title = mkE({
+								tag: 'a',
+								className: 'ajax',
+								text: this.data.title,
+								href: postUrl,
+								onclick:this._onclick
+							})
+						]
+					},
+					this._intro = mkE({
+						tag: 'div',
+						className: 'text',
+						innerHTML: nl2br(htmlspecialchars(this.data.introText.replace(/\n{2,}/g, "\n\n")))
+					})
+				],
+				onclick:this._onclick
+			}).append(this.node);
+
+			if( (this.data.hasImages || this.data.hasEmbeds) && this._hasCategory(2) ){
+				mkE({
+					tag: 'span',
+					className: 'foto-icon'
+				}).append(this._title);
+			}
+			this.firstEmbedReplace();
+			D.smileyReplace(this._intro);
+			D.linksReplace(this._intro);
+			if( this.data.image ){
+				this.image = mkE({
+					tag: 'div',
+					className: 'main-image',
+					style: {
+						backgroundImage: 'url(' + this.data.image.original + ')'
+					},
+					els: [
+						{
+							tag: 'a',
+							href: postUrl,
+							onclick:this._onclick
+						}
+					]
+				}).prepend(this._content);
+			}
+
+			if( this.data.readMore ){
+				mkE({
+					tag: 'div',
+					className: 'read-more',
+					els: [
+						{
+							tag: 'a',
+							text: D.blogs.l.get('read_more'),
+							href: postUrl,
+							onclick:this._onclick
+						}
+					]
+				}).append(this._content);
+			}
+		},
+
+		_drawFooter: function(){
+			this._footer = mkE({
+				tag: 'div',
+				className: 'footer'
+			}).append(this.node);
+
+			if( this.data.like ){
+				var likePar = this.data.like;
+				likePar.feed = true;
+				var p = new D.blogs.LikePar().fromLike(likePar);
+				this._like = new D.blogs.Like(p);
+				this._like.node.append(this._footer);
+			}
+
+			if( !this.data.disableComments && !this.data.isDraft ){
+				this.drawCommentsLink();
+			}
+
+			if( this.data.sayItem ){
+				var recPar = this.data.sayItem;
+				recPar.feed = true;
+				var par = new D.blogs.RecommendPar().fromSayItem(recPar);
+				this._recommend = new D.blogs.Recommend(par);
+				this._recommend.node.append(this._footer);
+			}
+		},
+
+		remove:function(){
+			this.node.remove();
+			this.onRemove();
+		},
+
+		drawCommentsLink: function(){
+			this._commentsLink = mkE({
+				tag: 'span',
+				className: 'comments-link'
+			}).append(this._footer);
+
+			var postUrl = this.postUrl();
+
+			mkE({
+				tag: 'a',
+				className: 'icon sayCommentIcon ajax',
+				text: D.Lang.get('Add comment'),
+				href: 'javascript:;',
+				onclick: this._comment
+			}).append(this._commentsLink);
+
+			if( this.data.commentsCount ){
+				mkE({
+					tag: 'a',
+					className: 'comments-count ajax',
+					els: [
+						{
+							tag: 'strong',
+							text: this.data.commentsCount
+						}
+					],
+					href: postUrl + '/comments'
+				}).append(this._commentsLink);
+			}
+		},
+
+		_comment: function(e) {
+			if ( !D.ID ) {
+				D.focusSmallLogin({ text: D.Lang.get('need_authorize') });
+				return;
+			}
+			Section.navigate(this.postUrl()+'/comment');
+			return false;
+		},
+
+		_onclick:function(e){
+			e = D.event(e);
+			D.stopPropagation(e);
+			if( this.par.clickStats ){
+				var mStats = new DR.blogs.Stats;
+				mStats.kw = this.par.clickStats;
+				mStats.call();
+			}
+			Section.navigate(this.postUrl());
+			return false;
+		},
+
+		postUrl: function(){
+			var postUrl = '/blogs/post/' + D.blogs.seoUrl(this.data.title) + '_' + this.data.id;
+			if( D.ENV == 'INSP' || ( window.SectionBlogsBase && Section.last instanceof SectionBlogsBase ) ){
+				return postUrl;
+			}
+			switch(this.data.user.type){
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					postUrl = this.data.user.url + 'news/post/' + D.blogs.seoUrl(this.data.title) + '_' + this.data.id;
+					break;
+				case D.USER_TYPE_API:
+					postUrl = '/applications/' + this.data.user.id + '/updates/post/' + D.blogs.seoUrl(this.data.title) + '_' + this.data.id;
+			}
+			return postUrl;
+		},
+
+		getHeaderCategories: function(){
+			var categories = [];
+			var hasCategories = false;
+			for( var i = 0, l = this.data.categories.length; i < l; i++ ){
+				if( hasCategories ){
+					categories.push(', ');
+				}
+				var category = this.data.categories[i];
+				var link;
+				switch(category.type){
+					case 0:
+						if( category.id == 2 ){
+							link = '/blogs/travel';
+							break;
+						}
+						link = '/blogs/categories/' + category.id;
+						break;
+					case 1:
+						link = '/blogs/travel/' + category.id;
+						break;
+					case 2:
+						category.title = D.blogs.l.get('important_updates');
+						link = '/applications/' + this.data.user.id + '/updates/?important';
+						break;
+					default:
+						continue;
+				}
+				categories.push(mkE({
+					tag: 'a',
+					className: 'ajax',
+					href: link,
+					text: category.title
+				}));
+				hasCategories = true;
+			}
+			return categories;
+		},
+
+		_hasCategory: function(cat){
+			for( var i = 0, l = this.data.categories.length; i < l; i++ ){
+				var category = this.data.categories[i];
+				if( category.id == cat ){
+					return true;
+				}
+			}
+			return false;
+		},
+
+		toggleFavorite: function(){
+			if( this.data.favorite ){
+				this.removeFavorite();
+			}else{
+				this.addFavorite()
+			}
+		},
+
+		addFavorite: function(){
+			if( this._mAddFavorite && this._mAddFavorite.processing ){
+				return;
+			}
+			this._mAddFavorite = new DR.blogs.AddFavorite();
+			this._mAddFavorite.id = this.data.id;
+			this._mAddFavorite.onLoad = this.onAddFavorite;
+			this._mAddFavorite.call();
+		},
+
+		onAddFavorite: function(){
+			if( !this._mAddFavorite.re || !this._mAddFavorite.re.ok ){
+				return;
+			}
+			this.data.favorite = true;
+			addClassName(this.favoriteNode, 'on');
+			this.favoriteNode.setAttribute('title', D.blogs.l.get('remove_from_favorites'));
+		},
+
+		removeFavorite: function(){
+			if( this._mRemoveFavorite && this._mRemoveFavorite.processing ){
+				return;
+			}
+			this._mRemoveFavorite = new DR.blogs.RemoveFavorite();
+			this._mRemoveFavorite.id = this.data.id;
+			this._mRemoveFavorite.onLoad = this.onRemoveFavorite;
+			this._mRemoveFavorite.call();
+		},
+
+		onRemoveFavorite: function(){
+			if( !this._mRemoveFavorite.re || !this._mRemoveFavorite.re.ok ){
+				return;
+			}
+			this.data.favorite = false;
+			removeClassName(this.favoriteNode, 'on');
+			this.favoriteNode.setAttribute('title', D.blogs.l.get('add_to_favorites'));
+		},
+
+		_optionsShow:function(){
+			if( this._optionsDropDown && this._optionsDropDown.isVisible() ){
+				this._optionsDropDown.remove();
+				this._optionsDropDown = null;
+				return;
+			}
+			this._optionsDropDown = new T.Options();
+			var opt;
+			opt = new T.Options.Item( {
+				caption: D.Lang.get('copy_shortlink')
+			} );
+			var copy = new ClipboardJS(opt.node, {
+				text: D.closure(this, function(){
+					return this.data.shortUrl
+				})
+			});
+			copy.on('success', D.closure(this, function() {
+				D.Confirm.success('Īsā saite nokopēta!', 2000);
+				this._optionsDropDown.toggle();
+			}));
+			this._optionsDropDown.addItem(opt);
+			if( this.data.canEdit || this.data.user.id == D.ID ){
+				if( this.data.canEditContent ){
+					opt = new T.Options.Item( {
+						caption: D.Lang.get('edit'),
+						onclick: this._edit
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+
+				opt = new T.Options.Item( {
+					caption: D.Lang.get('delete'),
+					onclick: this._delete
+				} );
+				this._optionsDropDown.addItem(opt);
+
+				opt = new T.Options.Item( {
+					caption: D.blogs.l.get('show_stats'),
+					onclick: this._stats
+				} );
+				this._optionsDropDown.addItem(opt);
+			}
+			if( D.ID != this.data.user.id ){
+				opt = new T.Options.Item( {
+					caption: D.blogs.l.get('send_police'),
+					onclick: this._sendPolice
+				} );
+				this._optionsDropDown.addItem(opt);
+				if( this.data.following ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('stop_following'),
+						onclick: this._unfollow
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+			}
+			if( D.ADMIN ) {
+				if( this.data.publish === DR.blogs.struct.Item.PUBLISH_PUBLISHED ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('Noraidīt rakstu'),
+						onclick: D.closure(this, function() {
+							D.onLoad('DR.insp.blogs', D.closure(this, function() {
+								var m = new DR.insp.blogs.Deny;
+								m.pid = this.data.id;
+								m.onLoad = D.closure(this, function() {
+									this.node.remove();
+								});
+								D.loadingOverlay(this.node);
+								m.call();
+							}));
+						})
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+				if( this.data.publish === DR.blogs.struct.Item.PUBLISH_REJECTED ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('Apstiprināt rakstu'),
+						onclick: D.closure(this, function() {
+							D.onLoad('DR.insp.blogs', D.closure(this, function() {
+								var m = new DR.insp.blogs.Approve;
+								m.pid = this.data.id;
+								m.onLoad = D.closure(this, function() {
+									this.node.remove();
+								});
+								D.loadingOverlay(this.node);
+								m.call();
+							}));
+						})
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+			}
+			this._optionsDropDown.append( this._headerRight );
+		},
+
+		_edit: function(){
+			if (!this.data.canEdit){
+				alert(D.blogs.l.get('edit_delete_later'));
+				return;
+			}
+			switch( this.data.user.type ){
+				case D.USER_TYPE_API:
+					Section.navigate('/applications/' + this.data.user.id + '/updates/post/' + this.data.id + '/edit');
+					break;
+				case D.USER_TYPE_BIZ:
+					Section.navigate(this.data.user.url + 'admin/news/?p=' + this.data.id + '&edit');
+					break;
+				case D.USER_TYPE_MUSIC:
+					Section.navigate(this.data.user.url + 'news/post/' + this.data.id + '/edit');
+					break;
+				default:
+					Section.navigate('/blogs/post/' + this.data.id + '/edit');
+					break;
+			}
+		},
+
+		_delete: function(){
+			if (!this.data.canEdit){
+				alert(D.blogs.l.get('edit_delete_later'));
+				return;
+			}
+			D.confirmDelete(this._doDelete, {
+				title: D.blogs.l.get('delete_confirm')
+			});
+		},
+
+		_doDelete: function(){
+			if( this._mDelete && this._mDelete.processing ){
+				return;
+			}
+			this._mDelete = new DR.blogs.Delete();
+			this._mDelete.uid = this.data.user.id;
+			this._mDelete.pid = this.data.id;
+			this._mDelete.onLoad = this._onDelete;
+			this._mDelete.call();
+		},
+
+		_onDelete: function(){
+			if( !this._mDelete || this._mDelete.error || !this._mDelete.re ){
+				return;
+			}
+			if( !this._mDelete.re.ok ){
+				return;
+			}
+			this.remove();
+		},
+
+		_unfollow: function(){
+			if( this._mUnfollow && this._mUnfollow.processing ){
+				return;
+			}
+			this._mUnfollow = new DR.blogs.UserUnfollow();
+			this._mUnfollow.uid = this.data.user.id;
+			this._mUnfollow.onLoad = this._onUnfollow;
+			this._mUnfollow.call();
+		},
+
+		_onUnfollow: function(){
+			if( this._mUnfollow.error ){
+				return;
+			}
+			this.data.following = false;
+			this._afterUnfollow();
+		},
+
+		_afterUnfollow: function(){
+			this.unfollowInfo = mkE({
+				tag: 'div',
+				className: 'unfollow-info',
+				els: [
+					{
+						tag: 'div',
+						text: D.blogs.l.get('unfollow_info')
+					},
+					{
+						tag: 'div',
+						els: [
+							{
+								tag: 'a',
+								text: D.Lang.get('cancel'),
+								onclick: this._cancelUnfollow
+							},
+							{
+								tag: 'strong',
+								text: ' · '
+							},
+							{
+								tag: 'a',
+								href: '/account/?tab=5&sub=3',
+								text: D.blogs.l.get('view_all_blocked')
+							}
+						]
+					}
+				]
+			}).replace(this.node);
+		},
+
+		_cancelUnfollow: function(){
+			this._mFollow = new DR.blogs.UserFollow();
+			this._mFollow.uid = this.data.user.id;
+			this._mFollow.notify = true;
+			this._mFollow.onLoad = this._onCancelUnfollow;
+			this._mFollow.call();
+		},
+
+		_onCancelUnfollow: function(){
+			if( this._mFollow.error ){
+				return;
+			}
+			this.data.following = true;
+			this.node.replace(this.unfollowInfo);
+		},
+
+		_stats: function(){
+			D.blogs.Stats.show( this.data.id );
+		},
+
+		_sendPolice: function(){
+			D.policeReport( this.data.user.id, 0, this.data.href );
+		},
+
+		_onScheduleText: function(value){
+			this._scheduleNode = mkE({
+				tag: 'span',
+				text: ' · ' + D.blogs.l.get('scheduled') + ' ' + value.date + ', ' + str_pad(value.hour, 2, 0, 'STR_PAD_LEFT') + ':' + str_pad(value.minute, 2, 0, 'STR_PAD_LEFT')
+			}).append(this._timeNode);
+		},
+
+		firstEmbedReplace: function(){
+			if( empty(this.data.firstEmbed) ){
+				return;
+			}
+			for( var link in this.data.firstEmbed ){
+				if( !this.data.firstEmbed.hasOwnProperty(link) ){
+					continue;
+				}
+				D.replaceWithNode(this._intro, D.RegExp(htmlspecialchars_decode(link), 'g'), this._embedReplace, {
+					ignoreLinks: true
+				});
+			}
+		},
+
+		_embedReplace: function(match){
+			if( !this.data.firstEmbed[htmlspecialchars(match[0])] ){
+				return match[0];
+			}
+			var embed = this.data.firstEmbed[htmlspecialchars(match[0])];
+			switch( embed.type ){
+				case 'youtube':
+				case 'vimeo':
+				case 'soundcloud':
+				case 'coub':
+				case 'slideshare':
+				case 'rutube':
+				case 'endomondo':
+				case 'vine':
+					this._firstEmbed = new D.blogs.FeedItem.Embed(embed);
+					this._firstEmbedLink = match[0];
+					return this._firstEmbed.node;
+			}
+			return match[0];
+		},
+
+		onBack: function(){
+			if( this._firstEmbed && this._firstEmbedLink ){
+				var node = document.createTextNode(this._firstEmbedLink);
+				D.insertBefore(node, this._firstEmbed.node);
+				removeNode(this._firstEmbed.node);
+				this.firstEmbedReplace();
+			}
+		}
+	}
+);
+
+/**
+ * @class
+ */
+D.blogs.FeedItem.Par = Class(
+	/**
+	 * @lends {D.blogs.FeedItem.Par}
+	 */
+	{
+		/** @type {string} */
+		clickStats:'',
+
+		/**
+		 * @param {string} v
+		 * @return {D.blogs.FeedItem.Par}
+		 */
+		setClickStats:function(v){
+			this.clickStats = v;
+			return this;
+		}
+	}
+);
+
+/**
+ * @class
+ * @param {DR.gallery.struct.Embed} data
+ */
+D.blogs.FeedItem.Embed = function (data) {
+	/**
+	 * @lends {D.blogs.FeedItem.Embed#}
+	 */
+	return {
+		__NAME: 'D.blogs.FeedItem.Embed',
+
+		/**
+		 * @param {DR.gallery.struct.Embed} data
+		 */
+		__construct: function (data) {
+			this.data = data;
+
+			var scaleWidth = 480 / this.data.w;
+			var scaleHeight = 270 / this.data.h;
+			var scale = Math.min(scaleWidth, scaleHeight, 1);
+
+			this.width = this.data.w * scale;
+			this.height = this.data.h * scale;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-feed-embed-placeholder',
+				style: {
+					backgroundImage: 'url(' + this.data.image.uber + ')',
+					width: this.width + 'px',
+					height: this.height + 'px'
+				},
+				onclick: this._showEmbed
+			});
+		},
+
+		_showEmbed: function(e){
+			e = D.event(e);
+			D.stopPropagation(e);
+			var embed = this.data;
+			var node;
+			switch( embed.type ){
+				case 'youtube':
+				case 'vimeo':
+				case 'soundcloud':
+				case 'coub':
+				case 'slideshare':
+				case 'rutube':
+				case 'endomondo':
+					var url = new Get(embed.src);
+					url.add('autoplay', 1);
+					url.add('autostart', 1);
+					node = mkE({
+						tag: 'iframe',
+						src: url.toUrl(),
+						style: {
+							width: this.width + 'px',
+							height: this.height + 'px'
+						},
+						attr:{
+							frameborder: '0',
+							allowFullScreen: '',
+							webkitAllowFullScreen: '',
+							mozallowfullscreen: ''
+						}
+					}).replace(this.node);
+					break;
+				case 'vine':
+					var url = new Get(embed.src);
+					url.add('autoplay', 1);
+					url.add('autostart', 1);
+					node = mkE({
+						tag: 'div',
+						style: {
+							width: this.width + 'px',
+							height: this.height + 'px'
+						},
+						els: [
+							{
+								tag:'iframe',
+								attr:{
+									frameborder: '0',
+									width:'100%',
+									height:'100%',
+									src:url,
+									allowFullScreen:'',
+									webkitAllowFullScreen:'',
+									mozallowfullscreen:''
+								}
+							},
+							{
+								tag: 'script',
+								attr: {
+									src: '//platform.vine.co/static/scripts/embed.js',
+									async: true
+								}
+							}
+						]
+					}).replace(this.node);
+			}
+			this.node = node;
+		}
+	};
+};
+Class(D.blogs.FeedItem.Embed);
+// --- feed_item.js --- 
+// +++ item.js +++ 
+/**
+ * @class
+ */
+D.blogs.Item = Class(
+	/**
+	 * @lends {D.blogs.Item#}
+	 */
+	{
+		/**
+		 *
+		 * @param {D.blogs.Item.Par} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.data = par.item;
+			this.id = this.data.id;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-item'
+			});
+			for( var k in par.item.categories ){
+				/** @type {DR.blogs.struct.Category} */
+				var cat = par.item.categories[k];
+				addClassName( this.node, 'blogs-item-cat-' + cat.id );
+			}
+			// ab test expire
+			if (in_array(D.ID % 10, [4,5,6])) {
+				addClassName(this.node, 'blogs-ab blogs-ab-' + D.ID % 10);
+			}
+			// expire
+			if( history.length > 1 ){
+				this._backButtonContainer = mkE({
+					tag: 'div',
+					className: 'backButtonContainer',
+					els: [
+						this._backButton = mkE({
+							tag: 'div',
+							className: 'backButton radius3 backSIcon SIcon',
+							onclick: this._onBackButtonClick
+						})
+					]
+				}).append(this.node);
+			}
+
+			this._drawHeader();
+			this._drawContent();
+			this._drawFooter();
+			this._drawComments();
+
+			if( !par.fromInfScroll ) {
+				if (par.fromPHP) {
+					$(window).on('scroll', this.onScroll);
+				}
+				setTimeout(this.onScroll, 100);
+			}
+		},
+
+		_drawHeader: function(){
+			this._header = mkE({
+				tag: 'div',
+				className: 'header'
+			}).append(this.node);
+
+			var userUrl = this.data.user.url;
+			switch(this.data.user.type){
+				case D.USER_TYPE_DEFAULT:
+					userUrl += 'blog';
+					break;
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					userUrl += 'news';
+					break;
+				case D.USER_TYPE_API:
+					userUrl = '/applications/' + this.data.user.id + '/updates';
+			}
+
+			mkE({
+				tag: 'a',
+				className: 'image',
+				href: userUrl,
+				els: [
+					{
+						tag: 'img',
+						src: this.data.user.image.small
+					}
+				]
+			}).append(this._header);
+
+			mkE({
+				tag: 'div',
+				className: 'info',
+				els: [
+					this._authorInfo = mkE({
+						tag: 'div',
+						els: [
+							{
+								tag: 'a',
+								className: 'user',
+								href: userUrl,
+								text: this.data.user.title
+							}
+						]
+					}),
+					this._timeNode = mkE({
+						tag: 'div',
+						className: 'time',
+						els: [
+							{
+								tag: 'span',
+								className: 'created',
+								text: D.ddate(this.data.ts)
+							},
+							this.data.readTime ? ' · ' + D.blogs.l.get('time_to_read') + ' ' + this.data.readTime + ' ' + D.blogs.l.get('min_to_read') : ''
+						]
+					})
+				]
+			}).append(this._header);
+
+			if( this.data.canEdit ){
+				switch(this.data.publish){
+					case DR.blogs.struct.Item.PUBLISH_REQUESTED:
+						mkE({
+							tag: 'span',
+							className: 'publish-info',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									text: D.blogs.l.get('waiting_approval')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_REJECTED:
+						mkE({
+							tag: 'span',
+							className: 'publish-info',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									className: 'colorDs',
+									text: D.blogs.l.get('publish_rejected')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_PUBLISHED:
+						mkE({
+							tag: 'span',
+							className: 'publish-info',
+							els: [
+								' · ',
+								{
+									tag: 'span',
+									className: 'colorOk',
+									text: D.blogs.l.get('published')
+								}
+							]
+						}).append(this._timeNode);
+						break;
+				}
+			}
+
+			if( !empty(this.data.categories) ) {
+				var headerCategories = this.getHeaderCategories();
+				if( !empty(headerCategories) ){
+					mkE({
+						tag: 'span',
+						els: [
+							' ' + D.blogs.l.get('in_category') + ' ',
+							{
+								tag: 'span',
+								className: 'categories',
+								els: headerCategories
+							}
+						]
+					}).append(this._authorInfo);
+				}
+			}
+
+			this._headerRight = mkE({
+				tag: 'div',
+				className: 'right'
+			}).append(this._header);
+
+			this.favoriteNode = mkE({
+				tag: 'a',
+				className: 'SIcon bookmarkSIcon' + (!this.data.favorite ? '' : ' on'),
+				onclick: this.toggleFavorite,
+				attr: {
+					title: this.data.favorite ? D.blogs.l.get('remove_from_favorites') : D.blogs.l.get('add_to_favorites')
+				}
+			}).append(this._headerRight);
+
+			mkE({
+				tag: 'a',
+				className: 'SIcon options2SIcon',
+				onclick: this._optionsShow
+			}).append(this._headerRight);
+			if( this.data.canEdit ){
+				if( (this.data.isDraft || this.data.permissions.value == 0) && this.data.canEdit ){
+					mkE({
+						tag: 'span',
+						className: 'draft-info',
+						els: [
+							' · ',
+							{
+								tag: 'span',
+								className: 'color1',
+								text: D.blogs.l.get('draft')
+							}
+						]
+					}).append(this._timeNode);
+				} else if( this.data.views ){
+					mkE( {
+						tag:'span',
+						className: 'views-info',
+						els:[
+							' · ',
+							{
+								tag:'a',
+								onclick:this._showStats,
+								els:[	this.data.views, ' ', D.Lang.nget( this.data.views, 'views' ) ]
+							}
+						]
+					} ).append(this._timeNode);
+				}
+			}
+
+			if( this.data.scheduled ){
+				this._onScheduleText({
+					date: this.data.scheduleDate,
+					hour: this.data.scheduleHour,
+					minute: this.data.scheduleMinute
+				});
+			}
+
+			if( this.data.is18plus ) {
+				mkE( {
+					tag:'span',
+					className:'badge',
+					text:'18+',
+					style:{
+						backgroundColor:'#F24D42',
+						margin: '0 5px'
+					}
+				} ).append( this._timeNode );
+			}
+
+			T.clear().append(this._header);
+		},
+
+		_drawContent: function(){
+			this._content = mkE({
+				tag: 'div',
+				className: 'content blog-content',
+				els: [
+					{
+						tag: 'div',
+						className: 'title',
+						text: this.data.title
+					},
+					this._text = mkE({
+						tag: 'div',
+						className: 'text postText clearfix',
+						innerHTML: nl2br(this.data.text)
+					})
+				]
+			}).append(this.node);
+
+			this.embedReplace(this._text);
+			this.imagesReplace(this._text);
+			D.smileyReplace(this._text);
+			D.linksReplace(this._text, {
+				click: D.closure(this, function(href){
+					if( D.ENV == 'INSP' ){
+						return href;
+					}
+					if( !this.data.sayItem ){
+						return href;
+					}
+					var get = new Get('/say/click.php');
+					get.add('url', href);
+					get.add('pid', this.data.sayItem.id);
+					get.add('uid', this.data.user.id);
+					return get.toUrl();
+				})
+			});
+			D.Say.hashTagReplace(this._text);
+			if( this.data.image ){
+				this.image = mkE({
+					tag: 'div',
+					className: 'main-image',
+					els: [
+						{
+							tag: 'img',
+							src: this.data.image.original
+						}
+					]
+				});
+				D.insertBefore(this.image, this._text);
+			}
+
+			if ( D.Ads && !D.Ads.outsideLV && !document.getElementById('adv366') ) {
+				var adNode = mkE({
+					tag: 'div',
+					id: 'adv366'
+				});
+				D.insertBefore( adNode, this._text);
+				D.Ads.place(366);
+			}
+
+			if( this.data.rssLink ){
+				mkE({
+					tag: 'a',
+					className: 'rssLink',
+					href: this.data.rssLink,
+					target: '_blank',
+					text: this.data.rssLink
+				}).append(this._content);
+			}
+		},
+
+		_drawFooter: function(){
+			if ( this.data.categories.length ) {
+				var category = this.data.categories[0];
+				if ( category.type == 2 ) { // speelju atjauninaajumi
+					new T.Form.Button({
+						className: 'buttonLargeFont',
+						stretch: true,
+						size: 'large',
+						caption: D.Lang.get('play'),
+						href: this.data.user.url + '?f=updatePlay',
+						color: 'submit',
+					}).append( this.node );
+				}
+			}
+
+			this._footer = mkE({
+				tag: 'div',
+				className: 'footer'
+			}).append(this.node);
+			this._optionsContainer = mkE({
+				tag: 'div',
+				className: 'options-container footer',
+				els: [
+					this._options = mkE({
+						tag: 'div',
+						className: 'options',
+						els: [
+							this._optionsLeftNode = mkE( {
+								tag: 'div',
+								className: 'left'
+							} ),
+							this._optionsRightNode = mkE( {
+								tag: 'div',
+								className: 'right'
+							} )
+						]
+					})
+				]
+			}).append(this.node);
+			if( this.data.canEdit ){
+				if( this.data.views ){
+					new T.Form.Button( {
+						caption: D.blogs.l.get('show_stats'),
+						onclick: this._stats,
+						color: 'link'
+					} ).append( this._optionsRightNode );
+				}
+				if( this.data.canEditContent ){
+					new T.Form.Button( {
+						caption: D.Lang.get('edit'),
+						onclick: this._edit
+					} ).append( this._optionsRightNode );
+				}
+			}
+
+			if( this.data.like ){
+				var p = new D.blogs.LikePar().fromLike(this.data.like);
+				this._like = new D.blogs.Like(p);
+				this._like.node.append(this._optionsLeftNode);
+			}
+			if( this.data.sayItem ){
+				var par = new D.blogs.RecommendPar().fromSayItem(this.data.sayItem);
+				this._recommend = new D.blogs.Recommend(par);
+				this._recommend.node.append(this._optionsLeftNode);
+			}
+			if( this.data.like && in_array(D.ID % 10, [4,5,6]) && this.data.like.count) {
+				var likeMore;
+				var likeABNode;
+				mkE({
+					tag: 'div',
+					id: 'likeBlock' + this.data.like.type + '_' + this.data.like.id,
+					els: [
+						{
+							tag: 'h3',
+							text: this.data.like.count + ' ' + D.Lang.nget(this.data.like.count, 'cilvekiem') + ' ' + D.Lang.nget(this.data.like.count, 'like it')
+						},
+						likeABNode = mkE({
+							tag: 'div'
+						})
+					]
+				}).append(this.node);
+				likeMore = mkE({
+					tag: 'a',
+					prop: {
+						href: 'javascript:',
+						onclick: D.closure(this, function () {
+							T.like.more(likeABNode, {type: this.data.like.type, id: this.data.like.id, pg: 1})
+						})
+					},
+					text: 'Vairāk'
+				}).append(likeABNode);
+				likeMore.click();
+			}
+		},
+
+		getHeaderCategories: function(){
+			var categories = [];
+			var hasCategories = false;
+			for( var i = 0, l = this.data.categories.length; i < l; i++ ){
+				if( hasCategories ){
+					categories.push(', ');
+				}
+				var category = this.data.categories[i];
+				var link;
+				switch(category.type){
+					case 0:
+						if( category.id == 2 ){
+							link = '/blogs/travel';
+							break;
+						}
+						link = '/blogs/categories/' + category.id;
+						break;
+					case 1:
+						link = '/blogs/travel/' + category.id;
+						break;
+					case 2:
+						category.title = D.blogs.l.get('important_updates');
+						link = '/applications/' + this.data.user.id + '/updates/?important';
+						break;
+					default:
+						continue;
+				}
+				categories.push(mkE({
+					tag: 'a',
+					className: 'ajax',
+					href: link,
+					text: category.title
+				}));
+				hasCategories = true;
+			}
+			return categories;
+		},
+
+		toggleFavorite: function(){
+			if( this.data.favorite ){
+				this.removeFavorite();
+			}else{
+				this.addFavorite()
+			}
+		},
+
+		addFavorite: function(){
+			if( this._mAddFavorite && this._mAddFavorite.processing ){
+				return;
+			}
+			this._mAddFavorite = new DR.blogs.AddFavorite();
+			this._mAddFavorite.id = this.data.id;
+			this._mAddFavorite.onLoad = this.onAddFavorite;
+			this._mAddFavorite.call();
+		},
+
+		onAddFavorite: function(){
+			if( !this._mAddFavorite.re || !this._mAddFavorite.re.ok ){
+				return;
+			}
+			this.data.favorite = true;
+			addClassName(this.favoriteNode, 'on');
+			this.favoriteNode.setAttribute('title', D.blogs.l.get('remove_from_favorites'));
+		},
+
+		removeFavorite: function(){
+			if( this._mRemoveFavorite && this._mRemoveFavorite.processing ){
+				return;
+			}
+			this._mRemoveFavorite = new DR.blogs.RemoveFavorite();
+			this._mRemoveFavorite.id = this.data.id;
+			this._mRemoveFavorite.onLoad = this.onRemoveFavorite;
+			this._mRemoveFavorite.call();
+		},
+
+		onRemoveFavorite: function(){
+			if( !this._mRemoveFavorite.re || !this._mRemoveFavorite.re.ok ){
+				return;
+			}
+			this.data.favorite = false;
+			removeClassName(this.favoriteNode, 'on');
+			this.favoriteNode.setAttribute('title', D.blogs.l.get('add_to_favorites'));
+		},
+
+		_showStats:function(){
+			D.blogs.Stats.show( this.data.id );
+		},
+
+		_optionsShow:function(){
+			if( this._optionsDropDown && this._optionsDropDown.isVisible() ){
+				this._optionsDropDown.remove();
+				this._optionsDropDown = null;
+				return;
+			}
+			this._optionsDropDown = new T.Options();
+			var opt;
+			opt = new T.Options.Item( {
+				caption: D.Lang.get('copy_shortlink')
+			} );
+			var copy = new ClipboardJS(opt.node, {
+				text: D.closure(this, function(){
+					return this.data.shortUrl
+				})
+			});
+			copy.on('success', D.closure(this, function() {
+				D.Confirm.success('Īsā saite nokopēta!', 2000);
+				this._optionsDropDown.toggle();
+			}));
+			this._optionsDropDown.addItem(opt);
+			if( this.data.canEdit || this.data.user.id == D.ID ){
+				if( this.data.canEditContent ){
+					opt = new T.Options.Item( {
+						caption: D.Lang.get('edit'),
+						onclick: this._edit
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+
+				opt = new T.Options.Item( {
+					caption: D.Lang.get('delete'),
+					onclick: this._delete
+				} );
+				this._optionsDropDown.addItem(opt);
+
+				opt = new T.Options.Item( {
+					caption: D.blogs.l.get('show_stats'),
+					onclick: this._stats
+				} );
+				this._optionsDropDown.addItem(opt);
+			}
+			if( D.ID != this.data.user.id ){
+				opt = new T.Options.Item( {
+					caption: D.blogs.l.get('send_police'),
+					onclick: this._sendPolice
+				} );
+				this._optionsDropDown.addItem(opt);
+				if( this.data.following ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('stop_following'),
+						onclick: this._unfollow
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+			}
+			if( D.ADMIN ) {
+				if( this.data.publish === DR.blogs.struct.Item.PUBLISH_PUBLISHED ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('Noraidīt rakstu'),
+						onclick: D.closure(this, function() {
+							D.onLoad('DR.insp.blogs', D.closure(this, function() {
+								var m = new DR.insp.blogs.Deny;
+								m.pid = this.data.id;
+								m.onLoad = D.closure(this, function() {
+									this.node.remove();
+								});
+								D.loadingOverlay(this.node);
+								m.call();
+							}));
+						})
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+				if( this.data.publish === DR.blogs.struct.Item.PUBLISH_REJECTED ){
+					opt = new T.Options.Item( {
+						caption: D.blogs.l.get('Apstiprināt rakstu'),
+						onclick: D.closure(this, function() {
+							D.onLoad('DR.insp.blogs', D.closure(this, function() {
+								var m = new DR.insp.blogs.Approve;
+								m.pid = this.data.id;
+								m.onLoad = D.closure(this, function() {
+									this.node.remove();
+								});
+								D.loadingOverlay(this.node);
+								m.call();
+							}));
+						})
+					} );
+					this._optionsDropDown.addItem(opt);
+				}
+			}
+			this._optionsDropDown.append( this._headerRight );
+		},
+
+		_edit: function(){
+			if (!this.data.canEdit){
+				alert(D.blogs.l.get('edit_delete_later'));
+				return;
+			}
+			switch( this.data.user.type ){
+				case D.USER_TYPE_API:
+					Section.navigate('/applications/' + this.data.user.id + '/updates/post/' + this.data.id + '/edit');
+					break;
+				case D.USER_TYPE_BIZ:
+					Section.navigate(this.data.user.url + 'admin/news/?p=' + this.data.id + '&edit');
+					break;
+				case D.USER_TYPE_MUSIC:
+					Section.navigate(this.data.user.url + 'news/post/' + this.data.id + '/edit');
+					break;
+				default:
+					Section.navigate('/blogs/post/' + this.data.id + '/edit');
+					break;
+			}
+		},
+
+		_delete: function(){
+			if (!this.data.canEdit){
+				alert(D.blogs.l.get('edit_delete_later'));
+				return;
+			}
+			D.confirmDelete(this._doDelete, {
+				title: D.blogs.l.get('delete_confirm')
+			});
+		},
+
+		_doDelete: function(){
+			if( this._mDelete && this._mDelete.processing ){
+				return;
+			}
+			this._mDelete = new DR.blogs.Delete();
+			this._mDelete.uid = this.data.user.id;
+			this._mDelete.pid = this.data.id;
+			this._mDelete.onLoad = this._onDelete;
+			this._mDelete.call();
+		},
+
+		_onDelete: function(){
+			if( !this._mDelete || this._mDelete.error || !this._mDelete.re ){
+				return;
+			}
+			if( !this._mDelete.re.ok ){
+				return;
+			}
+			switch( this.data.user.type ){
+				case D.USER_TYPE_DEFAULT:
+					Section.navigate('/blogs/my');
+					break;
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					Section.navigate(this.data.user.url + 'news');
+					break;
+				case D.USER_TYPE_API:
+					Section.navigate('/applications/' + this.data.user.id + '/updates');
+					break;
+				default:
+					Section.navigate('/blogs');
+					break;
+			}
+		},
+
+		_unfollow: function(){
+			if( this._mUnfollow && this._mUnfollow.processing ){
+				return;
+			}
+			this._mUnfollow = new DR.blogs.UserUnfollow();
+			this._mUnfollow.uid = this.data.user.id;
+			this._mUnfollow.onLoad = this._onUnfollow;
+			this._mUnfollow.call();
+		},
+
+		_onUnfollow: function(){
+			if( this._mUnfollow.error ){
+				return;
+			}
+			this.data.following = false;
+		},
+
+		_stats: function(){
+			D.blogs.Stats.show( this.data.id );
+		},
+
+		_sendPolice: function(){
+			D.policeReport( this.data.user.id, 0, this.data.href );
+		},
+
+		embedReplace: function(node){
+			if( empty(this.data.embeds) ){
+				return;
+			}
+			for( var link in this.data.embeds ){
+				if( !this.data.embeds.hasOwnProperty(link) ){
+					continue;
+				}
+				link = htmlspecialchars_decode(link);
+				D.replaceWithNode(node, D.RegExp(link, 'g'), this._embedReplace, {
+					ignoreLinks: true
+				});
+			}
+		},
+
+		_embedReplace: function(match){
+			match[0] = htmlspecialchars(match[0]);
+			if( !this.data.embeds[match[0]] ){
+				return match[0];
+			}
+			var embed = this.data.embeds[match[0]];
+			switch( embed.type ){
+				case 'youtube':
+				case 'vimeo':
+				case 'soundcloud':
+				case 'coub':
+				case 'slideshare':
+				case 'rutube':
+				case 'endomondo':
+					return mkE({
+						tag: 'iframe',
+						src: embed.src,
+						style: {
+							width: embed.w + 'px',
+							height: embed.h + 'px'
+						},
+						attr:{
+							frameborder: '0',
+							allowFullScreen: '',
+							webkitAllowFullScreen: '',
+							mozallowfullscreen: ''
+						}
+					});
+				case 'vine':
+					return mkE({
+						tag: 'div',
+						style: {
+							width: embed.w + 'px',
+							height: embed.h + 'px'
+						},
+						els: [
+							{
+								tag:'iframe',
+								attr:{
+									frameborder: '0',
+									width:'100%',
+									height:'100%',
+									src:embed.src,
+									allowFullScreen:'',
+									webkitAllowFullScreen:'',
+									mozallowfullscreen:''
+								}
+							},
+							{
+								tag: 'script',
+								attr: {
+									src: '//platform.vine.co/static/scripts/embed.js',
+									async: true
+								}
+							}
+						]
+					});
+				default:
+					return match[0];
+			}
+		},
+
+		imagesReplace: function(node){
+			this.postImages = [];
+			D.replaceCommentsWithNode(node, this._imagesReplace);
+		},
+
+		_imagesReplace: function(matches){
+			var data = trim(matches);
+			var images = [];
+			var id, img, image, description;
+			if( data.substr(0, 14) == 'teditorImages:' ){
+				data = D.JSON.decode(data.substr(14));
+				if( data.description ){
+					description = data.description;
+				}
+				for( var i = 0, l = data.images.length; i < l;  i++ ){
+					id = data.images[i];
+					if( !this.data.images[id] ){
+						continue;
+					}
+					img = this.data.images[id];
+					image = {
+						imageId: id,
+						id: img.id,
+						type: img.type,
+						w: img.w,
+						h: img.h,
+						image: {
+							large: img.large,
+							video: img.video
+						}
+					};
+					images.push(image);
+					this.postImages.push(image)
+				}
+			}else if( data.substr(0, 13) == 'teditorImage:' ){
+				data = D.JSON.decode(data.substr(13));
+				id = false;
+				switch( data.itype ){
+					case 'gallery':
+						id = 'gallery' + data.pid;
+						break;
+					case 'textarea':
+						id = 'textarea' + data.pid;
+						break;
+				}
+				if( !id ){
+					return;
+				}
+				if( !this.data.images[id] ){
+					return;
+				}
+				img = this.data.images[id];
+				image = {
+					imageId: id,
+					id: img.id,
+					type: img.type,
+					w: img.w,
+					h: img.h,
+					image: {
+						large: img.large,
+						video: img.video
+					}
+				};
+				images.push(image);
+				if( data.description ){
+					description = data.description;
+				}
+				this.postImages.push(image)
+			}else if( data.substr(0, 15) == 'teditorGallery:' ){
+				var pids = data.substr(15).split(',');
+				for( var j = 0, l2 = pids.length; j < l2; j++ ){
+					var pid = pids[j];
+					id = 'gallery' + pid;
+					if( !this.data.images[id] ){
+						continue;
+					}
+					img = this.data.images[id];
+					image = {
+						imageId: id,
+						id: img.id,
+						type: img.type,
+						w: img.w,
+						h: img.h,
+						image: {
+							large: img.large,
+							video: img.video
+						}
+					};
+					images.push(image);
+					this.postImages.push(image)
+				}
+			}
+			else if( data.substr(0, 13) == 'galleryPhoto:' ){
+				data = data.substr(13).split(',');
+				var pid = reset(data);
+				id = 'gallery' + pid;
+				if( this.data.images[id] ){
+					img = this.data.images[id];
+					image = {
+						imageId: id,
+						id: img.id,
+						type: img.type,
+						w: img.w,
+						h: img.h,
+						image: {
+							large: img.large,
+							video: img.video
+						}
+					};
+					images.push(image);
+					this.postImages.push(image)
+				}
+			}
+			if( empty(images) ){
+				return;
+			}
+			var collage = new D.blogs.Collage({
+				images: images,
+				onclick: this.openImagesModal
+			});
+			var c = mkE({
+				tag: 'div',
+				className: 'collageBlock',
+				els: [
+					collage.node
+				]
+			});
+			if( description ){
+				var descriptionNode = mkE({
+					tag: 'div',
+					className: 'description',
+					text: description
+				}).append(c)
+			}
+			if ( data.position && data.position == 'left' ){
+				addClassName(c, 'left');
+				var leftImg = reset(images);
+				var scaleWidth = 480 / leftImg.w;
+				var scaleHeight = 720 / leftImg.h;
+				var scale = Math.min(scaleWidth, scaleHeight);
+				if( descriptionNode ){
+					descriptionNode.style.maxWidth = scale < 1 ? scale * leftImg.w + 'px' : leftImg.w + 'px';
+				}
+			}
+			return c;
+		},
+
+		openImagesModal: function(image){
+			this._openImagesModal(image);
+		},
+
+		_openImagesModal: function(image){
+			var index = 0;
+			if( image ){
+				for( var i = 0, l = this.postImages.length; i < l; i++ ){
+					if( this.postImages[i].imageId == image.imageId ){
+						index = i;
+						break;
+					}
+				}
+			}
+			var gallery = new D.blogs.Item.Gallery({
+				images: this.postImages,
+				index: index
+			});
+			gallery.show();
+		},
+
+		_drawComments: function(){
+			if( this.data.isDraft ){
+				return;
+			}
+			if( this.data.disableComments ){
+				T.sep().append(this.node);
+				this._commentsNode = mkE({
+					tag: 'div',
+					className: 'comments'
+				}).append(this.node);
+				T.info(D.blogs.l.get('comments_disabled')).append(this._commentsNode);
+				return;
+			}
+			D.onLoad('Comments', this._onComments);
+		},
+
+		_onComments: function(){
+			//T.sep().append(this.node);
+			this._commentsNode = mkE({
+				tag: 'div',
+				className: 'comments'
+			}).append(this.node);
+			this._focusForm = D.addComment;
+			this._comments = new D.Comments({
+				type: 3,
+				id: this.data.id,
+				parent: this._commentsNode,
+				onInit: this._onCommentsInit,
+				blogComments: true
+			});
+		},
+
+		_onCommentsInit: function(){
+			if(this.par.fromInfScroll) {
+				return;
+			}
+			if( D.blogs.itemAction == 'comments' ){
+				D.scrollIntoView(this._commentsNode);
+			}else if( (D.blogs.itemAction == 'comment' || this._focusForm) && D.ID ){
+				this._comments._form.focus();
+			}
+		},
+
+		onScroll: function(){
+			if( !document.body.contains(this.node) ){
+				var chat = document.getElementById('chatContent');
+				if( chat ){
+					chat.style.display = '';
+				}
+				return;
+			}
+			if( this._optionsContainer ){
+				var pos = D.position(this._optionsContainer);
+				var scrollOffset = document.body.scrollTop || document.documentElement.scrollTop || 0;
+				var chat = document.getElementById('chatContent');
+				var abTest = !in_array(D.ID % 10, [4,5,6]) || this.data.canEdit;
+				if( abTest && pos.top - scrollOffset + 60 > window.innerHeight ){
+					addClassName(this._options, 'fixed');
+					if( chat ){
+						chat.style.display = 'none';
+					}
+				}else{
+					removeClassName(this._options, 'fixed');
+					if( chat ){
+						chat.style.display = '';
+					}
+				}
+			}
+			this.positionBack();
+		},
+
+		resetScroll: function () {
+			this.onLeave();
+			removeClassName(this._options, 'fixed');
+		},
+
+		onLeave:function(){
+			var chat = document.getElementById('chatContent');
+			if(chat){
+				chat.style.display = '';
+			}
+		},
+
+		positionBack: function(){
+			if( !this._backButtonContainer ){
+				return;
+			}
+			var pos = D.position(this._backButtonContainer);
+			var scrollOffset = document.body.scrollTop || document.documentElement.scrollTop || 0;
+			if( pos.top - scrollOffset - 20 - 45 <= 0 ){
+				addClassName(this._backButton, 'fixed');
+			}else{
+				removeClassName(this._backButton, 'fixed');
+			}
+		},
+
+		_onBackButtonClick: function(){
+			history.back();
+		},
+
+		_onScheduleText: function(value){
+			this._scheduleNode = mkE({
+				tag: 'span',
+				className: 'schedule-info',
+				text: ' · ' + D.blogs.l.get('scheduled') + ' ' + value.date + ', ' + str_pad(value.hour, 2, 0, 'STR_PAD_LEFT') + ':' + str_pad(value.minute, 2, 0, 'STR_PAD_LEFT')
+			}).append(this._timeNode);
+		},
+
+		_getPDFHTML: function(){
+			var node = this.node.cloneNode(false);
+			var title = this._header.cloneNode(true);
+			$('.right', title).remove();
+			$('.schedule-info', title).remove();
+			$('.publish-info', title).remove();
+			$('.views-info', title).remove();
+			$('.draft-info', title).remove();
+			$('.created', title).text(D.ddate(this.data.ts, {fullDate: true, showTime: true}));
+			$('a', title).each(function(){
+				var href = $(this).attr('href');
+				if( href[0] == '/' ){
+					href = D.URL + href.substr(1);
+					$(this).attr('href', href);
+				}
+			});
+			var text;
+			var content = mkE({
+				tag: 'div',
+				className: 'content blog-content',
+				els: [
+					{
+						tag: 'div',
+						className: 'title',
+						text: this.data.title
+					},
+					text = mkE({
+						tag: 'div',
+						className: 'text postText',
+						innerHTML: nl2br(this.data.text)
+					})
+				]
+			});
+
+			this.embedReplace(text);
+			this.imagesReplace(text);
+			D.smileyReplace(text);
+			D.linksReplace(text, {
+				noShorten: true,
+				click: function(href){
+					return href
+				}
+			});
+			if( this.data.image ){
+				var image = mkE({
+					tag: 'div',
+					className: 'main-image',
+					els: [
+						{
+							tag: 'img',
+							src: this.data.image.original
+						}
+					]
+				});
+				D.insertBefore(image, text);
+			}
+			node.appendChild(title);
+			node.appendChild(content);
+			var out = mkE({
+				tag: 'div',
+				els: [
+					node
+				]
+			});
+			return out.innerHTML;
+		}
+	}
+);
+
+D.blogs.Item.Par = Class(
+	/**
+	 * @lends {D.blogs.Item.Par#}
+	 */
+	{
+		/** @type {DR.blogs.struct.Item} */
+		item: null,
+		fromPHP: false,
+		fromInfScroll: false,
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Item} v
+		 * @returns {D.blogs.Item.Par}
+		 */
+		setItem: function(v){
+			this.item = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Boolean} v
+		 * @returns {D.blogs.Item.Par}
+		 */
+		setFromPHP: function(v){
+			this.fromPHP = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Boolean} v
+		 * @returns {D.blogs.Item.Par}
+		 */
+		setFromInfScroll: function(v){
+			this.fromInfScroll = v;
+			return this;
+		}
+	}
+);
+
+/**
+ * @class
+ * @param {Object} par
+ */
+D.blogs.Item.Gallery = function (par) {
+	/**
+	 * @lends {D.blogs.Item.Gallery#}
+	 */
+	return {
+		__NAME: 'D.blogs.Item.Gallery',
+
+		/**
+		 * @param {Object} par
+		 */
+		__construct: function (par) {
+			this.par = par;
+			this.current = par.index || 0;
+			this.images = par.images;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-item-gallery',
+				els: [
+					this.prevArrow = mkE({
+						tag: 'a',
+						className: 'prev',
+						els: [
+							{
+								tag: 'div'
+							}
+						],
+						onclick: this._prev
+					}),
+					this.content = mkE({
+						tag: 'div',
+						className: 'content'
+					}),
+					this.nextArrow = mkE({
+						tag: 'a',
+						className: 'next',
+						els: [
+							{
+								tag: 'div'
+							}
+						],
+						onclick: this._next
+					})
+				]
+			});
+			this._checkArrows();
+		},
+
+		show: function(){
+			InfoBox.els(this.node, {
+				stickTop: false
+			});
+			this._infoBox = InfoBox._i;
+			this._checkArrows();
+			this._draw();
+		},
+
+		_draw: function(){
+			clearNode(this.content);
+			var image = this.images[this.current];
+
+			var scaleWidth = (window.innerWidth - 50) / image.w;
+			var scaleHeight = (window.innerHeight - 70) / image.h;
+			var scale = Math.min(scaleWidth, scaleHeight, 1);
+
+			this._infoBox.width = image.w * scale;
+			this._infoBox.height = image.h * scale;
+
+			if( image.image.video ){
+				this._infoBox._resize();
+				if( image.image.video.substr(-3) == 'mp4' ){
+					var par = new D.VideoPlayerPar;
+					par.src = image.image.video;
+					par.poster = image.image.large;
+					par.width = image.image.w;
+					par.height = image.image.h;
+					par.autoplay = D.AUTOPLAY;
+					this.player = new D.VideoPlayer(par).append(this.content);
+				}else{
+					mkE({
+						tag: 'div',
+						id: 'blogsVideo' + image.imageId,
+						style: {
+							width: this._infoBox.width + 'px',
+							height: this._infoBox.height + 'px'
+						}
+					}).append(this.content);
+					var so = new SWFObject( D.PIMG + 'gallery/swf/v' + D.JS +  '/video_player_v3.swf', 'GalleryVideo111movie', '100%', '100%', 9, '#000000' );
+					so.addVariable( 'videoUrl', image.image.video );
+					so.addVariable( 'imageUrl' , image.image.large );
+					so.addParam( 'play', 'true' );
+					so.addParam( 'wmode', 'window' );
+					so.addParam( 'allowScriptAccess', 'always' );
+					so.addParam( 'allowfullscreen', 'true' );
+
+					so.write('blogsVideo' + image.imageId);
+				}
+			}else{
+				this.image = mkE({
+					tag: 'img',
+					src: this.images[this.current].image.large
+				}).append(this.content);
+				this.image.style.width = this._infoBox.width + 'px';
+				this.image.style.height = this._infoBox.height + 'px';
+				this._infoBox._resize();
+			}
+		},
+
+		_next: function(){
+			this.current++;
+			this._checkArrows();
+			this._draw();
+		},
+
+		_prev: function(){
+			this.current--;
+			this._checkArrows();
+			this._draw();
+		},
+
+		_checkArrows: function(){
+			this.prevArrow.style.display = this.current > 0 ? 'block' : 'none';
+			this.nextArrow.style.display = this.current < this.images.length - 1 ? 'block' : 'none';
+		}
+	};
+};
+Class(D.blogs.Item.Gallery);// --- item.js --- 
+// +++ form.js +++ 
+/**
+ * @class
+ */
+D.blogs.Form = Class(
+	/**
+	 * @lends {D.blogs.Form#}
+	 */
+	{
+		/**
+		 *
+		 * @param {D.blogs.Form.Par} par
+		 */
+		__construct: function(par){
+			CKEDITOR.disableAutoInline = true;
+			this.par = par;
+			this.item = this.par.item;
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-form',
+				els: [
+					this._header = mkE({
+						tag: 'div',
+						className: 'header'
+					}),
+					this._title = mkE({
+						tag: 'div',
+						className: 'title'
+					}),
+					this._image = mkE({
+						tag: 'div',
+						className: 'image'
+					}),
+					this._editor = mkE({
+						tag: 'div',
+						className: 'editor postText clearfix'
+					}),
+					this._categories = mkE({
+						tag: 'div',
+						className: 'categories'
+					}),
+					this._footer = mkE({
+						tag: 'div',
+						className: 'footer clearfix'
+					})
+				]
+			});
+
+			this._drawHeader();
+			this._drawTitle();
+			this._drawImage();
+			this._drawEditor();
+			this._drawCategories();
+			this._drawFooter();
+			if( !this.item || this.item.isDraft ){
+				this._setAutoSaveTimeout();
+			}
+		},
+
+		append: function(parent){
+			this.node.append(parent);
+		},
+
+		_drawHeader: function(){
+			mkE({
+				tag: 'a',
+				className: 'image',
+				href: this.par.user.url,
+				els: [
+					{
+						tag: 'img',
+						src: this.par.user.image.small
+					}
+				]
+			}).append(this._header);
+
+			mkE({
+				tag: 'div',
+				className: 'info',
+				els: [
+					{
+						tag: 'div',
+						className: 'user-link',
+						els: [
+							{
+								tag: 'a',
+								href: this.par.user.url,
+								text: this.par.user.title
+							}
+						]
+					},
+					this._postType = mkE({
+						tag: 'div',
+						className: 'post-type',
+						text: D.blogs.l.get('draft')
+					})
+				]
+			}).append(this._header);
+
+			if( this.item ){
+				clearNode(this._postType);
+				mkE({
+					tag: 'span',
+					text: D.ddate(this.item.ts)
+				}).append(this._postType);
+				if( this.item.isDraft ){
+					mkE({
+						tag: 'span',
+						text: ' · ' + D.blogs.l.get('draft')
+					}).append(this._postType);
+				}
+				switch( this.item.publish ){
+					case DR.blogs.struct.Item.PUBLISH_REQUESTED:
+						mkE({
+							tag: 'span',
+							text: ' · '
+						}).append(this._postType);
+						mkE({
+							tag: 'span',
+							className: 'publish-waiting',
+							text: D.blogs.l.get('waiting_approval')
+						}).append(this._postType);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_REJECTED:
+						mkE({
+							tag: 'span',
+							text: ' · '
+						}).append(this._postType);
+						mkE({
+							tag: 'span',
+							className: 'publish-rejected',
+							text: D.blogs.l.get('publish_rejected')
+						}).append(this._postType);
+						break;
+					case DR.blogs.struct.Item.PUBLISH_PUBLISHED:
+						mkE({
+							tag: 'span',
+							text: ' · '
+						}).append(this._postType);
+						mkE({
+							tag: 'span',
+							className: 'publish-published',
+							text: D.blogs.l.get('published')
+						}).append(this._postType);
+						break;
+				}
+
+				if( this.item.scheduled ){
+					this._onScheduleText({
+						date: this.item.scheduleDate,
+						hour: this.item.scheduleHour,
+						minute: this.item.scheduleMinute
+					});
+				}
+			}
+		},
+
+		_drawTitle: function(){
+			this.title = new D.blogs.Form.TitleInput();
+			this.title.node.append(this._title);
+
+			if( this.item ){
+				this.title.value(this.item.title);
+			}
+		},
+
+		_drawImage: function(){
+			D.onLoad(['Upload', 'FabricJS', 'Farbtastic', 'Cropper', 'GalleryApi'], this._onDrawImageLibs);
+		},
+
+		_onDrawImageLibs: function(){
+			this.image = new D.blogs.Form.Image({
+				uid: this.par.user.id
+			});
+			this.image.node.append(this._image);
+
+			if( this.item && this.item.image ){
+				this.image.setImage({
+					type: 'posts',
+					id: this.item.id,
+					url: this.item.image.original
+				})
+			}
+		},
+
+		_drawEditor: function(){
+			D.onLoad('TEditor', this._onEditor);
+		},
+
+		_onEditor: function(){
+			this._editorWrapper = mkE({
+				tag: 'div',
+				className: 'teditorWrapper',
+				els: [
+					this._editorContent = mkE({
+						tag: 'div',
+						id: 'teditorCont',
+						className: 'postText clearfix'
+					}),
+					this._editorToolbar = mkE({
+						tag: 'div',
+						className: 'teditorToolbarCont',
+						els: [
+							{
+								tag: 'div',
+								className: 'shadow'
+							},
+							{
+								tag: 'div',
+								id: 'teditorToolbar'
+							}
+						]
+					})
+				]
+			}).append(this._editor);
+			var data = this.item ? D.JSON.decode(this.item.blocksData) : (this.par.value ? [{type: 'text', data: this.par.value.replace('&nbsp;', ' ')}] : '');
+			this._tEditor = new D.TEditor({
+				container: this._editorContent,
+				toolbarContainerID: 'teditorToolbar',
+				placeholderText: this.par.user.type == D.USER_TYPE_DEFAULT ? D.blogs.l.get('editor_placeholder') : D.blogs.l.get('editor_placeholder_other'),
+				minHeight: 64,
+				maxDataLength: 170000,
+				fixedBottom: true,
+				uid: this.par.user.id,
+				customConfig: {
+					enterMode: CKEDITOR.ENTER_P,
+					toolbar: [
+						[ 'Bold', 'Italic', 'Link', 'Unlink' ],
+						[ 'H1', 'H2', 'Blockquote' ],
+						[ 'BulletedList', 'NumberedList', 'HorizontalRule' ],
+						[ 'DAddImages', 'Dsmiley' ]
+					],
+					removePlugins: 'liststyle',
+					extraPlugins: 'dmentions',
+					extraAllowedContent: 'span[!uid,contenteditable,id](!user)'
+				},
+				data: data
+			});
+		},
+
+		_drawCategories: function(){
+			var postCategories = [];
+			if( this.item ){
+				for( var i = 0, l = this.item.categories.length; i < l; i++ ){
+					postCategories.push(this.item.categories[i].id);
+				}
+			}
+			this.categories = new D.blogs.Form.Categories({
+				categories: this.par.categories,
+				countries: this.par.travelCountries,
+				canPublish: this.canPublish,
+				postCategories: postCategories,
+				onToggle: this._onCategoriesToggle
+			});
+			this.categories.node.append(this._categories);
+
+			if( this.par.user.type != D.USER_TYPE_DEFAULT && this.par.user.type != D.USER_TYPE_BIZ ){
+				this._categories.remove();
+			}
+		},
+
+		_onCategoriesToggle: function(){
+			if( this.categories.categorySwitch.value() ){
+				this._permissionsButton._perm.value(D.PERM_ALL);
+				this._permissionsButton.onPermChange();
+				this._permissionsButton.node.style.display = 'none';
+			}else{
+				this._permissionsButton.node.style.display = 'inline-block';
+			}
+		},
+
+		_drawFooter: function(){
+			clearNode(this._footer);
+			this._footerLeft = mkE({
+				tag: 'div',
+				className: 'left',
+				els: [
+					this.noComments = new T.Form.CheckBox({
+						caption: D.blogs.l.get('disallow_comments'),
+						checked: this.item && this.item.disableComments
+					}),
+					this.is18plus = D.me.age < 18 ? false : new T.Form.CheckBox({
+						caption: '18+',
+						checked: this.item && this.item.is18plus,
+						style: "margin-left: 15px;"
+					})
+				]
+			}).append(this._footer);
+
+			this._footerRight = mkE({
+				tag: 'div',
+				className: 'right'
+			}).append(this._footer);
+
+			switch(this.par.user.type){
+				case D.USER_TYPE_BIZ:
+					this._drawBizFeeds();
+					break;
+				case D.USER_TYPE_API:
+					this._drawImportantUpdate();
+					break;
+				case D.USER_TYPE_MUSIC:
+					this._drawPublicMusic();
+					break;
+			}
+
+			if( this.item ){
+				new T.Form.Button({
+					caption: D.Lang.get('delete'),
+					color: 'link',
+					className: 'deleteButton',
+					onclick: this._delete
+				}).append(this._footerRight);
+
+				if( this.item && this.item.scheduled ){
+					var value = {};
+					value = {
+						date: this.item.scheduleDate,
+						hour: this.item.scheduleHour,
+						minute: this.item.scheduleMinute
+					}
+					this._scheduler = new D.blogs.Form.Scheduler({
+						onSave: this._onSchedule,
+						value: value
+					});
+				}
+			}
+			this._permissionsButton = new T.Form.DropDownButton({
+				color: 'link',
+				caption: 'DropDown',
+				perms: {
+					value: this.item ? (this.item.user.type == D.USER_TYPE_DEFAULT ? this.item.permissions.value : D.PERM_ALL) : D.PERM_ALL,
+					onChange: this._onPermChange,
+					biz: this.item ? (this.item.user.type != D.USER_TYPE_DEFAULT) : (this.par.user.type != D.USER_TYPE_DEFAULT)
+				},
+				dropDownTop: true
+			}).append(this._footerRight);
+			if( this.item && !empty(this.item.categories) ){
+				this._permissionsButton.node.style.display = 'none';
+			}
+			if( this.par.user.type != D.USER_TYPE_DEFAULT && this.par.user.type != D.USER_TYPE_BIZ ){
+				this._permissionsButton.node.style.display = 'none';
+			}
+			if( this.item && !this.item.isDraft && !this.item.scheduled ){
+				this._submitButton = new T.Form.Button({
+					caption: D.Lang.get('Save'),
+					onclick: this._save
+				}).append(this._footerRight);
+			}else{
+				this._drawSubmitButton();
+			}
+		},
+
+		_drawSubmitButton: function(){
+			var options = [
+				{
+					caption: this._scheduler ? D.Lang.get('Save') : D.blogs.l.get('publish'),
+					value: 'publish',
+					onclick: this._save
+				}
+			];
+			if( this.par.user.type == D.USER_TYPE_BIZ || this.par.user.type == D.USER_TYPE_API ){
+				options.push({
+					caption: D.blogs.l.get('schedule'),
+					value: 'schedule',
+					onclick: this._schedule
+				});
+			}
+			if( !this._scheduler && (!this.item || !this.item.scheduled || this.item.isDraft) ){
+				options.push({
+					caption: D.blogs.l.get('save_draft'),
+					value: 'draft',
+					onclick: this._saveDraft
+				});
+			}
+			var submitButton = new T.Form.SwitchButton({
+				color: 'submit',
+				options: options,
+				defaultValue: 'publish'
+			});
+			if( this._submitButton ){
+				submitButton.replace(this._submitButton.node);
+			}else{
+				submitButton.append(this._footerRight);
+			}
+			this._submitButton = submitButton;
+		},
+
+		_delete: function(){
+			if (!this.item.canEdit){
+				alert(D.blogs.l.get('edit_delete_later'));
+				return;
+			}
+			D.confirmDelete(this._doDelete, {
+				title: D.blogs.l.get('delete_confirm')
+			});
+		},
+
+		_doDelete: function(){
+			if( this._mDelete && this._mDelete.processing ){
+				return;
+			}
+			this._mDelete = new DR.blogs.Delete();
+			this._mDelete.uid = this.item.user.id;
+			this._mDelete.pid = this.item.id;
+			this._mDelete.onLoad = this._onDelete;
+			this._mDelete.call();
+		},
+
+		_onDelete: function(){
+			if( !this._mDelete || this._mDelete.error || !this._mDelete.re ){
+				return;
+			}
+			if( !this._mDelete.re.ok ){
+				return;
+			}
+			switch( this.item.user.type ){
+				case D.USER_TYPE_DEFAULT:
+					Section.navigate('/blogs/my');
+					break;
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					Section.navigate(this.item.user.url + 'news');
+					break;
+				case D.USER_TYPE_API:
+					Section.navigate('/applications/' + this.item.user.id + '/updates');
+					break;
+				default:
+					Section.navigate('/blogs');
+					break;
+			}
+		},
+
+		_drawBizFeeds: function(){
+			if( empty(this.par.bizFeeds) ){
+				return;
+			}
+			var i, l;
+			var value = 0;
+			var feeds = [];
+			feeds.push({
+				value: 0,
+				caption: D.blogs.l.get('news')
+			});
+			for( i = 0, l = this.par.bizFeeds.length; i < l; i++ ){
+				var feed = this.par.bizFeeds[i];
+				feeds.push({
+					value: feed.id,
+					caption: feed.title
+				});
+			}
+			if( this.item ){
+				for( i = 0, l = this.item.categories.length; i < l; i++ ){
+					var category = this.item.categories[i];
+					if( category.id > 10000 ){
+						value = category.id;
+						break
+					}
+				}
+			}
+			this._bizFeedSelect = new T.Form.Select({
+				options: feeds,
+				value: value,
+				size: 'small'
+			}).append(this._footerRight);
+		},
+
+		_drawImportantUpdate: function(){
+			var checked = false;
+			if( this.item ){
+				for( var i = 0, l = this.item.categories.length; i < l; i++ ){
+					var category = this.item.categories[i];
+					if( category.id == 2001 ){
+						checked = true;
+						break
+					}
+				}
+			}
+			this._importantUpdate = new T.Form.CheckBox({
+				caption: D.blogs.l.get('important_update'),
+				value: 2001,
+				checked: checked,
+				title: D.blogs.l.get('important_update_descr')
+			}).append(this._footerLeft);
+		},
+
+		_drawPublicMusic: function(){
+			var checked = false;
+			if( this.item ){
+				for( var i = 0, l = this.item.categories.length; i > l; i++ ){
+					var category = this.item.categories[i];
+					if( category.id == 3001 ){
+						checked = true;
+						break
+					}
+				}
+			}
+			var info = T.info(D.blogs.l.get('publish_music_rules'));
+			D.insertBefore(info, this._footer);
+			this._publishMusic = new T.Form.CheckBox({
+				caption: D.blogs.l.get('publish_music'),
+				value: 3001,
+				checked: checked
+			}).append(this._footerLeft);
+		},
+
+		_save: function(draft, autosave){
+			if( this._mSave && this._mSave.processing ){
+				return;
+			}
+			var title = this.title.value();
+			var tEditorData = this._tEditor.getData();
+			var text = D.JSON.encode(tEditorData);
+			if( (empty(title) && !autosave) || empty(text) || this.isEmptyTEditor(tEditorData) ){
+				if( autosave ){
+					return;
+				}
+				alert(D.blogs.l.get('empty_title_or_text'));
+				return;
+			}
+			if( !autosave && this.categories && this.categories.categorySwitch.value() && empty(this.categories.getCategories()) ){
+				alert(D.blogs.l.get('need_1_cat'));
+				return;
+			}
+			if( !autosave ){
+				D.loadingOverlay(this.node);
+			}
+			this._mSave = new DR.blogs.Save();
+			if( this.draftId ){
+				this._mSave.id = this.draftId;
+			}
+			if( this.item ){
+				this._mSave.id = this.item.id;
+			}
+			this._mSave.title = title;
+			this._mSave.text = text;
+			this._mSave.uid = this.par.user.id;
+			var perm = new DR.base.struct.Permissions;
+			perm.value = this._permissionsButton.getPermissions();
+			this._mSave.permissions = perm;
+			if( this.categories && this.categories.categorySwitch.value() ){
+				var categories = this.categories.getCategories();
+				if( !empty(categories) ){
+					this._mSave.categories = categories;
+					this._mSave.countries = this.categories.getCountries();
+					this._mSave.publish = this.categories.categorySwitch.value();
+				}
+			}
+			this._mSave.disableComments = this.noComments.value();
+			this._mSave.is18plus = this.is18plus ? this.is18plus.value() : null;
+			this._mSave.draft = draft === true;
+			if( this.image && this.image.image ){
+				this._mSave.imageType = this.image.image.type;
+				this._mSave.imageId = this.image.image.id;
+			}
+			switch(this.par.user.type){
+				case D.USER_TYPE_BIZ:
+					if( this._bizFeedSelect ){
+						this._mSave.bizFeed = this._bizFeedSelect.value();
+					}
+					if( this._scheduler ){
+						var schedule = this._scheduler.value();
+						this._mSave.scheduleDate = schedule.date;
+						this._mSave.scheduleHour = schedule.hour;
+						this._mSave.scheduleMinute = schedule.minute;
+					}
+					break;
+				case D.USER_TYPE_API:
+					this._mSave.importantUpdate = this._importantUpdate.value();
+					if( this._scheduler ){
+						var schedule = this._scheduler.value();
+						this._mSave.scheduleDate = schedule.date;
+						this._mSave.scheduleHour = schedule.hour;
+						this._mSave.scheduleMinute = schedule.minute;
+					}
+					break;
+				case D.USER_TYPE_MUSIC:
+					this._mSave.publicMusic = this._publishMusic.value();
+					break;
+			}
+			this._mSave.onLoad = this._onSave;
+			if( autosave === true ){
+				this._mSave.onLoad = this._onAutoSave;
+			}
+			this._mSave.call();
+		},
+
+		_saveDraft: function(){
+			this._save(true);
+		},
+
+		_onSave: function(){
+			var re = this._mSave.re;
+			if( !re || re.error ){
+				alert(D.blogs.l.get('could_not_save'));
+				return;
+			}
+			var seo = D.blogs.seoUrl(this.title.value());
+			var postUrl = '/blogs/post/' + seo + '_' + re.id;
+			switch(this.par.user.type){
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					postUrl = this.par.user.url + 'news/post/' + seo + '_' + re.id;
+					break;
+				case D.USER_TYPE_API:
+					postUrl = '/applications/' + this.par.user.id + '/updates/post/' + seo + '_' + re.id;
+			}
+			Section.navigate(postUrl);
+		},
+
+		_onAutoSave: function(){
+			var re = this._mSave.re;
+			if( !re || re.error ){
+				return;
+			}
+			this.draftId = re.id;
+			if(this.image && this.image.image ){
+				this.image.image.type = 'posts';
+				this.image.image.id = re.id;
+			}
+			this._setAutoSaveTimeout();
+		},
+
+		isEmptyTEditor: function(blocks){
+			if( empty(blocks) ){
+				return true;
+			}
+			var hasText = false;
+			for( var i = 0, l = blocks.length; i < l; i++ ){
+				var block = blocks[i];
+				if( block.type != 'text' ){
+					continue;
+				}
+				if( !empty(block.data) ){
+					hasText = true;
+					break;
+				}
+			}
+			return !hasText;
+
+		},
+
+		_onPermChange: function(){
+			var perms = this._permissionsButton.getPermissions();
+			if( perms != D.PERM_ALL && perms != D.PERM_REG ){
+				this.categories.disable(true);
+			}else{
+				if( !empty(this.categories._selectedCategories) ){
+					this.categories.disable(false);
+				}
+			}
+		},
+
+		canPublish: function(){
+			var perms = this._permissionsButton.getPermissions();
+			return perms == D.PERM_ALL || perms == D.PERM_REG
+		},
+
+		perms: function(){
+			return this._permissionsButton.getPermissions();
+		},
+
+		_setAutoSaveTimeout: function(){
+			if( this._autoSaveTimeout ){
+				clearTimeout(this._autoSaveTimeout);
+			}
+			this._autoSaveTimeout = setTimeout(this._doAutoSave, 15000);
+		},
+
+		onLeave: function(){
+			if( this._autoSaveTimeout ){
+				clearTimeout(this._autoSaveTimeout);
+			}
+		},
+
+		_doAutoSave: function(){
+			var data = this._tEditor.getData();
+			if( data.length == 1 ){
+				var block = reset(data);
+				if( block.type == 'text' && empty(block.data) ){
+					this._setAutoSaveTimeout();
+					return;
+				}
+			}
+			this._save(true, true);
+		},
+
+		_schedule: function(){
+			if( this._scheduler ){
+				this._scheduler.show();
+				return;
+			}
+			var value = {};
+			if( this.item && this.item.scheduled ){
+				value = {
+					date: this.item.scheduleDate,
+					hour: this.item.scheduleHour,
+					minute: this.item.scheduleMinute
+				}
+			}
+			this._scheduler = new D.blogs.Form.Scheduler({
+				onSave: this._onSchedule,
+				value: value
+			});
+			this._scheduler.show();
+		},
+
+		_onSchedule: function(deleted){
+			if( this._scheduleNode ){
+				this._scheduleNode.remove();
+			}
+			if( deleted === true ){
+				this._scheduler = null;
+				this._drawSubmitButton();
+				return;
+			}
+			var value = this._scheduler.value();
+			this._onScheduleText(value);
+			this._drawSubmitButton();
+		},
+
+		_onScheduleText: function(value){
+			this._scheduleNode = mkE({
+				tag: 'span',
+				text: ' · ' + D.blogs.l.get('scheduled') + ' ' + value.date + ', ' + str_pad(value.hour, 2, 0, 'STR_PAD_LEFT') + ':' + str_pad(value.minute, 2, 0, 'STR_PAD_LEFT')
+			}).append(this._postType);
+		}
+	}
+);
+
+D.blogs.Form.Par = Class(
+	/**
+	 * @lends {D.blogs.Form.Par#}
+	 */
+	{
+		item: null,
+		travelCountries: null,
+		categories: null,
+		user: null,
+		bizFeeds: null,
+		value: null,
+
+		/**
+		 *
+		 * @param {DR.blogs.struct.Item} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setItem: function(v){
+			this.item = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {DR.users.struct.User} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setUser: function(v){
+			this.user = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Array.<DR.blogs.struct.Category>} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setCategories: function(v){
+			this.categories = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Array.<DR.blogs.struct.TravelCountry>} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setTravelCountries: function(v){
+			this.travelCountries = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {Array.<DR.blogs.struct.BizFeed>} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setBizFeeds: function(v){
+			this.bizFeeds = v;
+			return this;
+		},
+
+		/**
+		 *
+		 * @param {String} v
+		 * @returns {D.blogs.Form.Par}
+		 */
+		setValue: function(v){
+			this.value = v;
+			return this;
+		}
+	}
+);
+
+D.blogs.Form.TitleInput = Class(
+	/**
+	 * @lends {D.blogs.Form.TitleInput#}
+	 */
+	{
+		__construct: function(){
+			this.node = mkE({
+				tag: 'div',
+				els: [
+					this._textarea = mkE({
+						tag: 'textarea',
+						attr: {
+							placeholder: D.blogs.l.get('title_placeholder'),
+							rows: 1,
+							maxlength: 100
+						},
+						prop: {
+							onkeyup: this._onkeyup,
+							onkeydown: this._onkeydown,
+							oninput: this._onkeyup
+						}
+					})
+				]
+			});
+			setTimeout(this._resize, 50);
+		},
+
+		value: function(v){
+			if( isset(v) ){
+				this._textarea.value = v;
+				return v;
+			}
+			return this._textarea.value;
+		},
+
+		_onkeyup: function(){
+			this._resize();
+		},
+
+		_onkeydown: function(e){
+			e = D.event(e);
+			if( e.keyCode == 13 ){
+				D.stopPropagation(e);
+				return false;
+			}
+		},
+
+		_resize: function(){
+			this._textarea.style.height = '';
+			this._textarea.style.height = this._textarea.scrollHeight + 'px';
+		}
+	}
+);
+
+D.blogs.Form.Image = Class(
+	/**
+	 * @lends {D.blogs.Form.Image#}
+	 */
+	{
+		/**
+		 *
+		 * @param {{uid: Number}} par
+		 * @constructor
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.node = mkE({
+				tag: 'div'
+			});
+
+			this._drawPlaceholder();
+		},
+
+		_drawPlaceholder: function(){
+			clearNode(this.node);
+			this._placeholder = mkE({
+				tag: 'div',
+				className: 'placeholder',
+				els: [
+					{
+						tag: 'div',
+						className: 'placeholder-text',
+						els: [
+							{
+								tag: 'span',
+								className: 'SIcon addContSIcon',
+								text: D.blogs.l.get('add_main_image')
+							}
+						]
+					}
+				],
+				onclick: this._showPopup
+			}).append(this.node);
+		},
+
+		_showPopup: function(){
+			this._modal = new D.Modal({
+				width: 550
+			});
+			this._modal.html();
+			this._popup = mkE({
+				tag: 'div',
+				className: 'blogs-image-popup',
+				els: [
+					this._uploadContainer = mkE({
+						tag: 'div',
+						className: 'upload',
+						els: [
+							this._uploadButton = new T.Form.Button({
+								caption: D.Lang.get( 'upload_from_pc', 'xPosts' ),
+								size: 'large',
+								stretch: true,
+								color: 'link',
+								type:'html'
+							})
+						]
+					}),
+					T.hrText( D.Lang.get( 'or_choose_from_gallery', 'xPosts' ) ),
+					this._galleryApiContainer = mkE({
+						tag: 'div',
+						className: 'gallery'
+					})
+				]
+			});
+
+			this._galleryApi = new D.GalleryApi({
+				withSelected: false,
+				albumsPerPg: 10,
+				picsPerPg: 20,
+				uid: this.par.uid,
+				maxLength: 1,
+				type: 'PIC',
+				showPreview: false,
+				onclick: this._onSelectPicture
+			});
+			this._galleryApi.append(this._galleryApiContainer);
+
+			this._popup.append(this._modal.content);
+
+			this._initUploader();
+		},
+
+		_initUploader: function(){
+			var p = new D.UploaderPar;
+			p.limit = 1;
+			p.onSelect = this._onSelect;
+			p.log = false;
+			p.onGetUploadData = this._onGetUploadData;
+			p.onUploadCompleteData = this._onUploadData;
+			p.dropNode = this._popup;
+			/** @type {D.NativeUploader} */
+			this._uploader = new Uploader( D.closureObject( this, p ) );
+			this._uploader.append( this._uploadButton );
+		},
+
+		_onSelect: function(par){
+			var ext = last( par.name.split('.') );
+			ext = ext.toLowerCase();
+			if( !in_array(ext, D.PIC_EXT) ){
+				return false;
+			}
+			D.loadingOverlay(this._popup);
+		},
+
+		_onGetUploadData: function(){
+			return {
+				url: D.UPL + 'pic/upload.php',
+				data: {
+					type: 49,
+					id: 'tmp'
+				}
+			};
+		},
+
+		_onUploadData: function(par){
+			var data = D.JSON.decode(par.data);
+			if( data.error ){
+				if ( D.LV && data.errorNr == 4 || data.errorNr == 5 ) {
+					alert( data.error );
+				} else {
+					alert( D.Lang.get( 'pic upload error' + data.errorNr ) );
+				}
+				// alert(D.blogs.l.get('image_upload_size'));
+				D.removeLoadingOverlay(this._popup);
+				return;
+			}
+			this._modal.close();
+			var whatToDo = this._whatToDo(data.width, data.height);
+			var w = 800;
+			var h = 533;
+			switch( whatToDo ){
+				case 1:
+					break;
+				case 2:
+					h = 450;
+					break;
+				case 3:
+					this.setImage({
+						type: 'tmp',
+						id: data.id,
+						url: data.url
+					});
+					return;
+			}
+			this._crop(data.url, w, h);
+		},
+
+		_onSelectPicture: function(a, obj){
+			this._modal.close();
+			var whatToDo = this._whatToDo(obj.w, obj.h);
+			var w = 800;
+			var h = 533;
+			switch( whatToDo ){
+				case 1:
+					break;
+				case 2:
+					h = 450;
+					break;
+				case 3:
+					this.setImage({
+						type: 'gallery',
+						id: obj.pid,
+						url: obj.url
+					});
+					return;
+			}
+			this._crop(obj.url, w, h);
+		},
+
+		_whatToDo: function(w, h){
+			var ratio = 800 / w;
+			var newHeight = h * ratio;
+			if( newHeight > 533 ){
+				return 1;
+			}else if( newHeight < 450 ){
+				return 2;
+			}
+			return 3;
+		},
+
+		_crop: function(url, w, h){
+			var imgCropper = new D.Cropper({
+				cropWidth: w,
+				cropHeight: h,
+				uploadTo: {
+					url: D.UPL + 'pic/upload.php',
+					data: {
+						id: 'tmp',
+						type: 49
+					},
+					callback: this._onUpload,
+					DS: D.DS || ''
+				},
+				margin: 360,
+				crossOrigin: true,
+				ignoreMinSize: true
+			});
+			imgCropper.initFromUrl({
+				url: url
+			});
+		},
+
+		_onUpload: function(par){
+			var data = D.JSON.decode(par.data);
+			if( data.error ){
+				return;
+			}
+			this.setImage({
+				type: 'tmp',
+				id: data.id,
+				url: data.url
+			});
+		},
+
+		setImage: function(data){
+			this.image = data;
+			if( this.image ){
+				this._drawImage();
+			}else{
+				this._drawPlaceholder();
+			}
+		},
+
+		_drawImage: function(){
+			clearNode(this.node);
+			mkE({
+				tag: 'img',
+				src: this.image.url
+			}).append(this.node);
+			mkE({
+				tag: 'div',
+				className: 'overlay',
+				els: [
+					{
+						tag: 'div',
+						className: 'right',
+						els: [
+							{
+								tag: 'a',
+								className: 'btn',
+								text: D.blogs.l.get('change_main_image'),
+								onclick: this._showPopup
+							},
+							{
+								tag: 'a',
+								className: 'btn',
+								text: D.Lang.get('delete'),
+								onclick: this._delete
+							}
+						]
+					}
+				]
+			}).append(this.node);
+		},
+
+		_delete: function(){
+			this.setImage(null);
+		}
+	}
+);
+
+/**
+ * @class
+ */
+D.blogs.Form.Categories = Class(
+	/**
+	 * @lends {D.blogs.Form.Categories#}
+	 */
+	{
+		_categories: new D.SortedMap(),
+		_countries: new D.SortedMap(),
+		_selectedCategories: {},
+		_selectedCountries: [],
+		/**
+		 * @constructor
+		 */
+		__construct: function(par){
+			this.par = par;
+
+			var i, l, c;
+			var realCategoryCount = 0;
+			for( i = 0, l = this.par.postCategories.length; i < l; i++ ){
+				var c = this.par.postCategories[i];
+				if( c < 2000 ){
+					realCategoryCount++
+				}
+			}
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-form-categories',
+				els: [
+					this.categorySwitch = new T.Form.CheckBox({
+						caption: D.blogs.l.get('add_to_categories_title'),
+						checked: !empty(realCategoryCount),
+						onclick: this._onCheckboxClick
+					}),
+					this.categoryContainerNode = mkE({
+						tag: 'div',
+						className: 'category-container',
+						els: [
+							{
+								tag: 'div',
+								className: 'category-publish-info',
+								text: D.blogs.l.get('add_to_categories_info')
+							},
+							this.categoriesList = mkE({
+								tag: 'div',
+								className: 'categories-list'
+							}),
+							this.selectButton = new T.Form.Button({
+								caption: D.blogs.l.get('add_to_categories_choose'),
+								color: 'link',
+								onclick: this._showPopover
+							})
+						]
+					})
+				]
+			});
+
+			for( i = 0, l = this.par.categories.length; i < l; i++ ){
+				var category = this.par.categories[i];
+				var cat = new D.blogs.Form.Categories.Category(category, {
+					onChange: this._onCategoryClick,
+					selected: in_array(category.id, this.par.postCategories)
+				});
+				this._categories.set(category.id, cat);
+			}
+
+			for( i = 0, l = this.par.countries.length; i < l; i++ ){
+				var country = this.par.countries[i];
+				this._countries.set(country.id, {
+					value: country.id,
+					caption: country.name
+				});
+			}
+
+			if( !empty(this.par.postCategories) ){
+				for( i = 0, l = this.par.postCategories.length; i < l; i++ ){
+					c = this.par.postCategories[i];
+					if( c < 1000 ){
+						this._selectedCategories[c] = true;
+					}else if( c < 2000 ){
+						this._selectedCountries.push(c);
+					}
+				}
+				this.showCategoriesBlock();
+				this.drawList();
+			}
+		},
+
+		_onCheckboxClick: function(){
+			var checked = this.categorySwitch.value();
+			/*if( checked && (this.par.canPublish && !this.par.canPublish()) ){
+				alert(D.blogs.l.get('need_public_to_publish'));
+				return false
+			}*/
+			if( checked ){
+				this.showCategoriesBlock();
+			}else{
+				this.hideCategoriesBlock();
+			}
+			this.par.onToggle();
+		},
+
+		showCategoriesBlock: function(){
+			this.categoryContainerNode.style.display = 'block';
+		},
+
+		hideCategoriesBlock: function(){
+			this.categoryContainerNode.style.display = '';
+		},
+
+		drawList: function(){
+			if( !empty(this._selectedCategories) ){
+				this.selectButton.caption(D.blogs.l.get('add_to_categories_edit'));
+				this.categoriesList.style.display = 'block';
+				clearNode(this.categoriesList);
+				var categoryCount = count(this._selectedCategories);
+				mkE({
+					tag: 'span',
+					text: D.blogs.l.nget(categoryCount, 'selected_categories_count') + ': '
+				}).append(this.categoriesList);
+				var categories = [];
+				for( var k in this._selectedCategories ){
+					if( !this._selectedCategories.hasOwnProperty(k) ){
+						continue;
+					}
+					var c = this._categories.get(k);
+					categories.push(c.title);
+				}
+				mkE({
+					tag: 'strong',
+					text: categories.join(', ')
+				}).append(this.categoriesList);
+			}else{
+				this.selectButton.caption(D.blogs.l.get('add_to_categories_choose'))
+				this.categoriesList.style.display = '';
+			}
+		},
+
+		_showPopover: function(){
+			this._popoverCategories = {};
+			for( var k in this._selectedCategories ){
+				if( !this._selectedCategories.hasOwnProperty(k) ){
+					continue;
+				}
+				this._popoverCategories[k] = true;
+			}
+			if( this._popover ){
+				this._popover.show();
+				return;
+			}
+			this._popover = new T.Popover({
+				parent: this.selectButton.node,
+				position: 'top left',
+				onOverlayClick: this._cancel,
+				title: D.blogs.l.get('popover_post_cat')
+			});
+
+			mkE({
+				tag: 'div',
+				className: 'blogs-form-category-popover',
+				els: [
+					{
+						tag: 'p',
+						text: D.blogs.l.get('popover_post_cat_descr')
+					},
+					{
+						tag: 'h4',
+						text: D.blogs.l.get('choose_cat')
+					},
+					this._categoryButtons = mkE({
+						tag: 'div',
+						className: 'category-buttons'
+					}),
+					this._countryField = mkE({
+						tag: 'div',
+						className: 'category-countries',
+						els: [
+							{
+								tag: 'h4',
+								text: D.blogs.l.get('choose_country')
+							},
+							this._countryInput = new T.Form.AC({
+								options: this._countries.toArray(),
+								placeholder: D.blogs.l.get('choose_country_placeholder')
+							})
+						]
+					}),
+					{
+						tag: 'p',
+						className: 'info',
+						els: [
+							D.blogs.l.get('get_to_know') + ' ',
+							{
+								tag: 'a',
+								className: 'secondary',
+								text: D.blogs.l.get('publish_rules'),
+								onclick: this._showRules
+							}
+						]
+					},
+					{
+						tag: 'div',
+						className: 'buttons',
+						els: [
+							new T.Form.Button({
+								caption: D.Lang.get('Cancel'),
+								color: 'link',
+								onclick: this._cancel
+							}),
+							new T.Form.Button({
+								caption: D.Lang.get('Save'),
+								onclick: this._save
+							})
+						]
+					}
+				]
+			}).append(this._popover.content);
+			var cats = this._categories.toArray();
+			var i, l;
+			for( i = 0, l = cats.length; i < l; i++ ){
+				cats[i].node.append(this._categoryButtons);
+			}
+			if( this._selectedCategories[2] ){
+				this._countryField.style.display = 'block';
+			}
+			for( i = 0, l = this._selectedCountries.length; i < l; i++ ){
+				var country = this._selectedCountries[i];
+				this._countryInput.addValue(this._countries.get(country));
+			}
+			this._popover.show();
+		},
+
+		/**
+		 *
+		 * @param {D.blogs.Form.Categories.Category} category
+		 * @private
+		 */
+		_onCategoryClick: function(category){
+			if( category.selected ){
+				if( category.id == 2 ){
+					this._countryInput.clear();
+					this._countryField.style.display = '';
+				}
+				delete this._popoverCategories[category.id];
+				return;
+			}
+			if( count(this._popoverCategories) == 3 ){
+				alert(D.blogs.l.get('only_3_cats'));
+				return false;
+			}
+			this._popoverCategories[category.id] = true;
+			if( category.id == 2 ){
+				this._countryField.style.display = 'block';
+			}
+		},
+
+		_cancel: function(){
+			var cats = this._categories.toArray();
+			for( var i = 0, l = cats.length; i < l; i++ ){
+				var cat = cats[i];
+				if( !this._selectedCategories[cat.id] ){
+					cat.active(false);
+				}else{
+					cat.active(true);
+				}
+			}
+
+			if( !isset(this._selectedCategories[2]) ){
+				this._countryInput.clear();
+				this._countryField.style.display = '';
+			}else{
+				this._countryInput.addValues(this._selectedCountries);
+			}
+
+			this.drawList();
+
+			if( empty(this._selectedCategories) ){
+				this.disable(true);
+			}
+
+			this._popover.hide();
+		},
+
+		_save: function() {
+			var countries = this._countryInput.value();
+			if( this._popoverCategories[2] && empty(countries) ){
+				alert(D.blogs.l.get('travel_need_countries'));
+				return;
+			}
+			this._selectedCategories = {};
+			for( var cat in this._popoverCategories ){
+				if( !this._popoverCategories.hasOwnProperty(cat) ){
+					continue;
+				}
+				this._selectedCategories[cat] = true;
+			}
+			this._popover.hide();
+
+			if( this._selectedCategories[2] ){
+				this._selectedCountries = this._countryInput.value();
+			}else{
+				this._selectedCountries = [];
+			}
+
+			this.drawList();
+
+			if( empty(this._selectedCategories) ){
+				this.disable(true);
+			}
+		},
+
+		getCategories: function(){
+			var categories = [];
+			for( var k in this._selectedCategories ){
+				if( !this._selectedCategories.hasOwnProperty(k) ){
+					continue;
+				}
+				categories.push(Number(k));
+			}
+			return categories;
+		},
+
+		getCountries: function(){
+			return this._selectedCountries;
+		},
+
+		_showRules: function(){
+			InfoBox.els({
+				tag: 'div',
+				className: 'blogs-publish-rules',
+				innerHTML: D.blogs.l.get('publish_rules_text')
+			}, {
+				modal: true
+			});
+		},
+
+		disable: function(v){
+			if( !v ){
+				this.categorySwitch.value(true);
+				this.showCategoriesBlock();
+			}else{
+				this.categorySwitch.value(false);
+				this.hideCategoriesBlock();
+			}
+		}
+	}
+);
+
+/**
+ * @class
+ */
+D.blogs.Form.Categories.Category = Class(
+	/**
+	 * @lends {D.blogs.Form.Categories.Category#}
+	 */
+	{
+		__NAME: 'D.blogs.Form.Categories.Category',
+
+		selected: false,
+
+		__construct: function(data, par){
+			this.data = data;
+			this.par = par;
+			this.id = data.id;
+			this.title = data.title;
+
+			this.node = mkE({
+				tag: 'a',
+				className: 'category-button',
+				text: data.title,
+				onclick: this._onclick
+			});
+
+			if( par.selected ){
+				this.active(true);
+			}
+		},
+
+		_onclick: function(){
+			if( this.par.onChange && this.par.onChange(this) === false){
+				return;
+			}
+
+			if( this.selected ){
+				this.active(false);
+			}else{
+				this.active(true);
+			}
+		},
+
+		/**
+		 *
+		 * @param {boolean} v
+		 */
+		active: function(v){
+			if( v ){
+				addClassName(this.node, 'active');
+				this.selected = true;
+			}else{
+				removeClassName(this.node, 'active');
+				this.selected = false;
+			}
+		}
+	}
+);
+
+/**
+ * @class
+ * @param {Object|null} par
+ */
+D.blogs.Form.Scheduler = function (par) {
+	/**
+	 * @lends {D.blogs.Form.Scheduler#}
+	 */
+	return {
+		__NAME: 'D.blogs.Form.Scheduler',
+
+		/**
+		 * @param {Object|null} par
+		 */
+		__construct: function (par) {
+			this.par = par;
+			var hours = [];
+			for( var h = 0; h < 24; h++ ){
+				hours.push({
+					value: h,
+					caption: str_pad(h, 2, 0, 'STR_PAD_LEFT')
+				});
+			}
+
+			var minutes = [];
+			for( var m = 0; m < 60; m++ ){
+				minutes.push({
+					value: m,
+					caption: str_pad(m, 2, 0, 'STR_PAD_LEFT')
+				});
+			}
+
+			var date = new Date();
+			var disableBefore = str_pad(date.getUTCDate(), 2, 0, 'STR_PAD_LEFT') + '.' + str_pad((date.getUTCMonth() + 1), 2, 0, 'STR_PAD_LEFT') + '.' + date.getUTCFullYear();
+			date.setDate(date.getDate() + 1);
+			var selected = str_pad(date.getUTCDate(), 2, 0, 'STR_PAD_LEFT') + '.' + str_pad((date.getUTCMonth() + 1), 2, 0, 'STR_PAD_LEFT') + '.' + date.getUTCFullYear();
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-scheduler',
+				els: [
+					{
+						tag: 'div',
+						els: [
+							{
+								tag: 'h3',
+								text: D.blogs.l.get('schedule_date')
+							},
+							this._date = new T.Form.Input({
+								datepicker: {
+									format: 'd.m.Y',
+									disableBefore: disableBefore
+								},
+								value: par.value.date || selected
+							})
+						]
+					},
+					{
+						tag: 'div',
+						className: 'clearfix',
+						els: [
+							{
+								tag: 'h3',
+								text: D.blogs.l.get('schedule_time')
+							},
+							{
+								tag: 'div',
+								className: 'select-container',
+								els: [
+									this._hours = new T.Form.Select({
+										options: hours,
+										value: par.value.hour || 0
+									})
+								]
+							},
+							{
+								tag: 'div',
+								className: 'select-container',
+								els: [
+									this._minutes = new T.Form.Select({
+										options: minutes,
+										value: par.value.minute || 0
+									})
+								]
+							}
+						]
+					},
+					{
+						tag: 'div',
+						className: 'buttons clearfix',
+						els: [
+							{
+								tag: 'div',
+								className: 'left',
+								els: [
+									new T.Form.Button({
+										caption: D.Lang.get('Save'),
+										onclick: this._onSave
+									}),
+									new T.Form.Button({
+										caption: D.Lang.get('cancel'),
+										onclick: this._onCancel,
+										color: 'link'
+									})
+								]
+							},
+							this._deleteCont = mkE({
+								tag: 'div',
+								className: 'right',
+								els: [
+									new T.Form.Button({
+										caption: D.Lang.get('delete'),
+										onclick: this._onDelete,
+										color: 'link'
+									})
+								]
+							})
+						]
+					}
+				]
+			});
+
+			if( empty(par.value) ){
+				this._deleteCont.style.display = 'none';
+			}
+		},
+
+		show: function(){
+			this.saved = this.value();
+			this._modal = new D.Modal({
+				width: 300,
+				title: D.blogs.l.get('schedule')
+			});
+			this._modal.html();
+			this.node.append(this._modal.content);
+		},
+
+		_onCancel: function(){
+			this._date.value(this.saved.date);
+			this._hours.value(this.saved.hour);
+			this._minutes.value(this.saved.minute);
+			this._modal.close();
+		},
+
+		_onSave: function(){
+			this.par.onSave();
+			this._deleteCont.style.display = '';
+			this._modal.close();
+		},
+
+		_onDelete: function(){
+			this.par.onSave(true);
+			this._modal.close();
+		},
+
+		value: function(){
+			return {
+				date: this._date.value(),
+				hour: this._hours.value(),
+				minute: this._minutes.value()
+			};
+		}
+	};
+};
+Class(D.blogs.Form.Scheduler);// --- form.js --- 
+// +++ like.js +++ 
+D.blogs.Like = Class(
+	/**
+	 * @lends {D.blogs.Like#}
+	 */
+	{
+		/** @type {D.blogs.LikePar} */
+		par: null,
+		/**
+		 *
+		 * @param {D.blogs.LikePar} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.node = mkE({
+				tag: 'span',
+				className: 'like-link'
+			});
+
+			if( !this.par.canLike && !this.par.likes ){
+				this.node.style.display = 'none';
+				return;
+			}
+
+			this.draw();
+		},
+
+		draw: function(){
+			clearNode(this.node);
+
+			if( !this.par.canLike ){
+				mkE({
+					tag: 'a',
+					className: 'icon sayLikeIcon',
+					els: [
+						D.Lang.get('like') + ' ',
+						{
+							tag: 'strong',
+							text: this.par.likes
+						}
+					],
+					onclick: this.showLikes
+				}).append(this.node);
+				return;
+			}
+
+			this._likeNode = mkE({
+				tag: 'a',
+				className: 'icon ' + ( in_array(D.ID % 10, [4,5,6]) && !this.par.feed ? 'sayLikeBlueIcon' : 'sayLikeIcon'),
+				text: this.par.liked ? D.Lang.get('Dislike it') : D.Lang.get('I like it'),
+				onclick: this.par.liked ? this.cancelLike : this.like
+			}).append(this.node);
+
+			if( this.par.liked ){
+				addClassName(this._likeNode, 'active');
+			}
+
+			if( this.par.likes == 0 ){
+				return;
+			}
+
+			mkE({
+				tag: 'a',
+				className: 'likes-count',
+				els: [
+					{
+						tag: 'strong',
+						text: this.par.likes
+					}
+				],
+				onclick: this.showLikes
+			}).append(this.node);
+		},
+
+		showLikes: function(e){
+			if( !D.ID ){
+				e = D.event(e);
+				D.stopPropagation(e);
+				D.focusSmallLogin({ text: D.Lang.get('need_authorize') });
+				return;
+			}
+			InfoBox.open('/rq/like_modal.php?likeType=' + this.par.type + '&likeId=' + this.par.id, {
+				title: D.Lang.get('like'),
+				width: 820,
+				modal: true,
+				overlayClose: true
+			});
+		},
+
+		like: function(){
+			if( this._mLike && this._mLike.processing ){
+				return;
+			}
+			this._mLike = new DR.like.Like();
+			this._mLike.type = this.par.type;
+			this._mLike.id = this.par.id;
+			this._mLike.select = [
+				new DR.like.select.GetRe().canLike().liked().count()
+			];
+			this._mLike.onLoad = this.onLike;
+			this._mLike.call();
+		},
+
+		onLike: function(){
+			if( !this._mLike.re ){
+				return;
+			}
+			var re = this._mLike.re;
+			this.par.liked = re.liked;
+			this.par.canLike = re.canLike;
+			this.par.likes = re.count;
+			this.draw();
+		},
+
+		cancelLike: function(){
+			if( this._mDislike && this._mDislike.processing ){
+				return;
+			}
+			this._mDislike = new DR.like.Dislike();
+			this._mDislike.type = this.par.type;
+			this._mDislike.id = this.par.id;
+			this._mDislike.select = [
+				new DR.like.select.GetRe().canLike().liked().count()
+			];
+			this._mDislike.onLoad = this.onCancelLike;
+			this._mDislike.call();
+		},
+
+		onCancelLike: function(){
+			if( !this._mDislike.re ){
+				return;
+			}
+			var re = this._mDislike.re;
+			this.par.liked = re.liked;
+			this.par.canLike = re.canLike;
+			this.par.likes = re.count;
+			this.draw();
+		}
+	}
+);
+
+D.blogs.LikePar = Class(
+	/**
+	 * @lends {D.blogs.LikePar}
+	 */
+	{
+		id: null,
+		type: null,
+		canLike: false,
+		liked: false,
+		likes: 0,
+		feed: false,
+		/**
+		 *
+		 * @param {DR.like.struct.GetRe} data
+		 */
+		fromLike: function(data){
+			this.id = data.id;
+			this.type = data.type;
+			this.canLike = data.canLike;
+			this.liked = data.liked;
+			this.likes = data.count;
+			if (data.feed) {
+				this.feed = true;
+			}
+			return this;
+		}
+	}
+);// --- like.js --- 
+// +++ recommend.js +++ 
+D.blogs.Recommend = Class(
+	/**
+	 * @lends {D.blogs.Recommend#}
+	 */
+	{
+		/** @type {D.blogs.RecommendPar} */
+		par: null,
+		/**
+		 *
+		 * @param {D.blogs.RecommendPar} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.node = mkE({
+				tag: 'span',
+				className: 'recommend-link'
+			});
+
+			if( !this.par.canRecommend && !this.par.recommends ){
+				this.node.style.display = 'none';
+				return;
+			}
+
+			this.draw();
+		},
+
+		draw: function(){
+			clearNode(this.node);
+
+			if( !this.par.canRecommend ){
+				mkE({
+					tag: 'a',
+					className: 'icon sayRecommendIcon',
+					els: [
+						D.Lang.get('Iesaka') + ' ',
+						{
+							tag: 'strong',
+							text: this.par.recommends
+						}
+					],
+					onclick: this.showRecommends
+				}).append(this.node);
+				return;
+			}
+
+			this._recommendNode = mkE({
+				tag: 'a',
+				className: 'icon ' + (in_array(D.ID % 10, [4,5,6]) && !this.par.feed ? 'sayRecommendBlueIcon' : 'sayRecommendIcon'),
+				text: this.par.recommended ? D.Lang.get('Cancel') : D.Lang.get('Recommend'),
+				onclick: this.par.recommended ? this.cancelRecommend : this.doRecommend
+			}).append(this.node);
+
+			if( this.par.recommended ){
+				addClassName(this._recommendNode, 'active');
+			}
+
+			if( this.par.recommends == 0 ){
+				return;
+			}
+
+			mkE({
+				tag: 'a',
+				className: 'recommend-count',
+				els: [
+					{
+						tag: 'strong',
+						text: this.par.recommends
+					}
+				],
+				onclick: this.showRecommends
+			}).append(this.node);
+		},
+
+		showRecommends: function(e){
+			if( !D.ID ){
+				e = D.event(e);
+				D.stopPropagation(e);
+				D.focusSmallLogin({ text: D.Lang.get('need_authorize') });
+				return;
+			}
+			InfoBox.open('/say/rq/recs.php?pid=' + this.par.id, {
+				title: D.Lang.get('Iesaka'),
+				width: 820,
+				modal: true,
+				overlayClose: true
+			});
+		},
+
+		doRecommend: function(){
+			var profiles = D.store.get( 'profiles', 'blogs' );
+			if( profiles === null || D.store.get( 'profilesTS', 'blogs' ) < ( new Date() ).getTime() - 3600*1000 ){
+				this._mGetProfiles = new DR.say.GetProfiles;
+				this._mGetProfiles.select = [
+					new DR.users.select.User().id().title()
+				];
+				this._mGetProfiles.onLoad = this._onProfiles;
+				this._mGetProfiles.call();
+				return;
+			}
+			if( count(profiles) ){
+				this._showProfiles(profiles);
+				return;
+			}
+			this.recommend();
+		},
+
+		_onProfiles: function(){
+			if( !this._mGetProfiles.re ){
+				this.recommend();
+				return;
+			}
+			var users = this._mGetProfiles.re.users;
+			if( users ){
+				D.store.set( 'profiles', users, 'blogs' );
+				D.store.set( 'profilesTS', ( new Date() ).getTime(), 'blogs' );
+			}
+			if( count( users ) ){
+				this._showProfiles( users );
+				return;
+			}
+			this.recommend();
+		},
+
+		_showProfiles: function(users){
+			var profiles = [];
+			for( var i = 0, l = users.length; i < l; i++ ){
+				var user = users[i];
+				profiles.push({
+					id: user.id,
+					title: user.title
+				})
+			}
+			D.smallPopUp.open( '', {
+				title:D.Lang.get( 'Say recommend with', 'xGlobal' ),
+				width:200
+			} );
+			var form = mkE( {
+				tag:'form'
+			} );
+			this.profileCheckboxes = [];
+			for( var k in profiles ){
+				var r = profiles[k];
+				if( r.id == this.par.uid || (r.id == D.ID && this.par.uid == D.ID) ){
+					continue;
+				}
+				var cbx = T.Forms.checkbox( {
+					caption:r.title,
+					_dr:r,
+					checked:empty(this.profileCheckboxes)
+				} ).append(form);
+				this.profileCheckboxes.push(cbx);
+			}
+			mkE( {
+				tag:'div',
+				className:'sayRecommendProfiles',
+				els:[
+					form,
+					T.submitButton( {
+						caption:D.Lang.get('Recommend'),
+						stretch:true,
+						onclick:this._recommendProfile
+					} )
+				]
+			} ).append( D.smallPopUp.content );
+			D.smallPopUp.move();
+			return false;
+		},
+
+		_recommendProfile: function(){
+			var uids = [];
+			for( var i = 0; i < this.profileCheckboxes.length; ++ i ){
+				if( this.profileCheckboxes[i].checked ){
+					uids.push( this.profileCheckboxes[i]._dr.id );
+				}
+			}
+			D.smallPopUp.close();
+			if( empty(uids) ){
+				return;
+			}
+			if( this._mRecommend && this._mRecommend.processing ){
+				return;
+			}
+			this._mRecommend = new DR.say.Recommend;
+			this._mRecommend.uids = uids;
+			this._mRecommend.pid = this.par.id;
+			this._mRecommend.select = [
+				new DR.say.select.RecommendRe().item(),
+				new DR.say.select.Item().canRecommend().recommended().recCount()
+			];
+			this._mRecommend.onLoad = this.onRecommend;
+			this._mRecommend.call();
+		},
+
+		recommend: function(){
+			if( this._mRecommend && this._mRecommend.processing ){
+				return;
+			}
+			this._mRecommend = new DR.say.Recommend();
+			this._mRecommend.pid = this.par.id;
+			this._mRecommend.select = [
+				new DR.say.select.RecommendRe().item(),
+				new DR.say.select.Item().canRecommend().recommended().recCount()
+			];
+			this._mRecommend.onLoad = this.onRecommend;
+			this._mRecommend.call();
+		},
+
+		onRecommend: function(){
+			if( !this._mRecommend.re || !this._mRecommend.re.item ){
+				return;
+			}
+			var re = this._mRecommend.re.item;
+			this.par.recommended = re.recommended;
+			this.par.canRecommend = re.canRecommend;
+			this.par.recommends = re.recCount;
+			this.draw();
+		},
+
+		cancelRecommend: function(){
+			if( this._mCancelRecommend && this._mCancelRecommend.processing ){
+				return;
+			}
+			this._mCancelRecommend = new DR.say.CancelRecommend();
+			this._mCancelRecommend.pid = this.par.id;
+			this._mCancelRecommend.select = [
+				new DR.say.select.CancelRecommendRe().item(),
+				new DR.say.select.Item().canRecommend().recommended().recCount()
+			];
+			this._mCancelRecommend.onLoad = this.onCancelRecommend;
+			this._mCancelRecommend.call();
+		},
+
+		onCancelRecommend: function(){
+			if( !this._mCancelRecommend.re || !this._mCancelRecommend.re.item ){
+				return;
+			}
+			var re = this._mCancelRecommend.re.item;
+			this.par.recommended = re.recommended;
+			this.par.canRecommend = re.canRecommend;
+			this.par.recommends = re.recCount;
+			this.draw();
+		}
+	}
+);
+
+D.blogs.RecommendPar = Class(
+	/**
+	 * @lends {D.blogs.RecommendPar}
+	 */
+	{
+		id: null,
+		canRecommend: false,
+		recommended: false,
+		recommends: 0,
+		uid: 0,
+		feed: false,
+		/**
+		 *
+		 * @param {DR.say.struct.Item} data
+		 */
+		fromSayItem: function(data){
+			this.id = data.id;
+			this.canRecommend = data.canRecommend;
+			this.recommended = data.recommended;
+			this.recommends = data.recCount;
+			this.uid = data.user.id;
+			if (data.feed) {
+				this.feed = true;
+			}
+			return this;
+		}
+	}
+);// --- recommend.js --- 
+// +++ collage.js +++ 
+/**
+ * @class
+ * @param {Object} par
+ */
+D.blogs.Collage = function(par){
+	/**
+	 * @lends {D.blogs.Collage#}
+	 */
+	return {
+		__NAME: 'D.blogs.Collage',
+
+		/**
+		 * @param {Object} par
+		 */
+		__construct: function(par){
+			this.par = par;
+			this.images = par.images;
+			this.count = par.images.length;
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-collage',
+				onclick: this._onCollageClick
+			});
+			this.draw();
+		},
+
+		draw: function(){
+			clearNode(this.node);
+			var images = this.images.slice(0, 4);
+			switch(this.count){
+				case 1:
+					this._drawSingle(images);
+					break;
+				default:
+					this._drawMultiple(images);
+					break;
+			}
+		},
+
+		_drawSingle: function(images){
+			var image = reset(images);
+			var orientation;
+			if( image.image.w < image.image.h ){
+				orientation = 'vertical';
+			}else{
+				orientation = 'horizontal';
+			}
+			if( image.image.video || image.video ){
+				addClassName(this.node, 'single-video');
+			}
+			this._singleImage = mkE({
+				tag: 'img',
+				className: 'single ' + orientation,
+				src: image.image.large,
+				onclick: D.closure(this, this._onclick, image)
+			}).append(this.node);
+		},
+
+		_drawMultiple: function(images){
+			var image = reset(images);
+			var count = images.length;
+			var orientation;
+			if( image.image.w < image.image.h ){
+				orientation = 'vertical';
+			}else{
+				orientation = 'horizontal';
+			}
+			var cont = mkE({
+				tag: 'div',
+				className: 'clearfix multiple-' + count + ' ' + orientation
+			});
+
+			for( var i = 0, l = images.length; i < l; i++ ){
+				var img = images[i];
+				var imageNode = mkE({
+					tag: 'div',
+					className: 'image-' + (i + 1) + (img.image.video ? ' video' : ''),
+					style: {
+						backgroundImage: 'url(' + img.image.large + ')'
+					},
+					onclick: D.closure(this, this._onclick, img)
+				}).append(cont);
+			}
+
+			if( this.count > 4 ){
+				mkE({
+					tag: 'div',
+					className: 'more-overlay'
+				}).append(imageNode);
+				mkE({
+					tag: 'div',
+					className: 'more',
+					text: '+' + (this.count - 4)
+				}).append(imageNode);
+			}
+
+			cont.append(this.node);
+		},
+
+		_onclick: function(image, e){
+			D.stopPropagation(e);
+			if( this.par.onclick ){
+				this.par.onclick(image);
+			}
+		},
+
+		_onCollageClick: function(){
+			if( this._singleImage ){
+				this._singleImage.onclick();
+			}
+		}
+	};
+};
+Class(D.blogs.Collage);// --- collage.js --- 
+// +++ search.js +++ 
+/**
+ * @param {D.blogs.Search.Par} par
+ * @class
+ * @extends {mkE.Base}
+ */
+D.blogs.Search = function(par){
+	/** @lends {D.blogs.Search#} */
+	return {
+		__NAME:'D.blogs.Search',
+
+		uid:0,
+		cat:0,
+		friends:false,
+		_prevText:'',
+
+		onCancel:D.doNothing,
+		onSearch:D.doNothing,
+
+		/**
+		 * @param {D.blogs.Search.Par} par
+		 */
+		__construct:function(par){
+			this.uid = par.uid;
+			this.cat = par.cat;
+			this.friends = par.friends;
+			this.node = mkE( {
+				tag:'div',
+				className:'BlogsSearch',
+				els:[
+					this._input = new T.Form.Input( {
+						icon:'search',
+						onkeyup:this._onKeyUp,
+						onblur:this._onBlur,
+						placeholder:par.placeHolder
+					} ),
+					this._resultNode = mkE( {
+						tag:'div',
+						style:{
+							display:'none',
+							minHeight:'30px'
+						}
+					} )
+				]
+			} );
+		},
+
+		_onKeyUp:function(e){
+			if( e.keyCode == 27 ){
+				this._input.value('');
+				this._input.blur();
+				this._prevText = '';
+				return;
+			}
+			if( this._prevText == this._input.value() ){
+				return;
+			}
+			this._prevText = this._input.value();
+			clearTimeout( this._doSearchTO );
+			this._doSearchTO = setTimeout( this._doSearch, 300 );
+		},
+
+		_empty:function(){
+			return empty( trim( this._input.value() ) );
+		},
+
+		_doSearch:function(){
+			if( this._empty() ){
+				return;
+			}
+			var _mSearch = new DR.blogs.Search;
+			_mSearch.pg = 1;
+			_mSearch.blogId = this.uid;
+			_mSearch.cat = this.cat;
+			_mSearch.query = this._input.value();
+			_mSearch.friends = this.friends;
+			var ac = new DR.ApiCall;
+			this._feed = new D.blogs.Feed(
+				new D.blogs.Feed.Par()
+					.setMethod(_mSearch)
+					.setApiCall(ac)
+					.setType('search')
+			);
+			ac.onLoad = D.closure( this, this._onLoad, this._feed );
+			ac.call();
+			D.loadingOverlay( this._resultNode );
+			this._resultNode.style.display = '';
+		},
+
+		_onLoad:function(feed){
+			if( this._feed != feed ){
+				return;
+			}
+			clearNode( this._resultNode );
+			this._feed.append( this._resultNode );
+			this.onSearch();
+		},
+
+		_onBlur:function(){
+			if( !this._empty() ){
+				return;
+			}
+			this._feed = null;
+			clearNode( this._resultNode );
+			this._resultNode.style.display = 'none';
+			this.onCancel();
+		}
+
+	};
+};
+Class( D.blogs.Search, mkE.Base );
+
+/**
+ * @class
+ */
+D.blogs.Search.Par = function(){
+	/** @lends {D.blogs.Search.Par#} */
+	return {
+		__NAME:'D.blogs.Search.Par',
+		/** @type {number} */
+		uid:0,
+		/**
+		 * @param {number} v
+		 * @return {D.blogs.Search.Par}
+		 */
+		setUid:function(v){
+			this.uid = v;
+			return this;
+		},
+		/** @type {number} */
+		cat:0,
+		/**
+		 * @param {number} v
+		 * @return {D.blogs.Search.Par}
+		 */
+		setCat:function(v){
+			this.cat = v;
+			return this;
+		},
+		/** @type {string} */
+		placeHolder:'',
+		/**
+		 * @param {string} v
+		 * @return {D.blogs.Search.Par}
+		 */
+		setPlaceHolder:function(v){
+			this.placeHolder = v;
+			return this;
+		},
+		/** @type {boolean} */
+		friends:false,
+		/**
+		 * @param {boolean} v
+		 * @return {D.blogs.Search.Par}
+		 */
+		setFriends:function(v){
+			this.friends = v;
+			return this;
+		}
+	};
+};
+Class(D.blogs.Search.Par);
+// --- search.js --- 
+// +++ spotlight_request.js +++ 
+/**
+ * @class
+ * @param {Object} par
+ */
+D.blogs.SpotlightRequest = function (par) {
+	/**
+	 * @lends {D.blogs.SpotlightRequest#}
+	 */
+	return {
+		__NAME: 'D.blogs.SpotlightRequest',
+
+		/**
+		 * @param {D.blogs.SpotlightRequest.Par} par
+		 */
+		__construct: function (par) {
+			this.node = mkE( {
+				tag:'div',
+				els:[
+
+				]
+			} );
+			this._mCanRequest = new DR.blogs.CanRequestSpotlight();
+			this._mCanRequest.onLoad = this._onResponse;
+			par.apiCall.addMethod(this._mCanRequest);
+		},
+
+		_onResponse: function(){
+			if( !this._mCanRequest.re.ok ){
+				this.node.style.display = 'none';
+				return;
+			}
+			mkE({
+				tag: 'div',
+				className: 'request-spotlight-block',
+				els: [
+					{
+						tag: 'div',
+						className: 'image'
+					},
+					{
+						tag: 'div',
+						className: 'title',
+						text: D.blogs.l.get('earn_with_writing')
+					},
+					{
+						tag: 'p',
+						text: D.blogs.l.get('earn_with_writing_descr')
+					},
+					new T.Form.Button({
+						caption: D.blogs.l.get('earn_join'),
+						onclick: this._openRequest
+					})
+				]
+			}).append(this.node);
+		},
+
+		_openRequest: function(){
+			this._modal = new D.Modal({
+				title: D.blogs.l.get('earn_title')
+			});
+			this._modal.html();
+			mkE({
+				tag: 'div',
+				className: 'request-spotlight-popup',
+				els: [
+					{
+						tag: 'div',
+						className: 'rules',
+						innerHTML: nl2br(htmlspecialchars(D.blogs.l.get('earn_rules')))
+					},
+					this._input = new T.Form.TextArea({
+						caption: D.blogs.l.get('earn_input_title')
+					}),
+					mkE({
+						tag: 'div',
+						els: [
+							this._saveButton = new T.Form.Button({
+								caption: D.blogs.l.get('earn_join'),
+								onclick: this._join
+							}),
+							new T.Form.Button({
+								caption: D.Lang.get('cancel'),
+								onclick: this._cancel,
+								color: 'link'
+							})
+						]
+					})
+				]
+			}).append(this._modal.content);
+		},
+
+		_cancel: function(){
+			this._modal.close();
+		},
+
+		_join: function(){
+			var text = this._input.value();
+			if( empty(text) ){
+				return;
+			}
+			this._mRequestSpotlight = new DR.blogs.RequestSpotlight();
+			this._mRequestSpotlight.text = text;
+			this._mRequestSpotlight.onLoad = this._onRequest;
+			this._mRequestSpotlight.call();
+		},
+
+		_onRequest: function(){
+			D.Confirm.success(D.blogs.l.get('earn_join_success'), 3000);
+			this.node.remove();
+			this._modal.close();
+		}
+	};
+};
+Class(D.blogs.SpotlightRequest);
+// --- spotlight_request.js --- 
+// +++ spotlight_posts.js +++ 
+/**
+ * @class
+ * @param {D.blogs.SpotlightPosts.Par} par
+ */
+D.blogs.SpotlightPosts = function (par) {
+	/**
+	 * @lends {D.blogs.SpotlightPosts#}
+	 */
+	return {
+		__NAME: 'D.blogs.SpotlightPosts',
+
+		/**
+		 * @param {D.blogs.SpotlightPosts.Par} par
+		 */
+		__construct: function (par) {
+			this.node = mkE({
+				tag: 'div',
+				className: 'block blogs-spotlight-posts',
+				els: [
+					{
+						tag: 'h3',
+						className: 'sidebarTitle',
+						text: D.blogs.l.get('spotlight_posts')
+					},
+					this._posts = mkE({
+						tag: 'div',
+						className: 'posts'
+					})
+				]
+			});
+			this._mGetSpotlightPosts = new DR.blogs.GetSpotlightPosts();
+			this._mGetSpotlightPosts.count = 4;
+			this._mGetSpotlightPosts.select = [
+				new DR.blogs.select.Item().href().title().id().user(),
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.Image().small()
+			];
+			this._mGetSpotlightPosts.onLoad = this.onGetPosts;
+			if( par.apiCall ){
+				par.apiCall.addMethod(this._mGetSpotlightPosts);
+				return;
+			}
+			this._mGetSpotlightPosts.call();
+		},
+
+		onGetPosts: function(){
+			var re = this._mGetSpotlightPosts.re;
+			if( !re || empty(re.posts) ){
+				this.node.remove();
+				return;
+			}
+			this.node.style.display = 'block';
+			var removed = false;
+			for( var i = 0, l = re.posts.length; i < l; i++ ){
+				if( i == 3 && !removed ){
+					continue;
+				}
+				var postData = re.posts[i];
+				if( D.blogs.spotlightPost && D.blogs.spotlightPost == postData.id ){
+					removed = true;
+					continue;
+				}
+				var post = new D.blogs.SpotlightPost(re.posts[i]);
+				post.node.append(this._posts);
+			}
+		}
+	};
+};
+Class(D.blogs.SpotlightPosts);
+
+/**
+ * @class
+ */
+D.blogs.SpotlightPosts.Par = function () {
+	/**
+	 * @lends {D.blogs.SpotlightPosts.Par#}
+	 */
+	return {
+		__NAME: 'D.blogs.SpotlightPosts.Par',
+
+		apiCall: null,
+
+		/**
+		 * @param {DR.ApiCall} v
+		 * @returns {D.blogs.SpotlightPosts.Par}
+		 */
+		setApiCall: function(v){
+			this.apiCall = v;
+			return this;
+		}
+	};
+};
+Class(D.blogs.SpotlightPosts.Par);
+
+/**
+ * @class
+ * @param {DR.blogs.struct.Item} data
+ */
+D.blogs.SpotlightPost = function (data) {
+	/**
+	 * @lends {D.blogs.SpotlightPost#}
+	 */
+	return {
+		__NAME: 'D.blogs.SpotlightPost',
+
+		/**
+		 * @param {DR.blogs.struct.Item} data
+		 */
+		__construct: function (data) {
+			var userUrl = data.user.url + 'blog';
+			switch( data.user.type ){
+				case D.USER_TYPE_API:
+					userUrl = '/applications/' + data.user.id + '/updates'
+					break;
+				case D.USER_TYPE_BIZ:
+				case D.USER_TYPE_MUSIC:
+					userUrl = data.user.url + 'news';
+					break;
+			}
+			this.node = mkE({
+				tag: 'div',
+				className: 'spotlight-post',
+				els: [
+					{
+						tag: 'a',
+						href: data.href,
+						className: 'post-title ajax',
+						text: data.title,
+						onclick: this._onclick
+					},
+					{
+						tag: 'div',
+						className: 'user-info',
+						els: [
+							{
+								tag: 'a',
+								href: userUrl,
+								className: 'image',
+								els: [
+									{
+										tag: 'img',
+										src: data.user.image.small
+									}
+								]
+							},
+							{
+								tag: 'a',
+								className: 'user-title',
+								href: userUrl,
+								text: data.user.title
+							}
+						]
+					}
+				]
+			});
+		},
+
+		_onclick: function(){
+			if( !D.ID ){
+				return;
+			}
+			var mStats = new DR.blogs.Stats;
+			mStats.kw = 'slpr_click';
+			mStats.call();
+		}
+	};
+};
+Class(D.blogs.SpotlightPost);// --- spotlight_posts.js --- 
+// +++ similar_posts.js +++ 
+/**
+ * @class
+ * @param {D.blogs.SimilarPosts.Par} par
+ */
+D.blogs.SimilarPosts = function (par) {
+	/**
+	 * @lends {D.blogs.SimilarPosts#}
+	 */
+	return {
+		__NAME: 'D.blogs.SimilarPosts',
+
+		empty: false,
+
+		/**
+		 * @param {D.blogs.SimilarPosts.Par} par
+		 */
+		__construct: function (par) {
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-similar-posts',
+				els: [
+					{
+						tag: 'h3',
+						text: D.blogs.l.get('similar_posts')
+					},
+					{
+						tag: 'div',
+						className: 'blogs-feed',
+						els: [
+							this._posts = mkE({
+								tag: 'div',
+								className: 'blogs-feed-items'
+							})
+						]
+					}
+				]
+			});
+
+			this._mGetSimilarPosts = new DR.blogs.GetSimilarPosts();
+			this._mGetSimilarPosts.id = par.id;
+			this._mGetSimilarPosts.count = 2;
+			this._mGetSimilarPosts.select = D.blogs.Feed.SELECT;
+			this._mGetSimilarPosts.onLoad = this._onGetPosts;
+			if( par.apiCall ){
+				par.apiCall.addMethod(this._mGetSimilarPosts);
+				return;
+			}
+			this._mGetSimilarPosts.call();
+		},
+
+		_onGetPosts: function(){
+			var re = this._mGetSimilarPosts.re;
+			if( !re || empty(re.posts) ){
+				this.node.remove();
+				this.empty = true;
+				return;
+			}
+			for( var i = 0, l = re.posts.length; i < l; i++ ){
+				var postData = re.posts[i];
+				var post = new D.blogs.SimilarPosts.Post(postData);
+				post.node.append(this._posts);
+			}
+		}
+	};
+};
+Class(D.blogs.SimilarPosts);
+
+/**
+ * @class
+ */
+D.blogs.SimilarPosts.Par = function(){
+	/**
+	 * @lends {D.blogs.SimilarPosts.Par#}
+	 */
+	return {
+		__NAME:'D.blogs.SimilarPosts.Par',
+
+		apiCall: null,
+		id: null,
+
+		/**
+		 * @param {DR.ApiCall} v
+		 * @returns {D.blogs.SimilarPosts.Par}
+		 */
+		setApiCall: function(v){
+			this.apiCall = v;
+			return this;
+		},
+
+		/**
+		 * @param {Number} v
+		 * @returns {D.blogs.SimilarPosts.Par}
+		 */
+		setId: function(v){
+			this.id = v;
+			return this;
+		}
+	};
+};
+Class(D.blogs.SimilarPosts.Par);
+
+/**
+ * @class
+ * @extends {D.blogs.FeedItem}
+ * @param {DR.blogs.struct.Item} data
+ * @param {D.blogs.FeedItem.Par} [par]
+ */
+D.blogs.SimilarPosts.Post = function (data, par) {
+	/**
+	 * @lends {D.blogs.SimilarPosts.Post#}
+	 */
+	return {
+		__NAME: 'D.blogs.SimilarPosts.Post',
+
+		/**
+		 * @param {DR.blogs.struct.Item} data
+		 * @param {D.blogs.FeedItem.Par} [par]
+		 */
+		__construct: function (data, par) {
+			this.id = data.id;
+			this.par = par || new D.blogs.FeedItem.Par;
+			this.data = data;
+			this.node = mkE({
+				tag: 'div',
+				className: 'blogs-feed-item blogs-similar-posts-item clearfix',
+				attr:{
+					'data-id':data.id
+				}
+			});
+			this._drawHeader();
+			this._drawContent();
+		}
+	};
+};
+Class(D.blogs.SimilarPosts.Post, D.blogs.FeedItem);// --- similar_posts.js --- 
+// +++ payout.js +++ 
+/**
+ * @class
+ * @param {DR.ApiCall} ac
+ * @extends {mkE.Base}
+ */
+D.blogs.Payout = function(ac){
+	/**
+	 * @lends {D.blogs.Payout#}
+	 */
+	return {
+		__NAME:'D.blogs.Payout',
+
+		/**
+		 * @param {DR.ApiCall} ac
+		 */
+		__construct:function(ac){
+			this.node = mkE( {
+				tag:'div',
+				els:[
+					{
+						tag:'h2',
+						text:'Naudas izmaksa par reklāmas ieņēmumu daļu par Taviem rakstiem'
+					},
+					{ tag:'br' },
+					this._content = mkE( {
+						tag:'div'
+					} )
+				]
+			} );
+			this._mGetPayoutInfo = new DR.blogs.GetPayoutInfo;
+			this._mGetPayoutInfo.onLoad = this._mGetPayoutInfoRe;
+			this._mGetPayoutInfo.onError = this._mGetPayoutInfoRe;
+			ac.addMethod( this._mGetPayoutInfo );
+		},
+
+		_mGetPayoutInfoRe: function(){
+			this._payoutInfo = this._mGetPayoutInfo.re;
+			this._draw();
+		},
+
+		_draw:function(){
+			D.removeLoadingOverlay(this._content);
+			if( !this._payoutInfo ){
+				Section.navigate('/blogs/my/profit');
+				return;
+			}
+			clearNode( this._content );
+			switch( this._payoutInfo.status ){
+				case 'unregistered':
+					this._showUnregistered();
+					break;
+				case 'processing':
+					this._showProcessing();
+					break;
+				case 'confirmed':
+					this._showConfirmed();
+					return;
+			}
+		},
+
+		_showUnregistered: function(){
+			clearNode(this._content);
+			mkE({
+				tag: 'p',
+				text: 'Pirms varam Tev izmaksāt nopelnīto naudu, Tev ir jāpiekrīt lietošanas noteikumiem.'
+			}).append(this._content);
+			this._rulesCheckbox = new T.Form.CheckBox({
+				caption: mkE({
+					tag: 'span',
+					els: [
+						'Piekrītu ',
+						{
+							tag: 'a',
+							text: 'lietošanas noteikumiem',
+							onclick: this._rulesPopup
+						}
+					]
+				}),
+				checked: this._payoutInfo.acceptedRules
+			}).append(this._content);
+			new T.Form.Button({
+				caption: 'Saglabāt',
+				onclick: this._agreeRules
+			}).append(this._content);
+		},
+
+		_agreeRules: function(){
+			var agree = this._rulesCheckbox.value();
+			if( !agree ){
+				alert('Tev ir jāpiekrīt lietošanas noteikumiem, ja vēlies turpināt.');
+				return;
+			}
+			D.loadingOverlay(this._content);
+			this._mAgreeToRules = new DR.blogs.AgreeToPayoutRules;
+			this._mAgreeToRules.onLoad = this._onAgreeRules;
+			this._mAgreeToRules.onError = this._onAgreeRules;
+			this._mAgreeToRules.call();
+		},
+
+		_onAgreeRules: function(){
+			this._payoutInfo = this._mAgreeToRules.re;
+			this._draw();
+		},
+
+		_rulesPopup: function(){
+			D.blogs.payoutRules();
+		},
+
+		_showProcessing: function(){
+			clearNode(this._content);
+			mkE({
+				tag: 'p',
+				style: {
+					fontWeight: 'bold'
+				},
+				els: [
+					'Lai mēs varētu Tavā kontā ieskaitīt nopelnīto naudu, mums nepieciešams apstiprinājums, ka Tu vai Tava pilnvarotā persona ir šī konta lietotājs. Kā arī, ka ',
+					{
+						tag: 'span',
+						style: {
+							color: 'red'
+						},
+						text: 'Tu piekrīti autoratlīdzības līguma noteikumiem.'
+					},
+					' Lai mēs pārliecinātos, Tev no sava konta mūsu kontā jāieskaita 0,01 EUR. ',
+					{
+						tag: 'span',
+						style: {
+							color: 'red'
+						},
+						text: 'Pievērs uzmanību maksājuma mērķim veicot pārskaitījumu internetbankā, lūgums ierakstīt zemāk norādīto informāciju.'
+					}
+				]
+			}).append(this._content);
+			mkE({
+				tag: 'p',
+				els: [
+					{
+						tag: 'strong',
+						text: 'Mūsu konts:'
+					},
+					{
+						tag: 'br'
+					},
+					'Nosaukums: SIA Draugiem',
+					{
+						tag: 'br'
+					},
+					'Reģistrācijas numurs: 40003737497',
+					{
+						tag: 'br'
+					},
+					'Banka: A/S Swedbank',
+					{
+						tag: 'br'
+					},
+					'Konts: LV14HABA0551009685506'
+				]
+			}).append(this._content);
+			mkE({
+				tag: 'p',
+				els: [
+					'Informācija, kas Tev jānorāda, veicot pārskaitījumu:',
+					{
+						tag: 'br'
+					},
+					{
+						tag: 'strong',
+						style: {
+							color: 'red'
+						},
+						text: 'Piekrītu autoratlīdzības līguma noteikumiem. Lietotāja ID – ' + D.ID + '.'
+					}
+				]
+			}).append(this._content);
+			mkE({
+				tag: 'p',
+				text: 'Samaksu par reklāmas ieņēmumu daļu par Taviem rakstiem pārskaitīsim 20 dienu laikā pēc pārskaitījuma saņemšanas.'
+			}).append(this._content);
+		},
+
+		_showConfirmed: function(){
+			clearNode(this._content);
+			mkE({
+				tag: 'h3',
+				text: 'Saņēmēja dati'
+			}).append(this._content);
+			mkE({
+				tag: 'table',
+				className: 'listTable',
+				style: {
+					marginBottom: '10px'
+				},
+				els: [
+					{
+						tag: 'tbody',
+						els: [
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Vārds, uzvārds'
+									},
+									{
+										tag: 'td',
+										text: this._payoutInfo.name + ' ' + this._payoutInfo.surname
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Personas kods'
+									},
+									{
+										tag: 'td',
+										text: this._payoutInfo.code
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Saņēmēja banka'
+									},
+									{
+										tag: 'td',
+										text: this._payoutInfo.bankName
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Konta numurs'
+									},
+									{
+										tag: 'td',
+										text: this._payoutInfo.bankAccount
+									}
+								]
+							}
+						]
+					}
+				]
+			}).append(this._content);
+			new T.Form.Button({
+				color: 'link',
+				caption: 'Mainīt datus',
+				onclick: this._changeInfo
+			}).append(this._content);
+			mkE({
+				tag: 'h3',
+				text: 'Izmaksas',
+				style: {
+					marginTop: '20px'
+				}
+			}).append(this._content);
+			mkE({
+				tag: 'table',
+				className: 'listTable',
+				style: {
+					marginBottom: '10px'
+				},
+				els: [
+					{
+						tag: 'tbody',
+						els: [
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Nopelnītā summa'
+									},
+									{
+										tag: 'td',
+										text: '€ ' + this._payoutInfo.gross.toFixed(2)
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Autora izdevumi'
+									},
+									{
+										tag: 'td',
+										text: '€ ' + this._payoutInfo.nonTaxable.toFixed(2)
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Apliekamie ienākumi'
+									},
+									{
+										tag: 'td',
+										text: '€ ' + this._payoutInfo.taxable.toFixed(2)
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Iedzīvotāju ienākumu nodoklis (' + this._payoutInfo.taxRate + '%)'
+									},
+									{
+										tag: 'td',
+										text: '€ ' + this._payoutInfo.incomeTax.toFixed(2)
+									}
+								]
+							},
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'th',
+										text: 'Summa izmaksai'
+									},
+									{
+										tag: 'td',
+										els: [
+											{
+												tag: 'strong',
+												text: '€ ' + this._payoutInfo.netto.toFixed(2)
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}).append(this._content);
+			new T.Form.Button({
+				caption: 'Nosūtīt pieteikumu',
+				onclick: this._payout
+			}).append(this._content);
+		},
+
+		_changeInfo: function(){
+			if( !confirm('Tiešām vēlaties mainīt šos datus? Konta numurs būs jāapstiprina no jauna!') ){
+				return;
+			}
+			D.loadingOverlay(this._content);
+			this._mResetPayoutInfo = new DR.blogs.ResetPayoutInfo;
+			this._mResetPayoutInfo.onLoad = this._onChangeInfo;
+			this._mResetPayoutInfo.onError = this._onChangeInfo;
+			this._mResetPayoutInfo.call();
+		},
+
+		_onChangeInfo: function(){
+			this._payoutInfo = this._mResetPayoutInfo.re;
+			this._draw();
+		},
+
+		_payout: function(){
+			this._mPayout = new DR.blogs.RequestPayout;
+			this._mPayout.onLoad = this._onPayout;
+			this._mPayout.onError = this._onPayout;
+			this._mPayout.call();
+		},
+
+		_onPayout: function(){
+			Section.navigate('/blogs/my/profit');
+		}
+	};
+};
+Class( D.blogs.Payout, mkE.Base );// --- payout.js --- 
+D.loaded('blogs');
