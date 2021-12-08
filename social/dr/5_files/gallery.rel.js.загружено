@@ -1,0 +1,4698 @@
+
+// +++ base.js +++
+D.Gallery = {
+	TYPE_PIC: 0,
+	TYPE_VIDEO: 1,
+	TYPE_EMBED: 2,
+	TYPE_GIF: 3,
+	rpc: new RPC('/gallery/rq/app.php'),
+	l: new D.Lang('xGal'),
+	picRq: '/gallery/rq/picc/',
+	pic: function(loc, par) {
+		par = par || {};
+		par.hideThumbs = par.hideThumbs || false; // paslēpjam visu thumbu joslu (izmantot multiscore hack'ā, kad thumbu vnk nav)
+		var onload = function(){
+			if(par.hideThumbs){
+				$('#galleryLargePicThumbs_').remove();
+				$('#galleryLargePicH1').css({height : 25});
+			}
+		};
+
+		D.setUrlHash(loc);
+		InfoBox.open(loc, {
+			modal: true,
+			width: 980,
+			className:'gallery',
+			onClose: function() {
+				D.setUrlHash('...');
+			},
+			onload: onload
+		});
+		return false
+	},
+	picsPg: function(el, link) {
+		rq(link, InfoBox.opened ? InfoBox.content : 'ct', {overlay: true, scrollIntoView: true});
+		return false;
+	},
+	uploadCoverFile: function(par) {
+		var data = {
+			id: 'tmp',
+			type: par.type,
+			DS: par.DS
+		};
+		data[ par.nonce.name ] = par.nonce.value;
+		var upload = {
+			color: 'link',
+			url: D.UPL + 'pic/upload.php',
+			data: data,
+			limit: 1,
+			onUpload: function(re) {
+				if (!re.errorNr) {
+					$("#uploadedCover").find('#picture').attr('src', '');
+					$("#cover_temp_id").val(re.id);
+					$("#uploadedCover").find('#picture').attr('src', re.url).show(function() {
+						jQuery(function($) {
+							$('#picture').Jcrop({
+								onSelect: D.Gallery.showCoverCoords,
+								onRelease: function() {
+									var area = jcrop_api.tellSelect();
+									jcrop_api.setSelect([0, area.y, 700, (area.y + 214)]);
+								},
+								bgColor: 'black',
+								bgOpacity: .4,
+								maxSize: [700, 214],
+								minSize: [700, 214],
+								setSelect: [0, 0, 700, 214],
+								aspectRatio: 980 / 300
+							}, function() {
+								jcrop_api = this;
+							});
+						});
+					});
+					$(".formItemUpload").remove();
+				} else {
+
+				}
+			}
+		};
+		return upload;
+	},
+	showCoverCoords: function(c) {
+		D.Gallery.temp_x = c.x * 1.4;
+		D.Gallery.temp_y = c.y * 1.4;
+		D.Gallery.temp_h = $("#picture")[0].naturalHeight;
+		D.Gallery.temp_w = $("#picture")[0].naturalWidth;
+		var temp_dimensions = {'x': D.Gallery.temp_x, 'y': D.Gallery.temp_y, 'h': D.Gallery.temp_h, 'w': D.Gallery.temp_w};
+		$("#cover_temp_dimensions").val(D.JSON.stringify(temp_dimensions));
+	},
+	addPhotographer: function(uid) {
+		$.post("/gallery/rq/ajax.php", {method: 'add-photographer', uid: uid}, function() {
+			location.reload();
+		});
+	},
+	removePhotographer: function(uid) {
+		$.post("/gallery/rq/ajax.php", {method: 'del-photographer', uid: uid}, function() {
+			location.reload();
+		});
+	},
+	checkCoverFields: function(form) {
+		var data = D.ajaxPostData(form);
+		if (empty($.trim(data['author']))) {
+			T.Forms.error($("#author"),'Autors nedrīkst būt tukšs!');
+			return false;
+		}
+		if (empty($.trim(data['description']))) {
+			T.Forms.error($("#description"),'Apraksts nedrīkst būt tukšs!');
+			return false;
+		}
+		if ($(".formItemUpload").length > 0) {
+			alert("Lūdzu izvēlies bildi!");
+			return false;
+		}
+		if($.trim(data['author']).length > 26) {
+			T.Forms.error($("#author"),'Autora vārds pārsniedz 26 rakstzīmes!');
+			return false;
+		}
+		if($.trim(data['description']).length > 44) {
+			T.Forms.error($("#description"),'Apraksts pārsniedz 44 rakstzīmes!');
+			return false;
+		}
+		return true;
+	},
+	savePosition: function(el, pos) {
+		var overlay = mkE({
+			tag: 'div',
+			className: 'rqOverlay'
+		}).append(el);
+		D.Gallery.rpc.send(
+			'changeOrder',
+			{
+				pid: el.getAttribute('pid'),
+				pos: pos
+			},
+			function(re) {
+				removeNode(overlay);
+			}
+		);
+	},
+	deleteSelected: function(aid) {
+		if (!this.ms) {
+			return false;
+		}
+		if (!confirm(xGlobal[ 'confirm delete' ])) {
+			return false;
+		}
+		var pids = [];
+		for (var i = 0; i < this.ms.selected.length; i++) {
+			pids.push(Number(this.ms.selected[ i ].getAttribute('pid')));
+		}
+		rq(
+			'/gallery/rq/album_edit_pics.php?aid=' + aid + '&DS=' + D.DS + '&delAlbumItems=' + pids.join(','),
+			'galleryUploaded',
+			{
+				overlay: true
+			}
+		);
+		return false;
+	},
+	addPopupWidth: 670,
+	addPopupHeight: 500,
+	addPopup: function(par) {
+		var url = '/gallery/add.php?aid=' + (par.aid ? par.aid : '0');
+		url += '&tab=' + (par.tab ? par.tab : '1');
+		if (par.fid) {
+			url += '&fid=' + par.fid;
+		}
+		if (par.withTypes) {
+			url += '&withTypes';
+		}
+		if (par.choose) {
+			url += '&choose';
+		}
+		url += '&referer=' + encodeURIComponent(document.location.href.split('#')[0]);
+		if (par.lat && par.lng) {
+			url += '&lat=' + par.lat + '&lng=' + par.lng;
+		}
+		window.open(url, '_blank', 'location=0,status=1,scrollbars=1,width=' + this.addPopupWidth + ',height=' + this.addPopupHeight + ',resizable=0');
+		return false;
+	},
+	setThumb: function(el, event, aid, pid) {
+		el.disabled = true;
+		D.Gallery.rpc.send(
+			'setThumb',
+			{
+				aid: aid,
+				pid: pid
+			},
+			function(re) {
+				el.disabled = false;
+			}
+		);
+	},
+	commentReply: function(el, cid, reply, cancel) {
+		$('#galleryLargePictureCommentList .galleryCommentReply').html(reply);
+		var galleryLargePictureReply = document.getElementById('galleryLargePictureReply');
+		if (galleryLargePictureReply.value == cid) {
+			el.innerHTML = reply;
+			galleryLargePictureReply.value = 0;
+			document.getElementById('galleryLargePictureCommentList').appendChild(document.getElementById('galleryLargePictureAddComment'));
+			removeClassName(document.getElementById('galleryLargePictureAddComment'), 'answer');
+		} else {
+			el.innerHTML = cancel;
+			galleryLargePictureReply.value = cid;
+			D.insertAfter(document.getElementById('galleryLargePictureAddComment'), document.getElementById('galleryLargePictureComment' + cid));
+			addClassName(document.getElementById('galleryLargePictureAddComment'), 'answer');
+		}
+		return false;
+	}, // commentReply
+
+	// +++ add pic user +++
+
+	hoverPicUser: function(v, uid) {
+		if (!D.GalleryTagLarge) {
+			return;
+		}
+		var tag = D.GalleryTagLarge.tagByUid(uid);
+		if (!tag) {
+			return;
+		}
+		if (v) {
+			$(tag.node).addClass('hover');
+		} else {
+			$(tag.node).removeClass('hover');
+		}
+	}, // hoverPicUser
+
+	delPicUser: function(el, pid, fid) {
+		D.confirmDelete(function() {
+			if( el ){
+				el.style.display = 'none';
+			}
+			D.Gallery.rpc.send(
+				'delPicUser',
+				{
+					pid: pid,
+					fid: fid
+				},
+				function(re) {
+					var tag = D.GalleryTagLarge.tagByUid(fid);
+					if (tag) {
+						tag.remove();
+					}
+					if( D.GalleryFS.opened ){
+						D.GalleryFS._inst.reloadTags();
+						return;
+					}
+					D.GalleryTagLarge.update();
+					/*
+					 $( '#galleryLargePicUser' + fid ).remove();
+					 D.Gallery.activePicture.selectedUsers = re.selectedUsers;
+					 rq( '/gallery/rq/pic_users.php?pid=' + pid, 'galleryLargePicSelectedUsers', { overlay:true, hash:false } );
+					 */
+				}
+			);
+		});
+		return false;
+	},
+	addPicUser: function(el) {
+		/*D.onLoad( [ 'SelectArea', 'multiAC' ], function(){
+		 D.Gallery.addPicUser_(el);
+		 } );*/
+		this.onGalleryTag(function() {
+			D.Gallery._addPicUser(el);
+		});
+		return false;
+	},
+	addPicUserLarge: function() {
+		$('a.selectFriendIcon').click();
+		return false;
+	},
+	_addPicUser: function(el) {
+		if (el._drSelect) {
+			el.innerHTML = D.Gallery.l.get('Picture option select user');
+			el._drSelect = false;
+			D.GalleryTagLarge.disable();
+		} else {
+			el.innerHTML = D.Gallery.l.get('cancel pic user sel');
+			el._drSelect = true;
+			D.GalleryTagLarge.enable();
+			var md = function() {
+				$('#galleryLargePictureCenter').unbind('mousedown', md);
+				if (el._drSelect && $(el).closest(document.body).length) {
+					D.GalleryTagLarge.disable();
+					D.Gallery._addPicUser(el);
+				}
+			};
+			setTimeout(function() {
+				$('#galleryLargePictureCenter').mousedown(md);
+			}, 500);
+		}
+		$('#galLargeSelUsers a').html(el.innerHTML);
+	},
+	/*
+	 addPicUser_:function( el ){
+	 D.console.info( el._drSelect );
+	 if( el._drSelect ){
+	 el.innerHTML = D.Gallery.l.get('Picture option select user');
+	 el._drSelect = false;
+	 $( '#galleryLargePicture' ).removeClass( 'hover' );
+	 D.Gallery.addPicUserOverlay.remove();
+	 D.Gallery.addPicUserSA.unbind();
+	 D.Gallery.addPicUserSelectCancel();
+	 } else {
+	 el.innerHTML = D.Gallery.l.get('cancel pic user sel');
+	 el._drSelect = true;
+	 $( '#galleryLargePicture' ).addClass( 'hover' );
+	 D.Gallery.addPicUserOverlay = mkE( {
+	 tag:'div',
+	 className:'galleryLargePicOverlay'
+	 } ).append( document.getElementById( 'galleryLargePicture' ) );
+	 D.Gallery.addPicUserSA = new D.SelectArea( {
+	 node:D.Gallery.addPicUserOverlay,
+	 maxWidth:500,
+	 maxHeight:500,
+	 onSelectEnd:D.Gallery.addPicUserSelectEnd,
+	 onSelectCancel:D.Gallery.addPicUserSelectCancel
+	 } );
+	 }
+	 return false;
+	 },
+
+	 addPicUserSelectEnd:function( x, y, w, h ){
+	 D.smallPopUp.open( '/gallery/rq/pic_select_fr.php', {
+	 title:D.Gallery.l.get( 'Picture option select user' ),
+	 onClose:function(){
+	 D.Gallery.addPicUserSA.clear();
+	 }
+	 } );
+	 },
+
+	 addPicUserSelectCancel:function(){
+	 D.smallPopUp.close();
+	 },
+
+	 activePictureAddUserAC:function(){
+	 if( empty( this.addPicUserAC.value() ) ){
+	 D.blink( {
+	 node:D.Gallery.addPicUserAC.node
+	 } );
+	 return false;
+	 }
+	 this.activePictureAddUser( this.addPicUserAC.value()[ 0 ] );
+	 return false;
+	 },
+
+	 activePictureAddUser:function( uid ){
+	 if( array_search( uid, D.Gallery.activePicture.selectedUsers ) !== false ){
+	 if( InfoBox.opened ){
+	 defAlert( D.Gallery.l.get('user is in photo') + '!' );
+	 } else {
+	 alert( D.Gallery.l.get('user is in photo') + '!' );
+	 }
+	 return;
+	 }
+	 var coords = {
+	 x:D.Gallery.addPicUserSA.x,
+	 y:D.Gallery.addPicUserSA.y,
+	 w:D.Gallery.addPicUserSA.w,
+	 h:D.Gallery.addPicUserSA.h
+	 };
+	 D.Gallery.rpc.send(
+	 'addPicUser',
+	 {
+	 pid:D.Gallery.activePicture.id,
+	 fid:uid,
+	 coords:coords
+	 },
+	 function( re, par ){
+	 var node = document.getElementById( 'galleryLargePicSelectedUsers' );
+	 node.style.display = '';
+	 rq( '/gallery/rq/pic_users.php?pid=' + D.Gallery.activePicture.id + '&openPicUsers', node, { hash:false } );
+	 if( re.add ){
+	 mkE( {
+	 tag:'a',
+	 className:'galleryLargePicUser',
+	 prop:{
+	 id:'galleryLargePicUser' + re.uid,
+	 href:'/friend/?' + re.uid,
+	 style:{
+	 left:coords.x + 'px',
+	 top:coords.y + 'px',
+	 width:coords.w + 'px',
+	 height:coords.h + 'px'
+	 }
+	 },
+	 els:[
+	 mkE( {
+	 tag:'div',
+	 className:'bg'
+	 } ),
+	 mkE( {
+	 tag:'div',
+	 className:'galleryLargePicUserName',
+	 text:htmlspecialchars_decode( re.userName )
+	 } )
+	 ]
+	 } ).append( document.getElementById( 'galleryLargePicture' ) );
+	 }
+	 }
+	 );
+	 //D.Gallery.addPicUserForm.remove();
+	 D.Gallery.addPicUserSA.clear();
+	 D.Gallery.addPicUserAC.clear();
+	 D.smallPopUp.close();
+	 },*/
+	// --- add pic user ---
+
+	albumPicsInfoEdited: function(pid) {
+		if( !this.onBeforeUnload ){
+			this.onBeforeUnload = D.closure(this, this._onBeforeUnload);
+			if( window.addEventListener ){
+				window.addEventListener('beforeunload', this.onBeforeUnload);
+			}
+		}
+		this._albumPicsInfoEdited = true;
+		document.getElementById('galleryEditAlbumPicsInfoEdited' + pid).value = '1';
+	},
+	_onBeforeUnload: function(e){
+		e = e || window.event;
+		var message = D.Lang.get('close_tab_changes');
+		if (e)
+		{
+			e.returnValue = message;
+		}
+		return message;
+	},
+	removeEditUnload: function(){
+		if( this.onBeforeUnload && window.removeEventListener ){
+			window.removeEventListener('beforeunload', this.onBeforeUnload);
+		}
+	},
+	setVideoThumb: function(el, pid, nr) {
+		$('img', el.parentNode).removeClass('videoThumbsActive');
+		$('input', el.parentNode)[ 0 ].value = nr;
+		addClassName(el, 'videoThumbsActive');
+		D.Gallery.albumPicsInfoEdited(pid);
+	},
+	albumEditRotate: function(pid, angle, DS) {
+		window.anonymous = window.anonymous + 1 || 1;
+		var varName = 'anonymous' + window.anonymous;
+		var el = document.getElementById('galleryEditAlbumPid' + pid);
+		D.loadingOverlay(el.parentNode);
+		window[ varName ] = function(data) {
+			D.removeLoadingOverlay(el.parentNode);
+			el.style.display = 'none';
+			el.onload = function() {
+				this.style.display = '';
+			};
+			el.src = data[pid].urlGM;
+		};
+		var file = D.Gallery.UPL + 'gallery/rotate.php';
+		mkE( {
+			tag: 'script',
+			prop: {
+				type: 'text/javascript',
+				src: file + '?pids=' + pid + '&angle=' + angle + '&callback=' + varName + '&DS=' + DS + '&' + (new Date()).getTime()
+			}
+		} ).append( getHeadElement() );
+		return false;
+	},
+	albumEditDeleteItem: function(pid, deleteAlbum) {
+		deleteAlbum = deleteAlbum === true ? deleteAlbum : false;
+		D.confirmDelete(function() {
+			D.Gallery.rpc.send(
+				'deleteItem',
+				{
+					pid: pid,
+					deleteAlbum: deleteAlbum
+				},
+				function(re) {
+					if( re.delAlbum ){
+						window.location.href = D.me.url + 'gallery';
+					}
+				}
+			);
+			$('#galleryAlbumEditItem' + pid).fadeOut();
+		});
+		return false;
+	},
+	albumEditMoveItem: function(pid, aid, uid) {
+		InfoBox.html('', {width: 660});
+		D.onLoad('GalleryApi', function() {
+			D.Gallery._albumEditMoveItem(pid, aid, uid);
+		});
+		return false;
+	},
+	_albumEditMoveItem: function(pid, aid, uid) {
+		var button;
+		var gal = new D.GalleryApi({
+			albumsPerPg: 12,
+			picsPerPg: 7,
+			maxLength: 1,
+			showPreview: true,
+			albumSelect: true,
+			//profile:true,
+			albumOnclick: function() {
+			},
+			onchange: function() {
+				if (count(this.value())) {
+					$(button).show();
+				} else {
+					$(button).hide();
+				}
+			},
+			uid: uid
+		});
+		gal.append(InfoBox.content);
+		button = T.submitButton({
+			caption: D.Gallery.l.get('Pārvietot uz'),
+			onclick: function() {
+				var id = gal.value()[0];
+				if (aid == id) {
+					InfoBox.close();
+					return;
+				}
+				D.Gallery.rpc.send(
+					'moveItem',
+					{
+						pid: pid,
+						aid: id
+					},
+					function(re){
+						if( !re || !re.ok ){
+							return;
+						}
+						$('#galleryAlbumEditItem' + pid).fadeOut();
+						$('#galleryAlbumEditItem' + pid + ' .galleryEditThumb input').remove();
+					}
+				);
+				InfoBox.close();
+			}
+		});
+		button.append(InfoBox.content);
+		$(button).hide();
+	},
+	albumEditPg: function(pg) {
+		if (!this._albumPicsInfoEdited) {
+			return;
+		}
+		var form = document.getElementById('galleryAlbumEdit');
+		var get = new Get();
+		get.add('pg', pg);
+		form.action = '?' + get;
+		form.submit();
+		return false;
+	},
+	setAsProfile: function(el, pid) {
+		el.style.display = 'none';
+		D.Gallery.rpc.send(
+			'setAsProfile',
+			{
+				pid: pid
+			},
+			function(re) {
+				el.style.display = '';
+				if (!re.ok) {
+					return;
+				}
+				el.innerHTML = '<span class="colorOk">' + D.Gallery.l.get('Profile picture changed') + '</span>';
+			}
+		);
+		return false;
+	},
+	extAdd: function() {
+		var newName = document.getElementById('galleryNewAlbumTitleInput');
+		var albumSelect = document.getElementById('galleryNewAlbumTitleSelect');
+		if (!this.activeAlbum.id) {
+			if (newName && empty(newName.value)) {
+				T.Forms.setError('#Forms_galleryNewAlbumTitleInput');
+				/*
+				 D.blink( {
+				 node:newName
+				 } );
+				 */
+				return;
+			}
+			if (albumSelect && empty(albumSelect.value)) {
+				T.Forms.setError('#Forms_galleryNewAlbumTitleSelect');
+				/*
+				 D.blink( {
+				 node:albumSelect
+				 } );*/
+				return;
+			}
+		}
+		$('#galleryAddChoose').fadeOut();
+		if (newName) {
+			newName.disabled = true;
+		}
+		if (albumSelect) {
+			albumSelect.disabled = true;
+		}
+		this.extAddItem(0, this.activeAlbum.id);
+		$('#galleryExtAddFooter').hide();
+	},
+	extAddItem: function(i, aid) {
+		if (!this.extAddUrls[ i ]) {
+			$('#galleryExtAddDone').show();
+			if (window.parent.InfoBox) {
+				window.parent.InfoBox.retVal = true;
+			}
+			return;
+		}
+		window.anonymous = window.anonymous + 1 || 1;
+		var varName = 'anonymous' + window.anonymous;
+		window[ varName ] = function(re) {
+			if (re.aid) {
+				aid = re.aid;
+			}
+			document.getElementById('galleryExtAddLoad' + i).style.display = 'none';
+			document.getElementById('galleryExtAddOk' + i).style.display = '';
+			D.Gallery.extAddItem(i + 1, aid);
+		};
+		var file = D.Gallery.UPL + 'gallery/ext_add.php';
+		var src = file + '?callback=' + varName + '&aid=' + aid + '&url=' + encodeURIComponent(this.extAddUrls[i]) +
+			'&tags=' + encodeURIComponent(D.Gallery.extAddTags || '') +
+			'&descr=' + encodeURIComponent($('#galleryExtDescr').val() || '') +
+			'&DS=' + D.DS;
+		var newName = document.getElementById('galleryNewAlbumTitleInput');
+		if (!this.activeAlbum.id) {
+			src += '&newAlbumTitle=' + encodeURIComponent(newName.value);
+		}
+
+		var galleryAdvert = document.getElementById('galleryAd');
+		var galleryAdAppId = document.getElementById('galleryAdAppId');
+		if (galleryAdvert && galleryAdvert.value == 'true') {
+			if (galleryAdAppId && galleryAdAppId.value) {
+				src += '&galleryAdAppId='+parseInt(galleryAdAppId.value);
+			}
+			src += '&newAlbumAd=true';
+		}
+
+		mkE( {
+			tag: 'script',
+			prop: {
+				type: 'text/javascript',
+				src: src
+			}
+		} ).append( getHeadElement() );
+		document.getElementById('galleryExtAddLoad' + i).style.display = '';
+	},
+	extAddOnload: function() {
+		var node = document.getElementById('outermost') || document.body;
+		if (node.scrollHeight > node.offsetHeight) {
+			window.resizeTo(640, Math.min(node.scrollHeight + 100, 720));
+		}
+	},
+	keyDown: function(e) {
+		D.event(e);
+		if (!e) {
+			return;
+		}
+		var node = e.target || e.srcElement;
+		if (node && node.tagName) {
+			switch (node.tagName.toLowerCase()) {
+				case "input":
+				case "textarea":
+				case "select":
+					return;
+				case 'div':
+					var re = false;
+					if (node.contentEditable == 'true') {
+						return;
+					}
+					$(node).parents().each(function() {
+						if (this.contentEditable == 'true') {
+							re = true;
+						}
+					});
+					if (re) {
+						return;
+					}
+			}
+		}
+		switch (e.keyCode) {
+			case 27: // esc
+				if (D.Gallery.SlideShow.inst) {
+					D.Gallery.SlideShow.inst.close();
+					break;
+				}
+				break;
+			case 32: // space
+				if (D.Gallery.SlideShow.inst) {
+					if (D.Gallery.SlideShow.inst.playing) {
+						D.Gallery.SlideShow.inst.stop();
+					} else {
+						D.Gallery.SlideShow.inst.play();
+					}
+					break;
+				}
+				break;
+			case 37:
+				if (D.Gallery.SlideShow.inst) {
+					D.Gallery.SlideShow.inst.back();
+					break;
+				}
+				if (D.Gallery.prevPic) {
+					D.Gallery.prevPic();
+				}
+				break;
+			case 39:
+				if (D.Gallery.SlideShow.inst) {
+					D.Gallery.SlideShow.inst.next();
+					break;
+				}
+				if (D.Gallery.nextPic) {
+					D.Gallery.nextPic();
+				}
+				break;
+		}
+	},
+	editDescr: function(pid) {
+		rq('/gallery/rq/pic_descr.php?edit&pid=' + pid, 'galleryLargeDescr', {overlay: true, hash: false});
+		return false;
+	},
+	cancelEditDescr: function(pid) {
+		rq('/gallery/rq/pic_descr.php?pid=' + pid, 'galleryLargeDescr', {overlay: true, hash: false});
+		return false;
+	},
+	selectedOptions: function() {
+		var pids = [];
+		$('.galleryEditThumb input').each(function() {
+			if (this.checked) {
+				pids.push(Number(this.value));
+			}
+		});
+		var galleryEditAllCont = document.getElementById('galleryEditAllCont');
+		if ( galleryEditAllCont ) {
+			if (empty(pids)) {
+				document.getElementById('galleryEditAllCont').style.display = 'none';
+			} else {
+				document.getElementById('galleryEditAllCont').style.display = '';
+			}
+		}
+		this.selectedPids = pids;
+	},
+	selectedMove: function() {
+		D.onLoad('GalleryApi', function() {
+			D.Gallery._selectedMove()
+		});
+		return false;
+	},
+	_selectedMove: function() {
+		if (empty(this.selectedPids)) {
+			return false;
+		}
+		var pids = this.selectedPids;
+		InfoBox.html('', {width: 660});
+		var button;
+		var gal = new D.GalleryApi({
+			albumsPerPg: 12,
+			picsPerPg: 7,
+			maxLength: 1,
+			showPreview: true,
+			albumSelect: true,
+			albumOnclick: function() {
+			},
+			onchange: function() {
+				if (count(this.value())) {
+					$(button).show();
+				} else {
+					$(button).hide();
+				}
+			},
+			uid: D.Gallery.UID
+		});
+		gal.append(InfoBox.content);
+		button = T.submitButton({
+			caption: D.Gallery.l.get('Pārvietot uz'),
+			onclick: function() {
+				var aid = Number(gal.value()[0]);
+				if (aid == D.Gallery.activeAlbum.id) {
+					InfoBox.close();
+					return false;
+				}
+				D.Gallery.rpc.send(
+					'moveItems',
+					{
+						aid: aid,
+						pids: pids
+					},
+					function(re){
+						if(!re){
+							return;
+						}
+						for( var pid in re.moved ){
+							$( '#galleryAlbumEditItem' + pid ).fadeOut();
+							$( '#galleryAlbumEditItem' + pid + ' .galleryEditThumb input').remove();
+						}
+						D.Gallery.selectedOptions();
+					}
+				);
+				InfoBox.close();
+			}
+		});
+		button.append(InfoBox.content);
+		$(button).hide();
+		return false;
+	},
+	selectedDelete: function() {
+		if (empty(this.selectedPids)) {
+			return false;
+		}
+		if (!D.confirmDelete()) {
+			return false;
+		}
+		var pids = this.selectedPids;
+		this.rpc.send(
+			'deleteItems',
+			{
+				pids: pids
+			},
+			function() {
+				D.Gallery.selectedOptions();
+			}
+		);
+		for (var k in pids) {
+			$('#galleryAlbumEditItem' + pids[k]).fadeOut();
+			$( '#galleryAlbumEditItem' + pids[k] + ' .galleryEditThumb input').remove();
+		}
+		return false;
+	},
+	albumEdited: function(aid) {
+		this.albumEdited.edited = true;
+		document.getElementById('galAlbumEdited' + aid).value = 1;
+	},
+	albumEditedPg: function(pg) {
+		if (this.albumEdited.edited) {
+			if (confirm(D.Gallery.l.get('Albums is edited'))) {
+				var form = document.getElementById('galAlbumsEditForm');
+				var get = new Get();
+				get.add('pg', pg);
+				form.action = get.toUrl();
+				form.submit();
+				return false;
+			}
+		}
+	},
+	buyTotalVisitors: function() {
+		D.pb('gallery_stats_total', {
+			callback: "document.location.href = '/gallery/?tab=24';"
+		});
+		return false;
+	},
+	resizeLarge: function(par) {
+		var d = 140;
+		if (!InfoBox.opened) {
+			d = 80;
+			// return;
+		}
+		var bh = Math.max( $(window).height() - d, 380 );
+		if (bh > 710) {
+			return;
+		}
+		var c = $('#galleryLargePicture')[0];
+		if (!c) {
+			return;
+		}
+		if (par.h < bh) {
+			return;
+		}
+		var img = $('img', c)[0];
+		if (!img) {
+			return;
+		}
+		var ch = par.h;
+		var cw = par.w;
+		var r = bh / ch;
+		c.style.width = Math.round(cw * r) + 'px';
+		c.style.height = Math.round(ch * r) + 'px';
+		img.style.width = c.style.width;
+		img.style.height = c.style.height;
+		$('.galleryLargePicUser', c).each(function() {
+			this.style.top = parseInt(this.style.top) * r + 'px';
+			this.style.left = parseInt(this.style.left) * r + 'px';
+			this.style.width = parseInt(this.style.width) * r + 'px';
+			this.style.height = parseInt(this.style.height) * r + 'px';
+		});
+		this._largeScale = r;
+	},
+	incPicVersion: function(pid) {
+		this.rpc.send(
+			'incVersion',
+			{
+				id: pid
+			},
+			D.reload
+		);
+	},
+	watchTopHeader: function(items) {
+		var c = mkE({
+			tag: 'div',
+			prop: {
+				onmouseover: function() {
+					this._drStop = true;
+				},
+				onmouseout: function() {
+					this._drStop = false;
+				}
+			},
+			style: {
+				position: 'relative',
+				height: '200px'
+			}
+		});
+		var onmouseover = function() {
+			$(this).animate({opacity: 1}, 200);
+		};
+		var onmouseout = function() {
+			$(this).animate({opacity: 0.3}, 200);
+		};
+		var onclick = function() {
+			//document.location = '/gallery/?pid=' + this._drPid
+			var pid = this._drPid;
+			D.onLoad('Say', function() {
+				Say.slideShow(0, pid);
+			});
+		};
+		var r, img, t = 0, perRow = 16;
+		for (var k in items) {
+			r = items[k];
+			img = mkE({
+				tag: 'div',
+				style: {
+					position: 'absolute',
+					top: Math.floor(k / perRow) * 50 + 'px',
+					left: (k % perRow) * 50 + 'px',
+					width: '50px',
+					height: '50px',
+					backgroundImage: 'url("' + r.u + '")',
+					opacity: 0.3,
+					filter: 'alpha(opacity=30)',
+					cursor: 'pointer'
+				},
+				prop: {
+					onmouseover: onmouseover,
+					onmouseout: onmouseout,
+					onclick: onclick,
+					_drPid: r.i
+				}
+			}).append(c);
+			mkE({
+				tag: 'div',
+				style: {
+					position: 'absolute',
+					top: Math.floor(k / perRow) * 50 + 'px',
+					left: ((k % perRow) + perRow) * 50 + 'px',
+					width: '50px',
+					height: '50px',
+					backgroundImage: 'url("' + r.u + '")',
+					opacity: 0.3,
+					filter: 'alpha(opacity=30)',
+					cursor: 'pointer'
+				},
+				prop: {
+					onmouseover: onmouseover,
+					onmouseout: onmouseout,
+					onclick: onclick,
+					_drPid: r.i
+				}
+			}).append(c);
+			/*
+			 var show = function(){
+			 var img = arguments.callee.img;
+			 //img.style.opacity = '1';
+			 $(img).animate( { opacity:0.3 } );
+			 };
+			 show.img = img;
+			 setTimeout( show, Math.random() * 800 + 100 );
+			 */
+		}
+		c.appendTo('#galWatchTop');
+		setInterval(function() {
+			if (c._drStop || InfoBox.opened) {
+				return;
+			}
+			var left = (parseInt(c.style.left) || 0) - 1;
+			if (left == -800) {
+				left = 0;
+			}
+			c.style.left = left + 'px'
+		}, 70);
+		mkE({
+			tag: 'div',
+			id: 'galWatchTopText',
+			els: [
+				{
+					tag: 'div'
+				}
+			]
+		}).appendTo('#galWatchTop');
+	},
+	preload: function(src) {
+		if (D.Gallery.preloadNode) {
+			D.Gallery.preloadNode.remove();
+		}
+		D.Gallery.preloadNode = mkE({
+			tag: 'img',
+			prop: {
+				style: {
+					width: '1px',
+					height: '1px',
+					visibilty: 'hidden'
+				},
+				onload: function() {
+					if (D.DEV) {
+						D.console.info('preload ' + src);
+					}
+					this.remove();
+				}
+			}
+		});
+		D.Gallery.preloadNode.src = src;
+		//D.Gallery.preloadNode.appendTo('#galleryLargeBottom');
+	},
+	gemius: function() {
+	},
+	otherUserAlbum: function( aid, par, event ){
+		if (event && (event.ctrlKey || event.metaKey)) {
+			return;
+		}
+		par = par || {};
+		this.rpc.send(
+			'getAlbumFirstItem',
+			{
+				aid: aid,
+				stats:par.stats || ''
+			},
+			function(re) {
+				if (!re) {
+					return;
+				}
+				if (!D.browser.mobile && (InfoBox.opened || par.infoBox)) {
+					D.onLoad(['GalleryFS', 'Comments'], function() {
+						D.GalleryFS.open({pid: re.pid, noHash: par.noHash || false});
+					});
+					D.onLoad('Say', function() {
+						//Say.slideShow(0, re.pid);
+					});
+					return;
+				}
+				document.location = re.url;
+			}
+		);
+		return false;
+	},
+	otherUserGalleryCover:function(pid) {
+		if(!D.browser.mobile) {
+			return Say.slideShow(0,pid);
+		}
+		this.rpc.send('getAlbumURLByPid',{pid:pid},function(re){
+			document.location = re.url;
+		});
+	},
+	albumVisitors: function(aid) {
+		InfoBox.open('/gallery/rq/album_visitors.php?aid=' + aid, {width: 730});
+		return false;
+	},
+	filterLinkType: function(cbx) {
+		cbx.disabled = true;
+		this.rpc.send(
+			'filterLinkType',
+			{
+				linkType: cbx.value,
+				is: cbx.checked
+			},
+			function(re) {
+				cbx.disabled = false;
+				this.filterShow();
+			},
+			this
+		);
+		var c = 0;
+		$(cbx).closest('form').find('input').each(function() {
+			if (this.checked) {
+				++c;
+			}
+		});
+		if (!c) {
+			$(cbx).closest('form').find('input')[0].checked = true;
+		}
+	},
+	filterType: function(cbx) {
+		cbx.disabled = true;
+		this.rpc.send(
+			'filterType',
+			{
+				type: cbx.value,
+				is: cbx.checked
+			},
+			function(re) {
+				cbx.disabled = false;
+				this.filterShow();
+			},
+			this
+		);
+		var c = 0;
+		$(cbx).closest('form').find('input').each(function() {
+			if (this.checked) {
+				++c;
+			}
+		});
+		if (!c) {
+			$(cbx).closest('form').find('input').each(function() {
+				this.checked = true;
+			});
+		}
+	},
+	filterGroups: function() {
+		D.smallPopUp.open('/gallery/rq/filter_groups.php', {width: 400});
+		return false;
+	},
+	filterGroup: function(cbx, skipCountCheck) {
+		cbx.disabled = true;
+		var groups = [];
+		$(cbx).closest('table').find('input').each(function() {
+			if (this.value == 'all') {
+				return;
+			}
+			if (this.checked) {
+				groups.push(Number(this.value));
+			}
+		});
+		this.rpc.send(
+			'filterGroup',
+			{
+				groups: groups
+			},
+			function(re) {
+				if (re.caption) {
+					$('#galFilterGroups').html(re.caption);
+				}
+				cbx.disabled = false;
+				this.filterShow();
+			},
+			this
+		);
+		if (empty(groups) && !skipCountCheck) {
+			$(cbx).closest('table').find('input').each(function() {
+				this.checked = true;
+			});
+		}
+	},
+	filterShow: function() {
+		var get = new Get();
+		get.add('pg', 1).add('skipAJAX');
+		rq('/gallery/?' + get, 'ct', {overlay: true, hash: false});
+	},
+	filterGroupAll: function(cbx) {
+		$(cbx).closest('table').find('input').each(function() {
+			this.checked = cbx.checked;
+		});
+		this.filterGroup(cbx, true);
+	},
+	likeLarge: function(el) {
+		$(el).toggleClass('on');
+		$('.galLargeColL .likeIcon').click();
+		if ($(el).hasClass('on')) {
+			el.title = D.Lang.get('Dislike it');
+		} else {
+			el.title = D.Lang.get('I like it');
+		}
+	},
+	largeOnLike: function(v) {
+		var els = $('#galLargeLike');
+		if (v) {
+			els.addClass('on');
+			els.attr({title: D.Lang.get('Dislike it')});
+		} else {
+			els.removeClass('on');
+			els.attr({title: D.Lang.get('I like it')});
+		}
+	},
+	onGalleryTag: function(callback) {
+		if (!D.onLoad('GalleryTag', callback)) {
+			D.addJS('/gallery/js/gallery_tag.js');
+		}
+	},
+
+	publish:function( e, aid, node ){
+		$(node).closest('.button').remove();
+		D.stopPropagation(e);
+		new D.GalleryPublish(aid);
+		return false;
+	}
+};
+
+
+
+
+
+
+
+D.Gallery.calbums = {
+	add: function(type, id, par) {
+		par = par || {};
+		var url = '/gallery/calbums/add.php?calb=' + type + '|' + id;
+		if (par.uid) {
+			url += '&uid=' + par.uid;
+		}
+		InfoBox.iframe(url, {width: 700, height: 520});
+		return false;
+	},
+	doAdd: function(type, id) {
+		D.Gallery.rpc.send(
+			'joinAlbum',
+			{
+				type: type,
+				id: id,
+				aids: D.Gallery.calbums.tmpApi.value()
+			},
+			function(re) {
+				parent.D.reload();
+			}
+		);
+	}
+};
+//
+D.Gallery.text2HTML = {};
+D.Gallery.text2HTMLShowImage = function(pic, object) {
+	if(pic.parentNode.nodeName == 'A'){
+		return false;
+	}
+	var closeParent = true;
+	// Do not close parent if opened from comment.
+	if (typeof object == 'string' && object.substring(0, 7) == 'comment') {
+		closeParent = false;
+	}
+	InfoBox.html('', {width: 100, height: 100, overlayClose: true, closeParent:closeParent});
+	var img, prev, next;
+	var pid = pic.getAttribute('pid');
+	var pids = array_keys(D.Gallery.text2HTML[ object ]);
+	var n = Number(array_search(pid, pids));
+	var c = count(D.Gallery.text2HTML[ object ]);
+	var showArrows = function() {
+		prev.style.display = (n > 0 ? '' : 'none');
+		next.style.display = (n < c - 1 ? '' : 'none');
+	};
+	var node = mkE({
+		tag: 'center',
+		els: [
+			mkE({
+				tag: 'div',
+				prop: {
+					id: 'galleryLargePicture'
+				},
+				els: [
+					prev = mkE({
+						tag: 'div',
+						prop: {
+							id: 'galleryLargePicturePrev',
+							onclick: function() {
+								n = n - 1;
+								img.src = D.Gallery.text2HTML[ object ][ pids[ n ] ].urlLarge;
+								description.innerHTML = D.Gallery.text2HTML[ object ][ pids[ n ] ].description ? D.Gallery.text2HTML[ object ][ pids[ n ] ].description : '';
+								showArrows();
+							}
+						},
+						els: [
+							mkE({
+								tag: 'div'
+							})
+						]
+					}),
+					img = mkE({
+						tag: 'img',
+						prop: {
+							onload: function() {
+								this.style.display = '';
+								this.parentNode.style.width = this.width + 'px';
+								InfoBox.resizeTo(this.width, this.height, {animated: true});
+							}
+						}
+					}),
+					next = mkE({
+						tag: 'div',
+						prop: {
+							id: 'galleryLargePictureNext',
+							onclick: function() {
+								n = n + 1;
+								img.src = D.Gallery.text2HTML[ object ][ pids[ n ] ].urlLarge;
+								description.innerHTML = D.Gallery.text2HTML[ object ][ pids[ n ] ].description ? D.Gallery.text2HTML[ object ][ pids[ n ] ].description : '';
+								showArrows();
+							}
+						},
+						els: [
+							mkE({
+								tag: 'div'
+							})
+						]
+					})
+				]
+			}),
+			description = mkE({
+				tag: 'div',
+				innerHTML: D.Gallery.text2HTML[ object ][ pid ].description ? D.Gallery.text2HTML[ object ][ pid ].description : ''
+			})
+		]
+	}).append(InfoBox.content);
+	img.src = D.Gallery.text2HTML[ object ][ pid ].urlLarge;
+	showArrows();
+};
+
+D.Gallery.text2HTMLExpandImage = function(pic, object) {
+	$(pic).attr('src', D.Gallery.text2HTML[ object ][ $(pic).attr('pid') ].urlLarge);
+
+	$(pic).bind('click', function() {
+		if ($(this).width() > 500) {
+			$(pic).attr('src', D.Gallery.text2HTML[ object ][ $(pic).attr('pid') ].urlMiddle);
+		} else {
+			D.Gallery.text2HTMLExpandImage(pic, object);
+		}
+	});
+};
+
+D.Gallery.picEditorOnSave = function(resp) {
+	if (!resp || !resp.urlGM) {
+		D.reload();
+	}
+	document.getElementById('galleryEditAlbumPid' + resp.id).src = resp.urlGM;
+	InfoBox.close();
+};
+
+D.Gallery.makeCollage = function() {
+	var collage_start_row = 2;
+	D.Gallery.total_rows = D.Gallery.total_rows || 1;
+	D.Gallery.total_width = D.Gallery.total_width || 0;
+	D.Gallery.element_row = D.Gallery.element_row || [];
+	var temp_width = 0;
+	if (D.Gallery.element_row.length > 0) {
+		for (var i in D.Gallery.element_row) {
+			D.Gallery.element_row[i].show();
+		}
+	}
+	$(".gallery").each(function(i) {
+
+		var orig_height = parseInt($(this).children(".coverTop").attr("data-height"), 10);
+		var orig_width = parseInt($(this).children(".coverTop").attr("data-width"), 10);
+		$(this).width(orig_width);
+		D.Gallery.total_width += orig_width;
+		D.Gallery.element_row.push($(this));
+		var global_width = D.Gallery.collageWidth || 1080;
+		if (D.Gallery.total_width >= global_width) {
+			var row_overflow = (D.Gallery.total_width - global_width) + ((D.Gallery.element_row.length) * 5);// 740 - 730 + (20)
+			var new_width_of_last_element = orig_width - row_overflow;//cik vispaar ir briivaa vieta
+			var margin_h = 0;
+			var cropped_width = 0;//cik grib elements lai buutu smuki
+			if (orig_width >= orig_height) {
+				margin_h = 0;
+				cropped_width = Math.round(orig_width / 2);//66%
+			} else {
+				margin_h = Math.round(orig_height - D.Gallery.artificial_height) / 2;
+				cropped_width = Math.round(orig_width / 5) * 4;
+			}
+			if (new_width_of_last_element > cropped_width) {
+				$(this).width(new_width_of_last_element + 5);
+				var margin = (new_width_of_last_element - orig_width) / 2;
+				if (!$(this).next().hasClass("miniads")) {
+					$(this).addClass('lastAlbum');
+				}
+				$(this).children(".coverTop").css({
+					"margin-top": -margin_h,
+					"margin-left": margin
+				});
+			} else {
+				var missing_pixels = cropped_width - new_width_of_last_element;
+				var missing_pixels_per_element = Math.round(missing_pixels / (D.Gallery.element_row.length - 1));
+				var missing_pixels_from_rounding = missing_pixels - (missing_pixels_per_element * (D.Gallery.element_row.length - 1));
+				var last_element = D.Gallery.element_row.pop();
+				var row_size = 0;
+				for (i in D.Gallery.element_row) {
+					var this_width = D.Gallery.element_row[i].children(".coverTop").attr("data-width");
+					var this_height = D.Gallery.element_row[i].children(".coverTop").attr("data-height");
+					D.Gallery.element_row[i].css({
+						width: (this_width - missing_pixels_per_element)
+					});
+					margin = (parseInt(D.Gallery.element_row[i].css("width").replace("px", ""), 10) - this_width) / 2;
+					if (this_width < this_height) {
+						margin_h = (this_height - D.Gallery.artificial_height) / 2;
+					} else {
+						margin_h = 0;
+					}
+					D.Gallery.element_row[i].children(".coverTop").css({
+						"margin-top": -margin_h,
+						"margin-left": margin
+					});
+					row_size += this_width - missing_pixels_per_element + 5;
+				}
+				row_size += cropped_width;
+				var remainder = global_width % row_size;
+				last_element.width(cropped_width + remainder);
+				this_width = last_element.children(".coverTop").attr("data-width");
+				this_heigth = last_element.children(".coverTop").attr("data-height");
+				if (this_width < this_heigth) {
+					margin_h = (this_heigth - D.Gallery.artificial_height) / 2;
+				} else {
+					margin_h = 0;
+				}
+				margin = ((cropped_width + missing_pixels_from_rounding) - last_element.children(".coverTop").attr("data-width")) / 2;
+
+				if (!last_element.next().hasClass("miniads")) {
+					last_element.addClass('lastAlbum');
+				}
+
+				last_element.children(".coverTop").css({
+					"margin-top": -margin_h,
+					"margin-left": margin
+				});
+
+			}
+			D.Gallery.element_row = [];
+			D.Gallery.total_width = 0;
+			D.Gallery.total_rows++;
+		} else if (D.Gallery.total_width < global_width && $(this).next(".gallery").length === 0 && !D.Gallery.element_show_last) {
+			for (i in D.Gallery.element_row) {
+				D.Gallery.element_row[i].hide();
+			}
+		}
+		$(this).removeClass("gallery");
+	});
+};
+
+D.Gallery.clearPoll = function() {
+	$(".poll").children('.button').remove();
+	$('.question').html('Paldies, mums ir svarīgs Tavs viedoklis.');
+};
+
+D.Gallery.saveCover = function() {
+	$.post("/gallery/rq/ajax.php", {method: 'save_cover'}, function() {
+		location.reload();
+	});
+};
+
+D.Gallery.cancelCover = function() {
+	$.post("/gallery/rq/ajax.php", {method: 'cancel_cover'}, function() {
+		location.reload();
+	});
+};
+
+D.Gallery.coverPicture = function(pid,action,user,height) {
+	if(D.ENV == "INSP") {
+		window.parent.location.hash = "";
+	}
+	height = (height/1.4) + 130;
+	if(action === "remove") {
+		$.post(D.URL+"gallery/rq/ajax.php",{method:'delete','id':pid},function(data){
+			if( D.GalleryFS.opened ){
+				D.GalleryFS._inst.reloadItem();
+			}
+			InfoBox.close();
+		});
+	} else {
+		InfoBox.iframe('/gallery/rq/cover_from_gallery.php?picture='+pid+"&user="+user,{width:700,height:height});
+	}
+};
+
+D.Gallery.openCover = function(pid,uid) {
+	if(D.browser.mobile) {
+		document.location.href = D.URL+'user/'+uid+'/gallery/?pid='+pid;
+	} else {
+		return Say.slideShow( 0, pid )
+	}
+};
+
+D.Gallery.showUploadForm = function() {
+	document.location.href += "?upload=1";
+};
+
+D.Gallery.openInspector = function() {
+	var win=window.open(D.INSP+'/cover', '_blank');
+	InfoBox.close();
+	win.focus();
+};
+
+D.Gallery.changeContent = function() {
+	window.parent.$("#change-cover").addClass("hidden");
+	window.parent.$("#save-cover,#cancel-cover").removeClass("hidden");
+	$.post("/gallery/rq/ajax.php", {method: 'get_new_cover'}, function(data) {
+		json = D.JSON.parse(data);
+		window.parent.$(".head-picture").css({
+			"background-image": "url('" + json.image + "')"
+		});
+		window.parent.$(".additional-info").children(".picture-title").html(json.title);
+		window.parent.$(".additional-info").children(".author").html(json.author);
+		InfoBox.close();
+	})
+};
+
+// profila bilžu galerija
+D.Gallery.profile = {
+	edited: function(id) {
+		document.getElementById('profgal_edit' + id).value = '1';
+	},
+	del: function(id) {
+		var cb = function(){
+			D.Gallery.rpc.send(
+				'profileGalDel',
+				{
+					id: id
+				},
+				function() {
+				}
+			);
+			$('#galleryAlbumEditItem' + id).fadeOut();
+		};
+		D.confirmDelete(cb);
+		return false;
+	},
+	setAsProfile: function(el, id) {
+		el.parentNode.innerHTML = '...';
+		D.Gallery.rpc.send(
+			'profileGalAsProfile',
+			{
+				id: id
+			},
+			function() {
+				//D.reload();
+				$(el.parentNode).hide();
+				document.location.href = '?tab=21&i=0';
+			}
+		);
+	},
+	rate: function(el, id) {
+		//$( el.parentNode ).hide();
+		var rpc = new RPC('/rate/rq/app.php');
+		rpc.send(
+			'rate',
+			{
+				pid: id
+			},
+			function(re) {
+				el.parentNode.innerHTML = '<span class="color2">' + re.msg + '</span>';
+			}
+		);
+	},
+	editDescr: function(pid) {
+		rq('/gallery/profile/pic_descr.php?edit&id=' + pid, 'galleryLargeDescr', {overlay: true, hash: false});
+		return false;
+	},
+	cancelEditDescr: function(pid) {
+		rq('/gallery/profile/pic_descr.php?id=' + pid, 'galleryLargeDescr', {overlay: true, hash: false});
+		return false;
+	}
+};
+
+D.Gallery.recommend = function(par, el){
+	if( empty(par.pid) || empty(par.uid) ){
+		return;
+	}
+
+	D.Say.rpc.send('recommend', par, D.closure(this, D.Gallery.onRecommend, par, el));
+};
+
+D.Gallery.onRecommend = function(par, el, re){
+	setNodeText(el, D.Lang.get('Cancel'));
+	el.onclick = D.closure(this, D.Gallery.cancelRecommend, par, el);
+};
+
+D.Gallery.cancelRecommend = function(par, el){
+	if( empty(par.pid) || empty(par.uid) ){
+		return;
+	}
+
+	D.Say.rpc.send('cancelRecommend', par, D.closure(this, D.Gallery.onCancelRecommend, par, el));
+};
+
+D.Gallery.onCancelRecommend = function(par, el, re){
+	setNodeText(el, D.Lang.get('Recommend'));
+	el.onclick = D.closure(this, D.Gallery.recommend, par, el);
+};
+
+D.Gallery.metaText = function( par ) {
+	var parts = [];
+
+	var re = mkE({
+		tag: 'div',
+		className: 'metaInfo'
+	});
+
+	if( !empty( par.location ) ){
+		if( !empty(parts) ){
+			parts.push(' '  + D.Lang.get('and') + ' ');
+		}
+		parts.push({
+			tag: 'span',
+			els: [
+				D.Lang.get('checked_in') + ' ',
+				{
+					tag: 'a',
+					href: '/places/' + par.location.value,
+					text: htmlspecialchars_decode(par.location.caption)
+				}
+			]
+		});
+	}
+
+	if( !empty(par.friends) ){
+		if( empty(parts) ){
+			parts.push(D.Lang.get('with') + ' ');
+		}else{
+			parts.push(' '  + D.Lang.get('with') + ' ');
+		}
+		for( var i = 0, l = par.friends.length; i < l; i++ ){
+			if( i > 0 && i + 1 != l && (l <= 3 || i < 2) ){
+				parts.push(', ');
+			}else if( l > 1 && ( i == l - 1 || (i == 2 && l > 3) )  ){
+				parts.push(' ' + D.Lang.get('and') + ' ');
+			}
+			if(  i == 2 && l > 3 ){
+				var moreFriendsLink = mkE({
+					tag: 'a',
+					onclick: D.closure(this, function() {
+						var popup = new D.SayItem.WithPopup(par.friends);
+						InfoBox.els(popup, {
+							width: 500,
+							withoutPadding: true
+						});
+					}),
+					text: D.Lang.nget(l - 2, 'friends_ins')
+				});
+				parts.push(moreFriendsLink);
+				break;
+			}
+			var withName = par.friends[i];
+			if( !withName.uid && withName.title ){
+				parts.push({
+					tag: 'span',
+					className: 'notUser',
+					text: htmlspecialchars_decode(withName.title)
+				});
+				continue;
+			}
+			var user = withName.user;
+			var userNode = mkE({
+				tag: 'a',
+				href: user.url,
+				text: htmlspecialchars_decode(withName.aktitle)
+			});
+			D.Say.addUserTooltip(userNode, user);
+			parts.push(userNode);
+		}
+	}
+
+	if( empty(parts) ){
+		return false;
+	}
+
+	re.appendChild(document.createTextNode(' — '));
+	mkE.appendTypeElement(re, parts);
+
+	return re;
+};
+
+D.Gallery.showMoreAlbumDescription = function() {
+	document.getElementById('galleryDescriptionMore').style.display = '';
+	removeNode( document.getElementById('galleryDescriptionShort') );
+};
+// --- base.js ---
+
+// +++ publish.js +++
+/**
+ * @class {D.GalleryPublish}
+ * @param {Number} aid
+ */
+D.GalleryPublish = Class(
+	/**
+	 * @lends {D.GalleryPublish#}
+	 */
+	{
+		/**
+		 * @param {Number} aid
+		 * @constructs
+		 */
+		__construct: function ( aid ) {
+			this.aid = aid;
+			D.Gallery.rpc.send(
+				'publish',
+				{
+					aid:aid
+				},
+				this._publishRe,
+				this
+			);
+		},
+
+		_publishRe: function(re){
+			if( re.vAlbum ){
+				D.reload();
+				return;
+			}
+			if( re.aid ){
+				this.aid = re.aid;
+				this.newAlbum = true;
+				$('#galleryCT > .inlineList .editIcon').attr('href', '?aid=' + this.aid + '&edit&');
+				var href = $('#galleryCT > .inlineList .downloadIcon').attr('href');
+				var get = new Get(href);
+				get.add('aid', this.aid);
+				$('#galleryCT > .inlineList .downloadIcon').attr('href', get.toUrl());
+				$('#galleryCT > .inlineList .addIcon').attr('href', '?tab=3&aid=' + this.aid);
+			}
+			D.smallPopUp.html( '', { onClose:D.reload } );
+			if( !D.onLoad( 'xGal', D.closure( this, this._lang, re ) ) ){
+				D.addLang('xGal');
+			}
+		},
+
+		_lang: function(re){
+			this.node = mkE( {
+				tag:'div',
+				els:[
+					T.success( D.Lang.get( 'Galerija publicēta', 'xGal' ) )
+				]
+			} ).append( D.smallPopUp.content );
+			var p = new T.Form.PermissionsPar;
+			p.caption = '';
+			p.value = re.perm;
+			p.uid = re.uid;
+			p.onchange = D.closure( this, this._onPermChange );
+			this._perm = new T.Form.Permissions(p);
+			this._perm.append( this.node );
+			this._saveButton = new T.Form.Button( {
+				caption:D.Lang.get('Save'),
+				visible:false,
+				onclick:D.closure( this, this._save )
+			} ).append( this.node );
+		},
+
+		_onPermChange: function(){
+			this._saveButton.visible(true);
+		},
+
+		_save: function(){
+			D.loadingOverlay( this.node );
+			D.Gallery.rpc.send(
+				'publishPerm',
+				{
+					aid:this.aid,
+					perm:this._perm.value()
+				},
+				this._onSave,
+				this
+			);
+		},
+
+		_onSave: function(){
+			if( this.newAlbum ){
+				if( window.parent && window.parent !== window ){
+					var doc = window.parent.document;
+				} else {
+					var doc = document;
+				}
+				var get = new Get(doc.location.href);
+				get.add('aid', this.aid);
+				doc.location.href = get.toUrl();
+				return;
+			}
+			D.reload();
+		}
+	}
+);
+
+// --- publish.js ---
+
+// +++ large_pic_thumbs.js +++
+/**
+ * @class {D.Gallery.largePicThumbs}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ * @param {Number} par.count
+ * @param {Number} par.aid albuma id - ja 0, tad maina index
+ * @param {Object} par.calbums
+ * @desc large picture thumb slider
+ */
+D.Gallery.largePicThumbs = Class(
+	/**
+	 * @lends {D.Gallery.largePicThumbs#}
+	 */
+	{
+		itemWidth: 55,
+
+		/**
+		 * @param {Object} par
+		 * @param {Number} par.count
+		 * @param {Number} par.aid albuma id - ja 0, tad maina index
+		 * @param {Object} par.calbums
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			var $largePicThumbs = this;
+			this.current = 0;
+			this.count = par.count;
+			this.contentWidth = this.count * this.itemWidth;
+			this.aid = par.aid || 0;
+			this.calbums = par.calbums || false;
+			if (!this.calbums) {
+				var get = new Get(document.location.href);
+				if (get.v('calb')) {
+					this.calbums = {
+						type: get.v('calb').split('|')[0],
+						id: get.v('calb').split('|')[1]
+					};
+				}
+			}
+			this.node = mkE({
+				tag: 'span',
+				className: 'largePicThumbs',
+				prop: {
+					onmousemove: function() {
+						var y = findPosY(this);
+						var x = findPosX(this);
+						var step = 0;
+						var regLen = 150;
+						var regK = 5;
+						if (/*D.mouseY > y &&  D.mouseY < y + 60 &&*/ D.mouseX < x + regLen) {
+							step = regLen / regK - Math.max(5 * regK, D.mouseX - x) / regK;
+						}
+						if (/*D.mouseY > y &&  D.mouseY < y + 60 &&*/ D.mouseX > x + this.offsetWidth - regLen) {
+							step = regLen / regK - Math.max(5 * regK, (x + this.offsetWidth) - D.mouseX) / regK;
+							step = -step;
+						}
+						if ($largePicThumbs.interval) {
+							clearInterval($largePicThumbs.interval);
+						}
+						step = Math.floor(step);
+						if (!step) {
+							return;
+						}
+						$largePicThumbs.interval = setInterval(function() {
+							if ($largePicThumbs.content.offsetLeft + step > 0) {
+								return false;
+							}
+							if ($largePicThumbs.content.offsetLeft + step < -($largePicThumbs.contentWidth - $largePicThumbs.node.offsetWidth)) {
+								return false;
+							}
+							$largePicThumbs.content.style.left = $largePicThumbs.content.offsetLeft + step + 'px';
+						}, 100);
+					},
+					onmouseout: function() {
+						if ($largePicThumbs.interval) {
+							clearInterval($largePicThumbs.interval);
+						}
+						$largePicThumbs.interval = false;
+						$largePicThumbs.loadData();
+					},
+					onclick: function() {
+						InfoBox.close();
+					}
+				},
+				els: [
+					this.content = mkE({
+						tag: 'div',
+						className: 'largePicThumbsContent'
+					})
+				]
+			});
+			this.node.onmouseover = this.node.onmousemove;
+			this.els = [];
+			var returnFalse = function(e) {
+				D.stopPropagation(e);
+				return false;
+			};
+			for (var i = 0; i < par.count; i++) {
+				this.els[i] = mkE({
+					tag: 'a',
+					className: 'galleryLargePicThumb',
+					prop: {
+						_drPicIndex: i,
+						href: '',
+						style: {
+							left: (i * this.itemWidth) + 'px'
+						},
+						onclick: returnFalse
+					},
+					els: [
+						mkE({
+							tag: 'div'
+						})
+					]
+				}).append(this.content);
+			}
+			var get = new Get(document.location.href);
+			switch (String(get.v('tab'))) {
+				case '5':
+				case '6':
+				case '9':
+				case '10':
+				case '12':
+				case '17':
+					for (var k in this.els) {
+						get.add('i', k);
+						this.els[k].href = '/gallery/?' + get.str()
+						this.els[k].onclick = function(e) {
+							D.stopPropagation(e);
+							get.add('i', this._drPicIndex);
+							rq(D.Gallery.picRq + '?' + get.str(), 'galleryLargePicContent', {
+								overlay: true,
+								hashDir: (InfoBox.opened ? "/gallery/" : "")
+							});
+							return false;
+						};
+					}
+					break;
+				case '21':
+					for (var k in this.els) {
+						this.els[ k ].onclick = function(e) {
+							D.stopPropagation(e);
+							rq('/gallery/profile/pic.php?tab=21&i=' + this._drPicIndex + '&fid=' + D.Gallery.UID, 'galleryLargePicContent', {overlay: true});
+							return false;
+						};
+					}
+					break;
+			}
+		},
+
+		append: function(el) {
+			if (typeof el == 'string') {
+				el = document.getElementById(el);
+			}
+			this.node.append(el);
+			this.loadData();
+			/*
+			 if( InfoBox.opened && this.node.offsetWidth > this.count * D.Gallery.largePicThumbs.itemWidth ){
+			 this.node.style.width = String( this.count * D.Gallery.largePicThumbs.itemWidth ) + 'px';
+			 this.node.style.display = 'inline-block';
+			 }*/
+		},
+
+		loadData: function() {
+			var $largePicThumbs = this;
+			var count = Math.ceil(this.node.offsetWidth / this.itemWidth);
+			var start = Math.abs(Math.floor(this.content.offsetLeft / this.itemWidth));
+			var end = Math.min(start + count, this.count);
+			var from = false;
+			var to = 0;
+			var ids = [];
+			for (var i = start; i < end; i++) {
+				if (!this.els[ i ]._drItem) {
+					if (from === false) {
+						from = i;
+					}
+					if (i > to) {
+						to = i;
+					}
+					ids.push(i);
+				}
+			}
+			if (this.loading || empty(ids)) {
+				return;
+			}
+			this.loading = true;
+			if (this.aid) {
+				for (var j = i; j < Math.min(start + count + 10, this.count); j++) { // 10 vēl papildus ielādē, lai nebūtu pie katra pieprasījums
+					ids.push(j);
+				}
+				var resp = function(re) {
+					for (var k in re.items) {
+						$largePicThumbs.els[ k ]._drItem = re.items[ k ];
+						$largePicThumbs.els[ k ].style.backgroundImage = "url('" + re.items[ k ].urlIcon + "')";
+						$largePicThumbs.els[ k ].href = '/gallery/?pid=' + re.items[ k ].pid;
+						$largePicThumbs.els[ k ].onclick = function(e) {
+							D.stopPropagation(e);
+							var get = new Get(document.location.href);
+							if (D.Gallery._selectUsers) {
+								get = new Get({
+									selectUsers: true
+								});
+							}
+							get.add('pid', this._drItem.pid);
+							rq(D.Gallery.picRq + '?' + get.str(), 'galleryLargePicContent', {
+								overlay: true,
+								hashDir: (InfoBox.opened ? "/gallery/" : ""),
+								hash: (D.Gallery._selectUsers ? false : true)
+							});
+							return false;
+						};
+						if (re.items[ k ].type != 0) {
+							addClassName($largePicThumbs.els[ k ], 'video');
+						}
+					}
+					$largePicThumbs.loading = false;
+				};
+				D.Gallery.rpc.send(
+					'albumThumbsByIndexs',
+					{
+						aid: this.aid,
+						indexs: ids,
+						calbums: this.calbums
+					},
+					resp
+				);
+			} else {
+				var resp = function(re) {
+					for( var k in re.items ){
+						$largePicThumbs.els[k]._drItem = re.items[k];
+						$largePicThumbs.els[k].style.backgroundImage = "url('" + re.items[k].urlIcon + "')";
+						if( re.items[k].type != 0 ) {
+							addClassName( $largePicThumbs.els[k], 'video' );
+						}
+						if( D.Gallery.galleryGet && D.Gallery.galleryGet.i ){
+							$largePicThumbs.els[k].onclick = D.closure( this, function( index, e ){
+								D.stopPropagation(e);
+								var get = new Get( D.Gallery.galleryGet );
+								get.add( 'i', index );
+								rq( D.Gallery.picRq + '?' + get.str(), 'galleryLargePicContent', {
+									overlay: true,
+									hashDir: (InfoBox.opened ? "/gallery/" : ""),
+									hash: (D.Gallery._selectUsers ? false : true)
+								} );
+							}, k );
+						}
+					}
+					$largePicThumbs.loading = false;
+				};
+				var get = new Get( D.Gallery.galleryGet );
+				switch (get.v('tab')) {
+					case '5':
+						D.Gallery.rpc.send(
+							'getLastestPicThumbs',
+							{
+								uid: D.Gallery.UID,
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '6':
+						D.Gallery.rpc.send(
+							'getLastestVideoThumbs',
+							{
+								uid: D.Gallery.UID,
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '9':
+						D.Gallery.rpc.send(
+							'userTopThumbs',
+							{
+								uid: D.Gallery.UID,
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '10':
+						D.Gallery.rpc.send(
+							'getPicsWhereUser',
+							{
+								uid: D.Gallery.UID,
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '17':
+						D.Gallery.rpc.send(
+							'searchThumbs',
+							{
+								search: get.v('search'),
+								type: get.v('type'),
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '21':
+						D.Gallery.rpc.send(
+							'profileThumbs',
+							{
+								uid: D.Gallery.UID,
+								from: from,
+								to: to
+							},
+							resp
+						);
+						break;
+					case '31':
+						D.Gallery.rpc.send(
+							'viewByPidsThumbs',
+							{
+								pids: get.v('pids')
+							},
+							resp
+						);
+						break;
+				}
+			}
+		},
+
+		setCurrent: function(v) {
+			var $largePicThumbs = this;
+			removeClassName(this.els[ this.current ], 'current');
+			if (!this.els[ v ]) {
+				return;
+			}
+			this.current = v;
+			addClassName(this.els[ v ], 'current');
+			function animateEnd() {
+				$largePicThumbs.loadData();
+			}
+			var visible = this.node.offsetWidth / 55;
+			if (v < visible / 2 - 1) {
+				$(this.content).animate({left: 0}, animateEnd);
+			} else if (this.contentWidth > this.node.offsetWidth) {
+				if (v > this.count - visible / 2 - 1) {
+					$(this.content).animate({left: -(this.contentWidth - this.node.offsetWidth)}, animateEnd);
+				} else {
+					$(this.content).animate({left: -((v - 6) * this.itemWidth)}, animateEnd);
+				}
+			}
+		}
+	}
+);
+// --- large_pic_thumbs.js ---
+
+// +++ slideshow.js +++
+D.Gallery.SlideShow = function(aid, index) {
+	InfoBox.close();
+	if (document.onkeydown !== D.Gallery.keyDown) {
+		document.onkeydown = D.Gallery.keyDown;
+	}
+	D.Gallery.SlideShow.inst = this;
+	var $slideShow = this;
+	this.cached = {};
+	this.aid = aid;
+	this.index = index || 0;
+	this.playing = false;
+	this.node = mkE({
+		tag: 'div',
+		className: 'gallerySlideShow gallerySlideShow000000',
+		prop: {
+			onmousemove: function() {
+				$slideShow.fadeButtons(1);
+			}
+		},
+		els: [
+			this.bg = mkE({
+				tag: 'div',
+				className: 'gallerySlideShowBg',
+				els: [
+					this.loading = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowLoading',
+						prop: {
+							style: {
+								display: 'none'
+							}
+						}
+					})
+				]
+			}),
+			this.content = mkE({
+				tag: 'div',
+				className: 'gallerySlideShowContent',
+				els: [
+					this.closeButton = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowCloseImg',
+						prop: {
+							onclick: function() {
+								$slideShow.close();
+								return false;
+							}
+						}
+					}),
+					this.pic2 = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowPic'
+					}),
+					this.pic = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowPic',
+						els: [
+							this.playButton2 = mkE({
+								tag: 'div',
+								className: 'gallerySlideShowPlay',
+								prop: {
+									onclick: function() {
+										$slideShow.playButton.onclick();
+									},
+									onmouseover: function() {
+										$(this).fadeIn();
+									},
+									onmouseout: function() {
+										$(this).fadeOut();
+									}
+								}
+							})
+						]
+					}),
+					this.current = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowCurrent'
+					}),
+					this.tmpImage = mkE({
+						tag: 'img',
+						prop: {
+							style: {
+								display: 'none'
+							},
+							onload: function() {
+								$slideShow.pic2.style.backgroundImage = $slideShow.pic.style.backgroundImage;
+								$($slideShow.pic2).show();
+								$($slideShow.pic2).fadeOut();
+								$($slideShow.pic).hide();
+								$($slideShow.pic).fadeIn();
+								$slideShow.pic.style.backgroundImage = "url('" + this.src + "')";
+								$slideShow.cacheNext();
+								$slideShow.loading.style.display = 'none';
+							}
+						}
+					}),
+					this.cacheImage = mkE({
+						tag: 'img',
+						prop: {
+							style: {
+								display: 'none'
+							}
+						}
+					}),
+					this.descr = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowDescr'
+					}),
+					this.timeoutSelect = mkE({
+						tag: 'select',
+						className: 'gallerySlideShowTimeout inp',
+						els: [
+							mkE({
+								tag: 'option',
+								text: '3',
+								prop: {
+									value: 3
+								}
+							})
+						],
+						prop: {
+							onchange: function() {
+								Draugiem.Cookie.create('gallerySlideShowTimeout', this.value, 7, '/gallery/');
+							},
+							style: {
+								display: 'none'
+							}
+						}
+					}),
+					this.backButton = mkE({
+						tag: 'a',
+						className: 'gallerySlideShowNavigBack',
+						prop: {
+							onclick: function() {
+								$slideShow.stop();
+								$slideShow.back();
+								return false;
+							},
+							style: {
+								display: 'none'
+							}
+						}
+					}),
+					this.playButton = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowNavigPlay',
+						prop: {
+							onclick: function() {
+								if ($slideShow.playing) {
+									$slideShow.stop();
+								} else {
+									if ($slideShow.index + 1 == $slideShow.picCount) {
+										$slideShow.index = -1;
+									}
+									$slideShow.play();
+								}
+								$slideShow.fadeButtons();
+								return false;
+							}
+						}
+					}),
+					this.nextButton = mkE({
+						tag: 'div',
+						className: 'gallerySlideShowNavigNext',
+						prop: {
+							onclick: function() {
+								$slideShow.stop();
+								$slideShow.next();
+								return false;
+							}
+						}
+					})
+				]
+			}) // .gallerySlideShowContent
+		]
+	}).append(document.body);
+	this.playButton2.style.opacity = '0';
+	this.playButton2.style.filter = 'alpha(opacity=0)';
+	if (Draugiem.Cookie.read('gallerySlideShowTimeout')) {
+		this.timeoutSelect.value = Draugiem.Cookie.read('gallerySlideShowTimeout');
+	} else {
+		this.timeoutSelect.value = 5;
+	}
+	if (Draugiem.Cookie.read('gallerySlideShowColor')) {
+		removeClassName(this.node, 'gallerySlideShow000000');
+		addClassName(this.node, 'gallerySlideShow' + Draugiem.Cookie.read('gallerySlideShowColor'));
+	}
+	$(this.bg).css({opacity: 0.05});
+	D.Gallery.rpc.send(
+		'slideShowGetInfo',
+		{
+			aid: aid,
+			index: this.index
+		},
+		function(re) {
+			$($slideShow.bg).animate({opacity: 0.92});
+			if (re.picCount == 1) {
+				$slideShow.nextButton.style.display = 'none';
+				$slideShow.playButton.style.display = 'none';
+			}
+			$slideShow.picCount = re.picCount;
+			$slideShow.index = re.pic.index;
+			$slideShow.loading.style.display = '';
+			$slideShow.tmpImage.src = re.pic.urlLarge;
+			$slideShow.current.innerHTML = re.albumTitle + ' - ' + ($slideShow.index + 1) + '. ' + D.Gallery.l.get('no') + ' ' + $slideShow.picCount;
+			$slideShow.descr.innerHTML = re.pic.descr;
+		}
+	);
+};
+
+D.Gallery.SlideShow.prototype.close = function() {
+	D.Gallery.SlideShow.inst = false;
+	var $slideShow = this;
+	$(this.node).fadeOut('fast', function() {
+		$slideShow.node.remove();
+	});
+};
+
+D.Gallery.SlideShow.prototype.fadeButtons = function(v) {
+	v = v ? 1 : 0;
+	this.backButton.animate({opacity: v}, 300);
+	this.nextButton.animate({opacity: v}, 300);
+	this.closeButton.animate({opacity: v}, 300);
+	this.playButton.animate({opacity: v}, 300);
+};
+
+D.Gallery.SlideShow.prototype.cacheNext = function() {
+	var $slideShow = this;
+	if (this.index + 1 >= this.picCount) {
+		return false;
+	}
+	if ($slideShow.cached[ this.index + 1 ]) {
+		return false;
+	}
+	D.Gallery.rpc.send(
+		'slideShowGetPic',
+		{
+			aid: this.aid,
+			i: this.index + 1
+		},
+		function(re) {
+			$slideShow.cacheImage.src = re.pic.urlLarge;
+			$slideShow.cached[ re.pic.index ] = re;
+		}
+	);
+};
+
+D.Gallery.SlideShow.prototype.back = function() {
+	var $slideShow = this;
+	if (this.index - 1 < 0) {
+		return false;
+	}
+	$slideShow.loading.style.display = '';
+	var refn = function(re) {
+		$slideShow.index = re.pic.index;
+		$slideShow.tmpImage.src = re.pic.urlLarge;
+		$slideShow.cached[ re.pic.index ] = re;
+		$slideShow.backButton.style.display = ($slideShow.index == 0 ? 'none' : '');
+		$slideShow.nextButton.style.display = ($slideShow.index + 1 == $slideShow.picCount ? 'none' : '');
+		$slideShow.current.innerHTML = re.albumTitle + ' - ' + ($slideShow.index + 1) + '. ' + D.Gallery.l.get('no') + ' ' + $slideShow.picCount;
+		$slideShow.descr.innerHTML = re.pic.descr;
+		return true;
+	}
+	if ($slideShow.cached[ this.index - 1 ]) {
+		return refn($slideShow.cached[ this.index - 1 ]);
+	}
+	D.Gallery.rpc.send(
+		'slideShowGetPic',
+		{
+			aid: this.aid,
+			i: this.index - 1
+		},
+		refn
+	);
+	return true;
+};
+
+D.Gallery.SlideShow.prototype.next = function() {
+	var $slideShow = this;
+	if (this.index + 1 >= this.picCount) {
+		return false;
+	}
+	$slideShow.loading.style.display = '';
+	var refn = function(re) {
+		$slideShow.index = re.pic.index;
+		$slideShow.tmpImage.src = re.pic.urlLarge;
+		$slideShow.cached[ re.pic.index ] = re;
+		$slideShow.backButton.style.display = ($slideShow.index == 0 ? 'none' : '');
+		$slideShow.nextButton.style.display = ($slideShow.index + 1 == $slideShow.picCount ? 'none' : '');
+		$slideShow.current.innerHTML = re.albumTitle + ' - ' + ($slideShow.index + 1) + '. ' + D.Gallery.l.get('no') + ' ' + $slideShow.picCount;
+		$slideShow.descr.innerHTML = re.pic.descr;
+		return true;
+	}
+	if ($slideShow.cached[ this.index + 1 ]) {
+		return refn($slideShow.cached[ this.index + 1 ]);
+	}
+	D.Gallery.rpc.send(
+		'slideShowGetPic',
+		{
+			aid: this.aid,
+			i: this.index + 1
+		},
+		refn
+	);
+	return true;
+};
+
+D.Gallery.SlideShow.prototype.play = function() {
+	var $slideShow = this;
+	this.playing = true;
+	this.timeout = setTimeout(function() {
+		if ($slideShow.next()) {
+			$slideShow.play();
+			$slideShow.fadeButtons();
+		} else {
+			$slideShow.stop();
+		}
+	}, 3000); // this.timeoutSelect.value *
+	addClassName(this.playButton, 'pause');
+};
+
+D.Gallery.SlideShow.prototype.stop = function() {
+	this.playing = false;
+	clearTimeout(this.timeout);
+	removeClassName(this.playButton, 'pause');
+};
+// --- slideshow.js ---
+
+// +++ gif_player.js +++
+/**
+ * @class {D.Gallery.GifPlayer}
+ * @param {Object} par
+ */
+D.Gallery.GifPlayer = Class(
+	/**
+	 * @lends {D.Gallery.GifPlayer#}
+	 */
+	{
+		playing: false,
+
+		/**
+		 * @param {Object} par
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			this.poster = par.poster || '';
+			this.src = par.src || '';
+			this.autoplay = par.autoplay || false;
+			this.noControls = par.noControls || false;
+
+			var videoPars = {
+				poster: this.poster,
+				src: this.src,
+				loop: true,
+				preload: 'none',
+				'webkit-playsinline': true,
+				muted: true
+			};
+			if( this.autoplay ){
+				videoPars.autoplay = true;
+			}
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'gifContainer',
+				els: [
+					this.playNode = mkE({
+						tag: 'div',
+						className: 'playButton'
+					}),
+					this.video = mkE({
+						tag: 'video',
+						attr: videoPars,
+						els: [
+							this.legacyNode = mkE({
+								tag: 'div'
+							})
+						],
+						prop: {
+							onpause: D.closure(this, this._onPause),
+							onplay: D.closure(this, this._onPlay),
+							onerror: D.closure(this, this._onError)
+						}
+					})
+				],
+				prop: {
+					onclick: D.closure(this, this._togglePlay)
+				}
+			});
+
+			if( par.w && par.h ){
+				this.node.style.width = par.w + 'px';
+				this.node.style.height = par.h + 'px';
+			}
+
+			var so = new SWFObject( D.PIMG + 'gallery/gifplayer.swf', 'gifSwf', par.w, par.h, 0, '#FFFFFF' );
+			so.addParam( 'wmode', 'transparent' );
+			so.addParam( 'quality', 'best' );
+			so.addParam( 'play', 'true' );
+			so.addParam( 'allowScriptAccess', 'always' );
+			so.addParam( 'scale', 'scale' );
+			so.addParam( 'salign', 'tl' );
+			so.addVariable( 'imgur_video', this.src );
+			so.addVariable( 'imgur_width', par.w );
+			so.addVariable( 'imgur_height', par.h );
+			so.addVariable( 'imgur_url', '' );
+			so.addVariable( 'width', par.w );
+			so.addVariable( 'height', par.h );
+			so.write( this.legacyNode );
+
+			if(!this.video.play){
+				this._initLegacy();
+			}
+
+			if(this.noControls){
+				this.playNode.remove();
+			}
+		},
+
+		append: function(parent){
+			this.node.append(parent);
+			if(this.autoplay){
+				this.play();
+			}
+			return this;
+		},
+
+		play: function(){
+			if(this.playing){
+				return;
+			}
+			if(typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1){
+				this.video.play().catch(this._playFailed);
+			}else{
+				this.video.play();
+			}
+		},
+
+		_playFailed: function(){
+			this.pause();
+		},
+
+		pause: function(){
+			if(!this.playing){
+				return;
+			}
+			this.video.pause();
+		},
+
+		_onPause: function(){
+			this.playing = false;
+			if( this.noControls ){
+				return;
+			}
+			this.video.style.zIndex = 0;
+		},
+
+		_onPlay: function(){
+			this.playing = true;
+			if( this.noControls ){
+				return;
+			}
+			this.video.style.zIndex = 2;
+		},
+
+		_onError: function(){
+			this._initLegacy();
+		},
+
+		_togglePlay: function(){
+			if(this.playing){
+				this.pause();
+				return;
+			}
+			this.play();
+		},
+
+		_initLegacy: function(){
+			this.legacyNode.append(this.node);
+			this.playNode.remove();
+			this.video.remove();
+			this.node.onclick = function(){};
+			addClassName(this.node, 'legacy');
+		}
+	}
+);
+// --- gif_player.js ---
+
+// +++ stats_block.js +++
+/**
+ * @class {D.Gallery.StatsBlock}
+ * @param {Object} par
+ */
+D.Gallery.StatsBlock = Class(
+	/**
+	 * @lends {D.Gallery.StatsBlock#}
+	 */
+	{
+		/**
+		 * @param {Object} par
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			par = par || {};
+			this.par = par;
+			this.transition = 'fade';
+			this.node = mkE({
+				tag: 'div',
+				className: 'galleryStatsBlockNew ' + this.transition,
+				els: [
+					{
+						tag: 'h3',
+						className: 'sidebarTitle',
+						text: this.par.title
+					},
+					this.content = mkE({
+						tag: 'div',
+						className: 'content'
+					}),
+					new T.Form.Button({
+						caption: this.par.buttonCaption,
+						href: '/stats/click.php?key=gallery_stats_new_block_button&url=' + encodeURIComponent('/gallery/?tab=8'),
+						stretch: true
+					})
+				]
+			});
+			this.total = 0;
+			this.current = 0;
+			this.steps = 0;
+			this.duration = 1000;
+			this.delay = 1500;
+			if( this.par.type == 'album' ){
+				this.drawAlbum();
+			}else{
+				this.drawUser();
+			}
+		},
+
+		append: function(parent){
+			this.node.append(parent);
+			if( this.par.unseem ){
+				setTimeout(D.closure(this, function(){
+					addClassName(this.counts, 'new');
+				}), this.delay);
+			}
+			return this;
+		},
+
+		drawAlbum: function(){
+			this._drawItem({
+				url: this.par.album.href,
+				image: this.par.album.image,
+				title: this.par.album.title
+			});
+			var elements = [];
+			for( var i in this.par.users ){
+				if( !this.par.users.hasOwnProperty(i) ){
+					continue;
+				}
+				var u = this.par.users[i];
+				elements.push(new D.Gallery.StatsBlockElement({
+					url: u.url,
+					image: u.image,
+					title: u.title
+				}));
+			}
+			this._drawElements(elements);
+			this._drawCounts({
+				caption: this.par.countCaption,
+				total: this.par.album.views
+			});
+			this.total = this.par.album.views;
+			this.steps = this.par.album.views;
+			if( this.par.unseen ){
+				setTimeout(D.closure(this, this.countUp), this.delay);
+			}
+		},
+
+		drawUser: function(){
+			this._drawItem({
+				url: this.par.user.url,
+				image: this.par.user.image,
+				title: this.par.user.title
+			});
+			var elements = [];
+			for( var i in this.par.albums ){
+				if( !this.par.albums.hasOwnProperty(i) ){
+					continue;
+				}
+				var a = this.par.albums[i];
+				elements.push(new D.Gallery.StatsBlockElement({
+					url: a.url,
+					image: a.image,
+					title: a.title
+				}));
+			}
+			this._drawElements(elements);
+			this._drawCounts({
+				caption: this.par.countCaption,
+				total: this.par.user.views
+			});
+			this.total = this.par.user.views;
+			this.steps = this.par.user.views;
+			if( this.par.unseen ){
+				setTimeout(D.closure(this, this.countUp), this.delay);
+			}
+		},
+
+		_drawItem: function(par){
+			par = par || {};
+			this.item = mkE({
+				tag: 'div',
+				className: 'item',
+				els: [
+					{
+						tag: 'a',
+						href: par.url,
+						attr: {
+							title: par.title
+						},
+						els: [
+							{
+								tag: 'img',
+								src: par.image
+							}
+						]
+					}
+				]
+			}).append(this.content);
+		},
+
+		_drawElements: function(elements){
+			addClassName(elements[0].node, 'current');
+			mkE({
+				tag: 'div',
+				className: 'elements',
+				els: [
+					elements
+				]
+			}).append(this.content);
+			this.elements = elements;
+			if( count(elements) > 1 ){
+				this._startTransition();
+			}
+		},
+
+		_drawCounts: function(par){
+			mkE({
+				tag: 'a',
+				href: this.par.href,
+				els: [
+					this.counts = mkE({
+						tag: 'div',
+						className: 'counts',
+						els: [
+							{
+								tag: 'div',
+								className: 'count',
+								els: [
+									{
+										tag: 'img',
+										src: this.par.icon
+									},
+									this.counter = mkE({
+										tag: 'span',
+										className: 'number',
+										text: this.par.unseen ? 1 : par.total,
+										style: {
+											width: String(par.total).length * 12 + 'px'
+										}
+									})
+								]
+							},
+							{
+								tag: 'div',
+								text: par.caption
+
+							}
+						]
+					})
+				]
+			}).append(this.content);
+		},
+
+		countUp: function(){
+			if( this.current >= this.total ){
+				return;
+			}
+			this.current++;
+			setNodeText(this.counter, this.current);
+			if( this.current < this.total ){
+				setTimeout(D.closure(this, this.countUp), this.duration / this.steps)
+			}
+		},
+
+		_startTransition: function(){
+			if( this.transition == 'fade' ){
+				setTimeout(D.closure(this, this._fade), 2000);
+				return;
+			}
+		},
+
+		_fade: function(){
+			this.currentElement = this.currentElement || 0;
+			var total = count(this.elements);
+			var next = this.currentElement + 1;
+			if( this.currentElement == total - 1 ){
+				next = 0;
+			}
+			removeClassName(this.elements[this.currentElement].node, 'current');
+			addClassName(this.elements[next].node, 'current');
+			this.currentElement = next;
+			setTimeout(D.closure(this, this._fade), 2000);
+		}
+	}
+);
+
+
+/**
+ * @class {D.Gallery.StatsBlockElement}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ * @param {String} par.url
+ * @param {String} par.image
+ * @param {String} par.title
+ */
+D.Gallery.StatsBlockElement = Class(
+	/**
+	 * @lends {D.Gallery.StatsBlockElement#}
+	 */
+	{
+		/**
+		 * @param {Object} par
+		 * @param {String} par.url
+		 * @param {String} par.image
+		 * @param {String} par.title
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			par = par || {};
+			this.node = mkE({
+				tag: 'div',
+				className: 'element',
+				els: [
+					{
+						tag: 'a',
+						href: par.url,
+						els: [
+							{
+								tag: 'img',
+								src: par.image
+							}
+						],
+						attr: {
+							title: par.title
+						}
+					}
+				]
+			});
+		}
+	},
+	mkE.Base
+);
+// --- stats_block.js ---
+
+// +++ layout_choose.js +++
+D.Gallery.LayoutChoose = Class(
+	/**
+	 * @lends {D.Gallery.LayoutChoose#}
+	 */
+	{
+		__construct: function(){
+			this.node = mkE({
+				tag: 'div',
+				className: 'GalleryLayoutChoose',
+				els: [
+					{
+						tag: 'div',
+						className: 'left',
+						els: [
+							{
+								tag: 'div',
+								className: 'title',
+								text: 'Veco režģa skatu'
+							},
+							{
+								tag: 'img',
+								src: '/gallery/img/gallery_layout_grid.png'
+							},
+							new T.Form.Button({
+								caption: 'Izvēlēties',
+								onclick: this._grid
+							})
+						]
+					},
+					{
+						tag: 'div',
+						className: 'right',
+						els: [
+							{
+								tag: 'div',
+								className: 'title',
+								text: 'Jauno Runā ierakstu skatu'
+							},
+							{
+								tag: 'img',
+								src: '/gallery/img/gallery_layout_list.png'
+							},
+							new T.Form.Button({
+								caption: 'Izvēlēties',
+								onclick: this._list
+							})
+						]
+					},
+					T.clear()
+				]
+			});
+		},
+
+		_grid: function(){
+			this._setLayout('grid');
+		},
+
+		_list: function(){
+			this._setLayout('list');
+		},
+
+		_setLayout: function(layout){
+			D.loadingOverlay(this.node);
+			this._mSetLayout = new DR.gallery.SetLayout();
+			this._mSetLayout.layout = layout;
+			this._mSetLayout.onLoad = this._onSetLayout;
+			this._mSetLayout.call();
+		},
+
+		_onSetLayout: function(){
+			T.tour.next();
+		}
+	},
+	mkE.Base
+);
+// --- layout_choose.js ---
+
+// +++ album_edit.js +++
+/**
+ * @class {D.Gallery.AlbumEdit}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ * @desc large picture thumb slider
+ */
+D.Gallery.AlbumEdit = Class(
+	/**
+	 * @lends {D.Gallery.AlbumEdit#}
+	 */
+	{
+		actionUrl: '?',
+		album: {},
+		_albumPerm: {},
+		MAX_TAG_LENGTH: 0,
+		MAX_ALBUM_TITLE_LENGTH: 0,
+		canDelete: false,
+		virtualCaption: '',
+		itemsData: [],
+		DS: '',
+
+		l: new D.Lang('xGal'),
+		friends: [],
+		location: null,
+		/** @type {Object.<T.Form.MetaInfoText>} */
+		_metaInfo: null,
+
+		/**
+		 * @param {Object} par
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			if ( par.actionUrl ) {
+				this.actionUrl = par.actionUrl;
+			}
+			this.album = par.album;
+			this.MAX_ALBUM_TITLE_LENGTH = par.MAX_ALBUM_TITLE_LENGTH;
+			this.canDelete = par.canDelete;
+			this.virtualCaption = par.virtualCaption;
+			this.canAddEveryone = par.canAddEveryone;
+			this.isProfileCoverGal = par.isProfileCoverGal || false;
+			if ( par.itemsData ) {
+				this.itemsData = par.itemsData;
+			}
+			this.DS = par.DS;
+
+			this._albumPerm = {
+				canComment: this.album.canComment,
+				canSelectUsers: this.album.canSelectUsers,
+				canDownload: this.album.canDownload,
+				permissions: this.album.permissions,
+				is18: this.album.is18,
+				canAddEveryone: this.canAddEveryone
+			};
+
+			if ( par.location ) {
+				this.location = par.location;
+			}
+			if ( par.friends ) {
+				this.friends = par.friends;
+			}
+
+			this.galleryContest = par.galleryContest || null;
+
+			var postUrl = new Get();
+			postUrl.remove('edit');
+			postUrl.remove('def');
+
+			this.node = mkE({
+				tag: 'form',
+				id: 'galleryAlbumEdit',
+				method: 'post',
+				action: '?' + postUrl.toString(),
+				els: [
+					T.Form.Nonce(),
+					this._commonAlbumForm(),
+					this._h1Row(),
+					this._albumItemsCont = mkE({
+						tag: 'div',
+						els: this._albumItems()
+					}),
+					this._editAll(),
+					{
+						tag: 'div',
+						className: 'itemsSubmit',
+						els:[
+							T.submitButton({
+								caption: D.Lang.get('Save'),
+								name: 'save',
+								onclick: function() {
+									D.Gallery.removeEditUnload();
+								}
+							})
+						]
+					}
+				]
+			});
+
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+
+			$(window).on('scroll', this.onScroll);
+			setTimeout(this.onScroll, 100);
+		},
+
+		_commonAlbumForm: function() {
+			var re = mkE({
+				tag: 'div',
+				className: 'galleryUplFooter galleryEditTop',
+				els: [{
+					tag: 'div',
+					className: 'topBlock',
+					els: [{
+						tag:'table',
+						style:{
+							width:'100%'
+						},
+						els:[{
+							tag:'tbody',
+							els:[{
+								tag:'tr',
+								els:[
+									{
+										tag:'td',
+										attr:{
+											width:'75%',
+											valign:'top'
+										},
+										els:[
+											new T.Form.Input({
+												caption: this.l.get('Galerijas nosaukums') + ':',
+												name: 'gallery[edit_album][title]',
+												maxLength: this.MAX_ALBUM_TITLE_LENGTH,
+												value: htmlspecialchars_decode( this.album.title ),
+												disabled: this.album.profGal || this.album.sayGal
+											}),
+											new T.Form.TextArea({
+												caption: this.l.get('gallery_description') + ':',
+												className: 'galleryDescriptionTA',
+												name: 'gallery[edit_album][description]',
+												value: this.album.description
+											}),
+											this._metaInfo = new T.Form.MetaInfoText({
+												onTagClick: D.closure( this, this._addTag ),
+												onAfterUpdate: D.closure( this, function() {
+													if ( this._locationPopover ) {
+														this._locationPopover.position(true);
+													}
+													if ( this._tagPopover ) {
+														this._tagPopover.position(true);
+													}
+												})
+											})
+										]
+									}, // td
+									{
+										tag:'td',
+										attr:{
+											width:'25%',
+											valign:'top'
+										},
+										els: this._albumPermForm()
+									}
+								]} // tr
+							]} // tbody
+						]}
+					]},
+					this.galleryContest ? {
+						tag: 'div',
+						className: 'galleryContest',
+						els: [
+							{
+								tag: 'b',
+								text: 'Šis albums piedalās bilžu konkursā "' + D.Lang.get(this.galleryContest + '_title', 'xGal') + '"'
+							}
+						]
+					} : '',
+					{
+						tag: 'div',
+						className: 'bottomBlock',
+						els: [
+							{
+								tag: 'div',
+								className: 'links',
+								els: [
+									this._tagIcon = mkE({
+										tag: 'a',
+										els: [
+											T.svgIcon({ icon: 'tag', size: 20 }),
+											D.Lang.get('add_tag')
+										],
+										onclick: this._addTag
+									}),
+									this._locationIcon = mkE({
+										tag: 'a',
+										els: [
+											T.svgIcon({ icon: 'location' }),
+											D.Lang.get('add_location')
+										],
+										onclick: D.closure( this, this._addLocation )
+									})
+								]
+							},
+							{
+								tag: 'div',
+								els: [
+									{
+										tag: 'a',
+										className: 'trash',
+										href: '?aid=' + String( this.album.id ) + '&deleteAlbum&' + Get.nonce(),
+										els: [
+											T.svgIcon({ icon: 'music-trash' }),
+											D.Gallery.l.get('Delete album')
+										],
+										onclick:function(){
+											return D.confirmDelete(this);
+										},
+										style:{
+											display:( this.canDelete ? '' : 'none' )
+										}
+									},
+									this._permissionCont = mkE({
+										tag: 'span'
+									}),
+									this._locationInput = new T.Forms.hidden({
+										name: 'gallery[edit_album][placeId]',
+										value: this.location ? this.location.value : ''
+									}),
+									this._friendsInput = new T.Forms.hidden({
+										name: 'gallery[edit_album][with]',
+										value: this.friends ? D.JSON.encode( this.friends ) : ''
+									}),
+									T.submitButton({
+										caption: D.Lang.get('Save'),
+										onclick: function() {
+											D.Gallery.removeEditUnload();
+										}
+									})
+								]
+							}
+						]
+					}
+				]
+			});
+
+			if ( this.album.profGal || this.album.sayGal ) {
+				this._permissionCont.style.display = 'none';
+			}
+
+			if ( this.album.isVirtual && !this.isProfileCoverGal ) {
+				mkE({
+					tag: 'span',
+					text: this.l.get('Albumu rādīt') + ':'
+				}).append( this._permissionCont );
+				new T.Form.CheckBox({
+					caption: this.virtualCaption,
+					checked: this.album.permissions,
+					name: 'gallery[edit_album][virtualPublic]',
+					className: 'cbxVirtual'
+				}).append( this._permissionCont );
+			} else if ( !this.album.isVirtual ) {
+				this._permissionsInput = new T.Forms.hidden({
+					name: 'permissions_perm_btn',
+					value: this._albumPerm.permissions
+				}).append( this._permissionCont );
+				this._permissionsButton = new T.Form.PermButton({
+					onChange: D.closure( this, this._onPermChange ),
+					permissions: this._albumPerm.permissions
+				}).append( this._permissionCont );
+			}
+
+			return re;
+		},
+
+		_albumPermForm: function() {
+			if( !this.album.canSetPermissions ){
+				return [];
+			}
+			var re = [
+				new T.Form.Item({
+					caption: this.l.get('Albuma tiesības') + ':',
+					className: 'permissionsTitle'
+				}),
+				new T.Forms.hidden({
+					name: 'gallery[edit_album][_]',
+					value: 1
+				})
+			];
+			if ( !this.album.sayGal ) {
+				re.push(
+					new T.Form.CheckBox({
+						caption: this.l.get('Ļaut komentēt' ),
+						checked: this._albumPerm.canComment,
+						name: 'gallery[edit_album][canComment]'
+					})
+				);
+			}
+			re.push(
+				new T.Form.CheckBox({
+					caption: this.l.get('Ļaut atzīmēt draugus'),
+					checked: this._albumPerm.canSelectUsers,
+					name: 'gallery[edit_album][canSelectUsers]'
+				})
+			);
+			re.push(
+				new T.Form.CheckBox({
+					caption: this.l.get('Allow download'),
+					checked: this._albumPerm.canDownload,
+					name: 'gallery[edit_album][canDownload]'
+				})
+			);
+			if ( this.album.isVirtual ) {
+				re.push(
+					new T.Form.CheckBox({
+						caption: this.l.get( 'Ļaut pievienot jebkuram' ),
+						checked: this._albumPerm.canAddEveryone,
+						name: 'gallery[edit_album][canAddEveryone]'
+					})
+				);
+			}
+			if( !this.album.sayGal && !this.album.profGal && D.me.age > 17 ){
+				re.push(
+					new T.Form.CheckBox({
+						caption: '18+',
+						checked: this._albumPerm.is18,
+						name: 'gallery[edit_album][is18]'
+					})
+				);
+			}
+			return re;
+		},
+
+		_onPermChange: function( v ){
+			this._permissionsInput.value = v;
+		},
+
+
+		// +++ add location +++
+		_addLocation: function(){
+			if( this._addLocationOpened && this._locationPopover ){
+				this._locationPopover.hide();
+				this._addLocationOpened = false;
+				return;
+			}
+			D.Say.Form.stats('nsf_add_loc');
+			var par = new T.Popover.Par().setPosition('bottom left').setParent(this._locationIcon).setOnClose(this._addLocationClose).setNoHeader(true).setAlt(true);
+			this._locationPopover = new T.Popover(par);
+			this._locationPopover.show();
+			this._addLocationOpened = true;
+			D.onLoad(['DR.places'], this._showLocationForm);
+		},
+
+		_showLocationForm: function(){
+			if( this._locationWindow ){
+				this._locationWindow.append(this._locationPopover.content);
+				this._locationWindow.clear();
+				this._locationWindow.focus();
+				return;
+			}
+			this._locationWindow = new T.LocationSelect({
+				value: this.location
+			});
+			this._locationWindow._onChange = this._onLocationChange;
+			this._locationWindow.append(this._locationPopover.content);
+			this._locationWindow.focus();
+		},
+
+		_addLocationClose: function(){
+			this._addLocationOpened = false;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+		},
+
+		_onLocationChange: function(values){
+			if( !this._locationWindow ){
+				return;
+			}
+			if( !empty(values) ){
+				this._locationPopover.hide();
+				D.Say.Form.stats('nsf_choose_loc');
+			}
+			this.location = values;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+			this._locationPopover.position(true);
+
+			// update input
+			if ( this.location ) {
+				this._locationInput.value = this.location.value;
+			} else {
+				this._locationInput.value = '';
+			}
+		},
+		// --- add location ---
+
+
+		// +++ add tag +++
+		_addTag: function( event ){
+			if( this._addTagOpened && this._tagPopover ){
+				this._tagPopover.hide();
+				this._addTagOpened = false;
+				return;
+			}
+			D.Say.Form.stats('nsf_tag_friend');
+			var par = new T.Popover.Par().setPosition('bottom left').setParent( this._tagIcon ).setOnClose(this._addTagClose).setNoHeader(true).setAlt(true);
+			this._tagPopover = new T.Popover(par);
+			this._tagPopover.show();
+			this._addTagOpened = true;
+			D.onLoad(['DR.search'], this._showTagForm);
+		},
+
+		_showTagForm: function(){
+			if( this._tagWindow ){
+				this._tagWindow.append(this._tagPopover.content);
+				this._tagWindow.clear();
+				this._tagWindow.focus();
+				return;
+			}
+			this._tagWindow = new T.TagSelect({
+				values: this.friends,
+				galleryTagSelect: true
+			});
+			this._tagWindow._onChange = this._onTagChange;
+			this._tagWindow._onSearchFinished = this._onTagSearchFinished;
+			this._tagWindow.append(this._tagPopover.content);
+			this._tagWindow.focus();
+		},
+
+		_onTagChange: function(values){
+			D.Say.Form.stats('nsf_tag_friend_choose');
+			this.friends = values;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+			this._tagPopover.position(true);
+
+			// update input
+			if ( this.friends.length ) {
+				this._friendsInput.value = D.JSON.encode( this.friends );
+			} else {
+				this._friendsInput.value = '';
+			}
+		},
+
+		_onTagSearchFinished: function(){
+			this._tagPopover.positionInView();
+		},
+
+		_addTagClose: function(){
+			this._addTagOpened = false;
+		},
+		// --- add tag ---
+
+
+		_h1Row: function() {
+			if ( !this.album.count ) {
+				return '';
+			}
+
+			var rightSide;
+			var re = mkE({
+				tag: 'div',
+				className: 'h1Row',
+				els:[
+					{
+						tag: 'div',
+						els: [{
+							tag: 'h1',
+							text: this.l.get('Pic and video') + ' (' + this.album.count + ')'
+						}]
+					},
+					rightSide = mkE({
+						tag: 'div'
+					})
+				]
+			});
+
+			if ( this.album.canEdit && this.album.count > 1 ) {
+				mkE({
+					tag: 'a',
+					onclick: D.closure( this, function() {
+						new D.Gallery.Order( this.itemsData, this._onOrderChange );
+					}),
+					className: 'organize',
+					els:[
+						T.svgIcon({ icon: 'change-order', size: 24 }),
+						this.l.get('Organize')
+					]
+				}).append( rightSide );
+			}
+
+			if ( this.album.count > 1 && !this.album.sayGal ) {
+				this._cbxSelectAll = new T.Form.CheckBox({
+					caption: this.l.get('select_all'),
+					onclick: D.closure( this, function() {
+						$('.galleryEditThumb').find('input[type=checkbox]').prop('checked', this._cbxSelectAll.value());
+						D.Gallery.selectedOptions();
+						this.onScroll();
+					})
+				}).append( rightSide );
+			}
+
+			return re;
+		},
+
+		_onOrderChange: function( orderLog ) {
+			if ( !orderLog.length ) {
+				return;
+			}
+
+			var parent = this._albumItemsCont;
+			for ( var n = 0; n < orderLog.length; n++ ) {
+				var logItem = orderLog[n];
+				var pid = parseInt( logItem.el.getAttribute('pid'), 10 );
+
+				var el = document.getElementById( 'galleryAlbumEditItem' + pid );
+				if ( !logItem.pos ) {
+					parent.insertBefore( el, parent.children[0] );
+				} else {
+					var nodes = Array.prototype.slice.call( parent.children );
+					var currIndex = nodes.indexOf( el );
+
+					var newIndex = currIndex > logItem.pos ? logItem.pos - 1 : logItem.pos;
+					D.insertAfter( el, parent.children[ newIndex ] );
+				}
+
+				// update this.itemsData order
+				var currentIndex = this._getItemsDataKey( pid );
+				this._itemsDataInsertAt( currentIndex, logItem.pos );
+			}
+		},
+		_getItemsDataKey: function( pid ) {
+			for ( var i = 0; i < this.itemsData.length; i++ ) {
+				if ( this.itemsData[i].id == pid ) {
+					return i;
+				}
+			}
+
+			return false;
+		},
+		_itemsDataInsertAt: function( index, newIndex ) {
+			var removedElement = this.itemsData.splice( index, 1 )[0];
+			this.itemsData.splice( newIndex, 0, removedElement );
+		},
+
+		_albumItems: function() {
+			var re = [];
+			for ( var i = 0; i < this.itemsData.length; i++ ) {
+				re.push(
+					new D.Gallery.AlbumEditItem({
+						MAX_TAG_LENGTH: this.MAX_TAG_LENGTH,
+						item: this.itemsData[i],
+						album: this.album,
+						DS: this.DS,
+						onSelectChange: D.closure( this, function() {
+							this.onScroll();
+						})
+					})
+				);
+			}
+			return re;
+		},
+
+		_editAll: function() {
+			var re = [];
+			
+			if ( this.album.count <= 1 ) {
+				return re;
+			}
+
+			var p = new T.IconListPar();
+			p.items = [];
+			p.id = 'galleryEditAll';
+			p.className = 'galleryEditAll';
+
+			p.items.push({
+				node: mkE({
+					tag: 'li',
+					className: 'shad'
+				})
+			});
+
+			p.items.push({
+				node: mkE({
+					tag: 'li',
+					els: [{
+						tag: 'b',
+						text: this.l.get('Visas atzīmētās')
+					}]
+				})
+			});
+
+			p.items.push(
+				new T.IconListItem({
+					caption: this.l.get('Pārvietot uz'),
+					icon: 'galleryMove',
+					onclick: function() {
+						return D.Gallery.selectedMove();
+					}
+				})
+			);
+
+			p.items.push(
+				new T.IconListItem({
+					caption: [
+						T.svgIcon({ icon: 'music-trash' }),
+						D.Lang.get('delete')
+					],
+					onclick: function() {
+						return D.Gallery.selectedDelete();
+					}
+				})
+			);
+
+			var iconList = new T.IconList( p );
+			this._options = iconList.node;
+			this._editAllContainer = mkE({
+				tag: 'div',
+				id: 'galleryEditAllCont',
+				className: 'galleryEditAllCont',
+				els: [
+					iconList
+				]
+			});
+
+			re.push( this._editAllContainer );
+
+			return re;
+		},
+
+		onScroll: function(){
+			if( !document.body.contains(this.node) ){
+				var chat = document.getElementById('chatContent');
+				if( chat ){
+					chat.style.display = '';
+				}
+				return;
+			}
+			if( this._editAllContainer ){
+				var pos = D.position(this._editAllContainer);
+				var scrollOffset = document.body.scrollTop || document.documentElement.scrollTop || 0;
+				var chat = document.getElementById('chatContent');
+				if( pos.top - scrollOffset + 48 > window.innerHeight ){
+					addClassName(this._options, 'fixed');
+					if( chat ){
+						chat.style.display = 'none';
+					}
+				}else{
+					removeClassName(this._options, 'fixed');
+					if( chat ){
+						chat.style.display = '';
+					}
+				}
+			}
+		},
+
+		resetScroll: function () {
+			this.onLeave();
+			removeClassName(this._options, 'fixed');
+		}
+	},
+	mkE.Base
+);
+// --- album_edit.js ---
+
+// +++ album_edit_item.js +++
+/**
+ * @class {D.Gallery.AlbumEditItem}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ * @desc large picture thumb slider
+ */
+D.Gallery.AlbumEditItem = Class(
+	/**
+	 * @lends {D.Gallery.AlbumEditItem#}
+	 */
+	{
+		album: {},
+		item: {},
+		DS: '',
+
+		l: new D.Lang( 'xGal' ),
+		friends: [],
+		location: null,
+		/** @type {Object.<T.Form.MetaInfoText>} */
+		_metaInfo: null,
+		onSelectChange: function() {},
+
+		/**
+		 * @param {Object} par
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			this.album = par.album;
+			this.item = par.item;
+			this.DS = par.DS;
+			this.onSelectChange = par.onSelectChange || function() {};
+			if ( this.item.location ) {
+				this.location = this.item.location;
+			}
+			if ( this.item.friends ) {
+				this.friends = this.item.friends;
+			}
+			this._tagsAdded = [];
+			this._tagsDeleted = [];
+
+			this.node = mkE({
+				tag: 'div',
+				id: 'galleryAlbumEditItem' + this.item.id,
+				className: 'galleryAlbumEditItem',
+				els: [{
+					tag: 'table',
+					className: 'formTable',
+					els:[{
+						tag: 'tbody',
+						els: [{
+							tag: 'tr',
+							els: [
+								{
+									tag: 'td',
+									className: 'galleryEditThumb',
+									els: [{
+										tag: 'div',
+										els: [
+											{
+												tag: 'a',
+												href: '?pid=' + this.item.id,
+												style: {
+													display: 'block'
+												},
+												els: [{
+													tag: 'img',
+													id: 'galleryEditAlbumPid' + this.item.id,
+													src: this.item.image.GM,
+													width: 216,
+													height: 216
+												}]
+											},
+											{
+												tag: 'input',
+												type: 'checkbox',
+												onclick: D.closure( this, function() {
+													D.Gallery.selectedOptions();
+													this.onSelectChange();
+												}),
+												value: this.item.id
+											}
+										]
+									}]
+								},
+								{
+									tag: 'td',
+									className: 'galleryEditInfo',
+									els: [
+										new T.Forms.hidden({
+											id: 'galleryEditAlbumPicsInfoEdited' + this.item.id,
+											name: 'gallery[edit_pics_info][items][' + this.item.id + '][edited]'
+										}),
+										new T.Form.TextArea({
+											caption: this.l.get('Bildes apraksts'),
+											value: this.item.descr,
+											name: 'gallery[edit_pics_info][items][' + this.item.id + '][descr]',
+											onfocus: D.closure( this, function() {
+												D.Gallery.albumPicsInfoEdited( this.item.id );
+											}),
+											onchange: D.closure( this, function() {
+												D.Gallery.albumPicsInfoEdited( this.item.id );
+											}),
+											sayEditor: {
+												noLinkReplace: true,
+												value: this.item.descr
+											}
+										}),
+										this._locationInput = new T.Forms.hidden({
+											name: 'gallery[edit_pics_info][items][' + this.item.id + '][placeId]',
+											value: this.location ? this.location.value : ''
+										}),
+										this._metaInfo = new T.Form.MetaInfoText({
+											onTagClick: D.closure( this, this._addTag ),
+											onAfterUpdate: D.closure( this, function() {
+												if ( this._locationPopover ) {
+													this._locationPopover.position(true);
+												}
+												if ( this._tagPopover ) {
+													this._tagPopover.position(true);
+												}
+											})
+										}),
+										this._optionsLinks(),
+										this._videoThumbs(),
+										this.thumbRadioCont = mkE({
+											tag: 'div',
+											els: [
+												new T.Form.RadioBox({
+													caption: this.l.get('Titul bilde'),
+													checked: !empty( this.item.thumb ),
+													name: 'gallery[edit_pics_info][thumb]',
+													value: this.item.id,
+													onclick: D.closure( this, function() {
+														D.Gallery.albumPicsInfoEdited( this.item.id );
+													})
+												})
+											]
+										}),
+										this._tagsAddedInput = new T.Forms.hidden({
+											name: 'gallery[edit_pics_info][items][' + this.item.id + '][tagsAdded]',
+											value: ''
+										}),
+										this._tagsDeletedInput = new T.Forms.hidden({
+											name: 'gallery[edit_pics_info][items][' + this.item.id + '][tagsDeleted]',
+											value: ''
+										})
+									]
+								}
+							]
+						}]
+					}]
+				}]
+			});
+
+			this._addItemPermissions();
+
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+		},
+
+		_optionsLinks: function() {
+			var re = [];
+
+			this._tagIcon = mkE({
+				tag: 'a',
+				els: [
+					T.svgIcon({ icon: 'tag', size: 16 }),
+					D.Lang.get('add_tag')
+				],
+				onclick: this._addTag
+			});
+			re.push( this._tagIcon );
+
+			this._locationIcon = mkE({
+				tag: 'a',
+				els: [
+					T.svgIcon({ icon: 'location', size: 16 }),
+					D.Lang.get('add_location')
+				],
+				onclick: this._addLocation
+			});
+			re.push( this._locationIcon );
+
+
+			this._settingsIcon = mkE({
+				tag: 'a',
+				className: 'settingsIconA'
+			});
+			re.push( this._settingsIcon );
+
+			var menuItems = [];
+			menuItems.push( {
+				caption: '<span class="galleryUplDdBullet galleryMoveIcon icon"></span>' + D.Gallery.l.get('Pārvietot uz'),
+				onclick: D.closure( this, function(){
+					D.Gallery.albumEditMoveItem( this.item.id, this.album.id, D.Gallery.UID);
+				})
+			} );
+			if ( !D.Gallery.CLOSED[0] && this.item.type == D.Gallery.TYPE_PIC ) {
+				menuItems.push( {
+					caption: '<span class="galleryUplDdBullet rotateRightIcon icon"></span>' + D.Gallery.l.get('Rotate right title'),
+					onclick: D.closure( this, function(){
+						return D.Gallery.albumEditRotate(this.item.id, -90, this.DS);
+					})
+				} );
+				menuItems.push( {
+					caption: '<span class="galleryUplDdBullet rotateLeftIcon icon"></span>' + D.Gallery.l.get('Rotate left title'),
+					onclick: D.closure( this, function(){
+						return D.Gallery.albumEditRotate(this.item.id, 90, this.DS);
+					})
+				} );
+				menuItems.push( {
+					caption: '<span class="galleryUplDdBullet paletteIcon icon"></span>' + D.Lang.get('picture_editor'),
+					onclick: D.closure( this, function(){
+						return T.picEditor(12, this.item.id);
+					})
+				} )
+			}
+			clearNode( this._settingsIcon );
+			T.ddMenu( {
+				caption:[
+					T.svgIcon({ icon: 'settings', size: 20 }),
+					this.l.get('options')
+				],
+				items: menuItems
+			} ).append( this._settingsIcon );
+
+
+			re.push(
+				mkE({
+					tag: 'a',
+					className: 'trash',
+					els: [
+						T.svgIcon({ icon: 'music-trash' }),
+						D.Lang.get('delete')
+					],
+					onclick: D.closure( this, function(){
+						return D.Gallery.albumEditDeleteItem(this.item.id, true);
+					}),
+					style:{
+						display:( this.item.canDel ? '' : 'none' )
+					}
+				})
+			);
+
+			return mkE({
+				tag: 'div',
+				className: 'optionsLinks',
+				els: re
+			});
+		},
+
+		_videoThumbs: function() {
+			var re = [];
+
+			if ( this.item.type != D.Gallery.TYPE_VIDEO || empty( this.item.videoThumbUrls ) ) {
+				return re;
+			}
+
+			var node = mkE({
+				tag: 'div',
+				className: 'videoThumbs',
+				els: [
+					new T.Forms.hidden({
+						name: 'gallery[edit_pics_info][items][' + this.item.id + '][videoThumbNr]',
+						value: this.item.videoThumbNr
+					})
+				]
+			});
+
+			for ( var i = 0; i < this.item.videoThumbUrls.length; i++ ) {
+				var img = mkE({
+					tag: 'img',
+					src: this.item.videoThumbUrls[i]
+				}).append( node );
+				img.onclick = D.closure( this, function(img, ii) {
+					D.Gallery.setVideoThumb(img, this.item.id, ii);
+				}, img, i);
+				if ( i == this.item.videoThumbNr ) {
+					addClassName( img, 'videoThumbsActive' );
+				}
+			}
+
+			re.push( node );
+			return re;
+		},
+
+		_addItemPermissions: function() {
+			if ( !this.album.sayGal || this.album.isVirtual ) {
+				return;
+			}
+
+			var node = mkE({
+				tag: 'div'
+			}).prepend( this.thumbRadioCont );
+
+			new T.Forms.hidden({
+				id: 'itemPerm_' + this.item.id,
+				name: 'gallery[edit_pics_info][items][' + this.item.id + '][perm]',
+				value: this.item.permissions
+			}).append( node );
+
+			new T.Form.PermButton({
+				onChange: D.closure( this, function( v ) {
+					if ( !document.getElementById('itemPerm_' + this.item.id) ) {
+						return;
+					}
+
+					document.getElementById('itemPerm_' + this.item.id).value = v;
+					D.Gallery.albumPicsInfoEdited( this.item.id );
+				}),
+				permissions: this.item.permissions
+			}).append( node );
+		},
+
+
+		// +++ add location +++
+		_addLocation: function(){
+			if( this._addLocationOpened && this._locationPopover ){
+				this._locationPopover.hide();
+				this._addLocationOpened = false;
+				return;
+			}
+			D.Say.Form.stats('nsf_add_loc');
+			var par = new T.Popover.Par().setPosition('bottom left').setParent(this._locationIcon).setOnClose(this._addLocationClose).setNoHeader(true).setAlt(true);
+			this._locationPopover = new T.Popover(par);
+			this._locationPopover.show();
+			this._addLocationOpened = true;
+			D.onLoad(['DR.places'], this._showLocationForm);
+		},
+
+		_showLocationForm: function(){
+			if( this._locationWindow ){
+				this._locationWindow.append(this._locationPopover.content);
+				this._locationWindow.clear();
+				this._locationWindow.focus();
+				return;
+			}
+			this._locationWindow = new T.LocationSelect({
+				value: this.location
+			});
+			this._locationWindow._onChange = this._onLocationChange;
+			this._locationWindow.append(this._locationPopover.content);
+			this._locationWindow.focus();
+		},
+
+		_addLocationClose: function(){
+			this._addLocationOpened = false;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+		},
+
+		_onLocationChange: function(values){
+			if( !this._locationWindow ){
+				return;
+			}
+			if( !empty(values) ){
+				this._locationPopover.hide();
+				D.Say.Form.stats('nsf_choose_loc');
+			}
+			this.location = values;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+			this._locationPopover.position(true);
+
+			// update input
+			if ( this.location ) {
+				this._locationInput.value = this.location.value;
+			} else {
+				this._locationInput.value = '';
+			}
+
+			D.Gallery.albumPicsInfoEdited( this.item.id );
+		},
+		// --- add location ---
+
+
+		// +++ add tag +++
+		_addTag: function( event ){
+			if( this._addTagOpened && this._tagPopover ){
+				this._tagPopover.hide();
+				this._addTagOpened = false;
+				return;
+			}
+			D.Say.Form.stats('nsf_tag_friend');
+			var par = new T.Popover.Par().setPosition('bottom left').setParent( this._tagIcon ).setOnClose(this._addTagClose).setNoHeader(true).setAlt(true);
+			this._tagPopover = new T.Popover(par);
+			this._tagPopover.show();
+			this._addTagOpened = true;
+			D.onLoad(['DR.search'], this._showTagForm);
+		},
+
+		_showTagForm: function(){
+			if( this._tagWindow ){
+				this._tagWindow.append(this._tagPopover.content);
+				this._tagWindow.clear();
+				this._tagWindow.focus();
+				return;
+			}
+			this._tagWindow = new T.TagSelect({
+				values: this.friends,
+				galleryTagSelect: true
+			});
+			this._tagWindow._onChange = this._onTagChange;
+			this._tagWindow._onSearchFinished = this._onTagSearchFinished;
+			this._tagWindow._onRemoveItem = this._onTagRemove;
+			this._tagWindow._onAddItem = this._onTagAdd;
+			this._tagWindow.append(this._tagPopover.content);
+			this._tagWindow.focus();
+		},
+
+		_onTagChange: function(values){
+			D.Say.Form.stats('nsf_tag_friend_choose');
+			this.friends = values;
+			this._metaInfo.update({
+				location: this.location,
+				friends: this.friends
+			});
+			this._tagPopover.position(true);
+		},
+
+		_onTagRemove: function( uid ) {
+			var index = this._tagsAdded.indexOf( uid );
+			if ( index !== -1 ) {
+				this._tagsAdded.splice(index, 1);
+			}
+
+			this._tagsDeleted.push( uid );
+
+			this._tagsDeletedInput.value = this._tagsDeleted.join(',');
+
+			D.Gallery.albumPicsInfoEdited( this.item.id );
+		},
+
+		_onTagAdd: function( uid ) {
+			var index = this._tagsDeleted.indexOf( uid );
+			if ( index !== -1 ) {
+				this._tagsDeleted.splice(index, 1);
+			}
+
+			this._tagsAdded.push( uid );
+
+			this._tagsAddedInput.value = this._tagsAdded.join(',');
+
+			D.Gallery.albumPicsInfoEdited( this.item.id );
+		},
+
+		_onTagSearchFinished: function(){
+			this._tagPopover.positionInView();
+		},
+
+		_addTagClose: function(){
+			this._addTagOpened = false;
+		}
+		// --- add tag ---
+	},
+	mkE.Base
+);
+// --- album_edit_item.js ---
+
+// +++ order.js +++
+/**
+ * @class {D.Gallery.Order}
+ * @param {Object} itemsData
+ */
+D.Gallery.Order = Class(
+	/**
+	 * @lends {D.Gallery.Order#}
+	 */
+	{
+		modal: null,
+		l: new D.Lang('xGal'),
+		changeOrderLog: [],
+		onSave: D.doNothing,
+
+		scrollParentEl: null,
+		autoScroll: {},
+
+		/**
+		 * @param {Object} itemsData
+		 * @param {Function} onSave
+		 * @constructs
+		 */
+		__construct: function ( itemsData, onSave ) {
+			if ( onSave ) {
+				this.onSave = onSave;
+			}
+
+			this.modal = new D.Modal({
+				width: 648,
+				title: this.l.get('Organize'),
+				onClose: this._save
+			});
+
+			var cont;
+			var els = [
+				cont = mkE({
+					tag: 'div',
+					id: 'galleryEditAlbumOrder',
+					onmousedown: function() {
+						return false;
+					},
+					onselectstart: function() {
+						return false;
+					}
+				})
+			];
+
+			var inRow = 6;
+			var i;
+			for ( i = 0; i < itemsData.length; i++ ) {
+				mkE({
+					tag: 'div',
+					className: 'item',
+					attr: {
+						pid: itemsData[i].id,
+						pictype: itemsData[i].type
+					},
+					els: [
+						{
+							tag: 'img',
+							src: itemsData[i].image.gm ? itemsData[i].image.gm : itemsData[i].image.GM,
+							width: 100,
+							height: 100
+						},
+						{
+							tag: 'div'
+						}
+					]
+				}).append( cont );
+			}
+			if ( i % inRow ) {
+				var fakeItemCount = inRow - (i % inRow);
+				for ( var n = 0; n < fakeItemCount; n++ ) {
+					mkE({
+						tag: 'div',
+						style: {
+							width: '100px',
+							height: '100px'
+						}
+					}).append( cont );
+				}
+			}
+
+			els.push({
+				tag: 'div',
+				className: 'formFooter',
+				els: [
+					new T.Form.Button({
+						caption: D.Lang.get('Save'),
+						onclick: D.closure(this, function() {
+							this.modal.close();
+						})
+					})
+				]
+			});
+
+			this.modal.els( els );
+
+			D.loadingOverlay("galleryEditAlbumOrder");
+			D.onLoad( 'Drag', D.closure( this, function(){
+				D.removeLoadingOverlay("galleryEditAlbumOrder");
+				this.scrollParentEl = null;
+				this.autoScroll = {};
+				new D.Drag( {
+					node: document.getElementById( "galleryEditAlbumOrder" ),
+					query: '.item',
+					onDragEnd: this._onDragEnd,
+					timeout: 100,
+					onDrag: D.closure( this, function( evt ) {
+						this._autoScroll(evt, document.getElementById( "galleryEditAlbumOrder" ));
+					})
+				} );
+			} ) );
+		},
+
+		_save: function() {
+			this.onSave( this.changeOrderLog );
+		},
+
+		_onDragEnd: function( el, pos ) {
+			D.Gallery.savePosition( el, pos );
+			this.changeOrderLog.push({
+				el: el,
+				pos: parseInt(pos, 10)
+			});
+		},
+
+		_autoScroll: function( evt, rootEl ) {
+			setTimeout( D.closure( this, function( evt, rootEl ) {
+				if ( !rootEl ) {
+					return;
+				}
+
+				var el,
+					rect,
+					sens = 50, // scroll sensitivity - px, cik tuvu malai saakt skrolleet
+					speed = 10, // scroll speed - px,
+
+					x = evt.clientX,
+					y = evt.clientY,
+
+					win = this.modal.node,
+					winWidth = window.innerWidth,
+					winHeight = window.innerHeight,
+
+					vx,
+					vy,
+
+					scrollOffsetX,
+					scrollOffsetY,
+
+					scrollEl
+				;
+
+				if ( this.scrollParentEl !== rootEl ) {
+					this.scrollParentEl = rootEl;
+
+					scrollEl = rootEl;
+
+					do {
+						if ( (scrollEl.offsetWidth < scrollEl.scrollWidth) ||
+							(scrollEl.offsetHeight < scrollEl.scrollHeight)
+						) {
+							break;
+						}
+					} while ( scrollEl = scrollEl.parentNode );
+				}
+
+				if ( scrollEl ) {
+					el = scrollEl;
+					rect = scrollEl.getBoundingClientRect();
+					vx = (Math.abs( rect.right - x ) <= sens) - (Math.abs( rect.left - x ) <= sens);
+					vy = (Math.abs( rect.bottom - y ) <= sens) - (Math.abs( rect.top - y ) <= sens);
+				}
+
+				if ( !(vx || vy) ) {
+					vx = (winWidth - x <= sens) - (x <= sens);
+					vy = (winHeight - y <= sens) - (y <= sens);
+					(vx || vy) && (el = win);
+				}
+
+				if ( this.autoScroll.vx !== vx || this.autoScroll.vy !== vy || this.autoScroll.el !== el ) {
+					this.autoScroll.el = el;
+					this.autoScroll.vx = vx;
+					this.autoScroll.vy = vy;
+
+					clearInterval( this.autoScroll.pid );
+
+					if ( el ) {
+						this.autoScroll.pid = setInterval( function () {
+							scrollOffsetY = vy ? vy * speed : 0;
+							scrollOffsetX = vx ? vx * speed : 0;
+
+							if ( el === win ) {
+								win.scrollTo( win.scrollLeft + scrollOffsetX, win.scrollTop + scrollOffsetY );
+							} else {
+								el.scrollTop += scrollOffsetY;
+								el.scrollLeft += scrollOffsetX;
+							}
+						}, 24 );
+					}
+				}
+			}, evt, rootEl), 30);
+		}
+	}
+);
+// --- order.js ---
+
+// +++ tag_window.js +++
+/**
+ * @class {D.Gallery.TagWindow}
+ * @param {Object} par
+ */
+D.Gallery.TagWindow = Class(
+	/**
+	 * @lends {D.Gallery.TagWindow#}
+	 */
+	{
+		modal: null,
+		l: new D.Lang( 'xGal' ),
+		pid: 0,
+		image: '',
+		width: 0,
+		height: 0,
+		n: {
+			img: null,
+			imgCont: null,
+			btnClose: null,
+			btnCancel: null,
+			btnSave: null
+		},
+		_addedTags: [],
+		_deletedTags: [],
+
+		/**
+		 * @param {Object} par
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			this.pid = par.pid;
+			this.image = par.image;
+			this.width = par.width;
+			this.height = par.height;
+			this.onTagAdd = par.onTagAdd || D.doNothing;
+			this.onTagDelete = par.onTagDelete || D.doNothing;
+
+			this.modal = new D.Modal({
+				width: 757,
+				title: this.l.get('Select friends'),
+				className: 'galleryTagWindow'
+			});
+			this.modal.els({
+				tag: 'div',
+				els: [
+					this.n.imgCont = mkE({
+						tag: 'div',
+						className: 'imgCont',
+						els: [
+							this.n.img = mkE({
+								tag: 'img',
+								src: this.image
+							})
+						]
+					}),
+					{
+						tag: 'div',
+						className: 'formFooter',
+						els: [
+							this.n.btnClose = new T.Form.Button({
+								caption: D.Lang.get('close'),
+								onclick: D.closure(this, function() {
+									this.modal.close();
+								}),
+								color: 'link'
+							}),
+							this.n.btnCancel = new T.Form.Button({
+								caption: D.Lang.get('cancel'),
+								onclick: D.closure(this, function() {
+									this.modal.close();
+								}),
+								color: 'link'
+							}),
+							this.n.btnSave = new T.Form.Button({
+								caption: D.Lang.get('Save'),
+								onclick: D.closure(this, function() {
+									this._save();
+									this.modal.close();
+								})
+							})
+						]
+					}
+				]
+			});
+
+			this.n.btnCancel.hide();
+			this.n.btnSave.hide();
+
+			if ( this.n.img.complete ) {
+				this._loadedImage();
+			} else {
+				this.n.img.addEventListener('load', this._loadedImage);
+			}
+		},
+
+		_loadedImage: function() {
+			this.n.imgCont.style.width = this.n.img.offsetWidth + 'px';
+			this.n.imgCont.style.height = this.n.img.offsetHeight + 'px';
+
+			D.Gallery.activePicture = {
+				tags: [],
+				id: this.pid
+			};
+
+			D.Gallery.onGalleryTag(D.closure(this, this.initTags));
+		},
+
+		initTags: function() {
+			this.n.imgCont._tagWindow = this;
+
+			D.GalleryTagLarge.enable( this.n.imgCont );
+		},
+
+		_showSaveButton: function() {
+			this.n.btnClose.hide();
+			this.n.btnCancel.show();
+			this.n.btnSave.show();
+		},
+
+		onTagLargeAdd: function( data ) {
+			for ( var n = 0; n < this._deletedTags.length; n++ ) {
+				if ( this._deletedTags[n].uid == data.uid ) {
+					this._deletedTags.splice(n, 1);
+					break;
+				}
+			}
+
+			this._addedTags.push( data );
+
+			this._showSaveButton();
+		},
+
+		onTagLargeDelete: function( uid ) {
+			for ( var n = 0; n < this._addedTags.length; n++ ) {
+				if ( this._addedTags[n].uid == uid ) {
+					this._addedTags.splice(n, 1);
+					break;
+				}
+			}
+
+			this._deletedTags.push( uid );
+
+			this._showSaveButton();
+		},
+
+		_save: function() {
+			var n;
+			for ( n = 0; n < this._addedTags.length; n++ ) {
+				this.onTagAdd( this._addedTags[n] );
+			}
+
+			for ( n = 0; n < this._deletedTags.length; n++ ) {
+				this.onTagDelete( this._deletedTags[n] );
+			}
+		}
+	}
+);
+// --- tag_window.js ---
+
+// +++ competition.js +++
+/**
+ * @class {D.Gallery.CompetitionFeed}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ */
+D.Gallery.CompetitionFeed = Class(
+    /**
+     * @lends {D.Gallery.CompetitionFeed#}
+     */
+    {
+        /**
+         * @param {Object} par
+         * @constructs
+         */
+        GLOBAL_H: 260,
+        pg: 1,
+        global_par: {
+            global_H: this.GLOBAL_H
+        },
+        __construct: function (par) {
+            var get = new Get();
+            this.par = par || {};
+            this.top = get.v('top') !== null
+            this.node = mkE({
+                tag: 'div',
+                els: [
+                    this._feedNode = mkE({tag:'div'})
+                ]
+            });
+            D.onLoad(['DR.gallery'], this._onApi);
+            D.Gallery.element_height = this.GLOBAL_H;
+            D.Gallery.artificial_height = this.GLOBAL_H;
+        },
+        _onApi: function() {
+            this._mGetCompetitionPics = new DR.gallery.GetCompetitionPics();
+            this._mGetCompetitionPics.pg = this.pg;
+            this._mGetCompetitionPics.top = this.top;
+            this._mGetCompetitionPics.select = [
+                new DR.gallery.select.AlbumItems().pgs(),
+                new DR.gallery.select.Item().image().id().href().descr().like().user().created().comments(),
+                new DR.gallery.select.Image().all(),
+                new DR.like.select.GetRe().count().canLike().id().liked().type(),
+                new DR.users.select.User().title().url()
+            ];
+            this._mGetCompetitionPics.onLoad = this._drawFeed;
+            this._mGetCompetitionPics.call();
+
+            this._mContestUnsubscribe = new DR.gallery.ToggleContestSubscription();
+            this._mContestUnsubscribe.onLoad = this._onUnsubscribe;
+        },
+        _loadMore: function() {
+            this._mGetCompetitionPics.pg = ++this.pg;
+            this._mGetCompetitionPics.call();
+            return true;
+        },
+        _drawFeed: function() {
+            if (!this._mGetCompetitionPics.re) {return;}
+            for (var k in this._mGetCompetitionPics.re.items) {
+                var par = this._calc(this._mGetCompetitionPics.re.items[k]);
+                par.global_H = this.GLOBAL_H;
+                par.top = this.top;
+                new D.Gallery.CompetitionItem(this._mGetCompetitionPics.re.items[k], par).append(this._feedNode);
+            }
+
+            D.Gallery.makeCollage();
+
+            if (this._mGetCompetitionPics.re.pgs > this.pg && !this._more) {
+                this._more = new T.More({
+                    load: D.closure(this, this._loadMore),
+                    noOverlay: true,
+                    pg: this.pg,
+                    pgs: this._mGetCompetitionPics.re.pgs,
+                    caption: "Vairāk",
+                    node: this.node
+                });
+            }
+            if (!this._footer) {
+                this._footer = mkE({
+                    tag: 'div',
+                    className: 'feedFooter',
+                    els: [
+                        this.par.unsubscribed?'Tu esi attei' + (D.me.sex==2?'kusies':'cies') + ' no šī konkursa. ' : "",
+                        {
+                            tag: 'a',
+                            text: this.par.unsubscribed?'Pieteikties':'Atteikties',
+                            onclick: this._unsubscribe
+                        },
+                        {
+                            tag: 'a',
+                            text: 'Noteikumi',
+                            onclick: this._rules
+                        }
+                    ]
+                }).append(this.node);
+            }
+        },
+        _rules: function() {
+            InfoBox.els(mkE({
+                tag: 'div',
+                innerHTML: D.Lang.get('galcon9_rules', 'xGal')
+            }), {
+                title: 'Noteikumi'
+            });
+        },
+        _unsubscribe: function() {
+            this._mContestUnsubscribe.call();
+        },
+        _onUnsubscribe: function() {
+            D.reload();
+        },
+        _calc: function(item) {
+            var re = {
+                H: 0,
+                h: 0,
+                w: 0
+            };
+            if( !item.image.w || !item.image.h ){
+                return;
+            }
+            if( item.image.hLarge < this.GLOBAL_H ){
+                return;
+            }
+            if(item.image.w < item.image.h) {
+                re.H = 300;
+            } else {
+                re.H = 260;
+            }
+            var k = Math.min( 436 / item.image.w, re.H / item.image.h, 1 );
+            re.w = Math.round( item.image.w * k );
+            re.h = Math.round( item.image.h * k );
+            if( re.h < re.H ){
+                k = Math.min( 980 / item.image.w, re.H / item.image.h, 1 );
+                re.w = Math.round( item.image.w * k );
+            }
+            re.h = re.H;
+            return re;
+        }
+    },
+    mkE.Base
+);
+
+
+
+/**
+ * @class {D.Gallery.CompetitionItem}
+ * @extends {mkE.Base}
+ * @param {Object} par
+ */
+D.Gallery.CompetitionItem = Class(
+    /**
+     * @lends {D.Gallery.CompetitionItem#}
+     */
+    {
+        /**
+         * @param {Object} item
+         * @param {Object} par
+         * @constructs
+         */
+        __construct: function (item, par) {
+            this.par = par || {};
+            this.item = item;
+            this.node = mkE({
+                tag: 'div',
+                id: 'gallery-'+item.id,
+                className: 'galleryTop gallery',
+                style: {
+                    height: this.par.global_H + 'px'
+                },
+                els: [
+                    {
+                        tag: 'img',
+                        className: 'coverTop',
+                        src: item.image.uber,
+                        attr: {
+                            'data-width': this.par.w,
+                            'data-height': this.par.h,
+                            style: "height: "+this.par.h+"px"
+                        },
+                        onclick: function() { D.GalleryFS.open({"pid":item.id, tab: 35, msTop: par.top})}
+                    },
+                    {
+                        tag: 'div',
+                        className: 'galleryDetails',
+                        els: [
+                            {
+                                tag: 'a',
+                                text: item.user.title,
+                                href: item.user.url
+                            }
+                        ]
+                    },
+                    {
+                        tag: 'div',
+                            className: 'voteCounter',
+                        els: [
+                            this._likeBtn = new T.LikeButton(item, {noCaption: true})
+                        ]
+                    },
+                    D.ADMIN?{tag: 'a', className: 'rm', onclick: this._rm, text: 'Izņemt no konkursa'}:''
+                ]
+            });
+        },
+        _rm: function() {
+            /**
+             *
+             * @type {DR.gallery.UnspamItem}
+             */
+            this.mRm = new DR.gallery.UnspamItem;
+            this.mRm.pid = this.item.id;
+            this.mRm.onLoad = this._onRm;
+            this.mRm.call();
+        },
+        _onRm: function() {
+            addClassName(this.node, "inactive");
+        },
+        _onLike: function(p) {
+            var re = this._likeBtn;
+            this.likeCount.text = p.count;
+        }
+    },
+    mkE.Base
+);
+
+// --- competition.js ---
+D.loaded('Gallery');

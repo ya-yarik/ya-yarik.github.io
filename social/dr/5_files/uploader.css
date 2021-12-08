@@ -1,0 +1,133 @@
+.NativeUploader{
+	position:relative;
+	height:100%;
+	min-height:22px;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+	overflow:hidden;
+}
+
+.NativeUploader input{
+	position:absolute;
+	opacity:0;
+	filter:alpha(opacity=0);
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	font-size:80px;
+	cursor:pointer;
+}
+
+.NativeUploader input::-webkit-file-upload-button{
+	cursor: pointer;
+}
+
+.NativeUploaderDrop{
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background:#fff;
+	opacity:0.8;
+	border:4px dashed #CCC;
+}
+
+.NativeUploaderDrop div{
+	position:absolute;
+	top:50%;
+	left:20px;
+	right:20px;
+	text-align:center;
+	font-weight:bold;
+	margin-top:-10px;
+	font-size:14px;
+}
+/* +++ flashUpload +++ */
+.flashUpload{
+	position:relative;
+	top:0px;
+	left:0px;
+	height:100%;
+	-moz-user-select:none;
+	-webkit-user-select:none;
+}
+
+.flashUploadLabel{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	text-align:center;
+}
+
+.flashUploadContent{
+	position:relative;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+}
+
+.flashUpload embed, .flashUpload object{
+	position:relative;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+}
+/* --- flashUpload --- */
+
+
+/* +++ formsUpload +++ */
+.formsUpload{
+	position:relative;
+}
+
+.formsUploadIframeC{
+	position:absolute;
+}
+
+.formsUpload iframe{
+	width:1px;
+	height:1px;
+	visibility:hidden;
+}
+
+.formsUploadInpC{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	overflow:hidden;
+	height:20px;
+}
+
+.formsUploadInpC input{
+	position:absolute;
+	right:0px;
+	top:0px;
+	font-size:80px;
+	opacity:0;
+	filter:alpha(opacity=0);
+}
+
+.formsUploadProgress{
+	width:100%;
+	margin-top:5px;
+}
+
+.formsUploadProgress td:first-child{
+	width:10%;
+	padding-right:5px;
+}
+
+.formsUploadProgress div{
+	height:5px;
+	overflow:hidden;
+	background-color:#F60;
+	background-image:url('//ifrype.com/i/progress.gif');
+}
+/* --- formsUpload --- */

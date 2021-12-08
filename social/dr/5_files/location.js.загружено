@@ -1,0 +1,193 @@
+DR.location = DR.location || {};
+DR.location.struct = DR.location.struct || {};
+DR.location.select = DR.location.select || {};
+/** @extends {DR._Base} */
+DR.location.struct.Place = function(par){
+	/** @private */
+	this._t = 2771;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.caption)) this.caption = String(par.caption||'');
+	if(DR._Base.is(par.country)) this.country = String(par.country||'');
+	if(DR._Base.is(par.countryName)) this.countryName = String(par.countryName||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.location)) this.location = DR._Base.cast(par.location);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.type)) this.type = String(par.type||'');
+};
+DR._Base._types[2771] = DR.location.struct.Place;
+DR.location.struct.Place.TYPE_CITY = "city";
+DR.location.struct.Place.TYPE_REGION = "region";
+DR.location.struct.Place.TYPE_LOCALITY = "locality";
+DR.location.struct.Place[__P] = new DR._Base;
+DR.location.struct.Place[__P][__C] = DR.location.struct.Place;
+/** @type {String} */
+DR.location.struct.Place.prototype.caption = null;
+/** @type {String} */
+DR.location.struct.Place.prototype.country = null;
+/** @type {String} */
+DR.location.struct.Place.prototype.countryName = null;
+/** @type {Number} */
+DR.location.struct.Place.prototype.id = null;
+/** @type {DR.base.struct.LatLng} */
+DR.location.struct.Place.prototype.location = null;
+/** @type {String} */
+DR.location.struct.Place.prototype.name = null;
+/** @type {String} */
+DR.location.struct.Place.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.location.select.Place = function(){
+	this._fields = {};
+};
+DR.location.select.Place[__CL] = "Location__Place";
+DR.location.select.Place[__P] = new DR._Select;
+DR.location.select.Place[__P][__C] = DR.location.select.Place;
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.caption = function(v){ this._fields.caption = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.country = function(v){ this._fields.country = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.countryName = function(v){ this._fields.countryName = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.location = function(v){ this._fields.location = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.Place} */
+DR.location.select.Place.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.location.struct.AcItem = function(par){
+	/** @private */
+	this._t = 4562;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = String(par.id||'');
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+};
+DR._Base._types[4562] = DR.location.struct.AcItem;
+DR.location.struct.AcItem[__P] = new DR._Base;
+DR.location.struct.AcItem[__P][__C] = DR.location.struct.AcItem;
+/** @type {String} */
+DR.location.struct.AcItem.prototype.id = null;
+/** @type {String} */
+DR.location.struct.AcItem.prototype.name = null;
+ 
+/** @extends {DR._Base} */
+DR.location.struct.SearchRe = function(par){
+	/** @private */
+	this._t = 2741;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[2741] = DR.location.struct.SearchRe;
+DR.location.struct.SearchRe[__P] = new DR._Base;
+DR.location.struct.SearchRe[__P][__C] = DR.location.struct.SearchRe;
+/** @type {Number} */
+DR.location.struct.SearchRe.prototype.count = null;
+/** @type {Array.<DR.location.struct.Place>} */
+DR.location.struct.SearchRe.prototype.items = null;
+/** @type {Number} */
+DR.location.struct.SearchRe.prototype.pg = null;
+/** @type {Number} */
+DR.location.struct.SearchRe.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.location.select.SearchRe = function(){
+	this._fields = {};
+};
+DR.location.select.SearchRe[__CL] = "Location__SearchRe";
+DR.location.select.SearchRe[__P] = new DR._Select;
+DR.location.select.SearchRe[__P][__C] = DR.location.select.SearchRe;
+/** @param {boolean} [v]
+  * @return {DR.location.select.SearchRe} */
+DR.location.select.SearchRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.SearchRe} */
+DR.location.select.SearchRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.SearchRe} */
+DR.location.select.SearchRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.location.select.SearchRe} */
+DR.location.select.SearchRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.location.struct.AcRe = function(par){
+	/** @private */
+	this._t = 4563;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[4563] = DR.location.struct.AcRe;
+DR.location.struct.AcRe[__P] = new DR._Base;
+DR.location.struct.AcRe[__P][__C] = DR.location.struct.AcRe;
+/** @type {Array.<DR.location.struct.AcItem>} */
+DR.location.struct.AcRe.prototype.items = null;
+ 
+/** @extends {DR._Method} */
+DR.location.Search = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2742;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2742] = DR.location.Search;
+DR.location.Search[__CL] = "Location__Search";
+DR.location.Search.TYPE_REGION = "region";
+DR.location.Search.TYPE_CITY = "city";
+DR.location.Search.TYPE_LOCALITY = "locality";
+DR.location.Search[__P] = new DR._Method;
+DR.location.Search[__P][__C] = DR.location.Search;
+/** @type {Number|null} */
+DR.location.Search.prototype.count = null;
+/** @type {DR.base.struct.LatLng|null} */
+DR.location.Search.prototype.location = null;
+/** @type {Number} */
+DR.location.Search.prototype.pg = null;
+/** @type {String} */
+DR.location.Search.prototype.query = null;
+/** @type {String|null} */
+DR.location.Search.prototype.type = null;
+/** @type {DR.location.struct.SearchRe} */
+DR.location.Search.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.location.Ac = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4564;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4564] = DR.location.Ac;
+DR.location.Ac[__CL] = "Location__Ac";
+DR.location.Ac[__P] = new DR._Method;
+DR.location.Ac[__P][__C] = DR.location.Ac;
+/** @type {String} */
+DR.location.Ac.prototype.query = null;
+/** @type {DR.location.struct.AcRe} */
+DR.location.Ac.prototype.re = null;
+ 
+D.loaded();

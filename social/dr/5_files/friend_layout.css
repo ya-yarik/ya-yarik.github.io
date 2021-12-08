@@ -1,0 +1,1013 @@
+@import url('//fonts.googleapis.com/css?family=Open+Sans:300,400&subset=latin,cyrillic-ext,latin-ext');
+@import url('//fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=latin,cyrillic-ext,latin-ext');
+
+.profileTitleCont {
+	margin-bottom: 10px;
+	width: 720px;
+}
+.profileTitleCont .title {
+	font-family: "open sans", sans-serif;
+	font-size: 36px;
+	font-weight: 300;
+	line-height: 45px;
+}
+.profileTitleCont .age {
+	font-size: 15px;
+	position: relative;
+	top: -3px;
+	margin: 0 5px;
+}
+.profileTitleCont .age.hidden {
+	color: #aeaeae;
+}
+.profileTitleCont #fpemo {
+	display: inline-block;
+	position: relative;
+	bottom: -3px;
+	right: auto;
+}
+
+.profilePath {
+	margin-bottom: 15px;
+}
+
+/* profile intro box */
+.profileIntro .aboutmeLink,
+.profileIntro .galleryLink {
+	background-color: #f6f6f6;
+	float: left;
+	line-height: 97px;
+	position: relative;
+	font-family: "open sans", sans-serif;
+	font-weight: 300;
+	font-size: 28px;
+	color: #393939;
+	height: 99px;
+	border: 1px solid #dbdbdb;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.profileIntro .aboutmeLink:hover,
+.profileIntro .galleryLink:hover {
+	background-color: #efefef;
+	text-decoration: none;
+}
+.profileIntro .aboutmeLink .piIcon,
+.profileIntro .galleryLink .piIcon {
+	width: 27px;
+	height: 27px;
+	position: absolute;
+	background: url('/i/profile/block_arrow.png') no-repeat left;
+	top: 36px;
+	left: 23px;
+}
+.profileIntro .aboutmeLink:hover .piIcon,
+.profileIntro .galleryLink:hover .piIcon {
+	background-position: right;
+}
+
+.profileIntro .aboutmeLink.inactive,
+.profileIntro .galleryLink.inactive {
+	color: #6F6F6F;
+	cursor: default;
+	background-color: #f6f6f6;
+}
+.profileIntro .aboutmeLink.inactive .piIcon,
+.profileIntro .galleryLink.inactive .piIcon {
+	background-position: left;
+	opacity: 0.5;
+}
+
+
+.profileIntro .aboutmeLink {
+	width: 315px;
+	padding-left: 60px;
+}
+.langhu .profileIntro .aboutmeLink {
+	font-size: 22px;
+}
+.profileIntro .galleryLink {
+	width: 303px;
+	padding-left: 60px;
+	border-left: none;
+}
+
+.profileIntro .relationshipEmpty {
+	float: left;
+	width: 200px;
+	height: 99px;
+	padding-top: 22px;
+	background-color: #f6f6f6;
+	border: 1px solid #dbdbdb;
+	color: #6f6f6f;
+	text-align: center;
+	margin-left: 2px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.profileIntro .relationshipEmpty .piIcon {
+	display: block;
+	background: url('/i/profile/block_relationship.png') no-repeat left;
+	width: 32px;
+	height: 28px;
+	margin: 0 auto 7px;
+}
+.profileIntro .relationshipEmpty.inactive,
+.profileIntro .relationshipEmpty.inactive:hover {
+	cursor: default;
+	background-color: #f6f6f6;
+}
+.profileIntro .relationshipEmpty:hover {
+	text-decoration: none;
+	background-color: #efefef;
+}
+.profileIntro .relationshipEmpty:hover .piIcon {
+	background-position: right;
+}
+.profileIntro .relationshipEmpty.inactive:hover .piIcon {
+	background-position: left;
+}
+.profileIntro .relationshipBox {
+	width: 202px;
+	height: 99px;
+	position: relative;
+	float: left;
+}
+.profileIntro .relationshipBox img {
+	width: 99px;
+	height: 99px;
+	margin-left: 2px;
+	float: left;
+	display: block;
+}
+.profileIntro .relationshipIcon {
+	background: url('/i/profile/relationship_married.png') no-repeat;
+	width: 52px;
+	height: 52px;
+	position: absolute;
+	top: 24px;
+	left: 74px;
+}
+.profileIntro .rel2 .relationshipIcon {
+	background-image: url('/i/profile/relationship_inrelat.png');
+}
+.profileIntro .rel5 .relationshipIcon {
+	background-image: url('/i/profile/relationship_engaged.png');
+}
+
+
+
+
+.profileIntro .infoBox {
+	width: 315px;
+	height: 202px;
+	padding-top: 12px;
+	border: 1px solid #dbdbdb;
+	border-top: none;
+	float: left;
+	color: #6f6f6f;
+	overflow:hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.profileIntro .withoutGalleries .infoBox {
+	height: 101px;
+}
+.profileIntro ul {
+	margin-bottom: 3px;
+	padding-left: 10px;
+}
+.profileIntro .infoBox li {
+	padding: 2px 7px 4px 20px;
+	font-size: 13px;
+	background: url('/i/profile/info_icons.png') no-repeat top left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.profileIntro .infoBox li.withoutEllipsis {
+	text-overflow: clip;
+	white-space: normal;
+	word-wrap: break-word;
+}
+.profileIntro .infoBox .nick {
+	background-position: 0 -193px;
+}
+.profileIntro .infoBox .location {
+	background-position: -98px -94px;
+}
+.profileIntro .infoBox .bday {
+	background-position: -170px -25px;
+}
+.profileIntro .infoBox .nday {
+	background-position: -76px -122px;
+}
+.profileIntro .infoBox .work {
+	background-position: -121px -70px;
+}
+.profileIntro .infoBox .study {
+	background-position: -50px -143px;
+}
+.profileIntro .infoBox .interests {
+	background-position: -146px -47px;
+}
+.profileIntro .infoBox .suggests {
+	background-position: -26px -167px;
+}
+.profileIntro .infoBox a {
+	margin-left: 10px;
+}
+.profileIntro .infoBox .about {
+	background: url('/i/profile/info_icons.png') no-repeat -185px 0;
+	padding: 0 5px 7px 30px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #dbdbdb;
+	overflow: hidden;
+}
+.profileIntro .infoBox .about.withoutLine {
+	border-bottom: 0;
+}
+
+
+
+
+
+.profileIntro .galleries {
+	float: left;
+	width: 303px;
+	padding: 0;
+}
+.profileIntro .galleries li {
+	float: left;
+	margin-left: 2px;
+	margin-top: 2px;
+}
+.profileIntro .galleries a {
+	width: 99px;
+	height: 99px;
+	display: block;
+	position: relative;
+}
+.profileIntro .galleries .albPlay {
+	background: url("//ifrype.com/i/videoplayer/icn_playbtn_2x.png") no-repeat;
+	background-size: 40px 40px;
+	width: 40px;
+	height: 40px;
+	left: 50%;
+	margin-left: -20px;
+	opacity: 0.7;
+	position: absolute;
+	top: 32px;
+}
+.profileIntro .galleries a:hover .albPlay {
+	opacity: 1;
+}
+
+
+.profileIntro .rightNav {
+	width: 202px;
+	float: left;
+	overflow: hidden;
+}
+.profileIntro .rightNav a {
+	width: 99px;
+	padding-top: 62px;
+	height: 99px;
+	float: left;
+	border: 1px solid #dbdbdb;
+	background-color: #f6f6f6;
+	text-align: center;
+	color: #6f6f6f;
+	margin-top: 2px;
+	margin-left: 2px;
+	position: relative;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.profileIntro .rightNav a:hover {
+	background-color: #efefef;
+	text-decoration: none;
+}
+.profileIntro .rightNav a.inactive {
+	background-color: #f6f6f6;
+	color: #6f6f6f;
+	cursor: default;
+}
+.profileIntro .rightNav a.inactive .piIcon {
+	opacity: 0.5;
+}
+.profileIntro .rightNav a.inactive:hover .piIcon {
+	background-position: top center;
+}
+.profileIntro .rightNav .piIcon {
+	position: absolute;
+	top: 23px;
+	width: 100%;
+	left: 0;
+	background-position: top center;
+	background-repeat: no-repeat;
+}
+.profileIntro .rightNav a:hover .piIcon {
+	background-position: center 50%;
+}
+.profileIntro .rightNav .friends .piIcon {
+	background-image: url('/i/profile/block_friends.png');
+	height: 32px;
+}
+.profileIntro .rightNav .interests .piIcon {
+	background-image: url('/i/profile/block_interests.png');
+	height: 31px;
+}
+.profileIntro .rightNav .blogs .piIcon {
+	background-image: url('/i/profile/block_blogs.png');
+	height: 30px;
+}
+
+.profileIntro .rightNav .guestbook .piIcon {
+	background-image: url('/i/profile/block_guestbook.png');
+	height: 32px;
+	top: 20px;
+}
+
+.profileIntro .withoutGalleries .rightNav {
+	width: 505px;
+}
+.profileIntro .withoutGalleries .rightNav .friends {
+	width: 150px;
+}
+.profileIntro .withoutGalleries .rightNav .interests {
+	width: 149px;
+}
+
+.profileIntro .count,
+.introSmallMenu .count {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	font-size: 10px;
+	color: #fff;
+	padding: 0 4px;
+	background-color: #b2b2b2;
+}
+.profileIntro .galleryLink .count {
+	position: static;
+	display: inline-block;
+	line-height: 16px;
+	vertical-align: middle;
+	font-family: Arial,sans-serif;
+}
+
+
+
+/* profile intro block --- */
+
+
+/* friends section */
+.friendsTab {
+	margin-bottom: 15px;
+	width: 100%;
+}
+
+.friendsTabContainer {
+	position: relative;
+}
+
+.friendsTabContainer a.settings {
+	position: absolute;
+	top: 8px;
+	right: 0;
+	color: #747474;
+}
+
+.friendsTabContainer a.settings:hover {
+	color: #d8d8d8;
+}
+
+/* about me section */
+.aboutMeInfo {
+	font-size: 13px;
+	color: #6f6f6f;
+}
+.aboutMeInfo th {
+	font-weight: normal;
+	vertical-align: top;
+	padding-left: 21px;
+	padding-right: 5px;
+	text-align: left;
+	width: 115px;
+}
+.aboutMeInfo th {
+	padding-top: 3px;
+	background: url('/i/profile/info_icons.png') no-repeat top left;
+}
+
+.aboutMeInfo .location  { background-position: -98px -94px; }
+.aboutMeInfo .work      { background-position: -121px -70px; }
+.aboutMeInfo .study     { background-position: -50px -143px; }
+.aboutMeInfo .birthday  { background-position: -170px -25px; }
+.aboutMeInfo .nameday   { background-position: -76px -122px; }
+.aboutMeInfo .about     { background-position: -194px 0; }
+.aboutMeInfo .interests { background-position: -146px -47px; }
+.aboutMeInfo .suggests  { background-position: -26px -167px }
+.aboutMeInfo .nick      { background-position: 0 -193px; }
+
+
+.aboutMeInfo td {
+	padding-bottom: 12px;
+	padding-top: 3px;
+}
+
+/* interests */
+/*
+.profileInterestsMain h1 {
+	margin-bottom: 0;
+}
+.profileInterestsMain h1 span {
+	color: #6f6f6f;
+	font-weight: normal;
+}
+.profileInterestsMain .userList {
+	margin-bottom: 30px;
+}
+*/
+
+#lt .commonFriendsRight h3 a {
+	font-weight: bold;
+	float: none;
+}
+.commonFriendsRight > a {
+	float: left;
+	width: 74px;
+	height: 74px;
+	margin-right: 8px;
+	margin-bottom: 8px;
+	border-radius: 3px;
+	position: relative;
+}
+.commonFriendsRight > a:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.commonFriendsRight img {
+	width: 74px;
+	height: 74px;
+	display: block;
+	border-radius: 3px;
+}
+.commonFriendsRight .last {
+	margin-right: 0;
+}
+
+/* right column */
+.pymkBlock .profileSmallIcon {
+	float: left;
+	margin-right: 10px;
+}
+.pymkBlock .item {
+	clear: left;
+	margin-bottom: 5px;
+}
+.pymkBlock .title {
+	font-weight: bold;
+	display: inline-block;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 122px;
+}
+.pymkBlock .invite {
+	border: 1px solid #dedede;
+	color: #9c9c9c;
+	width: 122px;
+	height: 24px;
+	line-height: 24px;
+	display: inline-block;
+	text-align: center;
+	background: url('/i/profile/gray_btn.png') repeat-x top;
+	font-weight: 600;
+}
+.pymkBlock .invite:hover {
+	border-color: #bebebe;
+	color: #393939;
+	text-decoration: none;
+	background-position: bottom;
+}
+.pymkBlock .buttonCont {
+	position: relative;
+	float: left;
+}
+.pymkBlock .remove {
+	visibility: hidden;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	display: block;
+	right: -19px;
+	top: 4px;
+}
+.pymkBlock .item:hover .remove {
+	visibility: visible;
+}
+/*#lt .pymkBlock h3 a {*/
+	/*font-weight: bold;*/
+/*}*/
+
+
+#lt h3.lastInterestsTitle a {
+	font-weight: bold;
+}
+#lt h3.badgesTitle a ,
+#lt h3.sayFollowers a {
+    font-weight: bold;
+}
+#lt h3.badgesTitle p a {
+	font-weight:normal;
+}
+.lastInterests a {
+	display: block;
+	padding-bottom: 5px;
+	margin-bottom: 2px;
+	padding-top: 5px;
+	position: relative;
+	background-position: left;
+	line-height: 20px;
+	padding-left: 28px;
+	min-height: 20px;
+}
+.lastInterests a:hover {
+	background-color: #f8f8f8;
+}
+.lastInterests img {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 5px;
+	left: 0;
+}
+
+.myBand {
+	position: relative;
+}
+.myBand img {
+	display: block;
+}
+.myBand span {
+	position:absolute;
+	left:0;
+	right:0;
+	bottom:0;
+	color:#FFF;
+	font-weight:bold;
+	padding:30px 10px 10px;
+	background: url('//ifrype.com/say/img/pic_overlay.png') repeat-x;
+	background-size:100% 100%;
+	text-shadow:0 1px 2px rgba(0, 0, 0, 0.5);
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+
+
+.sidePlayer {
+	border: 1px solid #dbdbdb;
+	width: 238px;
+}
+.sidePlayer ul {
+	margin: 10px 10px 0;
+}
+.sidePlayer li {
+	margin-bottom: 10px;
+}
+.sidePlayer a {
+	color: #8d8d8d;
+}
+.sidePlayer a span {
+	font-weight: bold;
+}
+.sidePlayer .controls,
+.sidePlayer .playerProgress {
+	border-top: 1px solid #dbdbdb;
+	background-color: #f6f6f6;
+}
+.sidePlayer .playerProgress {
+	padding: 10px;
+}
+/*.sidePlayer .playerProgress .bg {*/
+	/*border-radius: 2px;*/
+	/*background-color: #e7e7e7;*/
+	/*height: 4px;*/
+/*}*/
+.sidePlayer .controls {
+	height: 45px;
+	position: relative;
+}
+.sidePlayer .controls a {
+	position: absolute;
+	display: block;
+}
+.sidePlayer .controls .star {
+	width: 16px;
+	height: 16px;
+	top: 15px;
+	left: 10px;
+}
+.sidePlayer .controls .prev {
+	width: 20px;
+	height: 12px;
+	top: 17px;
+	left: 71px;
+	background: url('/i/profile/player_buttons.png') no-repeat 0 0;
+}
+.sidePlayer .controls .play {
+	width: 18px;
+	height: 18px;
+	top: 15px;
+	left: 115px;
+	background: url('/i/profile/player_buttons.png') no-repeat -20px 0;
+}
+.sidePlayer .controls .pause {
+	width: 18px;
+	height: 18px;
+	top: 15px;
+	left: 115px;
+	background: url('/i/profile/player_buttons.png') no-repeat -70px 0;
+}
+.sidePlayer .controls .next {
+	width: 20px;
+	height: 12px;
+	top: 17px;
+	left: 148px;
+	background: url('/i/profile/player_buttons.png') no-repeat -38px 0;
+}
+.sidePlayer .controls .wnd {
+	width: 12px;
+	height: 10px;
+	top: 18px;
+	left: 216px;
+	background: url('/i/profile/player_buttons.png') no-repeat -58px 0;
+}
+.sidePlayer .active a,
+.sidePlayer a:hover {
+	color: #393939;
+	text-decoration: none;
+}
+
+/*.sidePlayer .complete {*/
+	/*width: 10%;*/
+	/*background-color: #ccc;*/
+	/*height: 4px;*/
+	/*position: relative;*/
+/*}*/
+/*.sidePlayer .handler {*/
+	/*background: url('/i/profile/player_handler.png') no-repeat;*/
+	/*width: 8px;*/
+	/*height: 8px;*/
+	/*position: absolute;*/
+	/*top: -2px;*/
+	/*right: -4px;*/
+/*}*/
+
+
+
+.profileSendGift {
+	border: 1px solid #bebebe;
+	color: #393939;
+	width: 238px;
+	height: 24px;
+	line-height: 24px;
+	display: inline-block;
+	text-align: center;
+	background: url('/i/sbook/buttons2/link.png') repeat-x top;
+	font-size: 13px;
+	font-weight: 600;
+}
+.profileSendGift img {
+	margin-right: 4px;
+	position: relative;
+	top: 2px;
+}
+.profileSendGift:hover {
+	text-decoration: none;
+	background-position: 0 -24px;
+}
+.profileSendGift:active {
+	background-position: bottom;
+}
+
+
+.profileLastSeen {
+	background: url('/i/profile/clock.png') no-repeat;
+	padding-left: 21px;
+}
+
+
+.profileAdditionalOptions {
+	padding-top: 4px;
+}
+.profileAdditionalOptions div {
+	padding-bottom: 7px;
+}
+.profileAdditionalOptions a {
+	color: #8d8d8d;
+}
+
+
+
+.introSmallMenu a {
+	width: 101px;
+	padding-top: 62px;
+	height: 99px;
+	float: left;
+	border: 1px solid #dbdbdb;
+	background-color: #f6f6f6;
+	text-align: center;
+	color: #6f6f6f;
+	margin-top: 2px;
+	margin-left: 2px;
+	position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.introSmallMenu a:hover {
+	/*background-color: #efefef;*/
+	text-decoration: none;
+}
+.introSmallMenu a.active {
+	color: #ff6700;
+}
+.introSmallMenu a.active .piIcon,
+.introSmallMenu a.active:hover .piIcon{
+	background-position: center 100%;
+}
+.introSmallMenu a.inactive {
+	background-color: #f6f6f6;
+	color: #6f6f6f;
+	cursor: default;
+}
+.introSmallMenu a.inactive .piIcon {
+	opacity: 0.5;
+}
+.introSmallMenu a.inactive:hover .piIcon {
+	background-position: top center;
+}
+.introSmallMenu .piIcon {
+	position: absolute;
+	top: 23px;
+	width: 100%;
+	left: 0;
+	background-position: top center;
+	background-repeat: no-repeat;
+}
+.introSmallMenu a:hover .piIcon {
+	background-position: center 50%;
+}
+.introSmallMenu .home {
+	margin-left: 0;
+}
+.introSmallMenu .home .piIcon {
+	background-image: url('/i/profile/block_home.png');
+	height: 30px;
+}
+.introSmallMenu .about .piIcon {
+	background-image: url('/i/profile/block_about.png');
+	height: 30px;
+}
+.introSmallMenu .gallery .piIcon {
+	background-image: url('/i/profile/block_gallery.png');
+	height: 32px;
+}
+.introSmallMenu .friends .piIcon {
+	background-image: url('/i/profile/block_friends.png');
+	height: 32px;
+}
+.introSmallMenu .interests .piIcon {
+	background-image: url('/i/profile/block_interests.png');
+	height: 31px;
+}
+.introSmallMenu .blogs .piIcon {
+	background-image: url('/i/profile/block_blogs.png');
+	height: 30px;
+}
+.introSmallMenu .guestbook .piIcon {
+	background-image: url('/i/profile/block_guestbook.png');
+	height: 32px;
+	top: 20px;
+}
+
+
+.profileViewed .btn {
+	border: 1px solid #bebebe;
+	color: #393939;
+	height: 38px;
+	line-height: 38px;
+	float: left;
+	text-align: center;
+	background: url('/i/sbook/buttons2/link_large.png') repeat-x top;
+	font-size: 20px;
+	font-weight: normal;
+	padding: 0 10px 0 12px;
+	margin-right: 8px;
+}
+.profileViewed .btn span {
+	padding-right: 20px;
+	background: url('/i/profile/profile_viewed.png') no-repeat right;
+}
+.profileViewed .btn:hover {
+	text-decoration: none;
+	background-position: 0 -38px;
+}
+.profileViewed .btn:active {
+	background-position: bottom;
+}
+.profileViewed div {
+	color: #6f6f6f;
+	padding-top: 4px;
+}
+.profileViewed a {
+	font-weight: bold;
+}
+
+
+#lt .changeSettingsCont .button {
+	width: 115px;
+	margin-bottom: 0;
+}
+#lt .changeSettingsCont .changePic {
+	margin-right: 5px;
+}
+#lt .changeSettingsCont {
+    margin-bottom: 10px;
+}
+#lt .followSay {
+	margin-left: 0;
+}
+#lt .followSay + .buttonStretch {
+	margin-top: 0;
+}
+
+.profileMessageForm .formItemTextarea {
+	margin-bottom: 0;
+}
+.profileMessageForm .formItemTextarea .formItemBorder {
+	border-radius: 3px 3px 0 0;
+}
+.profileMessageForm .formItemTextarea .formItemPadding {
+	margin: 10px;
+}
+.profileMessageForm textarea {
+	height: 50px;
+
+	transition: height 0.2s;
+	-webkit-transition: height 0.2s;
+	-moz-transition: height 0.2s;
+}
+.profileMessageForm .btnContainer {
+	background-color: #f8f8f8;
+	border-radius: 0 0 3px 3px;
+	border: 1px solid #bebebe;
+	border-top: none;
+	padding: 5px 4px;
+}
+#lt .profileMessageForm .button {
+	width: auto;
+	margin-bottom: 0;
+	float: left;
+}
+.profileMessageForm .mailUploadButton {
+	width: 19px;
+	height: 19px;
+	position: relative;
+	top: 3px;
+	margin-left: 8px;
+	margin-right: 5px;
+	padding: 0;
+	float: left;
+}
+.profileMessageForm .flashUploadContent {
+	background-image: url('/i/profile/add_attach.png');
+	background-position: top;
+}
+.profileMessageForm .flashUploadContent:hover {
+	background-position: bottom;
+}
+.profileMessageForm .flashUploadLabel {
+	text-indent: -888em;
+}
+.profileMessageForm .smileyBtn {
+	float: left;
+	position: relative;
+	top: 4px;
+	margin-left: 5px;
+	background-image: url('/i/profile/add_smiley.png');
+	background-position: top;
+	height: 19px;
+}
+.profileMessageForm .smileyBtn:hover {
+	background-position: bottom;
+}
+.profileMessageForm .formTextareaInfo,
+.profileMessageForm #mailErrors {
+	display: none;
+}
+
+.profileMessageForm #mailAttachments .item{
+	position:relative;
+	width:100%;
+	height:24px;
+	line-height:24px;
+	margin: 0 0 5px;
+	color:#393939;
+}
+.profileMessageForm #mailAttachments .item span{
+	position:absolute;
+	top:0;
+	left:20px;
+	padding-right:26px;
+	white-space:nowrap;
+}
+.profileMessageForm #mailAttachments .isUploading span{
+	left:24px;
+}
+.profileMessageForm #mailAttachments .item .closeIcon{
+	position:absolute;
+	top:5px;
+	right:4px;
+	width:16px;
+	height:16px;
+	margin:0;
+	padding:0;
+	cursor:pointer;
+}
+.profileMessageForm #mailAttachments .item img{
+	position:absolute;
+	top:4px;
+	left:0;
+}
+.profileMessageForm #mailAttachments .isUploading img{
+	left:4px;
+}
+.profileMessageForm #mailAttachments .isUploading{
+	color:#8d8d8d;
+	background:#f3f3f3;
+}
+.profileMessageForm #mailAttachments .itemProgress{
+	position:absolute;
+	top:0;
+	left:0;
+	width:0;
+	height:100%;
+	background:#c9c9c9;
+}
+.profileMessageForm .conversation {
+	float: right;
+	margin-top: 5px;
+	margin-right: 6px;
+}
+
+
+#lt .friendGroup {
+	height: auto;
+	margin-bottom: 0;
+}
+#lt .friendGroup .formItemMultiCheckbox .multiCbxContent {
+	width: 222px;
+}
+#lt .friendGroup .formItemMultiCheckbox {
+	position: relative;
+}
+
+.movie {
+	width:98px;
+	height:146px;
+	overflow:hidden;
+	display:inline-block;
+}
+#lt h3.guestBookTitle a {
+	font-weight: bold;
+	float: none;
+}
+
+.sayFollowersList li:nth-child(4n + 4) {
+	margin-right: 0;
+}
+
+.sayFollowersList div.profileSmallIcon {
+	width: 52px;
+	height: 52px;
+}
+
+#crtt:not(:empty) {
+	margin-bottom: 16px;
+}

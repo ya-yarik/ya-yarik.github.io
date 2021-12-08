@@ -1,0 +1,289 @@
+DR.miniads = DR.miniads || {};
+DR.miniads.struct = DR.miniads.struct || {};
+DR.miniads.select = DR.miniads.select || {};
+/** @extends {DR._Method} */
+DR.miniads.Get = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 114;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[114] = DR.miniads.Get;
+DR.miniads.Get[__CL] = "Miniads__Get";
+DR.miniads.Get[__P] = new DR._Method;
+DR.miniads.Get[__P][__C] = DR.miniads.Get;
+/** @type {Number|null} */
+DR.miniads.Get.prototype.count = null;
+/** @type {Number|null} */
+DR.miniads.Get.prototype.place = null;
+/** @type {Array.<Number>|null} */
+DR.miniads.Get.prototype.skip = null;
+/** @type {Number|null} */
+DR.miniads.Get.prototype.type = null;
+/** @type {DR.miniads.struct.Ads} */
+DR.miniads.Get.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.miniads.struct.Item = function(par){
+	/** @private */
+	this._t = 116;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.externalStats)) this.externalStats = String(par.externalStats||'');
+	if(DR._Base.is(par.follow)) this.follow = DR._Base.cast(par.follow);
+	if(DR._Base.is(par.highlight)) this.highlight = DR._Base.cast(par.highlight);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.image)) this.image = String(par.image||'');
+	if(DR._Base.is(par.isPreview)) this.isPreview = Boolean(par.isPreview);
+	if(DR._Base.is(par.json)) this.json = String(par.json||'');
+	if(DR._Base.is(par.link)) this.link = String(par.link||'');
+	if(DR._Base.is(par.note)) this.note = String(par.note||'');
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[116] = DR.miniads.struct.Item;
+DR.miniads.struct.Item[__P] = new DR._Base;
+DR.miniads.struct.Item[__P][__C] = DR.miniads.struct.Item;
+/** @type {String|null} */
+DR.miniads.struct.Item.prototype.externalStats = null;
+/** @type {DR.miniads.struct.Follow|null} */
+DR.miniads.struct.Item.prototype.follow = null;
+/** @type {DR.miniads.struct.Highlight|null} */
+DR.miniads.struct.Item.prototype.highlight = null;
+/** @type {Number} */
+DR.miniads.struct.Item.prototype.id = null;
+/** @type {String} */
+DR.miniads.struct.Item.prototype.image = null;
+/** @type {Boolean|null} */
+DR.miniads.struct.Item.prototype.isPreview = null;
+/** @type {String|null} */
+DR.miniads.struct.Item.prototype.json = null;
+/** @type {String} */
+DR.miniads.struct.Item.prototype.link = null;
+/** @type {String|null} */
+DR.miniads.struct.Item.prototype.note = null;
+/** @type {String} */
+DR.miniads.struct.Item.prototype.text = null;
+/** @type {String} */
+DR.miniads.struct.Item.prototype.title = null;
+/** @type {DR.users.struct.User|null} */
+DR.miniads.struct.Item.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.miniads.select.Item = function(){
+	this._fields = {};
+};
+DR.miniads.select.Item[__CL] = "Miniads__Item";
+DR.miniads.select.Item[__P] = new DR._Select;
+DR.miniads.select.Item[__P][__C] = DR.miniads.select.Item;
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.externalStats = function(v){ this._fields.externalStats = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.follow = function(v){ this._fields.follow = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.highlight = function(v){ this._fields.highlight = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.isPreview = function(v){ this._fields.isPreview = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.json = function(v){ this._fields.json = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.link = function(v){ this._fields.link = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.note = function(v){ this._fields.note = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.text = function(v){ this._fields.text = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Item} */
+DR.miniads.select.Item.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.miniads.GetItem = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 117;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[117] = DR.miniads.GetItem;
+DR.miniads.GetItem[__CL] = "Miniads__GetItem";
+DR.miniads.GetItem[__P] = new DR._Method;
+DR.miniads.GetItem[__P][__C] = DR.miniads.GetItem;
+/** @type {Number} */
+DR.miniads.GetItem.prototype.id = null;
+/** @type {DR.miniads.struct.Item} */
+DR.miniads.GetItem.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.miniads.Click = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 855;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[855] = DR.miniads.Click;
+DR.miniads.Click[__CL] = "Miniads__Click";
+DR.miniads.Click[__P] = new DR._Method;
+DR.miniads.Click[__P][__C] = DR.miniads.Click;
+/** @type {Boolean|null} */
+DR.miniads.Click.prototype.follow = null;
+/** @type {Number} */
+DR.miniads.Click.prototype.id = null;
+/** @type {DR.base.struct.Status} */
+DR.miniads.Click.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.miniads.Close = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 856;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[856] = DR.miniads.Close;
+DR.miniads.Close[__CL] = "Miniads__Close";
+DR.miniads.Close[__P] = new DR._Method;
+DR.miniads.Close[__P][__C] = DR.miniads.Close;
+/** @type {Number} */
+DR.miniads.Close.prototype.id = null;
+/** @type {Number|null} */
+DR.miniads.Close.prototype.reason = null;
+/** @type {DR.base.struct.Status} */
+DR.miniads.Close.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.miniads.struct.Follow = function(par){
+	/** @private */
+	this._t = 866;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.background)) this.background = String(par.background||'');
+	if(DR._Base.is(par.border)) this.border = String(par.border||'');
+};
+DR._Base._types[866] = DR.miniads.struct.Follow;
+DR.miniads.struct.Follow[__P] = new DR._Base;
+DR.miniads.struct.Follow[__P][__C] = DR.miniads.struct.Follow;
+/** @type {String} */
+DR.miniads.struct.Follow.prototype.background = null;
+/** @type {String} */
+DR.miniads.struct.Follow.prototype.border = null;
+ 
+/** @extends {DR._Select} */
+DR.miniads.select.Follow = function(){
+	this._fields = {};
+};
+DR.miniads.select.Follow[__CL] = "Miniads__Follow";
+DR.miniads.select.Follow[__P] = new DR._Select;
+DR.miniads.select.Follow[__P][__C] = DR.miniads.select.Follow;
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Follow} */
+DR.miniads.select.Follow.prototype.background = function(v){ this._fields.background = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Follow} */
+DR.miniads.select.Follow.prototype.border = function(v){ this._fields.border = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.miniads.struct.Ads = function(par){
+	/** @private */
+	this._t = 869;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[869] = DR.miniads.struct.Ads;
+DR.miniads.struct.Ads[__P] = new DR._Base;
+DR.miniads.struct.Ads[__P][__C] = DR.miniads.struct.Ads;
+/** @type {Array.<DR.miniads.struct.Item>|null} */
+DR.miniads.struct.Ads.prototype.items = null;
+ 
+/** @extends {DR._Base} */
+DR.miniads.struct.Highlight = function(par){
+	/** @private */
+	this._t = 1419;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.mobile)) this.mobile = DR._Base.cast(par.mobile);
+};
+DR._Base._types[1419] = DR.miniads.struct.Highlight;
+DR.miniads.struct.Highlight[__P] = new DR._Base;
+DR.miniads.struct.Highlight[__P][__C] = DR.miniads.struct.Highlight;
+/** @type {DR.miniads.struct.HighlightImage} */
+DR.miniads.struct.Highlight.prototype.mobile = null;
+ 
+/** @extends {DR._Select} */
+DR.miniads.select.Highlight = function(){
+	this._fields = {};
+};
+DR.miniads.select.Highlight[__CL] = "Miniads__Highlight";
+DR.miniads.select.Highlight[__P] = new DR._Select;
+DR.miniads.select.Highlight[__P][__C] = DR.miniads.select.Highlight;
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.Highlight} */
+DR.miniads.select.Highlight.prototype.mobile = function(v){ this._fields.mobile = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.miniads.struct.HighlightImage = function(par){
+	/** @private */
+	this._t = 1420;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.large)) this.large = String(par.large||'');
+	if(DR._Base.is(par.original)) this.original = String(par.original||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[1420] = DR.miniads.struct.HighlightImage;
+DR.miniads.struct.HighlightImage[__P] = new DR._Base;
+DR.miniads.struct.HighlightImage[__P][__C] = DR.miniads.struct.HighlightImage;
+/** @type {Number} */
+DR.miniads.struct.HighlightImage.prototype.h = null;
+/** @type {String} */
+DR.miniads.struct.HighlightImage.prototype.large = null;
+/** @type {String} */
+DR.miniads.struct.HighlightImage.prototype.original = null;
+/** @type {Number} */
+DR.miniads.struct.HighlightImage.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.miniads.select.HighlightImage = function(){
+	this._fields = {};
+};
+DR.miniads.select.HighlightImage[__CL] = "Miniads__HighlightImage";
+DR.miniads.select.HighlightImage[__P] = new DR._Select;
+DR.miniads.select.HighlightImage[__P][__C] = DR.miniads.select.HighlightImage;
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.HighlightImage} */
+DR.miniads.select.HighlightImage.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.HighlightImage} */
+DR.miniads.select.HighlightImage.prototype.large = function(v){ this._fields.large = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.HighlightImage} */
+DR.miniads.select.HighlightImage.prototype.original = function(v){ this._fields.original = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.miniads.select.HighlightImage} */
+DR.miniads.select.HighlightImage.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+D.loaded();

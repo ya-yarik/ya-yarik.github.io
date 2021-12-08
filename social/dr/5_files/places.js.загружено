@@ -1,0 +1,586 @@
+DR.places = DR.places || {};
+DR.places.struct = DR.places.struct || {};
+DR.places.select = DR.places.select || {};
+/** @extends {DR._Base} */
+DR.places.struct.Item = function(par){
+	/** @private */
+	this._t = 126;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.cat)) this.cat = DR._Base.cast(par.cat);
+	if(DR._Base.is(par.category)) this.category = String(par.category||'');
+	if(DR._Base.is(par.categoryId)) this.categoryId = String(par.categoryId||'');
+	if(DR._Base.is(par.counts)) this.counts = DR._Base.cast(par.counts);
+	if(DR._Base.is(par.distance)) this.distance = (parseInt(par.distance)||0);
+	if(DR._Base.is(par.id)) this.id = String(par.id||'');
+	if(DR._Base.is(par.idInt)) this.idInt = (parseInt(par.idInt)||0);
+	if(DR._Base.is(par.location)) this.location = DR._Base.cast(par.location);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+	if(DR._Base.is(par.urlFull)) this.urlFull = String(par.urlFull||'');
+	if(DR._Base.is(par.visitorsPreview)){
+		var tmp = [];
+		for( var k in par.visitorsPreview ) tmp.push(DR._Base.cast(par.visitorsPreview [k]));
+		this.visitorsPreview = tmp;
+	}
+};
+DR._Base._types[126] = DR.places.struct.Item;
+DR.places.struct.Item[__P] = new DR._Base;
+DR.places.struct.Item[__P][__C] = DR.places.struct.Item;
+/** @type {DR.places.struct.Category|null} */
+DR.places.struct.Item.prototype.cat = null;
+/** @type {String|null} */
+DR.places.struct.Item.prototype.category = null;
+/** @type {String|null} */
+DR.places.struct.Item.prototype.categoryId = null;
+/** @type {DR.places.struct.ItemCounts} */
+DR.places.struct.Item.prototype.counts = null;
+/** @type {Number|null} */
+DR.places.struct.Item.prototype.distance = null;
+/** @type {String} */
+DR.places.struct.Item.prototype.id = null;
+/** @type {Number} */
+DR.places.struct.Item.prototype.idInt = null;
+/** @type {DR.places.struct.Location} */
+DR.places.struct.Item.prototype.location = null;
+/** @type {String} */
+DR.places.struct.Item.prototype.name = null;
+/** @type {String} */
+DR.places.struct.Item.prototype.url = null;
+/** @type {String} */
+DR.places.struct.Item.prototype.urlFull = null;
+/** @type {Array.<DR.users.struct.User>|null} */
+DR.places.struct.Item.prototype.visitorsPreview = null;
+ 
+/** @extends {DR._Select} */
+DR.places.select.Item = function(){
+	this._fields = {};
+};
+DR.places.select.Item[__CL] = "Places__Item";
+DR.places.select.Item[__P] = new DR._Select;
+DR.places.select.Item[__P][__C] = DR.places.select.Item;
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.cat = function(v){ this._fields.cat = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.category = function(v){ this._fields.category = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.categoryId = function(v){ this._fields.categoryId = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.counts = function(v){ this._fields.counts = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.distance = function(v){ this._fields.distance = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.idInt = function(v){ this._fields.idInt = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.location = function(v){ this._fields.location = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.urlFull = function(v){ this._fields.urlFull = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Item} */
+DR.places.select.Item.prototype.visitorsPreview = function(v){ this._fields.visitorsPreview = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.places.struct.Category = function(par){
+	/** @private */
+	this._t = 2972;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.icon)) this.icon = String(par.icon||'');
+	if(DR._Base.is(par.id)) this.id = String(par.id||'');
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+};
+DR._Base._types[2972] = DR.places.struct.Category;
+DR.places.struct.Category[__P] = new DR._Base;
+DR.places.struct.Category[__P][__C] = DR.places.struct.Category;
+/** @type {String|null} */
+DR.places.struct.Category.prototype.icon = null;
+/** @type {String} */
+DR.places.struct.Category.prototype.id = null;
+/** @type {String} */
+DR.places.struct.Category.prototype.name = null;
+ 
+/** @extends {DR._Base} */
+DR.places.struct.ItemCounts = function(par){
+	/** @private */
+	this._t = 1072;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.checkins)) this.checkins = (parseInt(par.checkins)||0);
+	if(DR._Base.is(par.friends)) this.friends = (parseInt(par.friends)||0);
+	if(DR._Base.is(par.users)) this.users = (parseInt(par.users)||0);
+};
+DR._Base._types[1072] = DR.places.struct.ItemCounts;
+DR.places.struct.ItemCounts[__P] = new DR._Base;
+DR.places.struct.ItemCounts[__P][__C] = DR.places.struct.ItemCounts;
+/** @type {Number} */
+DR.places.struct.ItemCounts.prototype.checkins = null;
+/** @type {Number} */
+DR.places.struct.ItemCounts.prototype.friends = null;
+/** @type {Number} */
+DR.places.struct.ItemCounts.prototype.users = null;
+ 
+/** @extends {DR._Base} */
+DR.places.struct.Location = function(par){
+	/** @private */
+	this._t = 275;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.address)) this.address = String(par.address||'');
+	if(DR._Base.is(par.city)) this.city = String(par.city||'');
+	if(DR._Base.is(par.country)) this.country = String(par.country||'');
+	if(DR._Base.is(par.lat)) this.lat = (parseFloat(par.lat)||0);
+	if(DR._Base.is(par.lng)) this.lng = (parseFloat(par.lng)||0);
+};
+DR._Base._types[275] = DR.places.struct.Location;
+DR.places.struct.Location[__P] = new DR._Base;
+DR.places.struct.Location[__P][__C] = DR.places.struct.Location;
+/** @type {String} */
+DR.places.struct.Location.prototype.address = null;
+/** @type {String} */
+DR.places.struct.Location.prototype.city = null;
+/** @type {String} */
+DR.places.struct.Location.prototype.country = null;
+/** @type {Number} */
+DR.places.struct.Location.prototype.lat = null;
+/** @type {Number} */
+DR.places.struct.Location.prototype.lng = null;
+ 
+/** @extends {DR._Base} */
+DR.places.struct.Place = function(par){
+	/** @private */
+	this._t = 319;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.category)) this.category = String(par.category||'');
+	if(DR._Base.is(par.category_id)) this.category_id = String(par.category_id||'');
+	if(DR._Base.is(par.distance)) this.distance = (parseInt(par.distance)||0);
+	if(DR._Base.is(par.id)) this.id = String(par.id||'');
+	if(DR._Base.is(par.idInt)) this.idInt = (parseInt(par.idInt)||0);
+	if(DR._Base.is(par.location)) this.location = DR._Base.cast(par.location);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+};
+DR._Base._types[319] = DR.places.struct.Place;
+DR.places.struct.Place[__P] = new DR._Base;
+DR.places.struct.Place[__P][__C] = DR.places.struct.Place;
+/** @type {String} */
+DR.places.struct.Place.prototype.category = null;
+/** @type {String} */
+DR.places.struct.Place.prototype.category_id = null;
+/** @type {Number|null} */
+DR.places.struct.Place.prototype.distance = null;
+/** @type {String} */
+DR.places.struct.Place.prototype.id = null;
+/** @type {Number} */
+DR.places.struct.Place.prototype.idInt = null;
+/** @type {DR.places.struct.Location} */
+DR.places.struct.Place.prototype.location = null;
+/** @type {String} */
+DR.places.struct.Place.prototype.name = null;
+/** @type {Number} */
+DR.places.struct.Place.prototype.ts = null;
+ 
+/** @extends {DR._Select} */
+DR.places.select.Place = function(){
+	this._fields = {};
+};
+DR.places.select.Place[__CL] = "Places__Place";
+DR.places.select.Place[__P] = new DR._Select;
+DR.places.select.Place[__P][__C] = DR.places.select.Place;
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.category = function(v){ this._fields.category = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.category_id = function(v){ this._fields.category_id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.distance = function(v){ this._fields.distance = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.idInt = function(v){ this._fields.idInt = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.location = function(v){ this._fields.location = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Place} */
+DR.places.select.Place.prototype.ts = function(v){ this._fields.ts = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.places.struct.SearchRe = function(par){
+	/** @private */
+	this._t = 320;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.places)){
+		var tmp = [];
+		for( var k in par.places ) tmp.push(DR._Base.cast(par.places [k]));
+		this.places = tmp;
+	}
+};
+DR._Base._types[320] = DR.places.struct.SearchRe;
+DR.places.struct.SearchRe[__P] = new DR._Base;
+DR.places.struct.SearchRe[__P][__C] = DR.places.struct.SearchRe;
+/** @type {Array.<DR.places.struct.Item>} */
+DR.places.struct.SearchRe.prototype.items = null;
+/** @type {Array.<DR.places.struct.Place>} */
+DR.places.struct.SearchRe.prototype.places = null;
+ 
+/** @extends {DR._Select} */
+DR.places.select.SearchRe = function(){
+	this._fields = {};
+};
+DR.places.select.SearchRe[__CL] = "Places__SearchRe";
+DR.places.select.SearchRe[__P] = new DR._Select;
+DR.places.select.SearchRe[__P][__C] = DR.places.select.SearchRe;
+/** @param {boolean} [v]
+  * @return {DR.places.select.SearchRe} */
+DR.places.select.SearchRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.SearchRe} */
+DR.places.select.SearchRe.prototype.places = function(v){ this._fields.places = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.places.struct.GetPlaceRe = function(par){
+	/** @private */
+	this._t = 1236;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[1236] = DR.places.struct.GetPlaceRe;
+DR.places.struct.GetPlaceRe[__P] = new DR._Base;
+DR.places.struct.GetPlaceRe[__P][__C] = DR.places.struct.GetPlaceRe;
+/** @type {DR.places.struct.Item} */
+DR.places.struct.GetPlaceRe.prototype.item = null;
+ 
+/** @extends {DR._Base} */
+DR.places.struct.Visitors = function(par){
+	/** @private */
+	this._t = 1241;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[1241] = DR.places.struct.Visitors;
+DR.places.struct.Visitors[__P] = new DR._Base;
+DR.places.struct.Visitors[__P][__C] = DR.places.struct.Visitors;
+/** @type {Number} */
+DR.places.struct.Visitors.prototype.count = null;
+/** @type {Number} */
+DR.places.struct.Visitors.prototype.pg = null;
+/** @type {Number} */
+DR.places.struct.Visitors.prototype.pgs = null;
+/** @type {Array.<DR.users.struct.User>} */
+DR.places.struct.Visitors.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.places.select.Visitors = function(){
+	this._fields = {};
+};
+DR.places.select.Visitors[__CL] = "Places__Visitors";
+DR.places.select.Visitors[__P] = new DR._Select;
+DR.places.select.Visitors[__P][__C] = DR.places.select.Visitors;
+/** @param {boolean} [v]
+  * @return {DR.places.select.Visitors} */
+DR.places.select.Visitors.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Visitors} */
+DR.places.select.Visitors.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Visitors} */
+DR.places.select.Visitors.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.Visitors} */
+DR.places.select.Visitors.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.places.struct.GetPlacePicturesRe = function(par){
+	/** @private */
+	this._t = 1248;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[1248] = DR.places.struct.GetPlacePicturesRe;
+DR.places.struct.GetPlacePicturesRe[__P] = new DR._Base;
+DR.places.struct.GetPlacePicturesRe[__P][__C] = DR.places.struct.GetPlacePicturesRe;
+/** @type {Number} */
+DR.places.struct.GetPlacePicturesRe.prototype.count = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.places.struct.GetPlacePicturesRe.prototype.items = null;
+/** @type {Number} */
+DR.places.struct.GetPlacePicturesRe.prototype.pg = null;
+/** @type {Number} */
+DR.places.struct.GetPlacePicturesRe.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.places.select.GetPlacePicturesRe = function(){
+	this._fields = {};
+};
+DR.places.select.GetPlacePicturesRe[__CL] = "Places__GetPlacePicturesRe";
+DR.places.select.GetPlacePicturesRe[__P] = new DR._Select;
+DR.places.select.GetPlacePicturesRe[__P][__C] = DR.places.select.GetPlacePicturesRe;
+/** @param {boolean} [v]
+  * @return {DR.places.select.GetPlacePicturesRe} */
+DR.places.select.GetPlacePicturesRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.GetPlacePicturesRe} */
+DR.places.select.GetPlacePicturesRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.GetPlacePicturesRe} */
+DR.places.select.GetPlacePicturesRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.places.select.GetPlacePicturesRe} */
+DR.places.select.GetPlacePicturesRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.places.struct.GetCategoriesRe = function(par){
+	/** @private */
+	this._t = 2959;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[2959] = DR.places.struct.GetCategoriesRe;
+DR.places.struct.GetCategoriesRe[__P] = new DR._Base;
+DR.places.struct.GetCategoriesRe[__P][__C] = DR.places.struct.GetCategoriesRe;
+/** @type {Array.<DR.places.struct.Category>} */
+DR.places.struct.GetCategoriesRe.prototype.items = null;
+ 
+/** @extends {DR._Base} */
+DR.places.struct.CreateRe = function(par){
+	/** @private */
+	this._t = 2973;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.place)) this.place = DR._Base.cast(par.place);
+};
+DR._Base._types[2973] = DR.places.struct.CreateRe;
+DR.places.struct.CreateRe[__P] = new DR._Base;
+DR.places.struct.CreateRe[__P][__C] = DR.places.struct.CreateRe;
+/** @type {DR.places.struct.Item} */
+DR.places.struct.CreateRe.prototype.place = null;
+ 
+/** @extends {DR._Method} */
+DR.places.Search = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 318;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[318] = DR.places.Search;
+DR.places.Search[__CL] = "Places__Search";
+DR.places.Search.INTENT_CHECKIN = 1;
+DR.places.Search.INTENT_GLOBAL = 2;
+DR.places.Search.INTENT_MATCH = 3;
+DR.places.Search.INTENT_BROWSE = 4;
+DR.places.Search[__P] = new DR._Method;
+DR.places.Search[__P][__C] = DR.places.Search;
+/** @type {Number|null} */
+DR.places.Search.prototype.intent = null;
+/** @type {Number|null} */
+DR.places.Search.prototype.limit = null;
+/** @type {DR.base.struct.LatLng|null} */
+DR.places.Search.prototype.location = null;
+/** @type {String|null} */
+DR.places.Search.prototype.query = null;
+/** @type {Number|null} */
+DR.places.Search.prototype.radius = null;
+/** @type {DR.places.struct.SearchRe} */
+DR.places.Search.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.places.GetPlace = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1237;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1237] = DR.places.GetPlace;
+DR.places.GetPlace[__CL] = "Places__GetPlace";
+DR.places.GetPlace[__P] = new DR._Method;
+DR.places.GetPlace[__P][__C] = DR.places.GetPlace;
+/** @type {String|null} */
+DR.places.GetPlace.prototype.placeId = null;
+/** @type {Number|null} */
+DR.places.GetPlace.prototype.placeIdInt = null;
+/** @type {DR.places.struct.GetPlaceRe} */
+DR.places.GetPlace.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.places.GetVisitors = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1240;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1240] = DR.places.GetVisitors;
+DR.places.GetVisitors[__CL] = "Places__GetVisitors";
+DR.places.GetVisitors[__P] = new DR.base.Pg;
+DR.places.GetVisitors[__P][__C] = DR.places.GetVisitors;
+/** @type {Number} */
+DR.places.GetVisitors.prototype.placeId = null;
+/** @type {DR.places.struct.Visitors} */
+DR.places.GetVisitors.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.places.GetVisitorsFriends = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1242;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1242] = DR.places.GetVisitorsFriends;
+DR.places.GetVisitorsFriends[__CL] = "Places__GetVisitorsFriends";
+DR.places.GetVisitorsFriends[__P] = new DR.base.Pg;
+DR.places.GetVisitorsFriends[__P][__C] = DR.places.GetVisitorsFriends;
+/** @type {Number} */
+DR.places.GetVisitorsFriends.prototype.placeId = null;
+/** @type {DR.places.struct.Visitors} */
+DR.places.GetVisitorsFriends.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.places.GetPlacePictures = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1249;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1249] = DR.places.GetPlacePictures;
+DR.places.GetPlacePictures[__CL] = "Places__GetPlacePictures";
+DR.places.GetPlacePictures[__P] = new DR.base.Pg;
+DR.places.GetPlacePictures[__P][__C] = DR.places.GetPlacePictures;
+/** @type {Number} */
+DR.places.GetPlacePictures.prototype.placeId = null;
+/** @type {DR.places.struct.GetPlacePicturesRe} */
+DR.places.GetPlacePictures.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.places.GetCategories = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2960;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2960] = DR.places.GetCategories;
+DR.places.GetCategories[__CL] = "Places__GetCategories";
+DR.places.GetCategories[__P] = new DR._Method;
+DR.places.GetCategories[__P][__C] = DR.places.GetCategories;
+/** @type {String|null} */
+DR.places.GetCategories.prototype.parentId = null;
+/** @type {DR.places.struct.GetCategoriesRe} */
+DR.places.GetCategories.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.places.Create = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2971;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2971] = DR.places.Create;
+DR.places.Create[__CL] = "Places__Create";
+DR.places.Create[__P] = new DR._Method;
+DR.places.Create[__P][__C] = DR.places.Create;
+/** @type {String|null} */
+DR.places.Create.prototype.address = null;
+/** @type {DR.places.struct.Category} */
+DR.places.Create.prototype.category = null;
+/** @type {String|null} */
+DR.places.Create.prototype.city = null;
+/** @type {String|null} */
+DR.places.Create.prototype.countryCode = null;
+/** @type {String|null} */
+DR.places.Create.prototype.crossStreet = null;
+/** @type {String|null} */
+DR.places.Create.prototype.description = null;
+/** @type {DR.base.struct.LatLng} */
+DR.places.Create.prototype.location = null;
+/** @type {String} */
+DR.places.Create.prototype.name = null;
+/** @type {String|null} */
+DR.places.Create.prototype.phone = null;
+/** @type {String|null} */
+DR.places.Create.prototype.twitter = null;
+/** @type {String|null} */
+DR.places.Create.prototype.url = null;
+/** @type {String|null} */
+DR.places.Create.prototype.zip = null;
+/** @type {DR.places.struct.CreateRe} */
+DR.places.Create.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.places.GetLastPlaces = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3321;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3321] = DR.places.GetLastPlaces;
+DR.places.GetLastPlaces[__CL] = "Places__GetLastPlaces";
+DR.places.GetLastPlaces[__P] = new DR._Method;
+DR.places.GetLastPlaces[__P][__C] = DR.places.GetLastPlaces;
+/** @type {Number|null} */
+DR.places.GetLastPlaces.prototype.count = null;
+/** @type {DR.base.struct.LatLng|null} */
+DR.places.GetLastPlaces.prototype.location = null;
+/** @type {Boolean|null} */
+DR.places.GetLastPlaces.prototype.showNearby = null;
+/** @type {Number|null} */
+DR.places.GetLastPlaces.prototype.uid = null;
+/** @type {DR.places.struct.SearchRe} */
+DR.places.GetLastPlaces.prototype.re = null;
+ 
+D.loaded();

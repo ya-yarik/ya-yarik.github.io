@@ -1,0 +1,811 @@
+.galStatGroup{
+	position:relative;
+	padding-bottom:20px;
+}
+
+#galleryVisitors {
+	margin-top: 16px;
+}
+
+.IE7 #galleryVisitors > .galStatGroup{
+	overflow:hidden;
+}
+
+.galStatGroup:last-child{
+	padding-bottom:0;
+}
+
+.galStatGroup .badge{
+	position:relative;
+	float:left;
+	margin-bottom:5px;
+	min-width:88px;
+	z-index:1;
+}
+
+.galStatGroup ul{
+	clear:right;
+}
+
+.galStatImg{
+	position:relative;
+	display:inline-block;
+	width:100px;
+	height:100px;
+}
+
+.galStatImg img{
+	width:100%;
+	height:100%;
+}
+
+.galStatGroup > .galStatImg{
+	position:relative;
+	float:left;
+	margin-top:3px;
+	z-index:1;
+}
+
+.galStatGroupBody{
+	margin-left:110px;
+	min-height:103px;
+}
+
+.galStatGroupBody .user,
+.galStatGroupBody .album{
+	font-weight:bold;
+}
+
+.galStatGroupBody ul{
+	margin-top:5px;
+	margin-bottom:10px;
+}
+
+.galStatGroupBody ul:last-child{
+	margin-bottom:0;
+}
+
+.galStatGroupAlbum .galStatGroupBody > div:first-child{
+	min-height:100px;
+}
+
+.galStatGroup i{
+	position:absolute;
+	top:0;
+	left:50px;
+	bottom:0;
+	width:1px;
+	background-color:#e2e2e2;
+	overflow:hidden;
+}
+
+.galStatGroup .galStatGroup i{
+	top:53px;
+	left:-60px;
+	right:auto;
+	width:60px;
+	height:1px;
+}
+
+.galStatComment .profileSmallIcon{
+	margin-top:3px;
+}
+
+.galStatComment{
+	margin-bottom:10px;
+}
+
+.galStatComment:last-child{
+	margin-bottom:0;
+}
+
+.galStatAlbumIcon,
+.galStatUserIcon{
+	position:absolute;
+	bottom:-4px;
+	right:-4px;
+	width:29px;
+	height:29px;
+}
+
+.galStatAlbumIcon{
+	background-image:url('//ifrype.com/gallery/img/gallery.png');
+}
+
+.galStatUserIcon{
+	background-image:url('//ifrype.com/gallery/img/user.png');
+}
+
+#galleryTop5{
+	width:96%;
+	table-layout:fixed;
+	margin: 0 auto;
+}
+
+#galleryTop5 th{
+	text-align:left;
+}
+
+#galleryTop5 th,
+#galleryTop5 td{
+	padding:5px 0;
+}
+
+.galGrayBlock + .galStatTop5PayH {
+	margin-top: 10px;
+}
+.galStatTop5PayH{
+	overflow:hidden;
+	color:#fff;
+	height:195px;
+	font-size:16px;
+}
+
+.galStatTop5PayH div{
+	margin:45px 20px 0 170px;
+}
+
+.galStatTop5PayH p{
+	font-size:20px;
+	line-height:1.3em;
+}
+
+.galStatTop5PayH p b{
+	font-size:22px;
+}
+
+.galStatTop5Pay{
+	background-color:#f8f8f8;
+	border:1px solid #e7e7e7;
+	border-top:none;
+	padding:10px;
+	margin-bottom:10px;
+}
+
+.galStatTop5Pay .button{
+	width:200px;
+}
+
+.galStatTop5Overlay{
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	background-image:url('//ifrype.com/gallery/img/stats/stat_header_overlay.png');
+	background-repeat:repeat-x;
+	background-position:left bottom;
+}
+
+
+.galGrayBlock{
+	background-color:#F8F8F8;
+	border:1px solid #E7E7E7;
+	overflow:hidden;
+	padding:10px;
+	position: relative;
+}
+
+.galGrayBlock div{
+	float:left;
+	line-height:18px;
+	padding-left:50px;
+	background-repeat:no-repeat;
+	background-position:5px center;
+	width:183px;
+}
+
+.galGrayBlock b{
+	font-size:14px;
+}
+
+.galTopBlViews{
+	background-image:url('//ifrype.com/i/icons/eyeLarge.png');
+}
+
+.galTopBlLikes{
+	background-image:url('//ifrype.com/gallery/img/like_icon.png');
+}
+
+.galTopBlComments{
+	background-image:url('//ifrype.com/gallery/img/comment_icon.png');
+}
+
+.galleryStatsAlbumInfo {
+	margin: 12px 0;
+}
+
+.galleryStatsAlbumInfo > a, .galleryStatsAlbumInfo .right {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.galleryStatsAlbumInfo img.img {
+	margin-right: 5px;
+	width: 50px;
+	height: 50px;
+	display: block;
+}
+
+#galStatsLeft {
+	width: 500px;
+	margin-right: 20px;
+	float: left;
+}
+
+#galStatsRight {
+	width: 300px;
+	float: right;
+}
+
+.top-visitors {
+	width: 298px;
+	border: 1px solid #ededed;
+	background: #f8f8f8;
+}
+
+.top-visitors h2 {
+	border-bottom: 1px solid #ededed;
+	height: 48px;
+	background: #f8f8f8 url('//ifrype.com/gallery/img/aktivakie-apmekletaji.png') no-repeat 12px center;
+	padding-left: 52px;
+	line-height: 48px;
+	margin: 0;
+	color: #565656;
+	background-size: 32px 32px;
+}
+
+.top-visitors h2.lv {
+	padding-left: 52px;
+	font-size: 13px;
+}
+
+.top-visitors ul li {
+	border-bottom: 1px solid #ededed;
+	background: #f8f8f8;
+	padding: 12px;
+}
+
+.top-visitors ul li:last-child, .top-visitors ul li:last-of-type {
+	border: 0;
+}
+
+.top-visitors ul .more {
+	border-top: 1px solid #ededed;
+	padding: 10px;
+}
+
+.top-visitors ul .more:empty {
+	padding: 0;
+	border: 0;
+}
+
+.top-visitors .user-picture {
+	width: 44px;
+	height: 44px;
+	display: block;
+	float: left;
+	margin-right: 8px;
+	position: relative;
+	border-radius: 3px;
+}
+
+.top-visitors .user-picture:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+	border-radius: 3px;
+}
+
+.top-visitors .user-picture img {
+	width: 44px;
+	height: 44px;
+	border-radius: 4px;
+}
+
+.top-visitors .view-info {
+	width: 222px;
+	float: right;
+	margin-top: 0;
+}
+
+.top-visitors .view-info a {
+	font-size: 13px;
+	line-height: 17px;
+	font-weight: bold;
+}
+
+.top-visitors .view-info .date {
+	font-size: 12px;
+	line-height: 16px;
+	color: #747474;
+	margin-top: 1px;
+}
+
+.top-visitors .galleries-viewed {
+	font-size: 12px;
+	line-height: 16px;
+	color: #1e1e1e;
+	margin-top: 2px;
+}
+
+.top-visitors .galleries {
+	margin-top: 8px;
+}
+
+.top-visitors .gallery {
+	float: left;
+	margin-right: 4px;
+}
+
+.top-visitors .gallery a {
+	position: relative;
+	display: block;
+}
+
+.top-visitors .gallery a:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+	border-radius: 3px;
+}
+
+.top-visitors .gallery img {
+	width: 40px;
+	height: 40px;
+	display: block;
+	border-radius: 3px;
+}
+
+.top-visitors .gallery.last a {
+	width: 40px;
+	height: 40px;
+	background: #ededed;
+	text-align: center;
+	line-height: 40px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #205a9a;
+	display: block;
+}
+
+.top-visitors .gallery.last a:hover {
+	text-decoration: none;
+}
+
+.gallery-stats-popup h2 {
+	text-align: center;
+	margin-top: 28px;
+	margin-bottom: 14px;
+	font-size: 24px;
+	line-height: 24px;
+}
+
+.gallery-stats-popup .lv-text {
+	text-align: center;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.gallery-stats-popup ul {
+	width: 420px;
+	margin: 0 auto 14px;
+	font-size: 14px;
+	line-height: 18px;
+}
+
+.gallery-stats-popup ul li {
+	margin-bottom: 5px;
+}
+
+.gallery-stats-popup .image {
+	width: 100%;
+	height: 164px;
+	background: url('//ifrype.com/gallery/img/galeriju-statistika.jpg');
+}
+
+.gallery-stats-popup .close-button {
+	text-align: center;
+	margin: 20px auto;
+}
+
+.gal-stats-payment {
+	width: 818px;
+	height: 100px;
+	background: #f3f3f3 url('//ifrype.com/visitors/img/statistika_binoklis.png') no-repeat 30px center;
+	border: 1px solid #ebebeb;
+	margin-top: 16px;
+	cursor: pointer;
+}
+
+.gal-stats-payment-bottom {
+	width: 100%;
+	box-sizing: border-box;
+	background: #f3f3f3;
+	border: 1px solid #ebebeb;
+	margin-top: 10px;
+	text-align:center;
+	padding: 15px;
+}
+
+.gal-stats-payment-bottom strong {
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.gal-stats-payment p {
+	margin-left: 200px;
+	margin-bottom: 8px;
+	font-size: 13px;
+}
+
+.gal-stats-payment p:first-child {
+	margin-top: 18px;
+	margin-bottom: 2px;
+}
+
+.gal-stats-payment .buttons {
+	margin-left: 200px;
+}
+
+.gal-stats-userList .pic-collage {
+	position: absolute;
+	top: 73px;
+	left: 66px;
+	width: 44px;
+	height: 44px;
+	display: block;
+	background: #ffffff;
+	padding: 3px;
+}
+
+.gal-stats-userList .pic-collage.coll-size-small .picc-inner, .gal-stats-userList .pic-collage.coll-size-small {
+	width: 44px;
+	height: 44px;
+}
+
+.gal-stats-userList .pic-collage .more-link {
+	cursor: pointer;
+}
+
+.gal-stats-userList .userBox {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.gal-stats-userList .userPicture {
+	margin-bottom: 12px;
+	width: 92px;
+	height: 92px;
+}
+
+.gal-stats-userList .userPicture img {
+	width: 92px;
+	height: 92px;
+}
+
+.gal-stats-userList .newVisitor .userPicture img,
+.gal-stats-userList .newVisitor .userPicture:after{
+	border-radius: 0;
+}
+
+.gal-stats-userList .newVisitor .nv {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	border: 4px solid #FFD58D;
+	border-radius: 2px;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	box-sizing: border-box;
+}
+
+.gal-stats-userList .newVisitor .userPicture {
+	transform: scale(0.85, 0.85);
+	-ms-transform: scale(0.85, 0.85);
+	-webkit-transform: scale(0.85, 0.85);
+	-moz-transform: scale(0.85, 0.85);
+}
+
+.gal-stats-userList .newVisitor .userPicture.tw {
+	transform: scale(1, 1);
+	-ms-transform: scale(1, 1);
+	-webkit-transform: scale(1, 1);
+	-moz-transform: scale(1, 1);
+}
+
+.gal-stats-user {
+	display: inline-block;
+}
+
+.gal-stats-user .user {
+	margin-left: 10px;
+}
+
+.gal-stats-user .user .picture {
+	width: 50px;
+	height: 50px;
+	display: block;
+	float: left;
+	margin-right: 10px;
+}
+
+.gal-stats-user .user .userInfo {
+	float: left;
+}
+
+.gal-stats-user .albums {
+	margin-top: 20px;
+}
+
+.gal-stats-user .album {
+	width: 120px;
+	float: left;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.gal-stats-user .album .picture {
+	width: 100px;
+	height: 100px;
+	margin: 0 auto 5px;
+}
+
+.gal-stats-user .album .picture img {
+	width: 100px;
+	height: 100px;
+}
+
+.gal-stats-user .album .title {
+	font-weight: bold;
+}
+
+.gal-stats-user .album .date {
+	color: #6f6f6f;
+	margin-top: 5px;
+}
+
+@keyframes tween {
+	0% {
+		transform: scale(0.85, 0.85);
+		-ms-transform: scale(0.85, 0.85);
+		-webkit-transform: scale(0.85, 0.85);
+		-moz-transform: scale(0.85, 0.85);
+	}
+
+	50% {
+		transform: scale(1.15, 1.15);
+		-ms-transform: scale(1.15, 1.15);
+		-webkit-transform: scale(1.15, 1.15);
+		-moz-transform: scale(1.15, 1.15);
+	}
+
+	100% {
+		transform: scale(1, 1);
+		-ms-transform: scale(1, 1);
+		-webkit-transform: scale(1, 1);
+		-moz-transform: scale(1, 1);
+	}
+}
+
+@-webkit-keyframes tween {
+	0% {
+		transform: scale(0.85, 0.85);
+		-ms-transform: scale(0.85, 0.85);
+		-webkit-transform: scale(0.85, 0.85);
+		-moz-transform: scale(0.85, 0.85);
+	}
+
+	50% {
+		transform: scale(1.15, 1.15);
+		-ms-transform: scale(1.15, 1.15);
+		-webkit-transform: scale(1.15, 1.15);
+		-moz-transform: scale(1.15, 1.15);
+	}
+
+	100% {
+		transform: scale(1, 1);
+		-ms-transform: scale(1, 1);
+		-webkit-transform: scale(1, 1);
+		-moz-transform: scale(1, 1);
+	}
+}
+
+@-moz-keyframes tween {
+	0% {
+		transform: scale(0.85, 0.85);
+		-ms-transform: scale(0.85, 0.85);
+		-webkit-transform: scale(0.85, 0.85);
+		-moz-transform: scale(0.85, 0.85);
+	}
+
+	50% {
+		transform: scale(1.15, 1.15);
+		-ms-transform: scale(1.15, 1.15);
+		-webkit-transform: scale(1.15, 1.15);
+		-moz-transform: scale(1.15, 1.15);
+	}
+
+	100% {
+		transform: scale(1, 1);
+		-ms-transform: scale(1, 1);
+		-webkit-transform: scale(1, 1);
+		-moz-transform: scale(1, 1);
+	}
+}
+
+.tw {
+	animation: tween 0.8s ease;
+	-ms-animation: tween 0.8s ease;
+	-webkit-animation: tween 0.8s ease;
+	-moz-animation: tween 0.8s ease;
+}
+
+#galleryLastVisitorsAlbum {
+	background: #f5f5f5;
+	border: 1px solid #e7e7e7;
+	border-radius: 2px;
+	padding: 8px;
+}
+
+#galleryLastVisitorsAlbum .albumInfo > a {
+	display: block;
+	width: 44px;
+	height: 44px;
+	background: #ffffff;
+	padding: 3px;
+	border: 2px solid #EAE9E7;
+	margin-right: 5px;
+	float: left;
+}
+
+#galleryLastVisitorsAlbum .albumInfo img {
+	display: block;
+	width: 44px;
+	height: 44px;
+}
+
+#galleryLastVisitorsAlbum .albumInfo .info {
+	width: 160px;
+	display: block;
+	float: left;
+	margin-top: 11px;
+}
+
+#galleryLastVisitorsAlbum .albumInfo h3 {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin-bottom: 0;
+}
+
+#galleryLastVisitorsAlbum .visitors {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+#galleryLastVisitorsAlbum .visitor {
+	float: left;
+	margin-right: 8px;
+}
+
+#galleryLastVisitorsAlbum .visitor.last {
+	margin-right: 0;
+}
+
+#galleryLastVisitorsAlbum .visitor img {
+	width: 30px;
+	height: 30px;
+}
+
+#galleryLastVisitorsUser {
+	background: #f5f5f5;
+	border: 1px solid #e7e7e7;
+	border-radius: 2px;
+	padding: 8px;
+}
+
+#galleryLastVisitorsUser .userInfo > a {
+	display: block;
+	width: 44px;
+	height: 44px;
+	background: #ffffff;
+	padding: 3px;
+	border: 2px solid #EAE9E7;
+	margin-right: 5px;
+	float: left;
+}
+
+#galleryLastVisitorsUser .userInfo .new {
+	padding: 4px;
+	border: 1px solid #f5f5f5;
+	background: #FFD58D;
+}
+
+#galleryLastVisitorsUser .userInfo img {
+	display: block;
+	width: 44px;
+	height: 44px;
+}
+
+#galleryLastVisitorsUser .userInfo .info {
+	width: 160px;
+	float: left;
+	margin-top: 3px;
+}
+
+#galleryLastVisitorsUser .userInfo h3 {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin: 0;
+}
+
+#galleryLastVisitorsUser .userInfo .date {
+	font-size: 11px;
+	color: #8d8d8d;
+}
+
+#galleryLastVisitorsUser .albums {
+	margin-top: 8px;
+}
+
+#galleryLastVisitorsUser .album {
+	float: left;
+	margin-right: 8px;
+}
+
+#galleryLastVisitorsUser .album.last {
+	margin-right: 0;
+}
+
+#galleryLastVisitorsUser .album img {
+	width: 30px;
+	height: 30px;
+}
+
+#galleryLastVisitorsUser .album .more {
+	width: 30px;
+	height: 30px;
+	background: #d6d6d6;
+	text-align: center;
+	line-height: 30px;
+	font-size: 11px;
+	font-weight: bold;
+	color: #727272;
+	display: block;
+	text-decoration: none;
+}
+
+#galStatTop5Expandable {
+	display: none;
+}
+
+.galTopExpand {
+	width: 28px;
+	height: 10px;
+	background: url('//ifrype.com/gallery/img/expand.png');
+	display: block;
+	opacity: 0.7;
+	position: absolute;
+	top: 66%;
+	right: 16px;
+	margin-top: -5px;
+}
+
+.galTopExpand:hover {
+	opacity: 1;
+}
+
+.galTopExpand.expanded {
+	background: url('//ifrype.com/gallery/img/expand-collapse.png');
+}

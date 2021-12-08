@@ -1,0 +1,3033 @@
+#GalleryFSWindowContainer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1001;
+	overflow-y: auto;
+	background: rgba(0, 0, 0, 0.8);
+}
+
+#GalleryFSWindowContainer > div {
+	min-width: 980px;
+	min-height: 564px;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	padding-top: 48px;
+}
+
+#GalleryFSWindow {
+	margin: 0 48px;
+	/* 980 - (#GalleryFSWindowContainer padding * 2) */
+	min-width: 884px;
+	/* 612 - (#GalleryFSWindowContainer padding * 1) */
+	min-height: 564px;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	border-top-left-radius:2px;
+	border-top-right-radius:2px;
+	-moz-border-radius-topleft:2px;
+	-moz-border-radius-topright:2px;
+	-khtml-border-top-left-radius:2px;
+	-khtml-border-top-right-radius:2px;
+	-webkit-border-top-left-radius:2px;
+	-webkit-border-top-right-radius:2px;
+	-webkit-box-shadow: 0 0 48px 16px rgba(0,0,0,0.32);
+	-moz-box-shadow: 0 0 48px 16px rgba(0,0,0,0.32);
+	box-shadow: 0 0 48px 16px rgba(0,0,0,0.32);
+}
+
+#GalleryFSWindowContainer > div >.galleryTitle {
+	white-space: nowrap;
+	position: absolute;
+	left: 48px;
+	top: 16px;
+}
+
+#GalleryFSWindowContainer > div > .galleryTitle a {
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 16px;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+#GalleryFSLeft {
+	width: 336px;
+	min-height: 100%;
+	background: #FFFFFF;
+	float: right;
+	overflow: hidden;
+}
+
+#GalleryFSBodyContainer {
+	float: right;
+	padding: 8px 16px 0;
+	background: #F2F3F4;
+	position: relative;
+}
+
+#GalleryFSHeader {
+	height: 40px;
+	position: relative;
+	margin: 0 48px 0 0;
+}
+
+#GalleryTopAd {
+	width: 100%;
+	text-align: center;
+	display:none;
+	font-size: 10pt;
+}
+#GalleryTopAd .item {
+	width:auto;
+	background: #caddf3;
+	padding: 4px 13px;
+	color: #1d5fa9;
+	margin: 0 auto;
+	font-weight: bold;
+	display: inline-block;
+	cursor: pointer;
+	border-radius: 4px;
+}
+#GalleryTopAd .item .mdot {
+	color: #4F4F4F;
+}
+#GalleryTopAd .item a {
+	text-decoration: none;
+}
+#GalleryTopAd .more {
+	font-weight: normal;
+}
+
+#GalleryFSBody {
+	width: 100%;
+}
+
+#GalleryFSBody .bottomContent {
+	height: 48px;
+	float: left;
+	text-align: center;
+	line-height: 48px;
+	font-size: 13px;
+	font-family: Helvetica, Arial, sans-serif;
+	color: #848688;
+	position: relative;
+}
+
+#GalleryFSBody .bottomContent a {
+	color: #848688;
+}
+
+#GalleryFSBody .bottomContent a:hover {
+	color: #747678;
+}
+
+#GalleryFSBody .bottomContent .whatPic {
+	width: 230px;
+	display: inline-block;
+	visibility: hidden;
+}
+
+#GalleryFSBody .bottomContent .prevLinkButton, #GalleryFSBody .bottomContent .nextLinkButton {
+	display: inline-block;
+}
+
+#GalleryFSBody .bottomContent .prevLinkButton {
+	text-align: right;
+}
+
+#GalleryFSBody .bottomContent .nextLinkButton {
+	color: #848688;
+	text-align: left;
+}
+
+#GalleryFSBody .bottomContent .disabled a {
+	cursor: default;
+	text-decoration: none;
+	opacity: 0.7;
+}
+
+#GalleryFSBody .bottomContent .galStatsAndEdit {
+	position: absolute;
+	top: 0;
+	right: -10px;
+	line-height: 48px;
+	height: 48px;
+	font-size: 13px;
+}
+
+#GalleryFSBody .bottomContent .galStatsAndEdit a {
+	color: #445f96;
+}
+
+#GalleryFSBody .bottomContent .galStatsAndEdit > span {
+	display: inline-block;
+	line-height: 48px;
+}
+
+#GalleryFSBody .bottomContent .galleryStats > a {
+	background: url('img/fs/icn_statistika.png') no-repeat left center;
+	padding-left: 20px;
+}
+
+#GalleryFSBody .bottomContent .galleryEdit {
+	margin-left: 10px;
+}
+
+#GalleryFSBody .bottomContent .galleryEdit > a {
+	background: url('img/fs/icn_labot1.png') no-repeat left center;
+	padding-left: 20px;
+}
+
+#GalleryFSBody .bottomContent .galStatsAndEdit .text {
+	display: none;
+}
+
+@media (min-width: 1080px) {
+	#GalleryFSBody .bottomContent .galStatsAndEdit .text.short {
+		display: inline;
+	}
+}
+
+@media (min-width: 1220px) {
+	#GalleryFSBody .bottomContent .galStatsAndEdit .galleryEdit .text {
+		display: inline;
+	}
+}
+
+@media (min-width: 1325px) {
+	#GalleryFSBody .bottomContent .galStatsAndEdit .text.short {
+		display: none;
+	}
+	#GalleryFSBody .bottomContent .galStatsAndEdit .text.long {
+		display: inline;
+	}
+}
+
+#GalleryFSClose {
+	width: 24px;
+	height: 24px;
+	display: block;
+	background: #ffffff url('img/fs/btn_close_u.png') no-repeat top left;
+	background-size: 24px auto;
+	position: absolute;
+	top: 12px;
+	right: 48px;
+	z-index: 2;
+}
+
+#GalleryFSClose:hover {
+	background-color: #EDEEEF;
+}
+
+#GalleryFSClose:active {
+	background-color: #D6D7D8;
+	background-position: bottom left;
+}
+
+#GalleryFSContent {
+	height: 100%;
+	float: left;
+	position: relative;
+	z-index: 1;
+}
+
+#GalleryFSSide {
+	width: 32px;
+	height: 100%;
+	float: right;
+	position: relative;
+}
+
+#GalleryFSSide .toggleFullscreen {
+	width: 32px;
+	height: 32px;
+	display: block;
+	background: #E2E3E4 url('img/fs/1/btn_fs_1.png') no-repeat top center;
+	background-size: 32px auto;
+	position: absolute;
+	bottom: 48px;
+	right: 0;
+}
+
+.last #GalleryFSSide .toggleFullscreen {
+	background-color: transparent;
+}
+
+#GalleryFSSide .toggleFullscreen:hover {
+	background-color: #D6D7D8;
+	background-position: center left;
+}
+
+#GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+	background-color: #EDEEEF;
+	background-position: bottom left;
+}
+
+#GalleryFSSide .moreOptions {
+	width: 32px;
+	height: 32px;
+	display: block;
+	background: #E2E3E4 url('img/fs/1/btn_dots_1.png') no-repeat center center;
+	background-size: 32px auto;
+	position: absolute;
+	bottom: 8px;
+	right: 0;
+}
+
+.last #GalleryFSSide .moreOptions {
+	background-color: transparent;
+}
+
+#GalleryFSSide .moreOptions:hover {
+	background-color: #D6D7D8;
+	background-position: center center;
+}
+
+#GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+	background-color: #EDEEEF;
+	background-position: bottom center;
+}
+
+#GalleryFSSide .moreOptionsBlock {
+	position: absolute;
+	right: 0;
+	bottom: 44px;
+	padding: 5px 0;
+	background: #ffffff;
+	min-width: 190px;
+	-webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	-moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	white-space: nowrap;
+	display: none;
+	z-index: 1;
+}
+
+#GalleryFSSide .moreOptionsBlock:after {
+	content: '';
+	width: 0;
+	height: 0;
+	border-top: 7px solid #ffffff;
+	border-right: 7px solid transparent;
+	border-left: 7px solid transparent;
+	position: absolute;
+	top: 100%;
+	right: 9px;
+	z-index: 1;
+}
+
+#GalleryFSSide .moreOptionsBlock li {
+	height: 24px;
+	line-height: 24px;
+}
+
+#GalleryFSSide .moreOptionsBlock li a {
+	display: block;
+	padding: 0 16px;
+	color: #000000;
+	text-decoration: none;
+}
+
+#GalleryFSSide .moreOptionsBlock li a:hover {
+	background: #e7e7e7;
+	cursor: pointer;
+}
+
+#GalleryFSSide .sh4re {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	margin-top: -99px;
+}
+
+.fullscreen #GalleryFSSide .sh4re {
+	margin-top: -79px;
+}
+
+#GalleryFSSide .sh4reButton {
+	width: 32px;
+	height: 32px;
+	display: block;
+	margin-bottom: 28px;
+}
+
+#GalleryFSSide .sh4reButton:last-child {
+	margin-bottom: 0;
+}
+
+#GalleryFSSide .sh4reButton.recommend {
+	background: url('img/fs/1/icn_ieteikt_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+#GalleryFSSide .sh4reButton.like {
+	background: url('img/fs/1/icn_patik_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+#GalleryFSSide .sh4reButton.tag {
+	background: url('img/fs/1/icn_tag_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+#GalleryFSSide .sh4reButton:hover {
+	background-position: 0 -32px;
+}
+
+#GalleryFSSide .sh4reButton.active {
+	background-position: 0 -64px;
+}
+
+#GalleryFSSide .sh4reButton.disabled {
+	background-position: 0 0;
+	opacity: 0.16;
+	cursor: default;
+}
+
+#GalleryFSLeft .galleryInfo {
+	height: 32px;
+	padding: 16px 16px 8px;
+}
+
+#GalleryFSLeft .galleryInfo .user img {
+	float: left;
+}
+
+#GalleryFSLeft .galleryInfo .user > div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-break: break-all;
+	margin-left: 42px;
+}
+
+#GalleryFSLeft .galleryInfo .user a {
+	white-space: nowrap;
+	font-size: 14px;
+	font-weight: bold;
+	display: block;
+}
+
+#GalleryFSLeft .galleryInfo .user a img {
+	width: 32px;
+	height: 32px;
+	border-radius: 2px;
+}
+
+#GalleryFSLeft .galleryInfo .user .date {
+	font-size: 12px;
+	color: #8d8d8d;
+}
+
+#GalleryFSLeft .galleryInfo .badge.is18 {
+	background-color: #F24D42;
+	margin-left: 5px;
+}
+
+#GalleryFSLeft .realUser {
+	font-size: 13px;
+	margin-bottom: 4px;
+	margin-top: 8px;
+	padding: 0 16px;
+	color: #8d8d8d;
+}
+
+#GalleryFSLeft .galleryDescription .ad {
+	width: auto;
+	background: #caddf3;
+	padding: 4px 13px;
+	color: #1d5fa9;
+	margin: 12px auto;
+	font-weight: normal;
+	display: block;
+	cursor: default;
+	border-radius: 4px;
+	font-size: 10pt;
+}
+
+#GalleryFSLeft .sayContent {
+	margin-bottom: 4px;
+	margin-top: 8px;
+	padding: 0 16px;
+}
+
+#GalleryFSLeft .galleryDescription {
+	padding: 0px 16px 0;
+}
+
+#GalleryFSLeft .galleryDescription .description {
+	color: #393939;
+	font-size: 13px;
+	padding: 4px 0;
+}
+
+#GalleryFSLeft .galleryDescription .usersTagNode {
+	color: #8D8D8D;
+}
+
+#GalleryFSLeft .galleryDescription .noUser {
+	color: #393939;
+}
+
+#GalleryFSLeft .likesList, #GalleryFSLeft .tagsList {
+	padding: 0 16px;
+}
+
+#GalleryFSLeft .likesList .likeCount, #GalleryFSLeft .tagsList .tagsCount {
+	margin-top: 8px;
+	display: inline-block;
+}
+
+#GalleryFSLeft .likesList .likeUsers, #GalleryFSLeft .tagsList .tagsUsers {
+	margin-top: 5px;
+}
+
+#GalleryFSLeft .likesList .likeUsers .user, #GalleryFSLeft .tagsList .tagsUsers .user {
+	margin-right: 3px;
+	margin-bottom: 2px;
+	float: left;
+}
+
+#GalleryFSLeft .likesList .likeUsers .user img, #GalleryFSLeft .tagsList .tagsUsers .user img {
+	width: 40px;
+	height: 40px;
+	display: block;
+	border-radius: 2px;
+}
+
+#GalleryFSLeft .likesList .likeUsers .more {
+	height: 40px;
+	display: block;
+	text-align: center;
+	line-height: 40px;
+	float: left;
+	background: #F2F3F4;
+	font-size: 11px;
+	font-weight: bold;
+	padding: 0 10px;
+	border-radius: 2px;
+	min-width: 40px;
+	box-sizing: border-box;
+}
+
+#GalleryFSLeft .likesList .likeUsers .more-1 {
+	padding: 0 10px;
+}
+
+#GalleryFSLeft .likesList .likeUsers .more-2 {
+	padding: 0 7px;
+}
+
+#GalleryFSLeft .likesList .likeUsers .more-3 {
+	padding: 0 4px;
+}
+
+#GalleryFSLeft .likesList .likeUsers .more-0 {
+	padding: 0 1px;
+}
+
+#GalleryFSLeft .tagsList .tagsUsers .user {
+	position: relative;
+}
+
+#GalleryFSLeft .tagsList .tagsUsers .user .delete {
+	position: absolute;
+	top: 0;
+	right: 0;
+	display: none;
+}
+
+#GalleryFSLeft .tagsList .tagsUsers .user:hover .delete {
+	display: block;
+}
+
+#GalleryFSLeft .separator {
+	width: 304px;
+	height: 1px;
+	border-bottom: 1px solid #f3f3f3;
+	margin: 0 16px 8px;
+	padding-top: 12px;
+}
+
+#GalleryFSLeft .galleryCommentsSpecial {
+	padding: 10px 16px 0;
+}
+
+#GalleryFSLeft .galleryMiniAds {
+	min-height: 16px;
+	padding: 16px 16px;
+	background: none;
+}
+
+#galleryMiniadsCont {
+	min-height: 16px;
+}
+
+#GalleryFSContent .prevButtonBackground, #GalleryFSContent .nextButtonBackground {
+	width: 33px;
+	height: 152px;
+	position: absolute;
+	top: 50%;
+	margin-top: -76px;
+	opacity: 1;
+}
+
+#GalleryFSContent .prevButtonBackground {
+	left: 7px;
+}
+
+#GalleryFSContent .nextButtonBackground {
+	right: 7px;
+}
+
+#GalleryFSContent #galleryItem > img, #GalleryFSContent #galleryItem > div {
+	position: absolute;
+	/*-webkit-box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.5);
+	box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.5);*/
+	display: block;
+}
+
+#galleryItem .overlay {
+	background-image: url("//ifrype.com/i/px.gif");
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+}
+
+#galleryItem .GifPlayer {
+	margin: 0 auto;
+}
+
+#GalleryFSContent .prevButton, #GalleryFSContent .nextButton {
+	width: 50%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	opacity: 0.3;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-webkit-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+	z-index: 1;
+}
+
+#GalleryFSContent .prevButton {
+	left: 0;
+}
+
+#GalleryFSContent .nextButton {
+	right: 0;
+}
+
+#GalleryFSContent .prevButton div, #GalleryFSContent .nextButton div {
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	top: 50%;
+	margin-top: -20px;
+}
+
+#GalleryFSContent .prevButton div {
+	background: url('img/fs/3/icn_arrow_left_3.png') no-repeat center center;
+	background-size: 40px auto;
+	right: 75%;
+	margin-right: -20px;
+	border-radius: 40px;
+
+	-moz-transition: right 150ms ease-in-out;
+	-o-transition: right 150ms ease-in-out;
+	-webkit-transition: right 150ms ease-in-out;
+	transition: right 150ms ease-in-out;
+}
+
+#GalleryFSContent .nextButton div {
+	background: url('img/fs/3/icn_arrow_right_3.png') no-repeat center center;
+	background-size: 10px auto;
+	left: 75%;
+	margin-left: -20px;
+	border-radius: 40px;
+
+	-moz-transition: left 150ms ease-in-out;
+	-o-transition: left 150ms ease-in-out;
+	-webkit-transition: left 150ms ease-in-out;
+	transition: left 150ms ease-in-out;
+}
+
+/*#GalleryFSContent.videoItem .prevButton div {
+	right: 90%;
+}
+
+#GalleryFSContent.videoItem .nextButton div {
+	left: 90%;
+}*/
+
+#GalleryFSContent .prevButton:hover, #GalleryFSContent .nextButton:hover {
+	opacity: 1;
+}
+
+#GalleryFSContent .prevButton.disabled, #GalleryFSContent .nextButton.disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+#GalleryFSFeedback {
+	position: absolute;
+	bottom: 0;
+	right: 48px;
+	z-index: 1;
+}
+
+#GalleryFSFeedback .toggleFeedback {
+	display: block;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 10px;
+	white-space: nowrap;
+	background: #393939;
+	color: #c3c3c3;
+	text-decoration: none;
+}
+
+#GalleryFSFeedback .toggleFeedback span {
+	padding-left: 22px;
+	background: url('img/fs/icn_atsauksmes.png') no-repeat left center;
+}
+
+#GalleryFSFeedback .toggleFeedback:hover {
+	background: #414141;
+}
+
+#GalleryFSFeedback .window {
+	position: absolute;
+	right: 0;
+	bottom: 36px;
+	padding: 16px;
+	background: #ffffff;
+	width: 270px;
+	-webkit-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	-moz-box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.4);
+	display: none;
+}
+
+#GalleryFSFeedback .window.thanks {
+	width: 220px;
+}
+
+#GalleryFSFeedback .window:after {
+	content: '';
+	width: 0;
+	height: 0;
+	border-top: 7px solid #ffffff;
+	border-right: 7px solid transparent;
+	border-left: 7px solid transparent;
+	position: absolute;
+	top: 100%;
+	right: 9px;
+	z-index: 1;
+}
+
+#GalleryFSFeedback .window h2 {
+	color: #000000;
+	margin-bottom: 8px;
+}
+
+#GalleryFSFeedback .window .buttons {
+	height: 32px;
+}
+
+#GalleryFSFeedback .feedbackButton {
+	width: 130px;
+	height: 32px;
+	background: #F3F3F3;
+	cursor: pointer;
+	text-align: center;
+	line-height: 32px;
+	color: #6F6F6F;
+	font-weight: bold;
+}
+
+#GalleryFSFeedback .feedbackButton:hover {
+	background: #e7e7e7;
+}
+
+#GalleryFSFeedback .feedbackButton.yes {
+	float: left;
+}
+
+#GalleryFSFeedback .feedbackButton span {
+	height: 15px;
+	display: inline-block;
+	padding-left: 25px;
+	line-height: 18px;
+}
+
+#GalleryFSFeedback .feedbackButton.yes span {
+	background: url('img/fs/feedback_sprite_yes.png') no-repeat left top;
+}
+
+#GalleryFSFeedback .feedbackButton.no {
+	float: right;
+}
+
+#GalleryFSFeedback .feedbackButton.no span {
+	background: url('img/fs/feedback_sprite_no.png') no-repeat left top;
+}
+
+#GalleryFSFeedback .feedbackButton.active span {
+	background-position: left bottom;
+}
+
+#GalleryFSFeedback .feedbackButton.yes.active {
+	 background-color: #83B832;
+	 color: #ffffff;
+ }
+
+#GalleryFSFeedback .feedbackButton.no.active {
+	background-color: #d96565;
+	color: #ffffff;
+}
+
+#GalleryFSFeedback .feedbackForm {
+	margin-top: 18px;
+	display: none;
+}
+
+#GalleryFSFeedback .feedbackThanks {
+	background: url('img/fs/check_48.png') no-repeat center top;
+	font-weight: bold;
+	font-size: 14px;
+	text-align: center;
+	padding-top: 55px;
+	margin: 55px auto;
+}
+
+#GalleryFSFeedback .close {
+	width: 24px;
+	height: 24px;
+	display: block;
+	background: #f2f3f4 url('img/fs/close_br.png') no-repeat center center;
+	background-size: 10px 10px;
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	z-index: 1;
+}
+
+#GalleryFSFeedback .close:hover {
+	background-color: #e5e6e7;
+}
+
+#GalleryFSFeedback .closeFeedback {
+	text-align: center;
+	margin-top: 10px;
+}
+
+#GalleryFSFeedback .closeFeedback a {
+	color: #6F6F6F;
+}
+
+#GalleryFSThumbnails {
+	height: 32px;
+	text-align: center;
+	z-index: 2;
+}
+
+#GalleryFSThumbnails .thumbsContainer {
+	display: inline-block;
+	width: 408px;
+	height: 32px;
+	overflow: hidden;
+}
+
+#GalleryFSThumbnails .thumbsContainer .thumbs {
+	white-space: nowrap;
+	display: inline-block;
+}
+
+#GalleryFSThumbnails .thumbsContainer .thumb {
+	width: 32px;
+	height: 32px;
+	background: #777;
+	display: inline-block;
+	margin: 0 1px;
+	background-size: cover;
+	cursor: pointer;
+	position: relative;
+}
+
+#GalleryFSThumbnails .thumbsContainer .thumb.video > div {
+	background: url('img/video_50x50.png') no-repeat center center;
+	background-size: cover;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	opacity: 1;
+}
+
+#GalleryFSThumbnails .thumbsContainer .thumb > div {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: 1px solid #000000;
+	opacity: 0.08;
+}
+
+#GalleryFSThumbnails .thumbsContainer .thumb.active > div {
+	border: 2px solid #ff6600;
+	opacity: 1;
+}
+
+#GalleryFSThumbnails .control {
+	width: 24px;
+	height: 32px;
+	display: inline-block;
+}
+
+#GalleryFSThumbnails.no-controls .control {
+	display: none;
+}
+
+#GalleryFSThumbnails .control.prev {
+	background: url('img/fs/1/icn_arrow_left_small_1.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+	-moz-transition: opacity 300ms ease-in-out;
+	-o-transition: opacity 300ms ease-in-out;
+	-webkit-transition: opacity 300ms ease-in-out;
+	transition: opacity 300ms ease-in-out;
+}
+
+#GalleryFSThumbnails .control.next {
+	background: url('img/fs/1/icn_arrow_right_small_1.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+	-moz-transition: opacity 300ms ease-in-out;
+	-o-transition: opacity 300ms ease-in-out;
+	-webkit-transition: opacity 300ms ease-in-out;
+	transition: opacity 300ms ease-in-out;
+}
+
+#GalleryFSThumbnails .control.prev:hover, #GalleryFSThumbnails .control.next:hover {
+	opacity: 1;
+}
+
+#GalleryFSThumbnails .control.prev:active, #GalleryFSThumbnails .control.next:active {
+	opacity: 1;
+	background-position: left bottom;
+}
+
+#GalleryFSThumbnails .control.prev.disabled, #GalleryFSThumbnails .control.next.disabled {
+	opacity: 0.25;
+}
+
+#galleryComments {
+	padding: 0 16px;
+}
+
+.galTagLarge {
+	text-align: center;
+}
+
+.galTagLargeOut .galTagLargeName {
+	margin-top: 0;
+}
+
+#GalleryFSWindow .bodyOverlay {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: #393939;
+	opacity: 0.5;
+	display: none;
+}
+
+#galleryLastWindow {
+	position: absolute;
+	display: none;
+	height: 412px;
+	width: 850px;
+	top: 50%;
+	margin-top: -201px;
+	left: 50%;
+	margin-left: -420px;
+}
+
+#galleryLastWindow .other {
+	position: absolute;
+	top: 50%;
+	margin-top: -159px;
+	right: 0;
+}
+
+#galleryLastWindow .current {
+	position: absolute;
+	top: 50%;
+	margin-top: -201px;
+	height: 412px;
+}
+
+#galleryLastWindow .otherGalleriesLast {
+	width: 356px;
+	height: 280px;
+	position: relative;
+}
+
+#galleryLastWindow .otherGalleriesLast > h2 {
+	color: #212529;
+	margin-left: 58px;
+	font-size: 16px;
+	padding-top: 4px;
+}
+
+#galleryLastWindow .otherGalleriesLast .prev {
+	width: 40px;
+	height: 152px;
+	position: absolute;
+	bottom: 44px;
+	left: 6px;
+	opacity: 1;
+}
+
+#galleryLastWindow.large .otherGalleriesLast .prev {
+	left: 0;
+}
+
+#galleryLastWindow .otherGalleriesLast .prev div {
+	width: 40px;
+	height: 152px;
+	background: url('img/fs/3/icn_arrow_left_3.png') no-repeat center center;
+	background-size: 40px auto;
+	opacity: 0.6;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-webkit-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+}
+
+#galleryLastWindow .otherGalleriesLast .prev.disabled {
+	cursor: default;
+}
+
+#galleryLastWindow .otherGalleriesLast .prev:hover div{
+	opacity: 1;
+}
+
+#galleryLastWindow .otherGalleriesLast .prev.disabled div{
+	opacity: 0.25;
+}
+
+#galleryLastWindow .otherGalleriesLast .next {
+	width: 40px;
+	height: 152px;
+	position: absolute;
+	bottom: 44px;
+	right: 6px;
+	opacity: 1;
+}
+
+#galleryLastWindow.large .otherGalleriesLast .next {
+	right: 0;
+}
+
+#galleryLastWindow .otherGalleriesLast .next.disabled {
+	cursor: default;
+}
+
+#galleryLastWindow .otherGalleriesLast .next div {
+	width: 40px;
+	height: 152px;
+	background: url('img/fs/3/icn_arrow_right_3.png') no-repeat center center;
+	background-size: 40px auto;
+	opacity: 0.6;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-webkit-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+}
+
+#galleryLastWindow .otherGalleriesLast .next:hover div{
+	opacity: 1;
+}
+
+#galleryLastWindow .otherGalleriesLast .next.disabled div{
+	opacity: 0.25;
+}
+
+#galleryLastWindow .otherGalleriesLast .image {
+	width: 240px;
+	height: 240px;
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	margin-left: -120px;
+	background-position: center center;
+	background-size: cover;
+	cursor: pointer;
+}
+
+#galleryLastWindow .otherGalleriesLast .overlay {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 40%;
+	background: url('//ifrype.com/say/img/pic_overlay.png') repeat-x left bottom;
+}
+
+#galleryLastWindow.large .otherGalleriesLast .overlay {
+	background-position: left top;
+}
+
+#galleryLastWindow .otherGalleriesLast .itemCount {
+	color: #FFFFFF;
+	font-size: 11px;
+	font-weight: bold;
+	height: 22px;
+	line-height: 22px;
+	overflow: hidden;
+	position: absolute;
+	right: 5px;
+	text-align: center;
+	top: 5px;
+	width: 22px;
+	background-color: #000000;
+	opacity: 0.75;
+	border-radius: 11px;
+}
+
+#galleryLastWindow .otherGalleriesLast .title {
+	position: absolute;
+	bottom: 21px;
+	left: 5px;
+	font-size: 14px;
+	color: #ffffff;
+	font-weight: bold;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	width: 132px;
+	overflow: hidden;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+#galleryLastWindow .otherGalleriesLast .user {
+	position: absolute;
+	bottom: 6px;
+	left: 6px;
+	color: #fff;
+	font-size: 13px;
+	font-weight: bold;
+	opacity: 0.7;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	font-family: Helvetica, Arial, sans-serif;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	width: 132px;
+	overflow: hidden;
+}
+
+#galleryLastMosaic {
+	width: 484px;
+	height: 240px;
+	margin: 15px auto 16px;
+	position: relative;
+}
+
+#galleryLastMosaic .overlay {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	height: 190px;
+	top: auto;
+}
+#galleryLastMosaic .item .overlay {
+	display: none;
+}
+
+#galleryLastMosaic:before {
+	content: "";
+	position: absolute;
+	bottom: 10px;
+	left: 2px;
+	width: 220px;
+	height: 50px;
+	transform: skew(5deg, -5deg);
+	z-index: -1;
+}
+#galleryLastMosaic:after {
+	content: "";
+	position: absolute;
+	bottom: 10px;
+	right: 2px;
+	width: 220px;
+	height: 50px;
+	transform: skew(-5deg, 5deg);
+	z-index: -1;
+}
+
+#galleryLastMosaic .item a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 2;
+}
+
+#galleryLastMosaic .item {
+	width: 240px;
+	position: absolute;
+	background-size: cover;
+	background-position: center center;
+}
+
+#galleryLastMosaic.items-1 .item-1 {
+	height: 240px;
+	width: 100%;
+	background-size: cover;
+	background-position: center center;
+	left: 0;
+	margin-left: 0;
+}
+
+#galleryLastMosaic.items-2 .item-1, #galleryLastMosaic.items-3 .item-1 {
+	height: 240px;
+	top: 0;
+	left: 0;
+}
+
+#galleryLastMosaic.items-2 .item-2 {
+	height: 240px;
+	top: 0;
+	right: 0;
+}
+
+#galleryLastMosaic.items-3 .item-2 {
+	height: 118px;
+	top: 0;
+	right: 0;
+}
+
+#galleryLastMosaic.items-3 .item-3 {
+	height: 118px;
+	bottom: 0;
+	right: 0;
+}
+
+.large #galleryLastMosaic {
+	width: 540px;
+	height: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.large #galleryLastMosaic.items-1 .item-1 {
+	height: 300px;
+	width: 100%;
+}
+
+.large #galleryLastMosaic.items-2 .item-1, .large #galleryLastMosaic.items-3 .item-1 {
+	height: 300px;
+}
+
+.large #galleryLastMosaic.items-2 .item-1 {
+	width: 268px;
+}
+
+.large #galleryLastMosaic.items-2 .item-2 {
+	width: 268px;
+	height: 300px;
+}
+
+.large #galleryLastMosaic.items-3 .item-1 {
+	width: 296px;
+}
+
+.large #galleryLastMosaic.items-3 .item-2 {
+	width: 240px;
+	height: 148px;
+}
+
+.large #galleryLastMosaic.items-3 .item-3 {
+	width: 240px;
+	height: 148px;
+}
+
+#galleryLastWindow.large {
+	width: 1082px;
+	height: 532px;
+	margin-top: -320px;
+	margin-left: -541px;
+}
+
+#galleryLastWindow.large .current {
+	margin-top: -208px;
+	right: 494px;
+}
+
+#galleryLastWindow .otherGalleriesLastLarge {
+	width: 416px;
+	height: 336px;
+}
+
+#galleryLastWindow .otherGalleriesLastLarge > h2 {
+	margin-left: 57px;
+}
+
+#galleryLastWindow .otherGalleriesLastLarge .next, #galleryLastWindow .otherGalleriesLastLarge .prev {
+	bottom: 76px;
+}
+
+#galleryLastWindow .otherGalleriesLastLarge .items {
+	width: 318px;
+	position: absolute;
+	left: 50%;
+	margin-left: -159px;
+}
+
+#galleryLastWindow .otherGalleriesLastLarge .image {
+	position: relative;
+	left: auto;
+	top: auto;
+	width: 143px;
+	height: 143px;
+	float: left;
+	margin: 8px;
+}
+
+#galleryLastWindow .otherGalleriesLast .overlay {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 40%;
+	background: url('//ifrype.com/say/img/pic_overlay.png') repeat-x left bottom;
+}
+
+#galleryLastWindow.large .otherGalleriesLast .overlay {
+	background-position: left top;
+}
+
+#LastView {
+	text-align: center;
+}
+
+#LastView .lastPicture {
+	width: 40px;
+	height: 152px;
+	position: absolute;
+	bottom: 134px;
+	left: -52px;
+	opacity: 1;
+}
+
+.large #LastView .lastPicture {
+	bottom: 86px;
+}
+
+#LastView .lastPicture div {
+	width: 40px;
+	height: 152px;
+	background: url('img/fs/3/icn_arrow_left_3.png') no-repeat center center;
+	background-size: 40px auto;
+	opacity: 0.6;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-webkit-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+}
+
+#galleryLastWindow .lastPicture:hover div{
+	opacity: 1;
+}
+
+#LastView .watch-again {
+	display: inline-block;
+	margin: 0 auto;
+	height: 35px;
+	background-color: rgba(0, 0, 0, .6);
+	text-align: center;
+	line-height: 35px;
+	padding: 0 16px 0 12px;
+	color: #fff;
+	position: absolute;
+	top: 50%;
+	z-index: 10;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+}
+
+#LastView .watch-again:hover {
+	background-color: rgba(0, 0, 0, .7);
+}
+
+#LastView .watch-again span {
+	background-image: url('img/fs/ic-reload.png');
+}
+
+#LastView .albumDescription {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(255, 255, 255, 0.9);
+	padding: 40px 30px 0;
+	z-index: 15;
+	text-align: left;
+	font-size: 14px;
+	line-height: 19px;
+	overflow-y: auto;
+}
+#LastView .albumDescription .description {
+	padding-bottom: 30px;
+}
+#LastView .albumDescription .closeIcon {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+}
+
+#LastView .lastTitleMetaCont {
+	position: relative;
+	width: 540px;
+	padding-top: 67px;
+}
+#LastView .lastTitleMeta {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+}
+#LastView .galleryTitleCont {
+	display: flex;
+	width: 540px;
+	margin-top: 5px;
+}
+#LastView .galleryTitleCont.noMetaText {
+	margin-top: 43px;
+	padding-bottom: 5px;
+}
+#LastView .readMore {
+	line-height: 19px;
+	white-space: nowrap;
+	margin-left: 8px;
+}
+#LastView h2 {
+	color: #1e1e1e;
+	font-size: 16px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left;
+	display: inline-block;
+	margin: 0;
+	line-height: 16px;
+	font-family: Helvetica,Arial,sans-serif;
+}
+#LastView .metaInfo {
+	color: #8e8e8e;
+	padding-top: 5px;
+	font-size: 14px;
+	text-align: left;
+	width: 512px;
+	line-height: 1.36;
+}
+
+#LastView .who {
+	color: #6C6C6C;
+}
+
+#LastView .who a {
+	color: #A7A7A7;
+}
+
+#LastView .sayContainer {
+	position: relative;
+	z-index: 2;
+	margin-top: -35px;
+}
+
+#LastView .galleryLastMosaicSayCont {
+	position: relative;
+}
+
+.large #LastView .sayContainer {
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+#LastView .userIcons {
+	margin-top: 10px;
+	margin-bottom: 13px;
+}
+
+#LastView .userIcons a {
+	margin: 0 4px;
+}
+
+#LastView .userIcons a img {
+	width: 48px;
+	height: 48px;
+	border-radius: 3px;
+}
+
+#LastView .recommendActions {
+	margin-top: 29px;
+	color: #6C6C6C;
+}
+
+#LastView .recommendActions a {
+	color: #747678;
+	font-size: 14px;
+	margin: 0 12px;
+	line-height: 24px;
+	height: 24px;
+	display: inline-block;
+}
+
+#LastView .recommendActions .svg-icon {
+	margin-right: 8px;
+}
+
+#LastView .recommendActions a.on {
+	background-position: left bottom;
+	color: #FF7200;
+}
+
+#LastView .buttonDisabledO {
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+	border-radius: 3px;
+}
+
+#LastView .recommended {
+	margin-top: 16px;
+}
+
+#GalleryFSLeft .otherGalleries {
+	padding: 0 16px;
+}
+
+#GalleryFSLeft .otherGalleries h3 a {
+	color: #393939;
+}
+
+#GalleryFSLeft .otherGalleries .item {
+	width: 70px;
+	height: 70px;
+	background-size: cover;
+	background-position: center center;
+	display: inline-block;
+	margin-right: 8px;
+	cursor: pointer;
+}
+
+#GalleryFSLeft .otherGalleries .item.last {
+	margin-right: 0;
+}
+
+#GalleryFSLeft .otherGalleries .item.first {
+	margin-bottom: 4px;
+}
+
+#GalleryFSLeft .otherGalleries .item.second {
+	margin-bottom: 0;
+}
+
+#GalleryFSLeft .otherGalleries .item:last-child {
+	margin-right: 0;
+}
+
+#GalleryFSContent #galLargeLike {
+	background-image: url('img/fs/icn_patiksturis_sprite.png');
+	width: 28px;
+	height: 24px;
+	z-index: 2;
+}
+
+#galLargeLike:hover{
+	background-position:left -24px;
+}
+
+#galLargeLike.on{
+	background-position:left -48px;
+}
+
+#galLargeLike.on:hover{
+	background-position:left -72px;
+}
+
+#GalleryFSContent:hover #galLargeLike {
+	opacity: 1;
+}
+
+#GalleryFSLeft .descriptionEditButtons {
+	text-align: right;
+}
+
+#GalleryFSLeft .descriptionEdit .SayFormEditor {
+	margin-bottom: 10px;
+}
+
+#GalleryFSLeft .descriptionEdit .SayEditor {
+	max-height: 64px;
+}
+
+/* +++ Scheme selector +++ */
+#GalleryFSSide .moreOptionsBlock li.schemeSelector {
+	border-top: 1px solid #E7E7E7;
+	padding: 0 16px;
+	font-size: 11px;
+	height: auto;
+	color: #8D8D8D;
+	margin-top: 4px;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	padding: 0;
+	margin-right: 4px;
+	position: relative;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a.light {
+	background-color: #F2F3F4;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a.medium {
+	background-color: #656667;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a.dark {
+	background-color: #474748;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a.extradark {
+	background-color: #313030;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a > div {
+	border: 1px solid rgba(0,0,0,0.08);
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+#GalleryFSSide .moreOptionsBlock li.schemeSelector a.active > div {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: 2px solid #ff6600;
+}
+/* --- Scheme selector --- */
+
+/* +++ FullScreen +++ */
+#GalleryFSWindowContainer.fullscreen > div {
+	padding: 0;
+}
+
+.fullscreen #GalleryFSWindow {
+	margin: 0;
+	border-top-left-radius:0;
+	border-top-right-radius:0;
+	-moz-border-radius-topleft:0;
+	-moz-border-radius-topright:0;
+	-khtml-border-top-left-radius:0;
+	-khtml-border-top-right-radius:0;
+	-webkit-border-top-left-radius:0;
+	-webkit-border-top-right-radius:0;
+}
+
+.fullscreen #GalleryFSClose {
+	right: 16px;
+	background: #f2f3f4 url('img/fs/close_da.png') no-repeat center center;
+	background-size: 10px 10px;
+}
+
+.fullscreen #GalleryFSClose:hover {
+	background-color: #e5e6e7;
+}
+
+.fullscreen.last #GalleryFSClose {
+	background: #444648 url('img/fs/close_br.png') no-repeat center center;
+	background-size: 10px 10px;
+}
+
+.fullscreen.last #GalleryFSClose:hover {
+	background-color: #626466;
+}
+/* --- FullScreen --- */
+
+/* +++ Light theme +++ */
+.light #GalleryFSBodyContainer {
+	background-color: #F2F3F4;
+}
+
+.light #GalleryFSBody .bottomContent {
+	color: #848688;
+}
+
+.light #GalleryFSBody .bottomContent a {
+	color: #848688;
+}
+
+.light #GalleryFSBody .bottomContent a:hover {
+	color: #747678;
+}
+
+.light #GalleryFSBody .bottomContent .disabled a {
+	color: #848688;
+}
+
+.light #GalleryFSBody .bottomContent .galStatsAndEdit a {
+	color: #445f96;
+}
+
+.light #GalleryFSSide .toggleFullscreen {
+	background: #E2E3E4 url('img/fs/1/btn_fs_1.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.light #GalleryFSSide .toggleFullscreen:hover {
+	background-color: #D6D7D8;
+	background-position: center left;
+}
+
+.light #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+	background-color: #EDEEEF;
+	background-position: bottom left;
+}
+
+.light #GalleryFSSide .moreOptions {
+	background: #E2E3E4 url('img/fs/1/btn_dots_1.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.light #GalleryFSSide .moreOptions:hover {
+	background-color: #D6D7D8;
+	background-position: center left;
+}
+
+.light #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+	background-color: #EDEEEF;
+	background-position: bottom left;
+}
+
+.light #GalleryFSSide .sh4reButton.recommend {
+	background: url('img/fs/1/icn_ieteikt_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.light #GalleryFSSide .sh4reButton.like {
+	background: url('img/fs/1/icn_patik_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.light #GalleryFSSide .sh4reButton.tag {
+	background: url('img/fs/1/icn_tag_sprite_1.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.light #GalleryFSSide .sh4reButton:hover {
+	background-position: 0 -32px;
+}
+
+.light #GalleryFSSide .sh4reButton.active {
+	background-position: 0 -64px;
+}
+
+.light #GalleryFSSide .sh4reButton.disabled {
+	background-position: 0 0;
+	opacity: 0.16;
+	cursor: default;
+}
+
+.light #GalleryFSContent .prevButton div {
+	background-image: url('img/fs/3/icn_arrow_left_3.png');
+	background-size: 40px auto;
+}
+
+.light #GalleryFSContent .nextButton div {
+	background-image: url('img/fs/3/icn_arrow_right_3.png');
+	background-size: 40px auto;
+}
+
+.light #GalleryFSContent .prevButton:hover, .light #GalleryFSContent .nextButton:hover {
+	opacity: 1;
+}
+
+.light #GalleryFSContent .prevButton.disabled, .light #GalleryFSContent .nextButton.disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+.light #GalleryFSThumbnails .control.prev {
+	background: url('img/fs/1/icn_arrow_left_small_1.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.light #GalleryFSThumbnails .control.next {
+	background: url('img/fs/1/icn_arrow_right_small_1.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.light #GalleryFSThumbnails .control.prev:hover, .light #GalleryFSThumbnails .control.next:hover {
+	opacity: 1;
+}
+
+.light #GalleryFSThumbnails .control.prev:active, .light #GalleryFSThumbnails .control.next:active {
+	opacity: 1;
+	background-position: left bottom;
+}
+
+.light #GalleryFSThumbnails .control.prev.disabled, .light #GalleryFSThumbnails .control.next.disabled {
+	opacity: 0.25;
+	visibility: hidden;
+}
+
+.light #GalleryFSBody .bottomContent .galleryStats > a {
+	background-image: url('img/fs/icn_statistika.png');
+	background-size: 16px auto;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+.light #LastView h2 {
+	color: #1e1e1e;
+}
+
+.light #LastView .who {
+	color: #747678;
+}
+
+.light #LastView .who a {
+	color: #445f96;
+}
+
+.light #LastView .albumDescription {
+	background: rgba(255, 255, 255, 0.9);
+}
+
+.light #galleryLastWindow .otherGalleriesLast > h2 a {
+	color: #212529;
+}
+
+.light #galleryLastMosaic .item .overlay {
+	background-color: #F2F3F4;
+}
+
+.light #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(253, 253, 253, 0) 0%, rgba(253, 253, 253, 0.85) 40%, rgba(253, 253, 253, 1) 100%);
+	opacity: 1;
+}
+
+.light .large #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(253, 253, 253, 0) 0%, rgba(253, 253, 253, 0.85) 40%, rgba(253, 253, 253, 1) 100%);
+	opacity: 1;
+}
+
+.light #galleryLastMosaic:before {
+	box-shadow: -5px 10px 20px rgba(100, 100, 100, 0.15);
+}
+.light #galleryLastMosaic:after {
+	box-shadow: 5px 10px 20px rgba(100, 100, 100, 0.15);
+}
+
+.light.fullscreen #GalleryFSClose {
+	background-color: #E2E3E4;
+	background-image: url('img/fs/1/btn_close_fs1.png');
+	background-size: 24px auto;
+}
+
+.light.fullscreen #GalleryFSClose:hover {
+	background-color: #D6D7D8;
+}
+
+.light.fullscreen #GalleryFSClose:active {
+	background-color: #EDEEEF;
+}
+
+.medium #LastView .recommendActions a {
+	color: #747474;
+}
+
+/* --- Light theme --- */
+
+/* +++ Medium theme +++ */
+.medium #GalleryFSBodyContainer {
+	background-color: #656667;
+}
+
+.medium #GalleryFSBody .bottomContent {
+	color: #979a9c;
+}
+
+.medium #GalleryFSBody .bottomContent a {
+	color: #979a9c;
+}
+
+.medium #GalleryFSBody .bottomContent a:hover {
+	color: #b4b8ba;
+}
+
+.medium #GalleryFSBody .bottomContent .disabled a {
+	color: #979a9c;
+}
+
+.medium #GalleryFSBody .bottomContent .galStatsAndEdit a {
+	color: #bebfc0;
+}
+
+.medium #GalleryFSSide .toggleFullscreen {
+	background: #5A5B5C url('img/fs/2/btn_fs_2.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.medium #GalleryFSSide .toggleFullscreen:hover {
+	background-color: #535455;
+	background-position: center left;
+}
+
+.medium #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+	background-color: #606162;
+	background-position: bottom left;
+}
+
+.medium #GalleryFSSide .moreOptions {
+	background: #5A5B5C url('img/fs/2/btn_dots_2.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.medium #GalleryFSSide .moreOptions:hover {
+	background-color: #535455;
+	background-position: center left;
+}
+
+.medium #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+	background-color: #606162;
+	background-position: bottom left;
+}
+
+.medium #GalleryFSSide .sh4reButton.recommend {
+	background: url('img/fs/2/icn_ieteikt_sprite_2.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.medium #GalleryFSSide .sh4reButton.like {
+	background: url('img/fs/2/icn_patik_sprite_2.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.medium #GalleryFSSide .sh4reButton.tag {
+	background: url('img/fs/2/icn_tag_sprite_2.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.medium #GalleryFSSide .sh4reButton:hover {
+	background-position: 0 -32px;
+}
+
+.medium #GalleryFSSide .sh4reButton.active {
+	background-position: 0 -64px;
+}
+
+.medium #GalleryFSSide .sh4reButton.disabled {
+	background-position: 0 0;
+	opacity: 0.16;
+	cursor: default;
+}
+
+.medium #GalleryFSContent .prevButton div {
+	background-image: url('img/fs/3/icn_arrow_left_3.png');
+	background-size: 40px auto;
+}
+
+.medium #GalleryFSContent .nextButton div {
+	background-image: url('img/fs/3/icn_arrow_right_3.png');
+	background-size: 40px auto;
+}
+
+.medium #GalleryFSContent .prevButton:hover, .medium #GalleryFSContent .nextButton:hover {
+	opacity: 1;
+}
+
+.medium #GalleryFSContent .prevButton.disabled, .medium #GalleryFSContent .nextButton.disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+.medium #GalleryFSThumbnails .control.prev {
+	background: url('img/fs/2/icn_arrow_left_small_2.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.medium #GalleryFSThumbnails .control.next {
+	background: url('img/fs/2/icn_arrow_right_small_2.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.medium #GalleryFSThumbnails .control.prev:hover, .medium #GalleryFSThumbnails .control.next:hover {
+	opacity: 1;
+}
+
+.medium #GalleryFSThumbnails .control.prev:active, .medium #GalleryFSThumbnails .control.next:active {
+	opacity: 1;
+	background-position: left bottom;
+}
+
+.medium #GalleryFSThumbnails .control.prev.disabled, .medium #GalleryFSThumbnails .control.next.disabled {
+	opacity: 0.25;
+}
+
+.medium #GalleryFSBody .bottomContent .galleryStats a {
+	background-image: url('img/fs/icn_statistika.png');
+	background-size: 16px auto;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+.medium #LastView h2 {
+	color: #fff;
+}
+
+.mediaum #LastView .readMore {
+	color: #c9c9c9;
+}
+
+.medium #LastView .who {
+	color: #979a9c;
+}
+
+.medium #LastView .who a {
+	color: #bebfc0;
+}
+
+.medium #LastView .albumDescription {
+	background: rgba(200, 200, 200, 0.9);
+}
+
+.medium #galleryLastWindow .otherGalleriesLast > h2 a {
+	color: #fff;
+}
+
+.medium #galleryLastMosaic .item .overlay{
+	background-color: #656667;
+}
+
+.medium #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.medium .large #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.medium #galleryLastMosaic:before {
+	box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+.medium #galleryLastMosaic:after {
+	box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.medium.fullscreen #GalleryFSClose {
+	background-color: #5A5B5C;
+	background-image: url('img/fs/2/btn_close_fs2.png');
+	background-size: 24px auto;
+}
+
+.medium.fullscreen #GalleryFSClose:hover {
+	background-color: #535455;
+}
+
+.medium.fullscreen #GalleryFSClose:active {
+	background-color: #606162;
+}
+
+.medium #LastView .recommendActions a {
+	color: #c9c9c9;
+}
+
+/* --- Medium theme --- */
+
+/* +++ Dark theme +++ */
+.dark #GalleryFSBodyContainer {
+	background-color: #474748;
+}
+
+.dark #GalleryFSBody .bottomContent {
+	color: #848688;
+}
+
+.dark #GalleryFSBody .bottomContent a {
+	color: #848688;
+}
+
+.dark #GalleryFSBody .bottomContent a:hover {
+	color: #a8aaad;
+}
+
+.dark #GalleryFSBody .bottomContent .disabled a {
+	color: #848688;
+}
+
+.dark #GalleryFSBody .bottomContent .galStatsAndEdit a {
+	color: #bebfc0;
+}
+
+.dark #GalleryFSSide .toggleFullscreen {
+	background: #535353 url('img/fs/3/btn_fs_3.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.dark #GalleryFSSide .toggleFullscreen:hover {
+	background-color: #5D5D5D;
+	background-position: center left;
+}
+
+.dark #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+	background-color: #4D4D4D;
+	background-position: bottom left;
+}
+
+.dark #GalleryFSSide .moreOptions {
+	background: #535353 url('img/fs/3/btn_dots_3.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.dark #GalleryFSSide .moreOptions:hover {
+	background-color: #5D5D5D;
+	background-position: center left;
+}
+
+.dark #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+	background-color: #4D4D4D;
+	background-position: bottom left;
+}
+
+.dark #GalleryFSSide .sh4reButton.recommend {
+	background: url('img/fs/3/icn_ieteikt_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.dark #GalleryFSSide .sh4reButton.like {
+	background: url('img/fs/3/icn_patik_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.dark #GalleryFSSide .sh4reButton.tag {
+	background: url('img/fs/3/icn_tag_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.dark #GalleryFSSide .sh4reButton:hover {
+	background-position: 0 -32px;
+}
+
+.dark #GalleryFSSide .sh4reButton.active {
+	background-position: 0 -64px;
+}
+
+.dark #GalleryFSSide .sh4reButton.disabled {
+	background-position: 0 0;
+	opacity: 0.16;
+	cursor: default;
+}
+
+.dark #GalleryFSContent .prevButton div {
+	background-image: url('img/fs/3/icn_arrow_left_3.png');
+	background-size: 40px auto;
+}
+
+.dark #GalleryFSContent .nextButton div {
+	background-image: url('img/fs/3/icn_arrow_right_3.png');
+	background-size: 40px auto;
+}
+
+.dark #GalleryFSContent .prevButton:hover, .dark #GalleryFSContent .nextButton:hover {
+	opacity: 1;
+}
+
+.dark #GalleryFSContent .prevButton.disabled, .dark #GalleryFSContent .nextButton.disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+.dark #GalleryFSThumbnails .control.prev {
+	background: url('img/fs/3/icn_arrow_left_small_3.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.dark #GalleryFSThumbnails .control.next {
+	background: url('img/fs/3/icn_arrow_right_small_3.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.dark #GalleryFSThumbnails .control.prev:hover, .dark #GalleryFSThumbnails .control.next:hover {
+	opacity: 1;
+}
+
+.dark #GalleryFSThumbnails .control.prev:active, .dark #GalleryFSThumbnails .control.next:active {
+	opacity: 1;
+	background-position: left bottom;
+}
+
+.dark #GalleryFSThumbnails .control.prev.disabled, .dark #GalleryFSThumbnails .control.next.disabled {
+	opacity: 0.25;
+}
+
+.dark #GalleryFSBody .bottomContent .galleryStats a {
+	background-image: url('img/fs/icn_statistika.png');
+	background-size: 16px auto;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+.dark #LastView h2 {
+	color: #fff;
+}
+
+.dark #LastView .readMore {
+	color: #c9c9c9;
+}
+
+.dark #LastView .who {
+	color: #979a9c;
+}
+
+.dark #LastView .who a {
+	color: #bebfc0;
+}
+
+.dark #LastView .albumDescription {
+	background: rgba(200, 200, 200, 0.9);
+}
+
+.dark #galleryLastWindow .otherGalleriesLast > h2 a {
+	color: #fff;
+}
+
+.dark #galleryLastMosaic .item .overlay {
+	background-color: #474748;
+}
+
+.dark #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.dark .large #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.dark #galleryLastMosaic:before {
+	box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+.dark #galleryLastMosaic:after {
+	box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark.fullscreen #GalleryFSClose {
+	background-color: #535353;
+	background-image: url('img/fs/3/btn_close_fs3.png');
+	background-size: 24px auto;
+}
+
+.dark.fullscreen #GalleryFSClose:hover {
+	background-color: #5D5D5D;
+}
+
+.dark.fullscreen #GalleryFSClose:active {
+	background-color: #4D4D4D;
+}
+
+.dark #LastView .recommendActions a {
+	color: #c9c9c9;
+}
+
+/* --- Dark theme --- */
+
+/* +++ Extra Dark theme +++ */
+.extradark #GalleryFSBodyContainer {
+	background-color: #313030;
+}
+
+.extradark #GalleryFSBody .bottomContent {
+	color: #848688;
+}
+
+.extradark #GalleryFSBody .bottomContent a {
+	color: #848688;
+}
+
+.extradark #GalleryFSBody .bottomContent a:hover {
+	color: #a8aaad;
+}
+
+.extradark #GalleryFSBody .bottomContent .disabled a {
+	color: #848688;
+}
+
+.extradark #GalleryFSBody .bottomContent .galStatsAndEdit a {
+	color: #bebfc0;
+}
+
+.extradark #GalleryFSSide .toggleFullscreen {
+	background: #3b3b3b url('img/fs/3/btn_fs_3.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.extradark #GalleryFSSide .toggleFullscreen:hover {
+	background-color: #454545;
+	background-position: center left;
+}
+
+.extradark #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+	background-color: #353535;
+	background-position: bottom left;
+}
+
+.extradark #GalleryFSSide .moreOptions {
+	background: #3b3b3b url('img/fs/3/btn_dots_3.png') no-repeat top center;
+	background-size: 32px auto;
+}
+
+.extradark #GalleryFSSide .moreOptions:hover {
+	background-color: #454545;
+	background-position: center left;
+}
+
+.extradark #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+	background-color: #353535;
+	background-position: bottom left;
+}
+
+.extradark #GalleryFSSide .sh4reButton.recommend {
+	background: url('img/fs/3/icn_ieteikt_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.extradark #GalleryFSSide .sh4reButton.like {
+	background: url('img/fs/3/icn_patik_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.extradark #GalleryFSSide .sh4reButton.tag {
+	background: url('img/fs/3/icn_tag_sprite_3.png') no-repeat center top;
+	background-size: 32px auto;
+}
+
+.extradark #GalleryFSSide .sh4reButton:hover {
+	background-position: 0 -32px;
+}
+
+.extradark #GalleryFSSide .sh4reButton.active {
+	background-position: 0 -64px;
+}
+
+.extradark #GalleryFSSide .sh4reButton.disabled {
+	background-position: 0 0;
+	opacity: 0.16;
+	cursor: default;
+}
+
+.extradark #GalleryFSContent .prevButton div {
+	background-image: url('img/fs/3/icn_arrow_left_3.png');
+	background-size: 40px auto;
+}
+
+.extradark #GalleryFSContent .nextButton div {
+	background-image: url('img/fs/3/icn_arrow_right_3.png');
+	background-size: 40px auto;
+}
+
+.extradark #GalleryFSContent .prevButton:hover, .extradark #GalleryFSContent .nextButton:hover {
+	opacity: 1;
+}
+
+.extradark #GalleryFSContent .prevButton.disabled, .extradark #GalleryFSContent .nextButton.disabled {
+	opacity: 0.3;
+	cursor: default;
+}
+
+.extradark #GalleryFSThumbnails .control.prev {
+	background: url('img/fs/3/icn_arrow_left_small_3.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.extradark #GalleryFSThumbnails .control.next {
+	background: url('img/fs/3/icn_arrow_right_small_3.png') no-repeat left top;
+	background-size: 24px auto;
+	opacity: 0.7;
+}
+
+.extradark #GalleryFSThumbnails .control.prev:hover, .extradark #GalleryFSThumbnails .control.next:hover {
+	opacity: 1;
+}
+
+.extradark #GalleryFSThumbnails .control.prev:active, .extradark #GalleryFSThumbnails .control.next:active {
+	opacity: 1;
+	background-position: left bottom;
+}
+
+.extradark #GalleryFSThumbnails .control.prev.disabled, .extradark #GalleryFSThumbnails .control.next.disabled {
+	opacity: 0.25;
+}
+
+.extradark #GalleryFSBody .bottomContent .galleryStats a {
+	background-image: url('img/fs/icn_statistika.png');
+	background-size: 16px auto;
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+.extradark #LastView h2 {
+	color: #fff;
+}
+
+.extradark #LastView .readMore {
+	color: #c9c9c9;
+}
+
+.extradark #LastView .who {
+	color: #979a9c;
+}
+
+.extradark #LastView .who a {
+	color: #bebfc0;
+}
+
+.extradark #LastView .albumDescription {
+	background: rgba(170, 170, 170, 0.9);
+}
+
+.extradark #galleryLastWindow .otherGalleriesLast > h2 a {
+	color: #fff;
+}
+
+.extradark #galleryLastMosaic .item .overlay {
+	background-color: #313030;
+}
+
+.extradark #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.extradark .large #galleryLastMosaic > .overlay {
+	background: linear-gradient(to bottom, rgba(58, 58, 58, 0), #3a3a3a);
+	opacity: 1;
+}
+
+.extradark #galleryLastMosaic:before {
+	box-shadow: -5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+.extradark #galleryLastMosaic:after {
+	box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.extradark.fullscreen #GalleryFSClose {
+	background-color: #3b3b3b;
+	background-image: url('img/fs/3/btn_close_fs3.png');
+	background-size: 24px auto;
+}
+
+.extradark.fullscreen #GalleryFSClose:hover {
+	background-color: #454545;
+}
+
+.extradark.fullscreen #GalleryFSClose:active {
+	background-color: #353535;
+}
+
+.extradark #LastView .recommendActions a {
+	color: #c9c9c9;
+}
+
+/* --- Extra Dark theme --- */
+
+/* +++ Retina images +++ */
+@media only screen and (-Webkit-min-device-pixel-ratio: 1.5),
+only screen and (-moz-min-device-pixel-ratio: 1.5),
+only screen and (-o-min-device-pixel-ratio: 3/2),
+only screen and (min-device-pixel-ratio: 1.5) {
+	#GalleryFSClose {
+		background: #ffffff url('img/fs/btn_close_u_2x.png') no-repeat top left;
+		background-size: 24px auto;
+	}
+
+	#GalleryFSClose:hover {
+		background-color: #EDEEEF;
+	}
+
+	#GalleryFSClose:active {
+		background-color: #D6D7D8;
+		background-position: bottom left;
+	}
+
+	#GalleryFSSide .toggleFullscreen {
+		background: #E2E3E4 url('img/fs/1/btn_fs_1_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.last #GalleryFSSide .toggleFullscreen {
+		background-color: transparent;
+	}
+
+	#GalleryFSSide .toggleFullscreen:hover {
+		background-color: #D6D7D8;
+		background-position: center left;
+	}
+
+	#GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+		background-color: #EDEEEF;
+		background-position: bottom left;
+	}
+
+	#GalleryFSSide .moreOptions {
+		background: #E2E3E4 url('img/fs/1/btn_dots_1_2x.png') no-repeat center center;
+		background-size: 32px auto;
+	}
+
+	.last #GalleryFSSide .moreOptions {
+		background-color: transparent;
+	}
+
+	#GalleryFSSide .moreOptions:hover {
+		background-color: #D6D7D8;
+		background-position: center center;
+	}
+
+	#GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+		background-color: #EDEEEF;
+		background-position: bottom center;
+	}
+
+	#GalleryFSSide .sh4reButton:last-child {
+		margin-bottom: 0;
+	}
+
+	#GalleryFSSide .sh4reButton.recommend {
+		background: url('img/fs/1/icn_ieteikt_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	#GalleryFSSide .sh4reButton.like {
+		background: url('img/fs/1/icn_patik_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	#GalleryFSSide .sh4reButton.tag {
+		background: url('img/fs/1/icn_tag_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	#GalleryFSSide .sh4reButton:hover {
+		background-position: 0 -32px;
+	}
+
+	#GalleryFSSide .sh4reButton.active {
+		background-position: 0 -64px;
+	}
+
+	#GalleryFSSide .sh4reButton.disabled {
+		background-position: 0 0;
+	}
+
+	#GalleryFSContent .prevButton div {
+		background-image: url('img/fs/3/icn_arrow_left_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	#GalleryFSContent .nextButton div {
+		background-image: url('img/fs/3/icn_arrow_right_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	#GalleryFSThumbnails .control.prev {
+		background: url('img/fs/1/icn_arrow_left_small_1_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	#GalleryFSThumbnails .control.next {
+		background: url('img/fs/1/icn_arrow_right_small_1_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	#GalleryFSThumbnails .control.prev:active, #GalleryFSThumbnails .control.next:active {
+		background-position: left bottom;
+	}
+
+	#galleryLastWindow .otherGalleriesLast .prev div {
+		background: url('img/fs/3/icn_arrow_left_3_2x.png') no-repeat center center;
+		background-size: 40px auto;
+	}
+
+	#galleryLastWindow .otherGalleriesLast .next div {
+		background: url('img/fs/3/icn_arrow_right_3_2x.png') no-repeat center center;
+		background-size: 40px auto;
+	}
+
+	#LastView .lastPicture div {
+		background: url('img/fs/3/icn_arrow_left_3_2x.png') no-repeat center center;
+		background-size: 40px auto;
+	}
+
+	#LastView .watch-again span {
+		background-image: url('img/fs/ic-reload@2x.png');
+		background-size: 16px auto;
+	}
+
+	.fullscreen #GalleryFSClose {
+		background: #f2f3f4 url('img/fs/close_da_2x.png') no-repeat center center;
+		background-size: 10px 10px;
+	}
+
+	.fullscreen #GalleryFSClose:hover {
+		background-color: #e5e6e7;
+	}
+
+	.fullscreen.last #GalleryFSClose {
+		background: #444648 url('img/fs/close_br_2x.png') no-repeat center center;
+		background-size: 10px 10px;
+	}
+
+	.fullscreen.last #GalleryFSClose:hover {
+		background-color: #626466;
+	}
+
+	/* +++ Light theme +++ */
+	.light #GalleryFSSide .toggleFullscreen {
+		background: #E2E3E4 url('img/fs/1/btn_fs_1_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.light #GalleryFSSide .toggleFullscreen:hover {
+		background-color: #D6D7D8;
+		background-position: center left;
+	}
+
+	.light #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+		background-color: #EDEEEF;
+		background-position: bottom left;
+	}
+
+	.light #GalleryFSSide .moreOptions {
+		background: #E2E3E4 url('img/fs/1/btn_dots_1_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.light #GalleryFSSide .moreOptions:hover {
+		background-color: #D6D7D8;
+		background-position: center left;
+	}
+
+	.light #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+		background-color: #EDEEEF;
+		background-position: bottom left;
+	}
+
+	.light #GalleryFSSide .sh4reButton.recommend {
+		background: url('img/fs/1/icn_ieteikt_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.light #GalleryFSSide .sh4reButton.like {
+		background: url('img/fs/1/icn_patik_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.light #GalleryFSSide .sh4reButton.tag {
+		background: url('img/fs/1/icn_tag_sprite_1_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.light #GalleryFSSide .sh4reButton:hover {
+		background-position: 0 -32px;
+	}
+
+	.light #GalleryFSSide .sh4reButton.active {
+		background-position: 0 -64px;
+	}
+
+	.light #GalleryFSSide .sh4reButton.disabled {
+		background-position: 0 0;
+	}
+
+	.light #GalleryFSContent .prevButton div {
+		background-image: url('img/fs/3/icn_arrow_left_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.light #GalleryFSContent .nextButton div {
+		background-image: url('img/fs/3/icn_arrow_right_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.light #GalleryFSThumbnails .control.prev {
+		background: url('img/fs/1/icn_arrow_left_small_1_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.light #GalleryFSThumbnails .control.next {
+		background: url('img/fs/1/icn_arrow_right_small_1_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.light #GalleryFSThumbnails .control.prev:active, .light #GalleryFSThumbnails .control.next:active {
+		background-position: left bottom;
+	}
+
+	.light #GalleryFSBody .bottomContent .galleryStats a {
+		background-image: url('img/fs/icn_statistika_2x.png');
+		background-size: 16px auto;
+	}
+
+	.light #GalleryFSBody .bottomContent .galleryEdit a {
+		background-image: url('img/fs/icn_labot1_2x.png');
+		background-size: 16px auto;
+	}
+
+	.light.fullscreen #GalleryFSClose {
+		background-image: url('img/fs/1/btn_close_fs1_2x.png');
+		background-size: 24px auto;
+	}
+	/* --- Light theme --- */
+
+	/* +++ Medium theme +++ */
+	.medium #GalleryFSSide .toggleFullscreen {
+		background: #5A5B5C url('img/fs/2/btn_fs_2_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.medium #GalleryFSSide .toggleFullscreen:hover {
+		background-color: #535455;
+		background-position: center left;
+	}
+
+	.medium #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+		background-color: #606162;
+		background-position: bottom left;
+	}
+
+	.medium #GalleryFSSide .moreOptions {
+		background: #5A5B5C url('img/fs/2/btn_dots_2_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.medium #GalleryFSSide .moreOptions:hover {
+		background-color: #535455;
+		background-position: center left;
+	}
+
+	.medium #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+		background-color: #606162;
+		background-position: bottom left;
+	}
+
+	.medium #GalleryFSSide .sh4reButton.recommend {
+		background: url('img/fs/2/icn_ieteikt_sprite_2_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.medium #GalleryFSSide .sh4reButton.like {
+		background: url('img/fs/2/icn_patik_sprite_2_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.medium #GalleryFSSide .sh4reButton.tag {
+		background: url('img/fs/2/icn_tag_sprite_2_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.medium #GalleryFSSide .sh4reButton:hover {
+		background-position: 0 -32px;
+	}
+
+	.medium #GalleryFSSide .sh4reButton.active {
+		background-position: 0 -64px;
+	}
+
+	.medium #GalleryFSSide .sh4reButton.disabled {
+		background-position: 0 0;
+	}
+
+	.medium #GalleryFSContent .prevButton div {
+		background-image: url('img/fs/3/icn_arrow_left_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.medium #GalleryFSContent .nextButton div {
+		background-image: url('img/fs/3/icn_arrow_right_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.medium #GalleryFSThumbnails .control.prev {
+		background: url('img/fs/2/icn_arrow_left_small_2_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.medium #GalleryFSThumbnails .control.next {
+		background: url('img/fs/2/icn_arrow_right_small_2_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.medium #GalleryFSThumbnails .control.prev:active, .medium #GalleryFSThumbnails .control.next:active {
+		background-position: left bottom;
+	}
+
+	.medium #GalleryFSBody .bottomContent .galleryStats a {
+		background-image: url('img/fs/icn_statistika_2x.png');
+		background-size: 16px auto;
+	}
+
+	.medium #GalleryFSBody .bottomContent .galleryEdit a {
+		background-image: url('img/fs/icn_labot1_2x.png');
+		background-size: 16px auto;
+	}
+
+	.medium.fullscreen #GalleryFSClose {
+		background-image: url('img/fs/2/btn_close_fs2_2x.png');
+		background-size: 24px auto;
+	}
+	/* --- Medium theme --- */
+
+	/* +++ Dark theme +++ */
+	.dark #GalleryFSSide .toggleFullscreen {
+		background: #535353 url('img/fs/3/btn_fs_3_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.dark #GalleryFSSide .toggleFullscreen:hover {
+		background-color: #5D5D5D;
+		background-position: center left;
+	}
+
+	.dark #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+		background-color: #4D4D4D;
+		background-position: bottom left;
+	}
+
+	.dark #GalleryFSSide .moreOptions {
+		background: #535353 url('img/fs/3/btn_dots_3_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.dark #GalleryFSSide .moreOptions:hover {
+		background-color: #5D5D5D;
+		background-position: center left;
+	}
+
+	.dark #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+		background-color: #4D4D4D;
+		background-position: bottom left;
+	}
+
+	.dark #GalleryFSSide .sh4reButton.recommend {
+		background: url('img/fs/3/icn_ieteikt_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.dark #GalleryFSSide .sh4reButton.like {
+		background: url('img/fs/3/icn_patik_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.dark #GalleryFSSide .sh4reButton.tag {
+		background: url('img/fs/3/icn_tag_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.dark #GalleryFSSide .sh4reButton:hover {
+		background-position: 0 -32px;
+	}
+
+	.dark #GalleryFSSide .sh4reButton.active {
+		background-position: 0 -64px;
+	}
+
+	.dark #GalleryFSSide .sh4reButton.disabled {
+		background-position: 0 0;
+	}
+
+	.dark #GalleryFSContent .prevButton div {
+		background-image: url('img/fs/3/icn_arrow_left_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.dark #GalleryFSContent .nextButton div {
+		background-image: url('img/fs/3/icn_arrow_right_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.dark #GalleryFSThumbnails .control.prev {
+		background: url('img/fs/3/icn_arrow_left_small_3_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.dark #GalleryFSThumbnails .control.next {
+		background: url('img/fs/3/icn_arrow_right_small_3_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.dark #GalleryFSThumbnails .control.prev:active, .dark #GalleryFSThumbnails .control.next:active {
+		background-position: left bottom;
+	}
+
+	.dark #GalleryFSBody .bottomContent .galleryStats a {
+		background-image: url('img/fs/icn_statistika_2x.png');
+		background-size: 16px auto;
+	}
+
+	.dark #GalleryFSBody .bottomContent .galleryEdit a {
+		background-image: url('img/fs/icn_labot1_2x.png');
+		background-size: 16px auto;
+	}
+
+	.dark.fullscreen #GalleryFSClose {
+		background-image: url('img/fs/3/btn_close_fs3_2x.png');
+		background-size: 24px auto;
+	}
+	/* --- Dark theme --- */
+
+	/* +++ Extra Dark theme +++ */
+	.extradark #GalleryFSSide .toggleFullscreen {
+		background: #3b3b3b url('img/fs/3/btn_fs_3_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.extradark #GalleryFSSide .toggleFullscreen:hover {
+		background-color: #454545;
+		background-position: center left;
+	}
+
+	.extradark #GalleryFSSide .toggleFullscreen:active, #GalleryFSSide .toggleFullscreen.active {
+		background-color: #353535;
+		background-position: bottom left;
+	}
+
+	.extradark #GalleryFSSide .moreOptions {
+		background: #3b3b3b url('img/fs/3/btn_dots_3_2x.png') no-repeat top center;
+		background-size: 32px auto;
+	}
+
+	.extradark #GalleryFSSide .moreOptions:hover {
+		background-color: #454545;
+		background-position: center left;
+	}
+
+	.extradark #GalleryFSSide .moreOptions:active, #GalleryFSSide .moreOptions.active {
+		background-color: #353535;
+		background-position: bottom left;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton.recommend {
+		background: url('img/fs/3/icn_ieteikt_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton.like {
+		background: url('img/fs/3/icn_patik_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton.tag {
+		background: url('img/fs/3/icn_tag_sprite_3_2x.png') no-repeat center top;
+		background-size: 32px auto;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton:hover {
+		background-position: 0 -32px;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton.active {
+		background-position: 0 -64px;
+	}
+
+	.extradark #GalleryFSSide .sh4reButton.disabled {
+		background-position: 0 0;
+	}
+
+	.extradark #GalleryFSContent .prevButton div {
+		background-image: url('img/fs/3/icn_arrow_left_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.extradark #GalleryFSContent .nextButton div {
+		background-image: url('img/fs/3/icn_arrow_right_3_2x.png');
+		background-size: 40px auto;
+	}
+
+	.extradark #GalleryFSThumbnails .control.prev {
+		background: url('img/fs/3/icn_arrow_left_small_3_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.extradark #GalleryFSThumbnails .control.next {
+		background: url('img/fs/3/icn_arrow_right_small_3_2x.png') no-repeat left top;
+		background-size: 24px auto;
+	}
+
+	.extradark #GalleryFSThumbnails .control.prev:active, .extradark #GalleryFSThumbnails .control.next:active {
+		background-position: left bottom;
+	}
+
+	.extradark #GalleryFSBody .bottomContent .galleryStats a {
+		background-image: url('img/fs/icn_statistika_2x.png');
+		background-size: 16px auto;
+	}
+
+	.extradark #GalleryFSBody .bottomContent .galleryEdit a {
+		background-image: url('img/fs/icn_labot1_2x.png');
+		background-size: 16px auto;
+	}
+
+	.extradark.fullscreen #GalleryFSClose {
+		background-image: url('img/fs/3/btn_close_fs3_2x.png');
+		background-size: 24px auto;
+	}
+	/* --- Extra Dark theme --- */
+
+	#GalleryFSContent #galLargeLike {
+		background-image: url('img/fs/icn_patiksturis_sprite_2x.png');
+		background-size: 28px auto;
+	}
+}
+/* --- Retina images --- */

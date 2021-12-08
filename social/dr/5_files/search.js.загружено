@@ -1,0 +1,356 @@
+DR.search = DR.search || {};
+DR.search.struct = DR.search.struct || {};
+DR.search.select = DR.search.select || {};
+/** @extends {DR._Base} */
+DR.search.struct.FriendsRe = function(par){
+	/** @private */
+	this._t = 321;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.hasPhone)){
+		var tmp = {};
+		for( var k in par.hasPhone ) tmp[k] = Boolean(par.hasPhone [k]);
+		this.hasPhone = tmp;
+	}
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[321] = DR.search.struct.FriendsRe;
+DR.search.struct.FriendsRe[__P] = new DR._Base;
+DR.search.struct.FriendsRe[__P][__C] = DR.search.struct.FriendsRe;
+/** @type {Number} */
+DR.search.struct.FriendsRe.prototype.count = null;
+/** @type {Object.<Number,Boolean>} */
+DR.search.struct.FriendsRe.prototype.hasPhone = null;
+/** @type {Number} */
+DR.search.struct.FriendsRe.prototype.pgs = null;
+/** @type {Array.<DR.users.struct.User>} */
+DR.search.struct.FriendsRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.search.select.FriendsRe = function(){
+	this._fields = {};
+};
+DR.search.select.FriendsRe[__CL] = "Search__FriendsRe";
+DR.search.select.FriendsRe[__P] = new DR._Select;
+DR.search.select.FriendsRe[__P][__C] = DR.search.select.FriendsRe;
+/** @param {boolean} [v]
+  * @return {DR.search.select.FriendsRe} */
+DR.search.select.FriendsRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.FriendsRe} */
+DR.search.select.FriendsRe.prototype.hasPhone = function(v){ this._fields.hasPhone = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.FriendsRe} */
+DR.search.select.FriendsRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.FriendsRe} */
+DR.search.select.FriendsRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.search.Friends = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 322;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[322] = DR.search.Friends;
+DR.search.Friends[__CL] = "Search__Friends";
+DR.search.Friends[__P] = new DR._Method;
+DR.search.Friends[__P][__C] = DR.search.Friends;
+/** @type {Boolean|null} */
+DR.search.Friends.prototype.checkPhone = null;
+/** @type {Number} */
+DR.search.Friends.prototype.count = null;
+/** @type {Number} */
+DR.search.Friends.prototype.pg = null;
+/** @type {String} */
+DR.search.Friends.prototype.query = null;
+/** @type {Boolean|null} */
+DR.search.Friends.prototype.showUnregistered = null;
+/** @type {DR.search.struct.FriendsRe} */
+DR.search.Friends.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.search.All = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1062;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1062] = DR.search.All;
+DR.search.All[__CL] = "Search__All";
+DR.search.All[__P] = new DR._Method;
+DR.search.All[__P][__C] = DR.search.All;
+/** @type {Boolean} */
+DR.search.All.prototype.autocomplete = null;
+/** @type {Number} */
+DR.search.All.prototype.count = null;
+/** @type {Number} */
+DR.search.All.prototype.pg = null;
+/** @type {String} */
+DR.search.All.prototype.query = null;
+/** @type {Number|null} */
+DR.search.All.prototype.type = null;
+/** @type {DR.search.struct.AllRe} */
+DR.search.All.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.search.struct.Users = function(par){
+	/** @private */
+	this._t = 1063;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.type)) this.type = (parseInt(par.type)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[1063] = DR.search.struct.Users;
+DR.search.struct.Users[__P] = new DR._Base;
+DR.search.struct.Users[__P][__C] = DR.search.struct.Users;
+/** @type {Number} */
+DR.search.struct.Users.prototype.type = null;
+/** @type {Array.<DR.users.struct.User>} */
+DR.search.struct.Users.prototype.users = null;
+ 
+/** @extends {DR._Base} */
+DR.search.struct.AllRe = function(par){
+	/** @private */
+	this._t = 1064;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.types)){
+		var tmp = [];
+		for( var k in par.types ) tmp.push(DR._Base.cast(par.types [k]));
+		this.types = tmp;
+	}
+};
+DR._Base._types[1064] = DR.search.struct.AllRe;
+DR.search.struct.AllRe[__P] = new DR._Base;
+DR.search.struct.AllRe[__P][__C] = DR.search.struct.AllRe;
+/** @type {Array.<DR.search.struct.Users>} */
+DR.search.struct.AllRe.prototype.types = null;
+ 
+/** @extends {DR._Method} */
+DR.search.GetMentions = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2865;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2865] = DR.search.GetMentions;
+DR.search.GetMentions[__CL] = "Search__GetMentions";
+DR.search.GetMentions[__P] = new DR._Method;
+DR.search.GetMentions[__P][__C] = DR.search.GetMentions;
+/** @type {Number|null} */
+DR.search.GetMentions.prototype.count = null;
+/** @type {Boolean|null} */
+DR.search.GetMentions.prototype.friends = null;
+/** @type {Boolean|null} */
+DR.search.GetMentions.prototype.noSplit = null;
+/** @type {String} */
+DR.search.GetMentions.prototype.query = null;
+/** @type {Array.<Number>|null} */
+DR.search.GetMentions.prototype.types = null;
+/** @type {Number|null} */
+DR.search.GetMentions.prototype.uid = null;
+/** @type {DR.search.struct.AllRe} */
+DR.search.GetMentions.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.search.struct.UserItem = function(par){
+	/** @private */
+	this._t = 3165;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.selectable)) this.selectable = Boolean(par.selectable);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[3165] = DR.search.struct.UserItem;
+DR.search.struct.UserItem[__P] = new DR._Base;
+DR.search.struct.UserItem[__P][__C] = DR.search.struct.UserItem;
+/** @type {Boolean} */
+DR.search.struct.UserItem.prototype.selectable = null;
+/** @type {DR.users.struct.User} */
+DR.search.struct.UserItem.prototype.user = null;
+ 
+/** @extends {DR._Base} */
+DR.search.struct.BaseRe = function(par){
+	/** @private */
+	this._t = 3166;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[3166] = DR.search.struct.BaseRe;
+DR.search.struct.BaseRe[__P] = new DR._Base;
+DR.search.struct.BaseRe[__P][__C] = DR.search.struct.BaseRe;
+/** @type {Number} */
+DR.search.struct.BaseRe.prototype.count = null;
+/** @type {Number} */
+DR.search.struct.BaseRe.prototype.pgs = null;
+/** @type {Array.<DR.search.struct.UserItem>} */
+DR.search.struct.BaseRe.prototype.users = null;
+ 
+/** @extends {DR._Method} */
+DR.search.Base = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3168;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3168] = DR.search.Base;
+DR.search.Base[__CL] = "Search__Base";
+DR.search.Base[__P] = new DR._Method;
+DR.search.Base[__P][__C] = DR.search.Base;
+/** @type {Number} */
+DR.search.Base.prototype.count = null;
+/** @type {Number} */
+DR.search.Base.prototype.pg = null;
+/** @type {String|null} */
+DR.search.Base.prototype.query = null;
+ 
+/** @extends {DR._Base} */
+DR.search.struct.MembersRe = function(par){
+	/** @private */
+	this._t = 3776;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.uids)){
+		var tmp = [];
+		for( var k in par.uids ) tmp.push((parseInt(par.uids [k])||0));
+		this.uids = tmp;
+	}
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[3776] = DR.search.struct.MembersRe;
+DR.search.struct.MembersRe[__P] = new DR._Base;
+DR.search.struct.MembersRe[__P][__C] = DR.search.struct.MembersRe;
+/** @type {Number} */
+DR.search.struct.MembersRe.prototype.count = null;
+/** @type {Number} */
+DR.search.struct.MembersRe.prototype.pgs = null;
+/** @type {Array.<Number>} */
+DR.search.struct.MembersRe.prototype.uids = null;
+/** @type {Array.<DR.users.struct.UserDefault>} */
+DR.search.struct.MembersRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.search.select.MembersRe = function(){
+	this._fields = {};
+};
+DR.search.select.MembersRe[__CL] = "Search__MembersRe";
+DR.search.select.MembersRe[__P] = new DR._Select;
+DR.search.select.MembersRe[__P][__C] = DR.search.select.MembersRe;
+/** @param {boolean} [v]
+  * @return {DR.search.select.MembersRe} */
+DR.search.select.MembersRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.MembersRe} */
+DR.search.select.MembersRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.MembersRe} */
+DR.search.select.MembersRe.prototype.uids = function(v){ this._fields.uids = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.search.select.MembersRe} */
+DR.search.select.MembersRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.search.Members = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3777;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3777] = DR.search.Members;
+DR.search.Members[__CL] = "Search__Members";
+DR.search.Members[__P] = new DR._Method;
+DR.search.Members[__P][__C] = DR.search.Members;
+/** @type {Number} */
+DR.search.Members.prototype.count = null;
+/** @type {Number} */
+DR.search.Members.prototype.pg = null;
+/** @type {String} */
+DR.search.Members.prototype.query = null;
+/** @type {Number} */
+DR.search.Members.prototype.uid = null;
+/** @type {DR.search.struct.MembersRe} */
+DR.search.Members.prototype.re = null;
+ 
+/** @extends {DR.search.Base} */
+DR.search.GiftUsers = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3167;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3167] = DR.search.GiftUsers;
+DR.search.GiftUsers[__CL] = "Search__GiftUsers";
+DR.search.GiftUsers[__P] = new DR.search.Base;
+DR.search.GiftUsers[__P][__C] = DR.search.GiftUsers;
+/** @type {DR.search.struct.BaseRe} */
+DR.search.GiftUsers.prototype.re = null;
+ 
+/** @extends {DR.search.Base} */
+DR.search.GalleryTagUsers = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3169;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3169] = DR.search.GalleryTagUsers;
+DR.search.GalleryTagUsers[__CL] = "Search__GalleryTagUsers";
+DR.search.GalleryTagUsers[__P] = new DR.search.Base;
+DR.search.GalleryTagUsers[__P][__C] = DR.search.GalleryTagUsers;
+/** @type {Number} */
+DR.search.GalleryTagUsers.prototype.pid = null;
+/** @type {DR.search.struct.BaseRe} */
+DR.search.GalleryTagUsers.prototype.re = null;
+ 
+/** @extends {DR.search.Base} */
+DR.search.ConvMembers = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3656;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3656] = DR.search.ConvMembers;
+DR.search.ConvMembers[__CL] = "Search__ConvMembers";
+DR.search.ConvMembers[__P] = new DR.search.Base;
+DR.search.ConvMembers[__P][__C] = DR.search.ConvMembers;
+/** @type {Number} */
+DR.search.ConvMembers.prototype.cid = null;
+/** @type {DR.search.struct.BaseRe} */
+DR.search.ConvMembers.prototype.re = null;
+ 
+D.loaded();

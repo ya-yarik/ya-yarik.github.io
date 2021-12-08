@@ -1,0 +1,386 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700&subset=latin,latin-ext);
+
+.servicesTransf .formItem{
+	width:50%;
+}
+
+.servicesTransfModal .wrapper {
+	padding: 16px 0 20px;
+	text-align: center;
+}
+
+.servicesTransfModal .wrapper div.formItem label {
+	margin-bottom: 16px;
+}
+
+.servicesTransfModal .wrapper div.formItemBorder {
+	width: 100px;
+	display: inline-block;
+}
+
+.serviceLastUsedTable{
+	width:100%;
+}
+
+.serviceLastUsedTable td:first-child .serviceItem{
+	margin-left:0;
+	margin-right:5px;
+}
+.serviceLastUsedTable td {
+	width: 50%;
+}
+
+.serviceItem{
+	position:relative;
+	border:1px solid #E7E7E7;
+	margin-bottom:10px;
+	margin-left:5px;
+	padding:5px;
+}
+.serviceItemList .serviceItem{
+	min-height:120px;
+}
+
+.serviceItem img{
+	position:absolute;
+	top:50%;
+	margin-top:-25px;
+	left:15px;
+}
+
+.serviceItemName{
+	display:block;
+}
+
+.serviceItemName, 
+.serviceItem p,
+.serviceItem .progress,
+.serviceItemEnd,
+.servicesItemBuy{
+	margin-left:80px;
+	margin-bottom:2px;
+}
+
+.serviceAutoItem{
+	max-width:353px;
+}
+
+.serviceAutoItem .smsIcon, .serviceAutoItem .creditIcon{
+	position:absolute;
+	top:3px;
+	right:3px;
+}
+
+.servicesActual{
+	border-color:#BFD5E9;
+}
+
+.servicesActual .heading{
+	background-color:#BFD5E9;
+	font-weight:bold;
+}
+
+.servicesActual .content{
+	background-color:#EAF1F8;
+}
+
+
+/* macinjsh */
+.walletInfo {
+	background: #F4F4F4 url('img/wallet.png') no-repeat 10px 4px;
+	border: 1px solid #E5E5E5;
+	border-radius: 5px 5px 5px 5px;
+    margin-bottom: 20px;
+    padding: 10px 10px 10px 132px;
+	position: relative;
+	min-height: 82px;
+}
+	.walletInfo .money {
+		font-weight: bold;
+		font-size: 14px;
+		margin-bottom: 5px;
+		margin-top: 5px;
+	}
+	.walletInfo .button {
+		margin-bottom: 2px;
+		margin-top: 10px;
+	}
+
+.euroBalance {
+    color:#8D8D92;
+}
+
+.euroBalanceThin {
+    font-weight:normal;
+}
+
+/* +++ temp +++ */
+.servicesSpecColor{
+	color:#9f1515;
+}
+
+.servicesSpecFlag{
+	position:absolute;
+	top:-10px;
+	right:-12px;
+	width:68px;
+	height:67px;
+	background-image:url('//ifrype.com/services/temp/2013_18nov/flag.png');
+}
+
+.servicesSpecBlock{
+	position:relative;
+	background-color:#f4f4f4;
+	border:1px solid #e5e5e5;
+	min-height:100px;
+	background-image:url('//ifrype.com/services/temp/2013_18nov/pig.png');
+	background-repeat:no-repeat;
+	background-position:left center;
+	padding:10px;
+	padding-left:200px;
+	margin-bottom:10px;
+}
+
+.servicesSpecBlock .servicesSpecFlag{
+	top:0;
+	right:0;
+}
+
+.earningInformation th, .earningInformation td{
+	width: 25%;
+}
+
+.border_top{
+	padding-top: 3px;
+	margin-top: 5px;
+	width:100%;
+	border-top: 1px #e7e7e7 solid;
+}
+
+.serviceRequestMoney, .serviceActionLogTitle {
+	margin-top:15px;
+}
+
+.dr_lottery_banner_730 {
+	width: 730px;
+	height: 100px;
+	display: block;
+	background: url('//ifrype.com/d/loterija/assets/img/banners/730x100_2.jpg');
+	font-family: 'Open Sans', sans-serif;
+	margin-bottom: 10px;
+	text-decoration: none;
+}
+
+.dr_lottery_banner_730:hover {
+	text-decoration: none;
+}
+
+.dr_lottery_banner_730 h2 {
+	color: #ffb600;
+	margin-left: 160px;
+	font-size: 24px;
+	line-height: 28px;
+	padding-top: 21px;
+}
+
+.dr_lottery_banner_730 p {
+	color: #ffffff;
+	margin-left: 160px;
+	font-size: 15px;
+	line-height: 20px;
+}
+
+.dr_lottery_banner_pb {
+	width: 480px;
+	height: 110px;
+	display: block;
+	background: url('//ifrype.com/d/loterija/assets/img/banners/maks_bann.jpg');
+	text-decoration: none;
+	margin-bottom: 10px;
+	font-family: 'Open Sans', sans-serif;
+}
+
+.dr_lottery_banner_pb.sms {
+	background: url('//ifrype.com/d/loterija/assets/img/banners/maks_bann_2_v2.jpg');
+}
+
+.dr_lottery_banner_pb:hover {
+	text-decoration: none;
+}
+
+.dr_lottery_banner_pb h2 {
+	color: #ffb600;
+	margin-left: 180px;
+	font-size: 20px;
+	line-height: 24px;
+	padding-top: 16px;
+	text-transform: uppercase;
+}
+
+.dr_lottery_banner_pb ul {
+	color: #ffffff;
+	margin-left: 180px;
+	font-size: 13px;
+	line-height: 18px;
+}
+
+.dr_lottery_banner_pb ul li {
+	list-style: disc inside;
+	color: #ffb600;
+}
+
+.dr_lottery_banner_pb ul li span {
+	color: #ffffff;
+}
+
+.dr_lottery_banner_pb p {
+	color: #ffffff;
+	margin-left: 180px;
+	font-size: 14px;
+	line-height: 18px;
+	padding-right: 32px;
+	margin-top: 16px;
+}
+
+.ApiLottery {
+	background: url('/services/img/lottery/kreditu_kampana_maksajums_bg.jpg');
+	background-size: cover;
+	text-align: center;
+	color: #000000;
+}
+
+.ApiLottery.won {
+	padding: 32px 42px 16px;
+	font-size: 18px;
+	line-height: 26px;
+	font-weight: bold;
+}
+
+.ApiLottery.won img {
+	display: block;
+	margin: 8px auto 0;
+}
+
+.ApiLottery.lost {
+	padding: 16px 42px;
+	font-size: 16px;
+	line-height: 24px;
+}
+
+.ApiLottery.lost a {
+	color: #000000;
+}
+
+.lotteryBanner {
+	width: 100%;
+	background-color: #205a9a;
+	text-align: center;
+}
+
+.lotteryBanner > p, .lotteryBanner > span {
+	font-family: Montserrat, sans-serif;
+	font-size: 20px;
+	font-weight: 500;
+	font-style: normal;
+	font-stretch: normal;
+	line-height: 76px;
+	letter-spacing: 0.5px;
+	text-align: center;
+	color: #ffffff;
+}
+
+.lotteryBanner > p {
+	font-size: 16px;
+	line-height: 1.5;
+	letter-spacing: 0.4px;
+	margin: 0;
+	padding: 15px 30px 0 30px;
+}
+
+.lotteryBanner > div {
+	line-height: 1;
+	padding: 10px 0 15px;
+}
+
+.pbCredits > .buttonStretch {
+	padding: 0 120px;
+	box-sizing: border-box;
+}
+
+.pb .recommendations {
+	margin: 0 0 30px;
+	text-align: center;
+}
+
+.pb .recommendations h3 {
+	padding-bottom: 5px;
+}
+
+.pb .recommendations .items .item {
+	width: 112px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 4px;
+}
+
+.pb .recommendations .items .item > .wrapper {
+	min-height: 112px;
+	background: rgba(248, 248, 248, 0.85);
+	border: 1px solid #EDEDED;
+	box-sizing: border-box;
+	border-radius: 3px;
+	padding: 10px 0 4px 4px;
+	position: relative;
+}
+
+.pb .recommendations .items .item > .append {
+	font-size: 11px;
+	line-height: 11px;
+	color: #8E8E8E;
+	padding: 8px 0;
+	text-align: left;
+}
+
+.pb .recommendations .items .item .btnContainer {
+	margin: 0 4px 4px;
+}
+
+.pb .recommendations .items .item .btnContainer .buttonC {
+	padding: 0;
+}
+
+.pb .recommendations .items .item .recently_bought {
+	width: 72px;
+	height: 75px;
+	background: url("/services/img/tavs-iecienitais.svg") no-repeat center;
+	position: absolute;
+	top: -5px;
+	left: -5px;
+}
+
+.pb .recommendations .items .item .info {
+	color: #AEAEAE;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.pb .recommendations .items .item img.serviceIcon {
+	width: 50px;
+	height: 50px;
+	margin: 0 auto;
+	display: block;
+}
+
+.pb .recommendations .items .item .serviceCaption {
+	padding-top: 2px;
+	padding-bottom: 4px;
+	font-size: 12px;
+	font-weight: bold;
+	line-height: 14px;
+	text-align: center;
+}
+
+.pb .recommendations .items .item .options {
+	text-align: left;
+}

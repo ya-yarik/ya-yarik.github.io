@@ -1,0 +1,6020 @@
+if( !D.GalleryFS ) {
+	/**
+	 * @param {D.GalleryFSPar|Object} par
+	 * @constructor
+	 */
+	D.GalleryFS = function( par ) {
+		par = par || {};
+		this.aid = par.aid || 0;
+		this.pid = par.pid || 0;
+		this.current = par.i || 0;
+		this.pictures = [];
+		this.isPrev = false;
+		this.isNext = false;
+		this.itemObject = null;
+		this.tab = par.tab || 1;
+		this.fid = par.fid || null;
+		this.lastScreenActive = false;
+		this.search = par.search || null;
+		this.searchType = par.searchType || null;
+		this.events = {};
+		this.first = true;
+		this.fastInternet = false;
+		this.isFullScreen = false;
+		this.selectedScheme = D.store.get('gallery_color_scheme') || 'light';
+		this.hideLikeRecommend = D.store.get('gallery_hide_likeRec') || false;
+		this.isFullTags = false;
+		this.wasFullScreen = false;
+		this.nextImage = null;
+		this.autoPlay = par.autoPlay || false;
+		this.showDeleted = par.showDeleted || false;
+		this.fromSay = par.fromSay || false;
+		this.pids = par.pids || [];
+		this.hash = par.hash || '';
+		this.likeCount = 0;
+		this.seenRecPopup = false;
+		this.addToTopOpen = par.addToTop || false;
+		this.stats = par.stats || false;
+		this.tagActive = par.tagActive || false;
+		this.noHash = par.noHash || false;
+		this.startTime = par.startTime || false;
+		this._originalScrollTop = 0;
+		this.comId = par.comId || null;
+		this.noComId = false;
+		this.msTop = par.msTop || false;
+		this.placeId = par.placeId || null;
+		/**
+		 *
+		 * @type {DR.gallery.OtherGalleries}
+		 */
+		this.otherGalleriesItems = null;
+		D.GalleryFS.opened = true;
+		if( !empty(this.stats) ){
+			this.addStats(this.stats, true);
+		}
+		this.showWindow();
+		D.GalleryFS._inst = this;
+	};
+
+	D.GalleryFS.TYPE_PIC = 0;
+	D.GalleryFS.TYPE_VIDEO = 1;
+	D.GalleryFS.TYPE_EMBED = 2;
+	D.GalleryFS.TYPE_GIF = 3;
+	D.GalleryFS.LIKE_TYPE = 1;
+	D.GalleryFS.ALBUM_LIKE_TYPE = 37;
+	D.GalleryFS.l = new D.Lang('xGal');
+	D.GalleryFS.opened = false;
+	D.GalleryFS._inst = null;
+
+	D.GalleryFS.beforeCloseEvents = [];
+
+	D.GalleryFS.open = function( par ){
+		D.onLoad(['GalleryFS', 'Comments'], function(){
+			new D.GalleryFS(par);
+		});
+		return false;
+	};
+
+	D.GalleryFS.close = function(){
+		if( !D.GalleryFS._inst ){
+			return;
+		}
+		D.GalleryFS._inst.closeWindow();
+	};
+
+	D.GalleryFS.prototype = {
+		width: 0,
+		height: 0,
+		window: null,
+		commentsWidth: 336,
+		tab: 1,
+		popupPadding: 48,
+		bodyPadding: 32,
+		thumbsTitleSpace: 40,
+		bodyVerticalPadding: 8,
+		bottomContentHeight: 48,
+		sidebarWidth: 48,
+		largeLast: 1268,
+		schemes: {
+			light: true,
+			medium: false,
+			dark: true,
+			extradark: true
+		},
+		selectedScheme: 'light',
+		showWindow: function(){
+			D.Modal.resizeOnClose = true;
+			this.window = mkE({
+				tag: 'div',
+				id: 'GalleryFSWindowContainer',
+				className: this.selectedScheme,
+				els: [
+					this.windowInnerWrapper = mkE({
+						tag: 'div',
+						className: 'innerWrapper',
+						els: [
+
+							this.galleryTitleCont = mkE({
+								tag: 'span',
+								className: 'galleryTitle',
+								els: [
+									this.galleryTitle = mkE({
+										tag: 'a'
+									})
+								]
+							}),
+							this.closeButton = mkE({
+								tag: 'a',
+								id: 'GalleryFSClose',
+								className: 'radius3',
+								prop: {
+									onclick: D.closure(this, this.closeWindow, 'x')
+								}
+							}),
+							this.windowNode = mkE({
+								tag: 'div',
+								id: 'GalleryFSWindow',
+								els: [
+									this.leftSidebar = mkE({
+										tag: 'div',
+										id: 'GalleryFSLeft',
+										els: [
+											{
+												tag: 'div',
+												els: [
+													this.galleryInfo = mkE({
+														tag: 'div',
+														className: 'galleryInfo'
+													}),
+													this.leftScroll = mkE({
+														tag: 'div',
+														els: [
+															this.leftScrollContent = mkE({
+																tag: 'div',
+																id: 'GalleryFSLeftScrollContent',
+																els: [
+																	{
+																		tag: 'div',
+																		className: 'galleryTourStep2',
+																		els: [
+																			this.realAuthor = mkE({
+																				tag: 'div'
+																			}),
+																			this.sayContent = mkE({
+																				tag: 'div'
+																			}),
+																			this.galleryDescription = mkE({
+																				tag: 'div',
+																				className: 'galleryDescription'
+																			}),
+																			this.tagsList = mkE({
+																				tag: 'div',
+																				className: 'tagsList'
+																			}),
+																			this.likesList = mkE({
+																				tag: 'div',
+																				className: 'likesList'
+																			}),
+																			{
+																				tag: 'div',
+																				className: 'separator'
+																			}
+																		]
+																	},
+																	this.commentsNode = mkE({
+																		tag: 'div',
+																		id: 'galleryComments'
+																	})
+																]
+															})
+														]
+													})
+												]
+											},
+											this.commentsForm = mkE({
+												tag: 'div',
+												className: 'galleryCommentsSpecial galleryComments comments'
+											}),
+											this.myGalleryStats = mkE({
+												tag: 'div',
+												id: 'FSMyGalleryStats'
+											}),
+											this.otherGalleriesNode = mkE({
+												tag: 'div',
+												className: 'otherGalleries'
+											}),
+											this.bannerCont = mkE({
+												tag: 'div'
+											})
+										]
+									}),
+									this.bodyContainer = mkE({
+										tag: 'div',
+										id: 'GalleryFSBodyContainer',
+										els: [
+											this.header = mkE({
+												tag: 'div',
+												id: 'GalleryFSHeader',
+												els: [
+													{
+														tag: 'div',
+														id: 'GalleryFSHeaderInfo',
+														els: [
+															this.thumbnails = new D.GalleryFS.Thumbnails({
+																window: this,
+																onclick: D.closure(this, this.thumbClick)
+															}),
+															this.galleryAd = mkE({
+																tag: 'div',
+																className: 'galleryAd',
+																id: 'GalleryTopAd',
+																els: [
+																	this.galleryAdString = mkE({
+																		tag: 'div',
+																		className: 'item'
+																	})
+																]
+															})
+														]
+													}
+												]
+											}),
+											this.body = mkE({
+												tag: 'div',
+												id: 'GalleryFSBody',
+												els: [
+													this.content = mkE({
+														tag: 'div',
+														id: 'GalleryFSContent',
+														els: [
+															this.prevButtonBg = mkE({
+																tag: 'div',
+																className: 'prevButtonBackground'
+															}),
+															this.nextButtonBg = mkE({
+																tag: 'div',
+																className: 'nextButtonBackground'
+															}),
+															this.itemNode = mkE({
+																tag: 'div',
+																id: 'galleryItem'
+															}),
+															this.prevButton = mkE({
+																tag: 'a',
+																className: 'prevButton',
+																els: [
+																	{
+																		tag: 'div'
+																	}
+																],
+																prop: {
+																	onclick: D.closure(this, this.previousPicture)
+																}
+															}),
+															this.nextButton = mkE({
+																tag: 'a',
+																className: 'nextButton',
+																els: [
+																	{
+																		tag: 'div'
+																	}
+																],
+																prop: {
+																	onclick: D.closure(this, this.nextPicture)
+																}
+															}),
+															this.lastWindow = mkE({
+																tag: 'div',
+																id: 'galleryLastWindow',
+																els: [
+																	this.lastCurrent = mkE({
+																		tag: 'div',
+																		className: 'current'
+																	}),
+																	this.lastOther = mkE({
+																		tag: 'div',
+																		className: 'other'
+																	})
+																]
+															})
+														]
+													}),
+													this.side = mkE({
+														tag: 'div',
+														id: 'GalleryFSSide',
+														els: [
+															{
+																tag: 'div',
+																className: 'sh4re',
+																els: [
+																	this.recommendButton = mkE({
+																		tag: 'a',
+																		className: 'sh4reButton recommend',
+																		attr: {
+																			tooltip: D.GalleryFS.l.get('Ieteikt draugiem')
+																		}
+																	}),
+																	this.likeButton = mkE({
+																		tag: 'a',
+																		className: 'sh4reButton like',
+																		attr: {
+																			tooltip: D.Lang.get('I like it')
+																		},
+																		onclick: D.closure(this, this._like)
+																	}),
+																	this.tagButton = mkE({
+																		tag: 'a',
+																		className: 'sh4reButton tag',
+																		attr: {
+																			tooltip: D.GalleryFS.l.get('Picture option select user')
+																		}
+																	})
+																]
+															},
+															this.toggleFullScreenNode = mkE({
+																tag: 'a',
+																className: 'toggleFullscreen radius3',
+																prop: {
+																	onclick: D.closure(this, this.toggleFullscreen)
+																},
+																attr: {
+																	tooltip: D.GalleryFS.l.get('fullscreen_mode')
+																}
+															}),
+															this.moreOptionsBlock = mkE({
+																tag: 'ul',
+																className: 'moreOptionsBlock radius3',
+																els: [
+
+																]
+															}),
+															{
+																tag: 'a',
+																className: 'moreOptions radius3',
+																prop: {
+																	onclick: D.closure(this, this.toggleOptions)
+																}
+															}//,
+															//this.feedback = new D.GalleryFS.Feedback(this)
+														]
+													}),
+													this.bottomContent = mkE({
+														tag: 'div',
+														className: 'bottomContent',
+														els: [
+															this.prevLinkButton = mkE({
+																tag: 'div',
+																className: 'prevLinkButton',
+																els: [
+																	{
+																		tag: 'a',
+																		text: '← ' + D.GalleryFS.l.get('iepriekšējā'),
+																		prop: {
+																			onclick: D.closure(this, this.previousPicture)
+																		}
+																	}
+																]
+															}),
+															this.whatPic = mkE({
+																tag: 'div',
+																className: 'whatPic',
+																els: [
+																	this.whatCurrent = mkE({
+																		tag: 'span',
+																		className: 'current',
+																		text: '0'
+																	}),
+																	'. ',
+																	D.GalleryFS.l.get('no'),
+																	' ',
+																	this.whatTotal = mkE({
+																		tag: 'span',
+																		className: 'total',
+																		text: '0'
+																	})
+																]
+															}),
+															this.nextLinkButton = mkE({
+																tag: 'div',
+																className: 'nextLinkButton',
+																els: [
+																	{
+																		tag: 'a',
+																		text: D.GalleryFS.l.get('nākošā') + ' →',
+																		prop: {
+																			onclick: D.closure(this, this.nextPicture)
+																		}
+																	}
+																]
+															}),
+															{
+																tag: 'div',
+																className: 'galStatsAndEdit',
+																els: [
+																	this.galStats = mkE({
+																		tag: 'span',
+																		className: 'galleryStats'
+																	}),
+																	this.galEdit = mkE({
+																		tag: 'span',
+																		className: 'galleryEdit'
+																	})
+																]
+															}
+														]
+													})
+												]
+											}),
+											this.bodyOverlay = mkE({
+												tag: 'div',
+												className: 'bodyOverlay'
+											})
+										]
+									})
+								]
+							})
+						],
+						prop: {
+							onclick: D.closure(this, function(e){
+								e = D.event(e);
+								if( D.GalleryFS._inst && e.target.className == 'innerWrapper' ){
+									if( !this.canClose() ){
+										return;
+									}
+									D.GalleryFS._inst.closeWindow('overlay');
+								}
+							})
+						}
+					})
+				],
+				prop: {
+					onclick: D.closure(this, this.onClick)
+				}
+			}).append(document.body);
+
+			var scrollBarPar = new T.ScrollBarPar();
+			scrollBarPar.parent = this.leftScroll;
+			scrollBarPar.element = this.leftScrollContent;
+			if( window.navigator && window.navigator.platform.indexOf('Mac') > -1 ){
+				scrollBarPar.speed = 10;
+			}
+			this.leftScrollBar = new T.ScrollBar(scrollBarPar);
+
+			this._originalScrollTop = document.body.scrollTop || document.documentElement.scrollTop || 0;
+
+			this.onResize();
+			this.bindEvents();
+
+			new T.Tooltip({
+				node: this.recommendButton,
+				position: 'left'
+			});
+			new T.Tooltip({
+				node: this.likeButton,
+				position: 'left'
+			});
+			new T.Tooltip({
+				node: this.tagButton,
+				position: 'left'
+			});
+			new T.Tooltip({
+				node: this.toggleFullScreenNode,
+				position: 'left'
+			});
+
+			this.window.style.zIndex = Math.max(InfoBox.zIndex, 1001) + 1;
+			InfoBox.zIndex = Math.max(InfoBox.zIndex, 1001) + 1;
+
+			if( this.pid && this.tab == 1 ){
+				this.loadItem( this.pid );
+				this.first = false;
+				return;
+			}
+			if( this.aid ){
+				this.loadAlbum( this.aid );
+				this.first = false;
+				return;
+			}
+			if( this.tab ){
+				this.loadTab({
+					first: true
+				});
+				this.first = false;
+			}
+		},
+		canClose: function(){
+			for( var i = 0, l = D.GalleryFS.beforeCloseEvents.length; i < l; i++ ){
+				if( typeof D.GalleryFS.beforeCloseEvents[i] == 'function' && !D.GalleryFS.beforeCloseEvents[i]() ){
+					return false;
+				}
+			}
+			return true;
+		},
+		bindEvents: function(){
+			this.events.resize = D.closure(this, this.onResize);
+			this.events.keyup = D.closure(this, this.onKeyUp);
+			$(window).on('resize.galleryfs', this.events.resize);
+			$(document).on('keyup.galleryfs', this.events.keyup);
+		},
+		unbindEvents: function(){
+			$(window).off('resize.galleryfs');
+			$(document).off('keyup.galleryfs');
+		},
+		onResize: function(){
+			if( !D.GalleryFS.opened ){
+				return;
+			}
+			document.body.style.overflow = 'hidden';
+
+			/*var viewPortWidth;
+			var viewPortHeight;
+			viewPortWidth = this.window.childNodes[0].clientWidth - (this.popupPadding * 2);
+			viewPortHeight = this.window.childNodes[0].clientHeight - this.popupPadding;*/
+
+			this.width = Math.max(980, /*viewPortWidth, */this.window.clientWidth);
+			this.height = Math.max(612, /*viewPortHeight, */this.window.clientHeight);
+
+			document.body.style.minHeight = this.height + 'px';
+
+			this.windowInnerWrapper.style.width = this.width + 'px';
+			this.windowInnerWrapper.style.height = this.height - this.popupPadding + 'px';
+			this.windowNode.style.width = this.width - (this.popupPadding * 2) + 'px';
+			this.windowNode.style.height = this.height - this.popupPadding + 'px';
+
+			var bodyWidth = this.width - (this.popupPadding * 2) - this.commentsWidth - this.bodyPadding;
+			this.bodyContainer.style.width = bodyWidth + 'px';
+			this.bodyContainer.style.height = this.height - this.popupPadding - this.bodyVerticalPadding + 'px';
+			this.body.style.height = this.height - this.popupPadding - this.bodyVerticalPadding - this.thumbsTitleSpace + 'px';
+			this.content.style.height = this.height - this.popupPadding - this.bodyVerticalPadding - this.thumbsTitleSpace - this.bottomContentHeight + 'px';
+			this.bottomContent.style.width = bodyWidth - this.sidebarWidth + 'px';
+			this.content.style.width = bodyWidth - this.sidebarWidth + 'px';
+			if( this.lastOther.style.display == 'none' ){
+				this.lastCurrent.style.width = '100%';
+			}else{
+				if( this.width >= this.largeLast ) {
+					this.lastCurrent.style.width = 'auto';
+				}else{
+					this.lastCurrent.style.width = '484px';
+				}
+			}
+
+			if( this.width != Math.max(980, this.window.childNodes[0].clientWidth, this.window.clientWidth) || this.height != Math.max(612, this.window.childNodes[0].clientHeight, this.window.clientHeight ) ){
+				this.onResize();
+			}
+
+			this.leftScroll.style.height = this.height - this.popupPadding - this.galleryInfo.offsetHeight - this.commentsForm.offsetHeight - this.myGalleryStats.offsetHeight - this.bannerCont.offsetHeight - this.otherGalleriesNode.offsetHeight + 'px';
+			this.leftScrollBar.refresh();
+
+			this.window.style.display = 'none';
+			this.window.offsetHeight;
+			this.window.style.display = '';
+			this.resizeItem();
+			this.checkCommentsForm();
+		},
+		onKeyUp: function(e){
+			e = D.event(e);
+			var disableEvent = false;
+			if( T.tour.open || InfoBox.opened || D.smallPopUp.opened ){
+				disableEvent = true;
+			}
+			if( document.activeElement && (document.activeElement.contentEditable === 'true' || in_array(document.activeElement.tagName, ['INPUT', 'TEXTAREA'])) ){
+				disableEvent = true;
+			}
+			if( D.GalleryTagLarge && D.GalleryTagLarge.activeTagging && in_array(e.keyCode, [27, 37, 39, 79]) ){
+				disableEvent = true;
+			}
+			if( disableEvent ){
+				var tagAc = $('.galTagAc');
+				if( D.GalleryTagLarge && D.GalleryTagLarge.activeTagging && (!e.target || !tagAc || !tagAc[0] || !tagAc[0].contains(e.target)) ){
+					D.GalleryTagLarge.disable();
+					this.itemObject.item.onEndTag()
+				}
+				return true;
+			}
+			switch( e.keyCode ){
+				case 27:
+					// Esc
+					if( (e.target && e.target.type == 'file') || this.wasFullScreen || (this.itemObject.videoPlayer && this.itemObject.videoPlayer.fullscreen) ){
+						this.wasFullScreen = false;
+						this.toggleFullscreen(null, true);
+						return true;
+					}
+					if( !this.canClose() ){
+						return;
+					}
+					this.closeWindow('esc');
+					if( e.stopImmediatePropagation ){
+						e.stopImmediatePropagation()
+					}else{
+						e.isImmediatePropagationEnabled = false;
+						e.cancelBubble = true;
+					}
+					break;
+				case 39:
+					// Bulta pa labi
+					if( this.lastScreenActive && this.otherGalleries ){
+						this.otherGalleries.openAlbum();
+					}else{
+						this.nextPicture();
+					}
+					if( e.stopImmediatePropagation ){
+						e.stopImmediatePropagation()
+					}else{
+						e.isImmediatePropagationEnabled = false;
+						e.cancelBubble = true;
+					}
+					break;
+				case 37:
+					// Bulta pa kreisi
+					if( this.lastScreenActive && this.lastView ){
+						this.lastView.goToLast();
+					}else{
+						this.previousPicture();
+					}
+					if( e.stopImmediatePropagation ){
+						e.stopImmediatePropagation()
+					}else{
+						e.isImmediatePropagationEnabled = false;
+						e.cancelBubble = true;
+					}
+					break;
+				case 13:
+				case 32:
+					// Space, Enter
+					if( this.lastScreenActive && this.width < this.largeLast ){
+						this.otherGalleries.openAlbum();
+					}
+					break;
+				case 70:
+					// f
+					this.toggleFullscreen();
+					break;
+			}
+		},
+		closeWindow: function(type, changeUrl){
+			if( this.window ){
+				if( this.isFullScreen ){
+					this.toggleFullscreen();
+				}
+				if( type ){
+					var method = new DR.gallery.CloseStats();
+					method.type = type;
+					method.call();
+				}
+				this.unbindEvents();
+				D.Modal.resizeOnClose = false;
+				document.body.style.overflow = '';
+				document.body.style.minHeight = '';
+				this.window.remove();
+				if( changeUrl !== false ){
+					D.setUrlHash('...');
+				}
+				D.GalleryFS._inst = null;
+				D.GalleryFS.opened = false;
+			}
+			document.body.scrollTop = this._originalScrollTop;
+			document.documentElement.scrollTop = this._originalScrollTop;
+		},
+		drawItem: function(){
+			if( !this.item || !this.item.image ){
+				return;
+			}
+			clearNode(this.itemNode);
+			this.itemObject = new D.GalleryFS.Item({
+				data: this.item,
+				window: this
+			}).append(this.itemNode);
+		},
+		resizeItem: function(){
+			if( !this.itemObject ){
+				return;
+			}
+			this.itemObject.onResize();
+		},
+		toggleOptions: function(e){
+			e = D.event(e);
+			if( this.feedback ) {
+				this.feedback.hide();
+			}
+			if( this.moreOptionsBlock.visible ){
+				this.moreOptionsBlock.visible = false;
+				this.moreOptionsBlock.style.display = 'none';
+			}else{
+				this.moreOptionsBlock.visible = true;
+				this.moreOptionsBlock.style.display = 'block';
+			}
+			if( e.stopImmediatePropagation ){
+				e.stopImmediatePropagation()
+			}else{
+				e.isImmediatePropagationEnabled = false;
+				e.cancelBubble = true;
+			}
+		},
+		hideOptions: function(){
+			this.moreOptionsBlock.visible = false;
+			this.moreOptionsBlock.style.display = 'none';
+		},
+		toggleFullscreen: function(e, esc){
+			if( this.isFullScreen ){
+				this.isFullScreen = false;
+				this.popupPadding = 48;
+				removeClassName(this.window, 'fullscreen');
+				this.toggleFullScreenNode.setAttribute('tooltip', D.GalleryFS.l.get('fullscreen_mode'));
+				T.Tooltip.refresh();
+				this.onResize();
+				if(!esc) {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.mozCancelFullScreen) {
+						document.mozCancelFullScreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+				}
+				this.wasFullScreen = false;
+				this.commentsWidth = 336;
+				this.leftSidebar.style.display = '';
+				this.thumbsTitleSpace = 40;
+				this.header.style.display = '';
+				this.bottomContentHeight = 48;
+				this.bottomContent.style.display = '';
+				this.onResize();
+				return;
+			}
+
+			var method = new DR.gallery.FullScreenStats();
+			method.call();
+
+			this.isFullScreen = true;
+			this.popupPadding = 0;
+			addClassName(this.window, 'fullscreen');
+			this.toggleFullScreenNode.setAttribute('tooltip', D.GalleryFS.l.get('fullscreen_mode_off'));
+			T.Tooltip.refresh();
+
+			this.commentsWidth = 0;
+			this.leftSidebar.style.display = 'none';
+			this.thumbsTitleSpace = 0;
+			this.header.style.display = 'none';
+			this.bottomContentHeight = 8;
+			this.bottomContent.style.display = 'none';
+
+			this.onResize();
+			if (document.documentElement.requestFullscreen) {
+				document.documentElement.requestFullscreen();
+			} else if (document.documentElement.webkitRequestFullscreen) {
+				document.documentElement.webkitRequestFullscreen();
+			} else if (document.documentElement.mozRequestFullScreen) {
+				document.documentElement.mozRequestFullScreen();
+			} else if (document.documentElement.msRequestFullscreen) {
+				document.documentElement.msRequestFullscreen();
+			}
+			this.wasFullScreen = true;
+			this.onResize();
+		},
+		onClick: function(e){
+			e = D.event(e);
+			if( this.feedback ) {
+				this.feedback.hide();
+			}
+			this.hideOptions();
+			if( e.target.id == 'GalleryFSWindowContainer' ){
+				this.closeWindow('overlay');
+			}
+		},
+		onCommentsLoaded: function(){
+			this.leftScroll.style.height = this.height - this.popupPadding - this.galleryInfo.offsetHeight - this.commentsForm.offsetHeight + 'px';
+			this.leftScrollBar.refresh();
+			var freeSpace = this.leftScrollBar.parentHeight - this.leftScrollBar.elementHeight;
+			var sidebarEls = {
+				galleries: false,
+				stats: false,
+				banner: true
+			};
+			var rand = Math.floor((Math.random() * 5) + 1);
+			if( freeSpace > 380 && D.ID != this.item.uid ){
+				sidebarEls.galleries = true;
+				sidebarEls.stats = true;
+			}else if( freeSpace > 240 && D.ID != this.item.uid ){
+				sidebarEls.galleries = true;
+			}else if( freeSpace > 140 ){
+				sidebarEls.stats = true;
+			}
+
+			if( sidebarEls.stats ){
+				if( this.myGalleryStats.childNodes.length == 0 && this.galleryStatsBlock ){
+					this.galleryStatsBlock.append(this.myGalleryStats);
+					this.myGalleryStats.style.padding = '0 16px';
+				}
+			}else{
+				clearNode(this.myGalleryStats);
+				this.myGalleryStats.style.padding = 0;
+			}
+
+			if( sidebarEls.galleries ){
+				this.drawOtherGalleries();
+				this.otherGalleriesNode.style.paddingTop = 16 + 'px';
+			}else{
+				clearNode(this.otherGalleriesNode);
+				this.otherGalleriesNode.style.paddingTop = 0;
+			}
+
+			if( sidebarEls.banner ){
+				// mkE({
+				// 	tag: 'a',
+				// 	href: '/stats/click.php?key=klondike_from_gal&url=/klondike',
+				// 	els: [
+				// 		{
+				// 			tag: 'img',
+				// 			src: D.PIMG + 'gallery/img/banners/304_220_z.jpg',
+				// 			style: {
+				// 				width: '304px',
+				// 				height: '220px'
+				// 			}
+				// 		}
+				// 	]
+				// }).append(this.bannerCont);
+
+				if ( this.comments && this.comments._items && Object.keys(this.comments._items).length > 0 ) {
+					clearNode( this.bannerCont );
+				} else if ( this.bannerCont.childNodes.length === 0 || (this.current + 1) % 3 === 1 ) {
+					clearNode( this.bannerCont );
+					try {
+						var adNode = mkE({
+							tag: 'div'
+						}).append(this.bannerCont);
+						new D.Ads.AdSense({
+							adNode: adNode,
+							adSlot: 2999649031,
+							placeId: 381,
+							styleDisplay: 'inline-block',
+							styleWidth: '304px',
+							styleHeight: '250px'
+						});
+					} catch( e ) {
+						if( D.DEV ) {
+							console.error(e);
+						}
+					}
+				}
+
+				this.bannerCont.style.padding = '16px';
+				this.bannerCont.style.paddingTop = 0;
+			}else{
+				clearNode(this.bannerCont);
+				this.bannerCont.style.padding = 0;
+			}
+
+			if( freeSpace - this.otherGalleriesNode.offsetHeight - this.myGalleryStats.offsetHeight > 180 ){
+				this.fullDescription();
+			} else if (this.item.aid == 67825634 || this.item.aid == 68715532 || this.item.aid == 68814441  || this.item.aid == 69774956 ) {
+				// jo reklāma, thats why..
+				this.fullDescription();
+			} else if (this.item.spamPic && this.item.spamPic.search('galcon') === 0) {
+				this.fullDescription();
+			}
+
+			this.onResize();
+			addResizeListener( this.commentsForm, D.closure(this, this.checkCommentsForm) );
+			addResizeListener( this.commentsNode, D.closure(this, this.checkCommentsForm) );
+			this.leftScrollBar.refresh();
+			this.checkCommentsForm();
+		},
+		setEndOfContenteditable: function(contentEditableElement){
+			var range,selection;
+			if(document.createRange){
+				range = document.createRange();
+				range.selectNodeContents(contentEditableElement);
+				range.collapse(false);
+				selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}else if(document.selection){
+				range = document.body.createTextRange();
+				range.moveToElementText(contentEditableElement);
+				range.collapse(false);
+				range.select();
+			}
+		},
+		checkCommentsForm: function(){
+			if( !this.comments || !this.item || this.comments.id != this.item.id ){
+				return;
+			}
+			if( this.comments && this.comments._form && this.comments._form._editor ){
+				this.comments._form._editor.globalAC = true;
+			}
+			var focused = this.comments._form && existsClassName(this.comments._form._editorBorder, 'formItemFocus');
+			if( this.leftScrollContent.offsetHeight + 80 > this.leftScroll.offsetHeight ){
+				if( !this.comments.customReply ){
+					if(this.comments._form){
+						this.comments._form.append( this.commentsForm );
+						if( this.comments._form._editor ){
+							this.comments._form._editor.mentionListUp = true;
+						}
+						if( this.comments._form && focused ){
+							if( this.comments._form._editor ) {
+								this.setEndOfContenteditable(this.comments._form._editor._content);
+							}
+							this.comments._form.focus();
+						}
+					}
+				}
+				this.leftScroll.style.height = this.height - this.popupPadding - this.galleryInfo.offsetHeight - this.commentsForm.offsetHeight - this.myGalleryStats.offsetHeight - this.bannerCont.offsetHeight - this.otherGalleriesNode.offsetHeight + 'px';
+				this.leftScrollBar.refresh();
+				this.comments.defaultFormPlace = this.commentsForm;
+				if( this.comments._form && focused ){
+					this.setEndOfContenteditable(this.comments._form._editor._content);
+					this.comments._form.focus();
+				}
+				return;
+			}
+			if( this.comments._form && D.GalleryFS._inst && D.GalleryFS._inst.comments && D.GalleryFS._inst.comments._form && this.comments._form._editor ){
+				this.comments._form._editor.mentionListUp = D.GalleryFS._inst.comments._form.node.offsetTop > 300;
+			}
+			this.leftScroll.style.height = this.height - this.popupPadding - this.galleryInfo.offsetHeight - this.commentsForm.offsetHeight - this.myGalleryStats.offsetHeight - this.bannerCont.offsetHeight - this.otherGalleriesNode.offsetHeight + 'px';
+			this.leftScrollBar.refresh();
+			this.comments.defaultFormPlace = this.comments.node;
+			if( this.comments.form && focused ){
+				this.comments.form.focus();
+			}
+		},
+		loadItem: function( pid, methods ){
+			/** @type {Number} */
+			pid = pid || this.pid;
+			this.pid = pid;
+
+			methods = methods || [];
+
+			if( !this.sayProfiles && D.ID ){
+				this._mSayProfiles = new DR.say.GetProfiles();
+				this._mSayProfiles.select = [
+					new DR.users.select.User().id().title()
+				];
+				this._mSayProfiles.onLoad = D.closure(this, this.onSayProfiles);
+				methods.push(this._mSayProfiles);
+			}else if( !this.sayProfiles && !D.ID ) {
+				this.sayProfiles = [];
+			}
+
+			if( (!D.store.get('gallery_color_scheme') || D.store.get('seen_gal_new_tour') === null) && D.ID ){
+				var settingsMethod = new DR.gallery.GetSettings;
+				settingsMethod.select = [
+					new DR.gallery.select.Settings().all()
+				];
+				settingsMethod.onLoad = D.closure(this, function(){
+					if( !settingsMethod || settingsMethod.error || !settingsMethod.re ){
+						return;
+					}
+					D.store.set('seen_gal_new_tour', settingsMethod.re.seenTour);
+					this.toggleScheme( settingsMethod.re.colorScheme );
+					D.store.set('gallery_hide_likeRec', settingsMethod.re.hideLikeRecommend);
+					this.hideLikeRecommend = settingsMethod.re.hideLikeRecommend;
+				});
+				methods.push(settingsMethod);
+			}else if( !D.ID ){
+				D.store.set('seen_gal_new_tour', true);
+				D.store.set('gallery_color_scheme', 'light');
+				D.store.set('gallery_hide_likeRec', true);
+			}
+
+			if( !this.pictures.length ){
+				/**
+				 * @type {DR.gallery.GetTabPids} itemMethod
+				 */
+				var pidsMethod = new DR.gallery.GetTabPids;
+				pidsMethod.tab = 1;
+				pidsMethod.pid = pid;
+				pidsMethod.count = 100;
+				pidsMethod.first = true;
+				pidsMethod.select = [
+					new DR.gallery.select.GetPidsRe().all()
+				];
+				pidsMethod.onLoad = D.closure(this, function(){
+					this.thumbnails.addPids( pidsMethod.re, false );
+				});
+				methods.push(pidsMethod);
+
+				/**
+				 * @type {DR.gallery.Thumbnails} itemMethod
+				 */
+				var thumbnailsMethod = new DR.gallery.Thumbnails;
+				thumbnailsMethod.pid = pid;
+				thumbnailsMethod.select = [
+					new DR.gallery.select.ThumbnailsRe().all(),
+					new DR.gallery.select.Thumbnail().all(),
+					new DR.gallery.select.Image().icon()
+				];
+				thumbnailsMethod.onLoad = D.closure(this, function(){
+					this.thumbnails.addImages( thumbnailsMethod.re.items );
+				});
+				methods.push(thumbnailsMethod);
+
+				var ipMethod = new DR.users.GetIPInfo;
+				ipMethod.select = [
+					new DR.users.select.IPInfo().all()
+				];
+				ipMethod.onLoad = D.closure(this, function(){
+					if( !ipMethod || ipMethod.error || !ipMethod.re ){
+						return;
+					}
+					if( !ipMethod.re.mobile && ipMethod.re.country == 'LV' ){
+						this.fastInternet = true;
+						return;
+					}
+					this.fastInternet = false;
+				});
+				methods.push(ipMethod);
+			}
+
+			this.nextImage = null;
+
+			if( this.current + 1 < this.pictures.length ){
+				var nextImageMethod = new DR.gallery.NextImage();
+				nextImageMethod.pid = this.pictures[ this.current + 1 ];
+				nextImageMethod.onLoad = D.closure(this, function(){
+					if( nextImageMethod && !nextImageMethod.error && nextImageMethod.re ){
+						this.nextImage = nextImageMethod.re;
+					}
+				});
+				nextImageMethod.select = [
+					new DR.gallery.select.Image().uber().wLarge().hLarge().original().w().h()
+				];
+				methods.push(nextImageMethod);
+			}
+
+			this.itemMethod = new DR.gallery.GetItems;
+			this.itemMethod.ids = [ pid ];
+			this.itemMethod.showDeleted = this.showDeleted;
+			this.itemMethod.fromSay = this.fromSay;
+			if( this.tab == 31 ){
+				this.itemMethod.hash = this.hash;
+				this.itemMethod.pids = this.pids;
+			}
+
+			this.itemMethod.select = [
+				new DR.gallery.select.Item().all(),
+				new DR.gallery.select.Album().id().title().sayGal().profGal().href().uid().canEdit().nextAlbum().prevAlbum().is18().permissions().canAddItem().profileCoverGal().user(),
+				new DR.gallery.select.Image().uber().wLarge().hLarge().original().w().h(),
+				new DR.gallery.select.Video().ready().w().h().url().format(),
+				new DR.gallery.select.Embed().all(),
+				new DR.gallery.select.Gif().all(),
+				new DR.users.select.User().id().title().url().image().type(),
+				new DR.users.select.UserDefault().isFriend().aktitle(),
+				new DR.users.select.UserBusiness().pro(),
+				new DR.users.select.Image().icon(),
+				new DR.gallery.select.SelectedUser().all(),
+				new DR.say.select.Item().id().recommended().canRecommend().content(),
+				new DR.say.select.ItemContent().linkInfo(),
+				new DR.say.select.LinkInfo().all(),
+				new DR.places.select.Item().id().name().url(),
+				new DR.say.select.With().all()
+			];
+			this.itemMethod.onLoad = D.closure(this, function(){
+				this.loadItemRe( this.itemMethod );
+			});
+			methods.push(this.itemMethod);
+
+            if( D.ID ){
+    			var viewMethod = new DR.gallery.AddView();
+    			viewMethod.pids = [pid];
+    			methods.push(viewMethod);
+            }
+
+			this._mLikeGet = new DR.like.Get;
+			this._mLikeGet.type = D.GalleryFS.LIKE_TYPE;
+			this._mLikeGet.id = pid;
+			this._mLikeGet.select = [
+				new DR.like.select.GetRe().all(),
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon()
+			];
+			this._mLikeGet.onLoad = D.closure(this, this.likes, this._mLikeGet);
+			methods.push(this._mLikeGet);
+
+			if( this.first ){
+				this.otherGalleriesItems = null;
+				var otherGalleriesMethod = new DR.gallery.OtherGalleries;
+				otherGalleriesMethod.pid = pid;
+				otherGalleriesMethod.count = 9;
+				otherGalleriesMethod.select = [
+					new DR.gallery.select.OtherGalleriesRe().all(),
+					new DR.gallery.select.Album().id().title().thumbItem(),
+					new DR.gallery.select.Item().image(),
+					new DR.gallery.select.Image().small()
+				];
+				otherGalleriesMethod.onLoad = D.closure(this, function(){
+					this.otherGalleriesItems = otherGalleriesMethod;
+				});
+				methods.push(otherGalleriesMethod);
+
+				if( D.ID ){
+					/*this._mStatsGet = new DR.gallery.stats.Get;
+					this._mStatsGet.pg = 1;
+					this._mStatsGet.count = 2;
+					this._mStatsGet.select = [
+						new DR.gallery.stats.select.GetRe().all(),
+						new DR.gallery.stats.select.User().all(),
+						new DR.gallery.stats.select.Album().all(),
+						new DR.gallery.select.Album().id().title().thumbItem(),
+						new DR.gallery.select.Item().image(),
+						new DR.gallery.select.Image().small(),
+						new DR.users.select.User().title().url().image().type(),
+						new DR.users.select.Image().small()
+					];
+					this._mStatsGet.onLoad = D.closure(this, this._mStatsGetRe);
+					methods.push(this._mStatsGet);*/
+					this._mStatsGet = new DR.gallery.stats.GetBlockParams;
+					this._mStatsGet.onLoad = D.closure(this, this._mStatsGetRe);
+					methods.push(this._mStatsGet);
+				}
+
+				this.first = false;
+			}
+
+			var apiCall = new DR.ApiCall( {
+				methods: methods,
+				onLoad: function(){
+					this.checkControls();
+				},
+				context: this
+			} );
+
+			clearNode(this.commentsForm);
+			clearNode(this.commentsNode);
+			this.comments = new D.Comments({
+				type: 40,
+				id: this.pid,
+				parent: this.commentsNode,
+				className: 'galleryComments',
+				noReplyIcon: true,
+				onInit: D.closure(this, this.onCommentsLoaded),
+				onPageChange: D.closure(this, this.checkCommentsForm),
+				specialForm: true,
+				specialFormOffsetEl: this.leftScroll,
+				apiCall: apiCall,
+				scrollParent: this.leftScroll,
+				comId: this.comId || null,
+				noComId: this.noComId
+			});
+
+			apiCall.call();
+		},
+		/**
+		 * @param {DR.gallery.GetItems} items
+		 */
+		loadItemRe: function( items ){
+			if( items && !items.error && items.re && items.re.items[this.pid] ){
+				/*var seenPictures = D.store.get('new_gal_seen_pics');
+				if( !seenPictures ){
+					seenPictures = 1;
+				}
+				seenPictures++;
+				if( seenPictures == 5 ){
+					if( this.feedback ) {
+						this.feedback.toggle();
+					}
+				}
+				D.store.set('new_gal_seen_pics', seenPictures);*/
+				this.item = items.re.items[ this.pid ];
+				if( this.showDeleted ){
+					this.current = 0;
+					this.pictures = [ this.pid ];
+				}else{
+					this.current = this.thumbnails.pidToIndex[ this.pid ];
+					this.thumbnails.setActive(this.current, true);
+					this.thumbnails.checkControls();
+				}
+				setNodeText(this.whatCurrent, this.current + 1);
+				//this.thumbnails.thumbnailsNode.setAttribute('title', (this.current + 1) + '. ' + D.GalleryFS.l.get('no') + ' ' + this.pictures.length);
+				for( var i in this.thumbnails.thumbnails ){
+					if( !this.thumbnails.thumbnails.hasOwnProperty(i) ){
+						continue;
+					}
+					i = parseInt(i);
+					this.thumbnails.thumbnails[i].node.setAttribute('title', (i + 1) + '. ' + D.GalleryFS.l.get('no') + ' ' + this.pictures.length);
+				}
+				this.itemInfo();
+				this.drawItem();
+				this.recommendStatus();
+				this.optionLinks();
+				if( !D.GalleryFS.opened ){
+					return;
+				}
+				if( !this.noHash ){
+					var get = new Get();
+					var url = new Get(this.item.href);
+					if( this.showDeleted ){
+						url.add('showDeleted');
+					}
+					if( !this.noComId ){
+						if( this.comId ){
+							url.add('com_id', this.comId);
+						}else if( get.v('com_id') ){
+							url.add('com_id', get.v('com_id'));
+						}
+					}
+					D.setUrlHash(url.toUrl());
+				}
+				setTimeout(D.closure(this, function(){
+					if( this.item.type !== D.GalleryFS.TYPE_PIC ){
+						this.prevButton.getElementsByTagName('div')[0].style.right = '90%';
+						this.nextButton.getElementsByTagName('div')[0].style.left = '90%';
+					}else{
+						this.prevButton.getElementsByTagName('div')[0].style.right = '75%';
+						this.nextButton.getElementsByTagName('div')[0].style.left = '75%';
+					}
+				}), 100);
+				if( this.addToTopOpen ){
+					this.addToTopOpen = false;
+					this.addToTop(true);
+				}
+			}
+		},
+		loadAlbum: function( aid, lastPicture, otherGalleriesStats ){
+			lastPicture = typeof lastPicture == 'boolean' ? lastPicture : false;
+			this.reset();
+			this.otherGalleriesItems = null;
+			clearNode(this.otherGalleriesNode);
+			aid = aid || this.aid;
+
+			var methods = [];
+
+			var otherStats = {
+				other: true,
+				last: true
+			};
+			if( otherStats[otherGalleriesStats] ){
+				var oStatsMethod = new DR.gallery.OtherGalleriesStats;
+				oStatsMethod.type = otherGalleriesStats;
+				methods.push(oStatsMethod);
+			}
+
+			if( (!D.store.get('gallery_color_scheme') || D.store.get('seen_gal_new_tour') === null) && D.ID ){
+				var settingsMethod = new DR.gallery.GetSettings;
+				settingsMethod.select = [
+					new DR.gallery.select.Settings().all()
+				];
+				settingsMethod.onLoad = D.closure(this, function(){
+					if( !settingsMethod || settingsMethod.error || !settingsMethod.re ){
+						return;
+					}
+					D.store.set('seen_gal_new_tour', settingsMethod.re.seenTour);
+					this.toggleScheme( settingsMethod.re.colorScheme );
+				});
+				methods.push(settingsMethod);
+			}else if( !D.ID ){
+				D.store.set('seen_gal_new_tour', true);
+				D.store.set('gallery_color_scheme', 'light');
+			}
+
+			var pidMethod = new DR.gallery.GetFirstPid;
+			pidMethod.aid = aid;
+			pidMethod.lastPid = lastPicture || false;
+			pidMethod.select = [
+				new DR.gallery.select.GetFirstPidRe().all()
+			];
+			methods.push(pidMethod);
+
+			var otherGalleriesMethod = new DR.gallery.OtherGalleries;
+			otherGalleriesMethod.aid = aid;
+			otherGalleriesMethod.select = [
+				new DR.gallery.select.OtherGalleriesRe().all(),
+				new DR.gallery.select.Album().id().title().thumbItem(),
+				new DR.gallery.select.Item().image(),
+				new DR.gallery.select.Image().small()
+			];
+			methods.push(otherGalleriesMethod);
+
+			var ipMethod = new DR.users.GetIPInfo;
+			ipMethod.select = [
+				new DR.users.select.IPInfo().all()
+			];
+			ipMethod.onLoad = D.closure(this, function(){
+				if( !ipMethod || ipMethod.error || !ipMethod.re ){
+					return;
+				}
+				if( !ipMethod.re.mobile && ipMethod.re.country == 'LV' ){
+					this.fastInternet = true;
+					return;
+				}
+				this.fastInternet = false;
+			});
+			methods.push(ipMethod);
+
+			var apiCall = new DR.ApiCall( {
+				methods: methods,
+				onLoad: function(){
+					if( otherGalleriesMethod && !otherGalleriesMethod.error ){
+						this.otherGalleriesItems = otherGalleriesMethod;
+					}
+					if( pidMethod && !pidMethod.error && pidMethod.re.pid ){
+						this.loadItem( pidMethod.re.pid );
+					}
+				},
+				context: this
+			} );
+			apiCall.call();
+		},
+		loadTab: function(par){
+			par = par || {};
+			var first = par.first || false;
+			this.otherGalleriesItems = null;
+			clearNode(this.otherGalleriesNode);
+			/**
+			 * @type {DR.gallery.GetTabPids} itemMethod
+			 */
+			var pidsMethod = new DR.gallery.GetTabPids;
+			pidsMethod.tab = this.tab;
+			pidsMethod.i = this.current;
+			pidsMethod.count = 100;
+			pidsMethod.fid = this.fid;
+			pidsMethod.first = first;
+			pidsMethod.search = this.search;
+			pidsMethod.searchType = this.searchType;
+			pidsMethod.top = this.msTop;
+			pidsMethod.placeId = this.placeId;
+			pidsMethod.select = [
+				new DR.gallery.select.GetPidsRe().all()
+			];
+
+			var otherGalleriesMethod = new DR.gallery.OtherGalleries;
+			if( this.pid ){
+				otherGalleriesMethod.pid = this.pid;
+			}
+			if( this.fid ){
+				otherGalleriesMethod.fid = this.fid;
+			}
+			otherGalleriesMethod.select = [
+				new DR.gallery.select.OtherGalleriesRe().all(),
+				new DR.gallery.select.Album().id().title().thumbItem(),
+				new DR.gallery.select.Item().image(),
+				new DR.gallery.select.Image().small()
+			];
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					pidsMethod,
+					otherGalleriesMethod
+				],
+				onLoad: function(){
+					if( otherGalleriesMethod && !otherGalleriesMethod.error ){
+						this.otherGalleriesItems = otherGalleriesMethod;
+					}
+					var pid = 0;
+					if( this.tab == 31 ){
+						this.thumbnails.addPids( {
+							count: this.pids.length,
+							perPage: this.pids.length,
+							ids: this.pids
+						}, first );
+						pid = this.pid || this.pictures[ this.current ] || 0;
+						this.loadItem( pid, [this.thumbnails.loadByIndex( this.current )] );
+					}else if( pidsMethod && !pidsMethod.error && pidsMethod.re.ids ){
+						this.thumbnails.addPids( pidsMethod.re, first );
+						pid = this.pid || this.pictures[ this.current ] || 0;
+						this.loadItem( pid, [this.thumbnails.loadByIndex( this.current )] );
+					}
+				},
+				context: this
+			} );
+
+			if( (!D.store.get('gallery_color_scheme') || D.store.get('seen_gal_new_tour') === null) && D.ID ){
+				var settingsMethod = new DR.gallery.GetSettings;
+				settingsMethod.select = [
+					new DR.gallery.select.Settings().all()
+				];
+				settingsMethod.onLoad = D.closure(this, function(){
+					if( !settingsMethod || settingsMethod.error || !settingsMethod.re ){
+						return;
+					}
+					D.store.set('seen_gal_new_tour', settingsMethod.re.seenTour);
+					this.toggleScheme( settingsMethod.re.colorScheme );
+				});
+				apiCall.addMethod(settingsMethod);
+			}else if( !D.ID ){
+				D.store.set('seen_gal_new_tour', true);
+				D.store.set('gallery_color_scheme', 'light');
+			}
+
+			var ipMethod = new DR.users.GetIPInfo;
+			ipMethod.select = [
+				new DR.users.select.IPInfo().all()
+			];
+			ipMethod.onLoad = D.closure(this, function(){
+				if( !ipMethod || ipMethod.error || !ipMethod.re ){
+					return;
+				}
+				if( !ipMethod.re.mobile && ipMethod.re.country == 'LV' ){
+					this.fastInternet = true;
+					return;
+				}
+				this.fastInternet = false;
+			});
+			apiCall.addMethod(ipMethod);
+
+			apiCall.call();
+		},
+		itemInfo: function(){
+			clearNode(this.galleryInfo);
+			var user = this.item.user;
+			mkE({
+				tag: 'div',
+				className: 'user',
+				els: [
+					{
+						tag: 'a',
+						els: [
+							{
+								tag: 'img',
+								className: 'radius3',
+								src: user.image.icon
+							}
+						]
+					},
+					{
+						tag: 'div',
+						els: [
+							{
+								tag: 'a',
+								href: user.url,
+								text: user.title,
+								attr: {
+									title: user.title.length > 28 ? user.title : ''
+								}
+							},
+							{
+								tag: 'p',
+								className: 'date',
+								els: [
+									D.ddate2(this.item.created),
+									(this.item.album.is18 ? {
+										tag: 'span',
+										className: 'badge is18',
+										text: '18+'
+									} : '')
+								]
+							},
+							{
+								tag: 'div',
+								className: 'clear'
+							}
+						]
+					}
+				]
+			}).append(this.galleryInfo);
+
+			clearNode(this.realAuthor);
+			if( (this.item.creator != this.item.uid && ( this.item.canEdit || this.item.user.type == D.USER_TYPE_DEFAULT || this.item.user.type == D.USER_TYPE_GROUPS || this.item.user.type == D.USER_TYPE_EVENT|| (this.item.user.type == D.USER_TYPE_BIZ && this.item.canShowCreator) )) || this.showDeleted ){
+				mkE({
+					tag: 'div',
+					className: 'realUser',
+					els: [
+						D.GalleryFS.l.get('Ievietoja') + ' ',
+						{
+							tag: 'a',
+							href: this.item.creatorUser.url,
+							text: this.item.creatorUser.title
+						},
+						this.showDeleted && this.item.deleteUser ? {
+							tag: 'div',
+							els: [
+								'Deleted by: ',
+								{
+									tag: 'a',
+									href: this.item.deleteUser.url,
+									text: this.item.deleteUser.title
+								}
+							]
+						} : '',
+						this.showDeleted ? {
+							tag: 'div',
+							text: 'Deleted: ' + this.item.deleted
+						} : ''
+					]
+				}).append(this.realAuthor);
+			}
+
+			if( this.item.album.permissions == 0 && this.item.user.type == D.USER_TYPE_GROUPS ){
+				mkE({
+					tag: 'div',
+					style: {
+						padding: '0 16px'
+					},
+					els: [
+						T.info(D.GalleryFS.l.get('group_gal_hidden'))
+					]
+				}).append(this.realAuthor);
+			}
+
+			clearNode(this.sayContent);
+			if( this.item.sayItem ){
+				var sayItem = this.item.sayItem;
+				if( sayItem.content && sayItem.content.linkInfo && sayItem.content.linkInfo.link && sayItem.content.linkInfo.title ){
+					var sayContentNodes = [];
+					if( sayItem.content.linkInfo.title ){
+						sayContentNodes.push({
+							tag: 'span',
+							text: htmlspecialchars_decode(sayItem.content.linkInfo.title) + ':'
+						});
+						sayContentNodes.push(' ');
+					}
+					sayContentNodes.push({
+						tag: 'span',
+						innerHTML: sayItem.content.linkInfo.linkHTML
+					});
+					if( sayItem.content.linkInfo.description ){
+						sayContentNodes.push({
+							tag: 'p',
+							text: htmlspecialchars_decode(sayItem.content.linkInfo.description)
+						});
+					}
+					mkE({
+						tag: 'div',
+						className: 'sayContent',
+						els: sayContentNodes
+					}).append(this.sayContent);
+				}
+			}
+
+			clearNode(this.galleryDescription);
+			var descriptionEls = [
+				{
+					tag: 'div',
+					els: [
+						this.descriptionText = mkE({
+							tag: 'span',
+							innerHTML: nl2br(this.item.description)
+						}),
+						this.descriptionMorePlace = mkE({
+							tag: 'span'
+						}),
+						this.descriptionEditPlace = mkE({
+							tag: 'span'
+						}),
+						this.usersTagNode = mkE({
+							tag: 'span',
+							className: 'usersTagNode'
+						})
+					]
+				}
+			];
+			if( this.item.description.length > 200 ){
+				try {
+					this.descriptionText.innerHTML = trimHtml(this.item.description, {limit: 120});
+				}catch(e){
+					this.descriptionText.innerHTML = this.item.description;
+				}
+				mkE({
+					tag: 'span',
+					els: [
+						' ',
+						{
+							tag: 'a',
+							text: D.Lang.get('more'),
+							prop: {
+								onclick: D.closure(this, this.fullDescription)
+							}
+						}
+					]
+				}).append(this.descriptionMorePlace);
+				D.linksReplace(this.descriptionText, {
+					click: D.closure(this, function(href){
+						var get = new Get({});
+						get.add( 'url', href ).add( 'pid', (this.item.sayItem ? this.item.sayItem.id : 0) ).add( 'uid', this.item.uid );
+						return '/say/click.php?' + get;
+					})
+				});
+				D.smileyReplace(this.descriptionText);
+			}else{
+				D.linksReplace(this.descriptionText, {
+					click: D.closure(this, function(href){
+						var get = new Get({});
+						get.add( 'url', href ).add( 'pid', (this.item.sayItem ? this.item.sayItem.id : 0) ).add( 'uid', this.item.uid );
+						return '/say/click.php?' + get;
+					})
+				});
+				D.smileyReplace(this.descriptionText);
+				D.Say.hashTagReplace(this.descriptionText);
+			}
+			this.descriptionEl = mkE({
+				tag: 'p',
+				className: 'description',
+				els: [
+					descriptionEls
+				]
+			}).append(this.galleryDescription);
+			if( this.item.description && this.item.canEdit ){
+				mkE({
+					tag: 'a',
+					className: 'icon editGrayIcon',
+					prop: {
+						onclick: D.closure(this, this.editDescription)
+					}
+				}).append(this.descriptionEditPlace);
+			}else if( this.item.canEdit ){
+				mkE({
+					tag: 'div',
+					els: [
+						{
+							tag: 'a',
+							className: 'icon editBlueIcon',
+							text: D.GalleryFS.l.get('Pievienot aprakstu'),
+							prop: {
+								onclick: D.closure(this, this.editDescription)
+							}
+						}
+					],
+					style: {
+						marginBottom: '5px'
+					}
+				}).append(this.descriptionEditPlace);
+			}
+			this.tags(this.item.selectedUsers);
+			setNodeText(this.galleryTitle, this.item.album.title || '...');
+			this.galleryTitle.href = this.item.album.href + '&noPopup';
+			D.smileyReplace(this.galleryTitle);
+
+			if( this.item.album.uid == D.ID || this.item.album.canEdit ){
+				var statsUrl = this.item.album.href + '&tab=8';
+				if (
+					this.item.album.user.type === D.USER_TYPE_EVENT ||
+					this.item.album.user.type === D.USER_TYPE_GROUPS
+				) {
+					statsUrl = '/gallery/?tab=8&aid=' + this.item.album.id
+				}
+				clearNode(this.galStats);
+				mkE({
+					tag: 'a',
+					href: statsUrl,
+					els: [
+						{
+							tag: 'b',
+							className: 'text short',
+							text: this.item.views + 'x'
+						},
+						{
+							tag: 'span',
+							className: 'text long',
+							els: [
+								{
+									tag: 'b',
+									text: this.item.views
+								},
+								' ' + D.GalleryFS.l.nget(this.item.views, 'views')
+							]
+						}
+					]
+				}).append(this.galStats);
+				this.galStats.style.display = '';
+			}else{
+				this.galStats.style.display = 'none';
+			}
+			if( this.item.album.canEdit ){
+				clearNode(this.galEdit);
+				mkE({
+					tag: 'a',
+					href: '/gallery/?aid=' + this.item.aid + '&edit#galleryAlbumEditItem' + this.item.id,
+					els: [
+						{
+							tag: 'span',
+							className: 'text long',
+							text: D.GalleryFS.l.get('Edit album')
+						}
+					]
+				}).append(this.galEdit);
+				this.galEdit.style.display = '';
+			}else{
+				this.galEdit.style.display = 'none';
+			}
+		},
+		shorten: function( str, n, symbol ){
+			symbol = symbol || '&hellip;';
+			str = str || '';
+			var toLong = str.length > n;
+			var s_;
+
+			var cut = str.indexOf(' ', n);
+			if (cut === -1) {
+				cut = n - 1;
+			}
+			s_ = toLong ? str.substr(0, cut) : str;
+			return toLong ? s_ + " " + symbol : s_;
+		},
+		optionLinks: function(){
+			clearNode(this.moreOptionsBlock);
+			if( this.item.shortLink ){
+				mkE({
+					tag: 'li',
+					els: [
+						this.sendShortUrl = mkE({
+							tag: 'a',
+							text: D.Lang.get( 'send_friend' ),
+							onclick: D.closure(this, function(){
+								D.sendMail(null, null, this.item.shortLink);
+							})
+						})
+					]
+				}).append(this.moreOptionsBlock);
+				mkE({
+					tag: 'li',
+					els: [
+						this.copyToClipBoard = mkE({
+							tag: 'a',
+							text: D.Lang.get('copy_shortlink')
+						})
+					]
+				}).append(this.moreOptionsBlock);
+
+				try{
+					var copy = new ClipboardJS(this.copyToClipBoard, {
+						text: D.closure(this, function(){
+							return this.item.shortLink
+						})
+					});
+					copy.on('success', D.closure(this, function() {
+						this.hideOptions();
+						D.Confirm.success(D.GalleryFS.l.get('shortlink_copied'), 2000);
+					}));
+				}catch(err){
+				}
+			}
+			if( this.item.canDownload ){
+				if ( this.item.type == D.GalleryFS.TYPE_PIC ) {
+					mkE({
+						tag: 'li',
+						els: [{
+							tag: 'a',
+							text: D.GalleryFS.l.get('download pic'),
+							href: D.UPL + 'gallery/download_pic.php?pid=' + this.item.id,
+							target: '_blank'
+						}]
+					}).append(this.moreOptionsBlock);
+				} else if ( this.item.type == D.GalleryFS.TYPE_VIDEO ) {
+					mkE({
+						tag: 'li',
+						els: [{
+							tag: 'a',
+							text: D.GalleryFS.l.get('download_video'),
+							href: this.item.video.url + '?download'
+						}]
+					}).append(this.moreOptionsBlock);
+				}
+			}
+			if( this.item.album.canAddItem ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('Add pictures or video'),
+							href: this.item.album.href + '&tab=3'
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			if( this.item.uid == D.ID && this.item.type == 0 ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('add_to_top'),
+							prop: {
+								onclick: D.closure(this, this.addToTop)
+							}
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			if( this.item.album.canEdit ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('Edit album'),
+							href: '/gallery/?aid=' + this.item.aid + '&edit#galleryAlbumEditItem' + this.item.id
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			if( this.item.canSetAsProfile ) {
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('Set as profile picture'),
+							prop: {
+								onclick: D.closure(this, function(){
+									D.Confirm({
+										text: D.GalleryFS.l.get('set_as_profile'),
+										acceptText: D.GalleryFS.l.get('Uzlikt'),
+										onAccept: D.closure(this, this.setAsProfile)
+									});
+								})
+							}
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			if( this.item.canSetAsCover ){
+				if( this.item.cover ){
+					mkE({
+						tag: 'li',
+						els: [
+							{
+								tag: 'a',
+								text: D.GalleryFS.l.get('remove_from_cover'),
+								prop: {
+									onclick: D.closure(this, function(){
+										D.Gallery.coverPicture(this.item.id, 'remove', null, this.item.image.hLarge);
+									})
+								}
+							}
+						]
+					}).append(this.moreOptionsBlock);
+				}else{
+					mkE({
+						tag: 'li',
+						els: [
+							{
+								tag: 'a',
+								text: D.GalleryFS.l.get('add_to_cover'),
+								prop: {
+									onclick: D.closure(this, function(){
+										D.Gallery.coverPicture(this.item.id, 'add', null, this.item.image.hLarge);
+									})
+								}
+							}
+						]
+					}).append(this.moreOptionsBlock);
+				}
+			}
+			if( this.item.album.profileCoverGal ){
+				mkE({
+					tag: 'li',
+					els: [
+						this._setCoverButton = mkE({
+							tag: 'a',
+							text: D.GalleryFS.l.get('set_as_banner'),
+							href: !this.item.video ? this.item.user.url + '?bannerCrop=' + this.item.id : 'javascript:;',
+						})
+					]
+				}).append(this.moreOptionsBlock);
+
+				if ( this.item.video ) {
+					this._setCoverButton.onclick = D.closure(this, this.setCoverVideo, {
+						id: this.item.id,
+						uid: this.item.uid,
+						aid: this.item.aid,
+						url: this.item.user.url
+					});
+				}
+			}
+			if( this.item.canEdit ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('set_as_thumb'),
+							prop: {
+								onclick: D.closure(this, function(){
+									D.Confirm({
+										text: D.GalleryFS.l.get('set_as_thumb_q'),
+										acceptText: D.GalleryFS.l.get('Uzlikt'),
+										onAccept: D.closure(this, this.setAsThumbItem)
+									});
+								})
+							}
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			if( this.item.canDelete ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('delete_'+(this.item.video ? 'vid' : 'pic')),
+							prop: {
+								onclick: D.closure(this, function(){
+									var text = 'delete_'+(this.item.video ? 'vid' : 'pic')+'_q';
+									if( this.item.album.profGal && this.item.canSetAsProfile === false && this.item.user.id === D.ID ) {
+										text = 'Šī ir arī Tava profila bilde - dzēšot no galerijas, tā pazudīs arī no profila!';
+									}
+									D.Confirm({
+										text: D.GalleryFS.l.get(text),
+										acceptText: D.Lang.get('delete'),
+										onAccept: D.closure(this, this.deleteItem)
+									});
+								})
+							}
+						}
+					]
+				}).append(this.moreOptionsBlock);
+				if (this.item.spamPic && this.item.spamPic.search('galcon') === 0 ) {
+					mkE({
+						tag: 'li',
+						els: [
+							{
+								tag: 'a',
+								text: 'Izņemt no konkursa',
+								prop: {
+									onclick: D.closure(this, function(){
+										D.Confirm({
+											text:'Bilde tiks izņemta no dalības konkursā!',
+											acceptText: "Apstiprināt",
+											onAccept: D.closure(this, this.unspam)
+										});
+									})
+								}
+							}
+						]
+					}).append(this.moreOptionsBlock);
+				}
+			}
+			if( this.item.uid != D.ID ){
+				mkE({
+					tag: 'li',
+					els: [
+						{
+							tag: 'a',
+							text: D.GalleryFS.l.get('notify_police'),
+							prop: {
+								onclick: D.closure(this, function(){
+									InfoBox.iframe('/gallery/rq/police.php?pid=' + this.pid, {width:400} );
+								})
+							}
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+			var schemeNodes = [];
+			for( var scheme in this.schemes ){
+				if( !this.schemes[scheme] ){
+					continue;
+				}
+				schemeNodes.push({
+					tag: 'a',
+					id: 'galleryColor-' + scheme,
+					className: 'radius3 ' + scheme + ' ' + (scheme == this.selectedScheme ? 'active' : ''),
+					els: [
+						{
+							tag: 'div',
+							className: 'radius3'
+						}
+					],
+					prop: {
+						onclick: D.closure(this, this.toggleScheme, scheme)
+					}
+				});
+			}
+			if( schemeNodes.length ){
+				mkE({
+					tag: 'li',
+					className: 'schemeSelector',
+					els: [
+						{
+							tag: 'div',
+							text: D.GalleryFS.l.get('select_color_scheme') + ':'
+						},
+						{
+							tag: 'div',
+							className: 'schemes',
+							els: schemeNodes
+						}
+					]
+				}).append(this.moreOptionsBlock);
+			}
+		},
+		setCoverVideo: function(par) {
+			if ( !par.id || !par.uid || !par.aid || !par.url ){
+				return;
+			}
+			this._mSetCoverVideo = new DR.users.SetCoverVideo;
+			this._mSetCoverVideo.id = par.id;
+			this._mSetCoverVideo.uid = par.uid;
+			this._mSetCoverVideo.aid = par.aid;
+			this._mSetCoverVideo.onError = D.closure(this, this._onSetCoverVideoError);
+			this._mSetCoverVideo.onLoad = D.closure(this, this._onSetCoverVideo, par.url);
+			this._mSetCoverVideo.call();
+		},
+		_onSetCoverVideoError: function() {
+			alert(D.GalleryFS.l.get('set_as_cover_err'));
+		},
+		_onSetCoverVideo: function(url) {
+			window.location.href = url;
+		},
+		toggleScheme: function(scheme){
+			if( !this.schemes[scheme] ){
+				return;
+			}
+			removeClassName(this.window, this.selectedScheme);
+			addClassName(this.window, scheme);
+			var current = document.getElementById('galleryColor-' + this.selectedScheme);
+			var selected = document.getElementById('galleryColor-' + scheme);
+			if( current ){
+				removeClassName(current, 'active');
+			}
+			if( selected ){
+				addClassName(selected, 'active');
+			}
+			this.selectedScheme = scheme;
+			D.store.set('gallery_color_scheme', scheme );
+
+			var settingsMethod = new DR.gallery.SaveSettings;
+			settingsMethod.colorScheme = scheme;
+			settingsMethod.call();
+		},
+		setAsProfile: function(){
+			/**
+			 *
+			 * @type {DR.gallery.SetAsProfile}
+			 */
+			var method = new DR.gallery.SetAsProfile;
+			method.pid = this.item.id;
+			method.onLoad = function(){
+				D.Confirm.close();
+				D.Confirm.success(D.GalleryFS.l.get('Profile picture changed'));
+			};
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					method
+				],
+				context: this
+			} );
+			apiCall.call();
+		},
+		setAsThumbItem: function(){
+			/**
+			 *
+			 * @type {DR.gallery.SetAlbumThumb}
+			 */
+			var method = new DR.gallery.SetAlbumThumb;
+			method.pid = this.item.id;
+			method.onLoad = function(){
+				D.Confirm.close();
+				D.Confirm.success(D.GalleryFS.l.get('set_as_thumb_ok'));
+			};
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					method
+				],
+				context: this
+			} );
+			apiCall.call();
+		},
+		deleteItem: function(){
+			/**
+			 *
+			 * @type {DR.gallery.DeleteItem}
+			 */
+			var method = new DR.gallery.DeleteItem;
+			method.pid = this.item.id;
+			method.onLoad = D.closure(this, function(){
+				D.Confirm.close();
+				if( this.pictures.length == 1 ){
+					window.location.href = this.item.album.href;
+					return;
+				}
+				if( this.isPrev ){
+					window.location.href = '/gallery/?pid=' + this.pictures[ this.current - 1 ];
+					return;
+				}
+				if( this.isNext ){
+					window.location.href = '/gallery/?pid=' + this.pictures[ this.current + 1 ];
+					return;
+				}
+				D.reload();
+			});
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					method
+				],
+				context: this
+			} );
+			apiCall.call();
+		},
+		unspam: function() {
+			/**
+			 *
+			 * @type {DR.gallery.UnspamItem}
+			 */
+			var method = new DR.gallery.UnspamItem;
+			method.pid = this.item.id;
+			method.onLoad = D.closure(this, function(){
+				D.Confirm.close();
+				window.location.href = '/gallery/?tab=35';
+			});
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					method
+				],
+				context: this
+			} );
+			apiCall.call();
+		},
+		fullDescription: function(){
+			clearNode(this.galleryDescription);
+			this.descriptionEl = mkE({
+				tag: 'p',
+				className: 'description',
+				els: [
+					{
+						tag: 'span',
+						els: [
+							this.descriptionText = mkE({
+								tag: 'span',
+								innerHTML: nl2br(this.item.description)
+							}),
+							this.descriptionEditPlace = mkE({
+								tag: 'span'
+							}),
+							this.usersTagNode = mkE({
+								tag: 'span',
+								className: 'usersTagNode'
+							})
+						]
+					}
+				]
+			}).append(this.galleryDescription);
+			D.linksReplace(this.descriptionText, {
+				click: D.closure(this, function(href){
+					var get = new Get({});
+					get.add( 'url', href ).add( 'pid', (this.item.sayItem ? this.item.sayItem.id : 0) ).add( 'uid', this.item.uid );
+					return '/say/click.php?' + get;
+				})
+			});
+			D.smileyReplace(this.descriptionText);
+			D.Say.hashTagReplace(this.descriptionText);
+			if( this.item.description && this.item.canEdit ){
+				mkE({
+					tag: 'a',
+					className: 'icon editGrayIcon',
+					prop: {
+						onclick: D.closure(this, this.editDescription)
+					}
+				}).append(this.descriptionEditPlace);
+			}else if( this.item.canEdit ){
+				mkE({
+					tag: 'div',
+					els: [
+						{
+							tag: 'a',
+							className: 'icon editBlueIcon',
+							text: D.GalleryFS.l.get('Pievienot aprakstu'),
+							prop: {
+								onclick: D.closure(this, this.editDescription)
+							}
+						}
+					],
+					style: {
+						marginBottom: '5px'
+					}
+				}).append(this.descriptionEditPlace);
+			}
+			this.tags(this.item.selectedUsers);
+			this.leftScrollBar.refresh();
+
+			if ( this.item.spamPic && this.item.spamPic.search('galcon') === 0 && D.DATE_TODAY < 20201130 ) {
+				var href = '/stats/click.php?sub_key=gallery_ad_';
+				href += this.item.spamPic;
+				href += '&key=gallery_ad&url=';
+				href += encodeURIComponent('/gallery/?tab=3&f=contest');
+
+				mkE({
+					tag: 'div',
+					className: 'ad',
+					text: D.Lang.get(this.item.spamPic + '_ad_title', 'xGal')
+				}).append(this.galleryDescription);
+
+				new T.Form.Button({
+					caption: 'Pievienot konkursa bildi',
+					href: href,
+					tyle: 'link',
+					color: 'submit'
+				}).append(this.galleryDescription);
+			}
+		},
+		thumbClick: function(thumb){
+			this.current = thumb.index;
+			this.pid = thumb.pid || 0;
+			this.loadItem();
+			this.thumbnails.checkPosition();
+			this.checkControls();
+		},
+		previousPicture: function(){
+			if( this.itemMethod.processing ){
+				return false;
+			}
+			if( !this.isPrev ){
+				return false;
+			}
+			this.comId = null;
+			this.noComId = true;
+			if( this.lastScreenActive ){
+				this.cancelLastScreen();
+			}else if( this.current == 0 && this.item.album.sayGal && this.item.album.prevAlbum ){
+				this.loadAlbum( this.item.album.prevAlbum, true );
+				return;
+			}else{
+				this.current--;
+			}
+			this.pid = this.pictures[this.current] || 0;
+			this.loadItem();
+			this.checkControls();
+			this.thumbnails.checkThumbs();
+		},
+		nextPicture: function(){
+			if( this.itemMethod.processing ){
+				return false;
+			}
+			if( !this.isNext ){
+				return false;
+			}
+			if( !this.item.album.sayGal && this.current == this.pictures.length - 1 ){
+				this.lastScreen();
+				return;
+			}
+			this.comId = null;
+			this.noComId = true;
+			if( this.current == this.pictures.length - 1 && this.item.album.sayGal && this.item.album.nextAlbum ){
+				this.loadAlbum( this.item.album.nextAlbum );
+				return;
+			}
+			this.current++;
+			this.pid = this.pictures[this.current] || 0;
+			this.loadItem();
+			this.checkControls();
+			this.thumbnails.checkThumbs();
+		},
+		checkControls: function(){
+			if( this.showDeleted ){
+				this.isNext = false;
+				addClassName( this.nextButton, 'disabled' );
+				addClassName( this.nextLinkButton, 'disabled' );
+				this.isPrev = false;
+				addClassName( this.prevButton, 'disabled' );
+				addClassName( this.prevLinkButton, 'disabled' );
+				return;
+			}
+
+			if( this.current == 0 && !this.lastScreenActive && !(this.tab == 1 && this.item && this.item.album.sayGal && this.item.album.prevAlbum) ){
+				this.isPrev = false;
+				addClassName( this.prevButton, 'disabled' );
+				addClassName( this.prevLinkButton, 'disabled' );
+			}else{
+				this.isPrev = true;
+				removeClassName( this.prevButton, 'disabled' );
+				removeClassName( this.prevLinkButton, 'disabled' );
+			}
+
+			if( !this.item || !this.item.album || ((this.item.album.sayGal && !this.item.album.nextAlbum) || this.tab != 1 || this.lastScreenActive) && this.current == this.pictures.length - 1 ){
+				this.isNext = false;
+				addClassName( this.nextButton, 'disabled' );
+				addClassName( this.nextLinkButton, 'disabled' );
+			}else{
+				this.isNext = true;
+				removeClassName( this.nextButton, 'disabled' );
+				removeClassName( this.nextLinkButton, 'disabled' );
+			}
+
+			if (this.item && this.item.galleryAd && this.item.galleryAdTitle) {
+				this.galleryAd.style.display = 'block';
+				var t = this.item.description;
+				var regex = new RegExp(D._linksReplaceExp);
+				var matches = t.match(regex);
+				if ( matches ) {
+					var link = '';
+					// prioritaate linkiem ar http*
+					for(var n = 0, len = matches.length; n < len; n++) {
+						if ( matches[n].indexOf('http') != -1 ) {
+							link = matches[n];
+							break;
+						}
+					}
+					if ( !link ) {
+						link = matches[0];
+					}
+					link = htmlspecialchars_decode( link );
+					// liberi.lv statu hacks
+					if ( link.indexOf('liberi.lv') != -1 ) {
+						link = link.replace('&ff=r', '&ff=t');
+					}
+					// dziugas statu hacks cmon...
+					if ( link.indexOf('dziugas') != -1 ) {
+						link = link.replace('&ff=r', '&ff=t');
+					}
+					var adStr = '<a href="/stats/click.php?sub_key=gallery_ad_';
+					adStr += this.item.galleryAppHash;
+					adStr += '&key=gallery_ad&url=';
+					adStr += encodeURIComponent( link )+'">';
+					adStr += this.item.galleryAdTitle;
+					// raseena kola haks
+					if ( link.indexOf('rasens') != -1 ) {
+						adStr += ':&nbsp;';
+					} else {
+						adStr += '&nbsp<span class="mdot">&middot;</span>&nbsp;';
+					}
+					adStr += '<span class="more">Uzzini vairāk</span></a>';
+					this.galleryAdString.innerHTML = adStr;
+
+					this.header.style.height = '60px';
+				}
+			} else {
+				clearNode(this.galleryAd)
+			}
+		},
+		/**
+		 *
+		 * @param {DR.like.Get} likeMethod
+		 */
+		likes: function( likeMethod ){
+			clearNode(this.likesList);
+			if( !likeMethod || likeMethod.error || !likeMethod.re ){
+				return;
+			}
+			this._likeStatus = likeMethod.re;
+			var re = likeMethod.re;
+			if( this.itemLike ){
+				this.itemLike.remove();
+			}
+			this.itemLike = mkE({
+				tag: 'div',
+				id: 'galLargeLike',
+				onclick: D.closure(this, this._like)
+			});
+			if( re.liked ){
+				addClassName(this.likeButton, 'active');
+				removeClassName(this.likeButton, 'disabled');
+				this.likeButton.setAttribute('tooltip', D.Lang.get('Dislike it'));
+				if( this.item.type == D.Gallery.TYPE_PIC ){
+					addClassName(this.itemLike, 'on');
+					this.itemLike.append(this.itemObject.item.node);
+				}
+			}else{
+				removeClassName(this.likeButton, 'active');
+				this.likeButton.setAttribute('tooltip', D.Lang.get('I like it'));
+				if( re.canLike || !D.ID ){
+					removeClassName(this.likeButton, 'disabled');
+					if( this.item.type == D.Gallery.TYPE_PIC ){
+						removeClassName(this.itemLike, 'on');
+						this.itemLike.append(this.itemObject.item.node);
+					}
+				}else{
+					addClassName(this.likeButton, 'disabled');
+					if( this.item.type == D.Gallery.TYPE_PIC ){
+						removeClassName(this.itemLike, 'on');
+						this.itemLike.remove();
+					}
+				}
+			}
+			if( !likeMethod.re.count ){
+				return;
+			}
+			mkE({
+				tag: 'a',
+				className: 'likeCount',
+				els: [
+					{
+						tag: 'strong',
+						text: re.count
+					},
+					' ',
+					D.Lang.nget(re.count, 'like it')
+				],
+				prop: {
+					onclick: D.closure(this, function(){
+						InfoBox.open('/rq/like_modal.php?likeType=' + D.GalleryFS.LIKE_TYPE + '&likeId=' + this.pid, { width:820 });
+					})
+				}
+			}).append(this.likesList);
+			var likeUsers = mkE({
+				tag: 'div',
+				className: 'likeUsers'
+			});
+			for( var i = 0, l = re.users.length; i < l; i++ ){
+				var like = re.users[i];
+				mkE({
+					tag: 'a',
+					className: 'user',
+					href: like.url,
+					attr: {
+						title: like.title
+					},
+					els: [
+						{
+							tag: 'img',
+							src: like.image.icon
+						}
+					]
+				}).append(likeUsers);
+			}
+			if( re.count > re.users.length ){
+				var moreCount = re.count - re.users.length;
+				var moreClass = 'more-';
+				if( moreCount < 10 ){
+					moreClass += 1;
+				}else if( moreCount < 100 ){
+					moreClass += 2;
+				}else if( moreCount < 1000 ){
+					moreClass += 3;
+				}else {
+					moreClass += 0;
+				}
+				mkE({
+					tag: 'a',
+					className: 'more ' + moreClass,
+					text: '+' + moreCount,
+					prop: {
+						onclick: D.closure(this, function(){
+							InfoBox.open('/rq/like_modal.php?likeType=' + D.GalleryFS.LIKE_TYPE + '&likeId=' + this.pid, { width:820 });
+						})
+					}
+				}).append(likeUsers);
+			}
+			likeUsers.append(this.likesList);
+			mkE({
+				tag: 'div',
+				className: 'clear'
+			}).append(this.likesList);
+		},
+		_like: function(e){
+			e = D.event(e);
+			D.stopPropagation(e);
+			if( !D.ID ){
+				this._showSmallLogin();
+				return;
+			}
+			if( !this._likeStatus ){
+				return;
+			}
+			if( this._likeStatus.liked ){
+				this.cancelRate();
+				return;
+			}
+			if( !this.sayProfiles || empty(this.sayProfiles) || (count(this.sayProfiles) == 1 && reset(this.sayProfiles).id == D.ID) || (this.item.user.type == D.USER_TYPE_DEFAULT && this.item.user.isFriend) ){
+				this.rate();
+				return;
+			}
+			this.showLikeProfiles();
+		},
+		showLikeProfiles: function(){
+			var profiles = this.sayProfiles;
+			var pos = D.position(this.likeButton);
+			D.smallPopUp.open( '', {
+				title:D.Lang.get( 'Say like with', 'xGlobal' ),
+				width:200,
+				x: pos.left + (this.likeButton.offsetWidth / 2) - 4,
+				y: pos.top + 8,
+				forceUp: true
+			} );
+			var form = mkE( {
+				tag:'form'
+			} );
+			var checkBoxes = [];
+			for( var k = 0, l = profiles.length; k < l; k++ ){
+				var r = profiles[k];
+				if( this.item.uid == D.ID ){
+					continue;
+				}
+				if( this.item.uid != D.ID && this.item.uid == r.id ){
+					continue;
+				}
+				var cbx = T.Forms.checkbox( {
+					caption:htmlspecialchars(r.title),
+					_dr:r,
+					checked: r.id == D.ID
+				} ).append(form);
+				checkBoxes.push(cbx);
+			}
+			mkE( {
+				tag:'div',
+				className:'commentsLikeProfiles',
+				els:[
+					form,
+					T.submitButton( {
+						caption:D.Lang.get('Save'),
+						stretch:true,
+						onclick:D.closure(this, this._likeProfile, checkBoxes)
+					} )
+				]
+			} ).append( D.smallPopUp.content );
+			D.smallPopUp.move();
+		},
+		_likeProfile: function(checkBoxes){
+			var uids = [];
+			for( var i = 0, l = checkBoxes.length; i < l; ++ i ){
+				if( checkBoxes[i].checked ){
+					uids.push( checkBoxes[i]._dr.id );
+				}
+			}
+			D.smallPopUp.close();
+			this._mLikeArray = new DR.like.LikeArray();
+			this._mLikeArray.type = D.GalleryFS.LIKE_TYPE;
+			this._mLikeArray.id = this.pid;
+			this._mLikeArray.uids = uids;
+			this._mLikeArray.select = [
+				new DR.like.select.GetRe().all(),
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon()
+			];
+			this._mLikeArray.onLoad = D.closure(this, this._onLikeProfile);
+			this._mLikeArray.call();
+		},
+		_onLikeProfile: function(){
+			this.likes( this._mLikeArray );
+			T.Tooltip.refresh();
+			if( !this._mLikeArray || this._mLikeArray.error || !this._mLikeArray.re ){
+				return;
+			}
+			this.onLike( this._mLikeArray );
+		},
+		rate: function(){
+			if( this._mLike && this._mLike.processing ){
+				return;
+			}
+			this._mLike = new DR.like.Like;
+			this._mLike.type = D.GalleryFS.LIKE_TYPE;
+			this._mLike.id = this.pid;
+			this._mLike.select = [
+				new DR.like.select.GetRe().all(),
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon()
+			];
+			this._mLike.onLoad = D.closure(this, this.onRate);
+			this._mLike.call();
+		},
+		onRate: function(){
+			this.likes( this._mLike );
+			T.Tooltip.refresh();
+			if( !this._mLike || this._mLike.error || !this._mLike.re ){
+				return;
+			}
+			this.onLike( this._mLike );
+		},
+		onLike: function( likeMethod ){
+			if( likeMethod.re.liked ){
+				this.likeCount = this.likeCount + 1;
+				if( this.likeCount == 3 && !this.hideLikeRecommend && !this.seenRecPopup && this.item.sayItem &&  this.item.sayItem.canRecommend && !this.item.sayItem.recommended ){
+					this.seenRecPopup = true;
+					var pos = D.position(this.recommendButton);
+					D.smallPopUp.html(this.likeRecContent = mkE({
+						tag: 'div',
+						els: [
+							{
+								tag: 'div',
+								text: D.GalleryFS.l.get('want_to_recommend')
+							},
+							{
+								tag: 'div',
+								els: [
+									this.likeRecCheckbox = new T.Form.CheckBox({
+										caption: D.GalleryFS.l.get('dont_show_anymore'),
+										value: 1
+									})
+								]
+							},
+							{
+								tag: 'div',
+								className: 'formFooter',
+								els: [
+									new T.Form.Button({
+										caption: D.Lang.get('Recommend'),
+										onclick: D.closure(this, this.recFromLikePopup)
+									}),
+									new T.Form.Button({
+										caption: D.GalleryFS.l.get('no_thanks'),
+										onclick: D.closure(this, this.closeLikePopup),
+										color: 'link'
+									})
+								]
+							}
+						]
+					}), {
+						title: this.item.album.title,
+						x: pos.left + (this.recommendButton.offsetWidth / 2) - 4,
+						y: pos.top + 8,
+						forceUp: true
+					});
+					var statsMethod = new DR.gallery.LikeRecommendSeen();
+					statsMethod.call();
+				}
+			}
+		},
+		cancelRate: function(){
+			if( this._mDislike && this._mDislike.processing ){
+				return;
+			}
+			this._mDislike = new DR.like.Dislike;
+			this._mDislike.type = D.GalleryFS.LIKE_TYPE;
+			this._mDislike.id = this.pid;
+			this._mDislike.select = [
+				new DR.like.select.GetRe().all(),
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.Image().icon()
+			];
+			this._mDislike.onLoad = D.closure(this, this.onCancelRate);
+			this._mDislike.call();
+		},
+		onCancelRate: function(){
+			this.likes( this._mDislike );
+			T.Tooltip.refresh();
+			if( this._mDislike.re.liked ){
+				this.likeCount = Math.max(0, this.likeCount - 1);
+			}
+		},
+		reloadTags: function(){
+			/**
+			 *
+			 * @type {DR.gallery.GetTags}
+			 */
+			var tagsMethod = new DR.gallery.GetTags;
+			tagsMethod.pid = this.pid;
+			tagsMethod.select = [
+				new DR.users.select.User().id().title().url().image(),
+				new DR.users.select.UserDefault().aktitle(),
+				new DR.users.select.Image().icon(),
+
+				new DR.gallery.select.GetTagsRe().all(),
+				new DR.gallery.select.SelectedUser().all()
+			];
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					tagsMethod
+				],
+				onLoad: function(){
+					this.tags( tagsMethod );
+				},
+				context: this
+			} );
+			apiCall.call();
+		},
+		getUserList: function(users, count, show, moreCb){
+			show = show || 2;
+			if( count - 1 == show ){
+				show++;
+			}
+			var userLinks = [];
+			var uLinkCount = 0;
+			for( var i in users ){
+				var taggedUser = users[i];
+				var userNode;
+				if( !taggedUser.user.id ){
+					userNode = {
+						tag: 'span',
+						className: 'noUser',
+						innerHTML: taggedUser.title
+					};
+				}else{
+					var prop = {};
+					if( !taggedUser.withUsers ) {
+						prop = {
+							onmouseover: D.closure(this, function (user) {
+								D.Gallery.hoverPicUser(true, user);
+							}, taggedUser.user.id),
+							onmouseout: D.closure(this, function (user) {
+								D.Gallery.hoverPicUser(false, user);
+							}, taggedUser.user.id)
+						}
+					}
+
+					userNode = {
+						tag: 'a',
+						href: taggedUser.user.url,
+						innerHTML: taggedUser.user.aktitle,
+						prop: prop
+					};
+				}
+				userLinks.push(userNode);
+				if( ++uLinkCount == show){
+					break;
+				}
+				if( this.isFullTags && uLinkCount < show - 1 ){
+					userLinks.push(', ')
+				}
+			}
+			if( this.isFullTags ){
+				if( !moreCount && userLinks.length > 1){
+					userLinks.splice(-1, 0,  ' ' + D.Lang.get('and') + ' ');
+				}
+				return mkE({
+					tag: 'span',
+					els: userLinks
+				});
+			}
+			userLinks = userLinks.slice(0, show);
+			var moreCount = count - userLinks.length;
+			if( !moreCount && userLinks.length == 3){
+				userLinks.splice(1, 0,  ', ');
+				userLinks.splice(-1, 0,  ' ' + D.Lang.get('and') + ' ');
+			}else if( !moreCount && userLinks.length > 1){
+				userLinks.splice(-1, 0,  ' ' + D.Lang.get('and') + ' ');
+			}else if( moreCount && userLinks.length == 1){
+				userLinks.push(' ' + D.Lang.get('and') + ' ');
+			}else if( moreCount && userLinks.length > 0){
+				userLinks.splice(1, 0, ', ');
+				userLinks.push(' ' + D.Lang.get('and') + ' ');
+			}
+			if( moreCount ){
+				userLinks.push({
+					tag: 'a',
+					prop: {
+						onclick: moreCb
+					},
+					els: [
+						D.GalleryFS.l.nget(moreCount, 'and_more')
+					]
+				})
+			}
+
+			return mkE({
+				tag: 'span',
+				els: userLinks
+			});
+		},
+		/**
+		 *
+		 * @param {DR.gallery.GetTags|Object.<Number,DR.gallery.struct.SelectedUser>} data
+		 */
+		tags: function( data ){
+			var users = {};
+			var count = 0;
+			if( data.re ){
+				users = data.re.users;
+				count = data.re.count;
+			}else{
+				users = data;
+				if (!Object.keys) {
+					Object.keys = function(obj) {
+						var keys = [];
+
+						for (var i in obj) {
+							if (obj.hasOwnProperty(i)) {
+								keys.push(i);
+							}
+						}
+
+						return keys;
+					};
+				}
+				count = Object.keys(users).length;
+			}
+
+			var usersArr = [];
+			var i, l;
+			for( i in users ){
+				if( !users.hasOwnProperty(i) ){
+					continue;
+				}
+				usersArr.push(users[i]);
+			}
+
+			for( i = 0, l = this.item.withUsers.length; i < l; i++ ){
+				var user = this.item.withUsers[i];
+				if( !user || users[user.uid] ){
+					continue;
+				}
+				usersArr.push(user);
+				count++;
+			}
+
+			clearNode(this.tagsList);
+			clearNode(this.usersTagNode);
+
+			var tagsElements = [];
+			if( this.item.description && (this.item.place || count) ){
+				tagsElements.push(' — ');
+			}
+			if( this.item.place && this.item.place.name ){
+				tagsElements.push(D.GalleryFS.l.get('checkedIn') + ' ');
+				tagsElements.push({
+					tag: 'a',
+					href: this.item.place.url,
+					innerHTML: this.item.place.name
+				});
+				tagsElements.push(' ');
+			}
+			if( !count ){
+				if( tagsElements.length ){
+					mkE({
+						tag: 'span',
+						els: tagsElements
+					}).append(this.usersTagNode);
+				}
+				return;
+			}
+			tagsElements.push(D.GalleryFS.l.get('together_with') + ' ');
+
+			mkE({
+				tag: 'span',
+				els: tagsElements
+			}).append(this.usersTagNode);
+			this.getUserList(usersArr, count, (this.isFullTags ? count : 2), D.closure(this, this.fullTags)).append(this.usersTagNode);
+		},
+		fullTags: function(){
+			this.isFullTags = true;
+			this.tags(this.item.selectedUsers);
+		},
+		deleteTag: function(fid){
+			D.Gallery.delPicUser(false, this.pid, fid);
+		},
+		recommendStatus: function(){
+			removeClassName(this.recommendButton, 'active');
+			removeClassName(this.recommendButton, 'disabled');
+			if( (!this.item.sayItem || !this.item.sayItem.canRecommend) && D.ID ){
+				addClassName(this.recommendButton, 'disabled');
+				this.recommendButton.onclick = function(){};
+				this.recommendButton.setAttribute('tooltip', D.GalleryFS.l.get('Ieteikt draugiem'));
+			}else if( !D.ID || !this.item.sayItem.recommended ){
+				this.recommendButton.onclick = D.closure(this, this.rec);
+				this.recommendButton.setAttribute('tooltip', D.GalleryFS.l.get('Ieteikt draugiem'));
+			}else{
+				addClassName(this.recommendButton, 'active');
+				this.recommendButton.onclick = D.closure(this, this.cancelRecommend);
+				this.recommendButton.setAttribute('tooltip', D.Lang.get('Cancel'));
+			}
+			T.Tooltip.refresh();
+		},
+		rec: function(e){
+			e = D.event(e);
+			D.stopPropagation(e);
+			if( !D.ID ){
+				this._showSmallLogin();
+				return;
+			}
+			if( !this.item.sayItem ){
+				return;
+			}
+			if( !this.sayProfiles || empty(this.sayProfiles) || (count(this.sayProfiles) == 1 && reset(this.sayProfiles).id == D.ID) || (this.item.user.type == D.USER_TYPE_DEFAULT && this.item.user.isFriend) ){
+				this.recommend();
+				return;
+			}
+			this.showRecommendProfiles();
+		},
+		showRecommendProfiles: function(){
+			var profiles = this.sayProfiles;
+			var pos = D.position(this.recommendButton);
+			D.smallPopUp.open( '', {
+				title:D.Lang.get( 'Say recommend with', 'xGlobal' ),
+				width:200,
+				x: pos.left + (this.recommendButton.offsetWidth / 2) - 4,
+				y: pos.top + 8,
+				forceUp: true
+			} );
+			var form = mkE( {
+				tag:'form'
+			} );
+			var checkBoxes = [];
+			for( var k = 0, l = profiles.length; k < l; k++ ){
+				var r = profiles[k];
+				if( this.item.uid == D.ID ){
+					continue;
+				}
+				if( this.item.uid != D.ID && this.item.uid == r.id ){
+					continue;
+				}
+				var cbx = T.Forms.checkbox( {
+					caption:htmlspecialchars(r.title),
+					_dr:r,
+					checked: r.id == D.ID
+				} ).append(form);
+				checkBoxes.push(cbx);
+			}
+			mkE( {
+				tag:'div',
+				className:'commentsLikeProfiles',
+				els:[
+					form,
+					T.submitButton( {
+						caption:D.Lang.get('Save'),
+						stretch:true,
+						onclick:D.closure(this, this._recommendProfile, checkBoxes)
+					} )
+				]
+			} ).append( D.smallPopUp.content );
+			D.smallPopUp.move();
+		},
+		_recommendProfile: function(checkBoxes){
+			var uids = [];
+			for( var i = 0, l = checkBoxes.length; i < l; ++ i ){
+				if( checkBoxes[i].checked ){
+					uids.push( checkBoxes[i]._dr.id );
+				}
+			}
+			D.smallPopUp.close();
+			if( empty(uids) ){
+				return;
+			}
+			this._mRecommendArray = new DR.say.Recommend;
+			this._mRecommendArray.pid = this.item.sayItem.id;
+			this._mRecommendArray.uids = uids;
+			this._mRecommendArray.select = [
+				new DR.say.select.RecommendRe().all(),
+				new DR.say.select.Item().canRecommend().recommended()
+			];
+			this._mRecommendArray.onLoad = D.closure(this, this._onRecommendProfile);
+			this._mRecommendArray.call();
+		},
+		_onRecommendProfile: function(){
+			this._recommend( this._mRecommendArray );
+		},
+		recommend: function(extraMethods){
+			/**
+			 *
+			 * @type {DR.say.Recommends}
+			 */
+			var recommendMethod = new DR.say.Recommend;
+			recommendMethod.pid = this.item.sayItem.id;
+			recommendMethod.select = [
+				new DR.say.select.RecommendRe().all(),
+				new DR.say.select.Item().canRecommend().recommended()
+			];
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					recommendMethod
+				],
+				onLoad: function(){
+					this._recommend(recommendMethod);
+				},
+				context: this
+			} );
+
+			if( extraMethods instanceof Array ){
+				for( var i in extraMethods ){
+					apiCall.addMethod(extraMethods[i]);
+				}
+			}
+			apiCall.call();
+		},
+		/**
+		 *
+		 * @param {DR.say.Recommend} method
+		 * @private
+		 */
+		_recommend: function( method ){
+			if( !method || method.error ){
+				return;
+			}
+
+			this.item.sayItem.canRecommend = method.re.item.canRecommend;
+			this.item.sayItem.recommended = method.re.item.recommended;
+			this.recommendStatus();
+		},
+		cancelRecommend: function(){
+			/**
+			 *
+			 * @type {DR.say.CancelRecommend}
+			 */
+			var recommendMethod = new DR.say.CancelRecommend;
+			recommendMethod.pid = this.item.sayItem.id;
+			recommendMethod.select = [
+				new DR.say.select.CancelRecommendRe().all(),
+				new DR.say.select.Item().canRecommend().recommended()
+			];
+
+			var apiCall = new DR.ApiCall( {
+				methods: [
+					recommendMethod
+				],
+				onLoad: function(){
+					this._cancelRecommend(recommendMethod);
+				},
+				context: this
+			} );
+			apiCall.call();
+		},
+		/**
+		 *
+		 * @param {DR.say.CancelRecommend} method
+		 * @private
+		 */
+		_cancelRecommend: function( method ){
+			if( !method || method.error ){
+				return;
+			}
+
+			this.item.sayItem.canRecommend = method.re.item.canRecommend;
+			this.item.sayItem.recommended = method.re.item.recommended;
+			this.recommendStatus();
+		},
+		lastScreen: function(){
+			this.lastScreenActive = true;
+			this.checkControls();
+			clearNode(this.lastCurrent);
+			clearNode(this.lastOther);
+			this.commentsWidth = 0;
+			this.leftSidebar.style.width = this.commentsWidth;
+			//this.bodyOverlay.style.display = 'block';
+			addClassName(this.recommendButton, 'disabled');
+			addClassName(this.likeButton, 'disabled');
+			addClassName(this.tagButton, 'disabled');
+			addClassName(this.window, 'last');
+			this.thumbnails.thumbnails[this.current].active(false);
+			clearNode(this.itemNode);
+			this.prevButtonBg.style.display = 'none';
+			this.nextButtonBg.style.display = 'none';
+			this.nextButton.style.display = 'none';
+			this.prevButton.style.display = 'none';
+			this.lastWindow.style.display = 'block';
+			this.thumbnails.node.style.display = 'none';
+			this.whatPic.style.visibility = 'hidden';
+			this.galleryTitleCont.style.display = 'none';
+			this.bottomContent.style.display = 'none';
+			this.bottomContentHeight = 0;
+			this.header.style.display = 'none';
+			this.thumbsTitleSpace = 0;
+			this.leftSidebar.style.display = 'none';
+			this.sidebarWidth = 0;
+
+			if( this.width >= this.largeLast ){
+				addClassName( this.lastWindow, 'large' );
+			}else{
+				removeClassName( this.lastWindow, 'large' );
+			}
+
+			var albumsMethod;
+			if( this.width >= this.largeLast ){
+				albumsMethod = new DR.gallery.LastViewAlbumLarge;
+				albumsMethod.aid = this.item.aid;
+				albumsMethod.select = [
+					new DR.gallery.select.OtherGalleriesLastLargeRe().all(),
+					new DR.gallery.select.Album().title().thumbItem().id().uid().count(),
+					new DR.gallery.select.Item().image().user(),
+					new DR.gallery.select.Image().large().gm(),
+					new DR.users.select.User().title()
+				];
+			}else{
+				albumsMethod = new DR.gallery.LastViewAlbum;
+				albumsMethod.aid = this.item.aid;
+				albumsMethod.select = [
+					new DR.gallery.select.OtherGalleriesLastRe().all(),
+					new DR.gallery.select.Album().title().thumbItem().id().uid().count(),
+					new DR.gallery.select.Item().user(),
+					new DR.users.select.User().title()
+				];
+			}
+
+			var viewMethod = new DR.gallery.LastView;
+			viewMethod.aid = this.item.aid;
+			viewMethod.select = [
+				new DR.gallery.select.LastViewRe().all(),
+				new DR.say.select.Item().id().canRecommend().recommended().suggestions().recCount(),
+				new DR.users.select.User().title().url().image(),
+				new DR.users.select.Image().icon().small()
+			];
+
+			var apiCall = new DR.ApiCall( {
+				select: [
+					new DR.gallery.select.OtherGalleriesLastRe().all(),
+					new DR.gallery.select.Album().title().thumbItem().id().href().canComment().comments().like().place().withUsers().description(),
+					new DR.gallery.select.Item().image(),
+					new DR.gallery.select.Image().large(),
+					new DR.like.select.GetRe().count(),
+					new DR.places.select.Item().id().url().name(),
+					new DR.say.select.With().uid().title().user(),
+					new DR.users.select.UserDefault().id().type().aktitle()
+				],
+				methods: [
+					albumsMethod,
+					viewMethod
+				],
+				onLoad: function(){
+					if( albumsMethod && !albumsMethod.error && albumsMethod.re ){
+						if( this.width >= this.largeLast ) {
+							if( albumsMethod.re.albums && albumsMethod.re.count > 1 ){
+								this.otherGalleries = new D.GalleryFS.OtherGalleriesLarge(albumsMethod.re, this);
+								this.otherGalleries.append(this.lastOther);
+							}else{
+								this.lastOther.style.display = 'none';
+								this.lastCurrent.style.right = '30%';
+							}
+						} else {
+							if( albumsMethod.re.album && albumsMethod.re.count > 1  ){
+								this.otherGalleries = new D.GalleryFS.OtherGalleries(albumsMethod.re, this.item.aid, this);
+								this.otherGalleries.append(this.lastOther);
+								this.lastCurrent.style.width = '';
+							}else{
+								this.lastOther.style.display = 'none';
+								this.lastCurrent.style.width = '100%';
+								this.lastCurrent.style.right = '30%';
+							}
+						}
+					}
+					if( viewMethod && !viewMethod.error && viewMethod.re ){
+						this.lastView = new D.GalleryFS.LastView(viewMethod.re, this);
+						this.lastView.append(this.lastCurrent);
+					}
+				},
+				context: this
+			} );
+			apiCall.call();
+			this.onResize();
+		},
+		cancelLastScreen: function(){
+			this.lastScreenActive = false;
+			if( !this.isFullScreen ){
+				this.commentsWidth = 336;
+				this.leftSidebar.style.width = this.commentsWidth + 'px';
+				this.bottomContent.style.display = '';
+				this.bottomContentHeight = 48;
+				this.header.style.display = '';
+				this.thumbsTitleSpace = 40;
+				this.leftSidebar.style.display = '';
+			}else{
+				this.bottomContentHeight = 8;
+			}
+			//this.bodyOverlay.style.display = 'none';
+			removeClassName(this.window, 'last');
+			this.prevButtonBg.style.display = '';
+			this.nextButtonBg.style.display = '';
+			this.nextButton.style.display = '';
+			this.prevButton.style.display = '';
+			this.lastWindow.style.display = '';
+			this.lastOther.style.display = '';
+			if( this.pictures.length > 1 ){
+				this.thumbnails.node.style.display = '';
+			}
+			this.whatPic.style.visibility = 'visible';
+			this.galleryTitleCont.style.display = '';
+			this.sidebarWidth = 48;
+			this.onResize();
+		},
+		reset: function(){
+			this.pictures = [];
+			this.current = 0;
+			this.isPrev = false;
+			this.isNext = false;
+			this.itemObject = null;
+			this.thumbnails.thumbnails = [];
+			this.thumbnails.pidToIndex = {};
+			this.thumbnails.current = 0;
+			this.thumbnails.firstVisible = 0;
+			this.thumbnails.lastVisible = 7;
+			this.thumbnails.isPrev = false;
+			this.thumbnails.isNext = false;
+			this.thumbnails.firstLoadedThumb = null;
+			this.thumbnails.firstLoadedId = null;
+			this.thumbnails.lastLoadedId = null;
+			clearNode(this.thumbnails.thumbnailsNode);
+			this.nextImage = null;
+			this.likeCount = 0;
+			this.seenRecPopup = false;
+		},
+		drawOtherGalleries: function(){
+			if( !this.otherGalleriesItems || !this.otherGalleriesItems.re.items.length ){
+				return;
+			}
+			clearNode(this.otherGalleriesNode);
+			var text = D.GalleryFS.l.get('Citas šī lietotāja galerijas');
+			if(this.item.user.type == 7) {
+				text = D.GalleryFS.l.get('Citas šīs grupas galerijas');
+			}
+			mkE({
+				tag: 'h3',
+				els: [
+					{
+						tag: 'a',
+						text: text,
+						href: this.item.user.url + 'gallery'
+					}
+				]
+			}).append(this.otherGalleriesNode);
+			for( var i = 0, l = this.otherGalleriesItems.re.items.length; i < l; i++){
+				var item = this.otherGalleriesItems.re.items[i];
+				mkE({
+					tag: 'div',
+					className: 'item' + ( i == 3 || i == 7 ? ' last' : '') + (this.otherGalleriesItems.re.items.length > 4 ? ( i < 4 ? ' first' : ' second' ) : '' ),
+					attr: {
+						title: item.title
+					},
+					prop: {
+						onclick: D.closure(this, this.loadAlbum, item.id, false, 'other')
+					},
+					style: {
+						backgroundImage: 'url(' + item.thumbItem.image.small + ')'
+					}
+				}).append(this.otherGalleriesNode);
+			}
+			this.onResize();
+		},
+		reloadItem: function(){
+			if( !this.lastScreenActive ){
+				this.loadItem(this.pictures[this.current] || 0);
+			}
+		},
+		addToTop: function(fromProfileNews){
+			fromProfileNews = fromProfileNews === true;
+			var append = '';
+			if( fromProfileNews ){
+				append = '&fromProfileNews';
+			}
+			InfoBox.iframe('/rate/add/gal?pid=' + this.item.id + append, {
+				title: D.Lang.get('add_to_top'),
+				width: 700
+			});
+		},
+		editDescription: function(){
+			this.descriptionEditor = new D.SayEditor({
+				noLinkReplace: true
+			});
+			this.descriptionEditor.value(nl2br(this.item.descriptionEdit));
+			var onScroll = D.closure(this, function(e){
+				e = window.event || e;
+				var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+				if( isNaN(delta) ){
+					return;
+				}
+				this.descriptionEditor._content.scrollTop = this.descriptionEditor._content.scrollTop - delta * 32;
+			});
+			if( this.descriptionEditor._content.addEventListener ){
+				this.descriptionEditor._content.addEventListener("mousewheel", onScroll, false);
+				this.descriptionEditor._content.addEventListener("DOMMouseScroll", onScroll, false);
+			} else {
+				this.descriptionEditor._content.attachEvent("onmousewheel", onScroll);
+			}
+			this.descriptionEditor._content.onscroll = onScroll;
+			this.descriptionEdit = mkE({
+				tag: 'div',
+				className: 'descriptionEdit',
+				els: [
+					{
+						tag: 'div',
+						className: 'SayFormEditor radius3',
+						els: [
+							{
+								tag: 'div',
+								className: 'formItemBorder radius3 editorTextContainer',
+								els: [
+									this.descriptionEditor
+								]
+							}
+						]
+					},
+					{
+						tag: 'div',
+						className: 'descriptionEditButtons',
+						els: [
+							new T.Form.Button({
+								caption: D.Lang.get('Cancel'),
+								color: 'link',
+								onclick: D.closure(this, this.itemInfo)
+							}),
+							new T.Form.Button({
+								caption: D.Lang.get('Save'),
+								onclick: D.closure(this, this.saveDescription)
+							})
+						]
+					}
+				]
+			}).replace(this.descriptionEl);
+		},
+		saveDescription: function(){
+			D.loadingOverlay(this.descriptionEdit);
+			var method = new DR.gallery.EditDescription();
+			method.pid = this.item.id;
+			method.description = this.descriptionEditor.value();
+			method.onLoad = D.closure(this, function(){
+				if( !method || method.error ){
+					D.removeLoadingOverlay(this.descriptionEdit);
+					return;
+				}
+				this.item.description = method.re.text;
+				this.item.descriptionEdit = this.descriptionEditor.value();
+				this.itemInfo();
+			});
+			method.call();
+		},
+		recFromLikePopup: function(){
+			D.loadingOverlay(this.likeRecContent);
+			this.hideLikeRecommend = Boolean(this.likeRecCheckbox.value());
+			D.store.set('gallery_hide_likeRec', this.hideLikeRecommend);
+			var method = new DR.gallery.SaveSettings();
+			method.hideLikeRecommend = this.hideLikeRecommend;
+			method.colorScheme = this.selectedScheme;
+			method.onLoad = function(){
+				D.smallPopUp.close();
+			};
+			var statsMethod = new DR.gallery.LikeRecommendStats();
+			this.recommend([method, statsMethod]);
+		},
+		closeLikePopup: function(){
+			D.smallPopUp.close();
+			this.hideLikeRecommend = Boolean(this.likeRecCheckbox.value());
+			D.store.set('gallery_hide_likeRec', this.hideLikeRecommend);
+			var method = new DR.gallery.SaveSettings();
+			method.hideLikeRecommend = this.hideLikeRecommend;
+			method.colorScheme = this.selectedScheme;
+			method.call();
+		},
+		_mStatsGetRe: function(){
+			if( !this._mStatsGet.re || empty(this._mStatsGet.re.par) ){
+				return;
+			}
+			var par = D.JSON.parse(this._mStatsGet.re.par);
+			if( (par.type == 'user' && empty(par.albums)) || par.type == 'album' && empty(par.users) ){
+				return;
+			}
+			this.galleryStatsBlock = new D.Gallery.StatsBlock(par);
+		},
+		/**
+		 * @param keyword
+		 * @param {DR.ApiCall} call
+		 */
+		addStats: function(keyword, call){
+			if( !keyword ){
+				return;
+			}
+			this._mStats = new DR.gallery.Stats;
+			this._mStats.key = keyword;
+			if( call === true ){
+				this._mStats.call();
+			}
+		},
+		onSayProfiles: function(){
+			if( !this._mSayProfiles || this._mSayProfiles.error || !this._mSayProfiles.re ){
+				return;
+			}
+			this.sayProfiles = this._mSayProfiles.re.users;
+		},
+
+		_showSmallLogin: function(){
+			T.Tooltip.hide();
+			this.closeWindow(null, false);
+			D.focusSmallLogin();
+		}
+	};
+
+	/**
+	 * @constructor
+	 */
+	D.GalleryFSPar = function(){};
+	D.GalleryFSPar.prototype.aid = 0;
+	D.GalleryFSPar.prototype.pid = 0;
+	D.GalleryFSPar.prototype.tab = 1;
+	D.GalleryFSPar.prototype.i = 0;
+	D.GalleryFSPar.prototype.fid = null;
+	D.GalleryFSPar.prototype.autoPlay = false;
+	D.GalleryFSPar.prototype.search = null;
+	D.GalleryFSPar.prototype.searchType = null;
+	D.GalleryFSPar.prototype.showDeleted = false;
+	D.GalleryFSPar.prototype.fromSay = false;
+	D.GalleryFSPar.prototype.pids = [];
+	D.GalleryFSPar.prototype.hash = '';
+	D.GalleryFSPar.prototype.addToTop = false;
+	D.GalleryFSPar.prototype.stats = '';
+	D.GalleryFSPar.prototype.tagActive = false;
+	D.GalleryFSPar.prototype.noHash = false;
+	D.GalleryFSPar.prototype.startTime = false;
+	D.GalleryFSPar.prototype.msTop = false;
+
+
+	/**
+	 * @constructor
+	 */
+	D.GalleryFS.ThumbnailsPar = function(){};
+	/**
+	 * @type {D.GalleryFS}
+	 */
+	D.GalleryFS.ThumbnailsPar.prototype.window = null;
+	D.GalleryFS.ThumbnailsPar.prototype.onclick = function(){};
+	/**
+	 * @param {D.GalleryFS.ThumbnailsPar|Object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Thumbnails = function(par){
+		this.window = par.window;
+		this._onClick = par.onclick;
+		this.thumbnails = [];
+		this.pidToIndex = {};
+		this.node = mkE({
+			tag: 'div',
+			id: 'GalleryFSThumbnails',
+			els: [
+				this.prevNode = mkE({
+					tag: 'a',
+					className: 'control prev disabled',
+					prop: {
+						onclick: D.closure(this, this.prev),
+						onmousedown: D.closure(this, this.mouseDownPrev),
+						onmouseup: D.closure(this, this.mouseDownPrevStop),
+						onmouseout: D.closure(this, this.mouseDownPrevStop)
+					}
+				}),
+				this.thumbnailContainer = mkE({
+					tag: 'div',
+					className: 'thumbsContainer',
+					els: [
+						this.thumbnailsNode = mkE({
+							tag: 'div',
+							className: 'thumbs'
+						})
+					]
+				}),
+				this.nextNode = mkE({
+					tag: 'a',
+					className: 'control next disabled',
+					prop: {
+						onclick: D.closure(this, this.next),
+						onmousedown: D.closure(this, this.mouseDownNext),
+						onmouseup: D.closure(this, this.mouseDownNextStop),
+						onmouseout: D.closure(this, this.mouseDownNextStop)
+					}
+				})
+			]
+		});
+	};
+	D.GalleryFS.Thumbnails.prototype = new mkE.Base();
+	/**
+	 * @type {D.GalleryFS}
+	 */
+	D.GalleryFS.Thumbnails.prototype.window = null;
+	/**
+	 * @type {Array<D.GalleryFS.Thumbnail>}
+	 */
+	D.GalleryFS.Thumbnails.prototype.thumbnails = [];
+	D.GalleryFS.Thumbnails.prototype.pidToIndex = {};
+	D.GalleryFS.Thumbnails.prototype.current = 0;
+	D.GalleryFS.Thumbnails.prototype.visibleThumbs = 12;
+	D.GalleryFS.Thumbnails.prototype.firstVisible = 0;
+	D.GalleryFS.Thumbnails.prototype.lastVisible = 11;
+	D.GalleryFS.Thumbnails.prototype.isPrev = false;
+	D.GalleryFS.Thumbnails.prototype.isNext = false;
+	D.GalleryFS.Thumbnails.prototype.activeSize = 34;
+	D.GalleryFS.Thumbnails.prototype.firstLoadedThumb = null;
+	D.GalleryFS.Thumbnails.prototype.firstLoadedId = null;
+	D.GalleryFS.Thumbnails.prototype.lastLoadedId = null;
+	D.GalleryFS.Thumbnails.prototype._onClick = function(){};
+	D.GalleryFS.Thumbnails.prototype.prev = function(){
+		if( !this.isPrev ){
+			return;
+		}
+		this.firstVisible = Math.max( this.firstVisible - 1, 0 );
+		this.lastVisible = Math.min(this.window.pictures.length - 1, this.firstVisible + (this.visibleThumbs - 1));
+		this.setScroll();
+		this.checkControls();
+	};
+	D.GalleryFS.Thumbnails.prototype.next = function(){
+		if( !this.isNext ){
+			return;
+		}
+		this.firstVisible = Math.min( this.firstVisible + 1, Math.max(0, this.window.pictures.length - (this.visibleThumbs - 1)));
+		this.lastVisible = Math.min(this.window.pictures.length - 1, this.firstVisible + (this.visibleThumbs - 1));
+		this.setScroll();
+		this.checkControls();
+	};
+	D.GalleryFS.Thumbnails.prototype.mouseDownNext = function(){
+		this.next();
+		if( this.isNext ){
+			this.nextTimeout = setTimeout(D.closure(this, this.mouseDownNext), 250);
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.mouseDownNextStop = function(){
+		if( this.nextTimeout ){
+			clearTimeout(this.nextTimeout);
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.mouseDownPrev = function(){
+		this.prev();
+		if( this.isNext ){
+			this.prevTimeout = setTimeout(D.closure(this, this.mouseDownPrev), 250);
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.mouseDownPrevStop = function(){
+		if( this.prevTimeout ){
+			clearTimeout(this.prevTimeout);
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.setScroll = function(){
+		if( empty(this.thumbnails) ){
+			return;
+		}
+		clearNode(this.thumbnailsNode);
+		for( var i = this.firstVisible; i < this.firstVisible + 12; i++ ){
+			if( !this.thumbnails[i] ){
+				continue;
+			}
+			this.thumbnailsNode.appendChild(this.thumbnails[ i ].node);
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.checkControls = function( noThumbs ){
+		if( this.firstVisible == 0 ){
+			addClassName(this.prevNode, 'disabled');
+			this.isPrev = false;
+		}else{
+			removeClassName(this.prevNode, 'disabled');
+			this.isPrev = true;
+		}
+
+		if( this.window.pictures.length < this.visibleThumbs || this.lastVisible == this.window.pictures.length - 1 ){
+			addClassName(this.nextNode, 'disabled');
+			this.isNext = false;
+		}else{
+			removeClassName(this.nextNode, 'disabled');
+			this.isNext = true;
+		}
+		if( !noThumbs ){
+			this.checkThumbs();
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.checkThumbs = function(){
+		var pids = [];
+		var frontPids = [];
+		var backPids = [];
+		for(var i = this.window.current; i > Math.max(-1, this.firstVisible - 20); i--){
+			if(!this.thumbnails[i].loaded){
+				frontPids.push(this.thumbnails[i].pid || 0);
+			}
+		}
+		if( this.thumbnails[this.firstVisible] && (!this.thumbnails[this.firstVisible].loaded || frontPids.length >= 20 || this.window.current - 20 <= 0) ){
+			pids = pids.concat(frontPids);
+		}
+		for(var k = this.window.current; k < Math.min(this.window.pictures.length, this.lastVisible + 20); k++){
+			if(!this.thumbnails[k].loaded){
+				backPids.push(this.thumbnails[k].pid || 0);
+			}
+		}
+		if( !this.thumbnails[this.lastVisible].loaded || backPids.length >= 20 || this.window.current + 20 >= this.window.pictures.length - 1){
+			pids = pids.concat(backPids);
+		}
+		this.loadMore(pids);
+		this.checkPids();
+	};
+	D.GalleryFS.Thumbnails.prototype.checkPids = function(){
+		var check = Math.min(this.window.pictures.length, this.lastVisible + 50);
+		if( this.window.pictures[check] == 0 ){
+			this.loadMorePids();
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.checkPosition = function(noThumbCheck){
+		var index = this.current;
+		if( index - this.firstVisible < 2 ){
+			this.firstVisible = Math.max( this.firstVisible - ( this.firstVisible - index + 2 ), 0 );
+		}else if( this.lastVisible < this.window.pictures.length - 1 && this.lastVisible - index < 2 ){
+			this.firstVisible = Math.min(this.firstVisible + (index - this.lastVisible + 2), this.window.pictures.length - 7);
+		}
+		this.lastVisible = Math.min(this.window.pictures.length - 1, this.firstVisible + (this.visibleThumbs - 1));
+		this.setScroll();
+		this.checkControls(noThumbCheck);
+	};
+	D.GalleryFS.Thumbnails.prototype.loadMorePids = function(){
+		if( this.pidsLoading ){
+			return;
+		}
+		this.pidsLoading = true;
+		var index = this.lastLoadedId + 2;
+
+		var pidsMethod = new DR.gallery.GetTabPids;
+		pidsMethod.tab = this.window.tab;
+		pidsMethod.i = index;
+		pidsMethod.count = 100;
+		pidsMethod.fid = this.window.fid;
+		pidsMethod.first = false;
+		pidsMethod.search = this.window.search;
+		pidsMethod.searchType = this.window.searchType;
+		pidsMethod.aid = this.window.item.aid;
+		pidsMethod.top = this.window.msTop;
+		pidsMethod.placeId = this.window.placeId;
+		pidsMethod.select = [
+			new DR.gallery.select.GetPidsRe().all()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				pidsMethod
+			],
+			onLoad: function(){
+				this.pidsLoading = false;
+				if( pidsMethod && !pidsMethod.error && pidsMethod.re.ids ){
+					this.addMorePids( pidsMethod.re, index - 1 );
+				}
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+	/**
+	 *
+	 * @param {DR.gallery.struct.GetPidsRe} re
+	 * @param {int} start
+	 */
+	D.GalleryFS.Thumbnails.prototype.addMorePids = function( re, start ){
+		var index = start;
+		for( var i in re.ids ){
+			var pid = re.ids[i];
+			this.window.pictures[index] = pid;
+			this.pidToIndex[pid] = index;
+
+			if( this.thumbnails[index] ){
+				this.thumbnails[index].pid = pid;
+			}
+
+			this.firstLoadedId = Math.min(this.firstLoadedId, index);
+			this.lastLoadedId = Math.max(this.lastLoadedId, index);
+			index++;
+		}
+		this.checkControls(true);
+	};
+	/**
+	 *
+	 * @param {DR.gallery.struct.GetPidsRe} re
+	 * @param {null|bool} first
+	 */
+	D.GalleryFS.Thumbnails.prototype.addPids = function( re, first ){
+		this.window.search = re.search;
+		setNodeText(this.window.whatTotal, re.count);
+		this.window.whatPic.style.visibility = 'visible';
+		var pid, index, thumb;
+		first = first || false;
+		if( !this.window.pictures.length && !first && this.window.current >= re.perPage ){
+			var firstLoaded = Math.floor(this.window.current / re.perPage) * re.perPage;
+			for( var k = 0; k < firstLoaded; k++ ){
+				index = k;
+				this.window.pictures.push(0);
+				thumb = new D.GalleryFS.Thumbnail({
+					index: index,
+					pid: 0,
+					onclick: this._onClick
+				});
+				this.thumbnails.push(thumb);
+			}
+		}
+		for( var i in re.ids ){
+			pid = re.ids[i];
+			index = this.window.pictures.length;
+			this.window.pictures.push(pid);
+			this.pidToIndex[pid] = index;
+			thumb = new D.GalleryFS.Thumbnail({
+				index: index,
+				pid: pid,
+				onclick: this._onClick
+			});
+			this.thumbnails.push(thumb);
+
+			this.firstLoadedId = Math.min(this.firstLoadedId, index);
+			this.lastLoadedId = Math.max(this.lastLoadedId, index);
+		}
+		if( re.count > this.window.pictures.length ){
+			for( var j = this.window.pictures.length; j < re.count; j++ ){
+				index = j;
+				this.window.pictures.push(0);
+				thumb = new D.GalleryFS.Thumbnail({
+					index: index,
+					pid: 0,
+					onclick: this._onClick
+				});
+				this.thumbnails.push(thumb);
+			}
+		}
+		if(this.window.pictures.length == 1){
+			this.node.style.display = 'none';
+		}else{
+			this.node.style.display = '';
+		}
+
+		if( this.window.pictures.length <= this.visibleThumbs ){
+			addClassName(this.node, 'no-controls');
+		}else{
+			removeClassName(this.node, 'no-controls');
+		}
+
+		this.checkControls(true);
+	};
+	D.GalleryFS.Thumbnails.prototype.addImages = function( thumbs ){
+		for( var i in thumbs ){
+			if( !thumbs.hasOwnProperty(i) ){
+				continue;
+			}
+			/**
+			 * @type {DR.gallery.struct.Thumbnail}
+			 */
+			var thumb = thumbs[i];
+			if( typeof this.pidToIndex[ thumb.pid ] == 'undefined' ){
+				continue;
+			}
+			var index = this.pidToIndex[ thumb.pid ];
+			this.firstLoadedThumb = Math.min(this.firstLoadedThumb, index);
+			this.thumbnails[ index ].node.style.backgroundImage = 'url(' + thumb.image.icon + ')';
+			this.thumbnails[ index ].loaded = true;
+			if( thumb.type != D.GalleryFS.TYPE_PIC ){
+				addClassName(this.thumbnails[ index ].node, 'video');
+			}
+		}
+	};
+	D.GalleryFS.Thumbnails.prototype.setActive = function( index, noThumbCheck ){
+		if( this.thumbnails[ this.current ] ){
+			this.thumbnails[ this.current ].active(false);
+		}
+		if( this.thumbnails[ index ] ){
+			this.thumbnails[ index ].active(true);
+		}
+		this.current = index;
+		this.window.current = index;
+
+		this.checkPosition(noThumbCheck);
+	};
+	D.GalleryFS.Thumbnails.prototype.loadMore = function( pids ){
+		if( !pids.length || this.loading ){
+			return;
+		}
+		this.loading = true;
+		var thumbnailsMethod = new DR.gallery.Thumbnails;
+		thumbnailsMethod.pids = pids;
+		if( this.window.tab == 31 ){
+			thumbnailsMethod.ids = this.window.pids;
+			thumbnailsMethod.hash = this.window.hash;
+		}
+		thumbnailsMethod.select = [
+			new DR.gallery.select.ThumbnailsRe().all(),
+			new DR.gallery.select.Thumbnail().all(),
+			new DR.gallery.select.Image().icon()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				thumbnailsMethod
+			],
+			onLoad: function(){
+				this.loading = false;
+				if( thumbnailsMethod && !thumbnailsMethod.error && thumbnailsMethod.re && thumbnailsMethod.re.items ){
+					this.addImages( thumbnailsMethod.re.items );
+				}
+			},
+			onError: function(){
+				this.loading = false;
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+	D.GalleryFS.Thumbnails.prototype.loadByIndex = function( index ){
+		var pids = [];
+		pids = pids.concat(this.window.pictures.slice(Math.max(0, index - 20), index));
+		pids = pids.concat(this.window.pictures.slice(index, Math.min(this.window.pictures.length, index + 20)));
+
+		var thumbnailsMethod = new DR.gallery.Thumbnails;
+		thumbnailsMethod.pids = pids;
+		if( this.window.tab == 31 ){
+			thumbnailsMethod.ids = this.window.pids;
+			thumbnailsMethod.hash = this.window.hash;
+		}
+		thumbnailsMethod.onLoad = D.closure(this, function(){
+			this.addImages(thumbnailsMethod.re.items);
+		});
+
+		return thumbnailsMethod;
+	};
+	/**
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Thumbnail = function(par){
+		par = par || {};
+		this.index = par.index;
+		this.pid = par.pid;
+		this.onclick = par.onclick;
+		this.isActive = false;
+		this.loaded = false;
+		this.node = mkE({
+			tag: 'div',
+			className: 'thumb',
+			els: [
+				{
+					tag: 'div'
+				}
+			],
+			prop: {
+				onclick: D.closure(this, this.onClick)
+			}
+		});
+	};
+	D.GalleryFS.Thumbnail.prototype = new mkE.Base();
+	D.GalleryFS.Thumbnail.prototype.active = function(v){
+		if( v ){
+			addClassName(this.node, 'active');
+			this.isActive = true;
+		}else{
+			removeClassName(this.node, 'active');
+			this.isActive = false;
+		}
+		return this.isActive;
+	};
+	D.GalleryFS.Thumbnail.prototype.onClick = function(){
+		this.onclick(this);
+	};
+
+
+	/**
+	 * @constructor
+	 */
+	D.GalleryFS.Feedback = function(fs){
+		this.fs = fs;
+		this.formOpen = false;
+		this.visible = false;
+		this.node = mkE({
+			tag: 'div',
+			id: 'GalleryFSFeedback',
+			els: [
+				this.button = mkE({
+					tag: 'a',
+					className: 'toggleFeedback radius3',
+					els: [
+						{
+							tag: 'span',
+							text: D.GalleryFS.l.get('gallery_feedback')
+						}
+					],
+					prop: {
+						onclick: D.closure(this, this.toggle)
+					}
+				}),
+				this.window = mkE({
+					tag: 'div',
+					className: 'window radius3',
+					els: [
+						{
+							tag: 'h2',
+							text: D.GalleryFS.l.get('gallery_feedback_text')
+						},
+						{
+							tag: 'div',
+							className: 'buttons',
+							els: [
+								this.yes = mkE({
+									tag: 'div',
+									className: 'feedbackButton yes radius3',
+									els: [
+										{
+											tag: 'span',
+											text: D.GalleryFS.l.get('feedback_yes')
+										}
+									],
+									prop: {
+										onclick: D.closure(this, this.toggleForm, 'yes')
+									}
+								}),
+								this.no = mkE({
+									tag: 'div',
+									className: 'feedbackButton no radius3',
+									els: [
+										{
+											tag: 'span',
+											text: D.GalleryFS.l.get('feedback_no')
+										}
+									],
+									prop: {
+										onclick: D.closure(this, this.toggleForm, 'no')
+									}
+								}),
+								{
+									tag: 'div',
+									className: 'clear'
+								}
+							]
+						},
+						this.form = mkE({
+							tag: 'div',
+							className: 'feedbackForm',
+							els: [
+								this.textarea = new T.Form.TextArea({
+									placeholder: D.GalleryFS.l.get('enter_feedback')
+								}),
+								this.button = new T.Form.Button({
+									caption: D.GalleryFS.l.get('send_feedback'),
+									stretch: true,
+									onclick: D.closure(this, this.sendForm)
+								})
+							]
+						}),
+						this.noOpinion = mkE({
+							tag: 'div',
+							className: 'closeFeedback',
+							els: [
+								{
+									tag: 'a',
+									text: D.GalleryFS.l.get('gal_feedback_discard'),
+									prop: {
+										onclick: D.closure(this, this.discard)
+									}
+								}
+							]
+						})
+					]
+				})
+			],
+			prop: {
+				onclick: D.closure(this, function(e){
+					e = D.event(e);
+					this.fs.hideOptions();
+					if( e.stopImmediatePropagation ){
+						e.stopImmediatePropagation()
+					}else{
+						e.isImmediatePropagationEnabled = false;
+						e.cancelBubble = true;
+					}
+				})
+			}
+		});
+	};
+	D.GalleryFS.Feedback.prototype = new mkE.Base;
+	D.GalleryFS.Feedback.prototype.toggle = function(){
+		if( this.visible ){
+			this.visible = false;
+			this.window.style.display = 'none';
+		}else{
+			this.visible = true;
+			this.window.style.display = 'block';
+		}
+	};
+	D.GalleryFS.Feedback.prototype.hide = function(){
+		this.visible = false;
+		this.window.style.display = 'none';
+	};
+	D.GalleryFS.Feedback.prototype.toggleForm = function(type){
+		if( type == 'yes' ){
+			this.active = 'positive';
+			addClassName(this.yes, 'active');
+			removeClassName(this.no, 'active');
+		}else{
+			this.active = 'negative';
+			addClassName(this.no, 'active');
+			removeClassName(this.yes, 'active');
+		}
+		this.noOpinion.remove();
+		if( this.formOpen ){
+			return;
+		}
+		this.formOpen = true;
+		this.form.style.display = 'block';
+	};
+	D.GalleryFS.Feedback.prototype.discard = function(){
+		this.toggle();
+		/**
+		 *
+		 * @type {DR.gallery.Feedback}
+		 */
+		var feedbackMethod = new DR.gallery.Feedback;
+		feedbackMethod.discard = true;
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				feedbackMethod
+			],
+			onLoad: function(){},
+			context: this
+		} );
+		apiCall.call();
+	};
+	D.GalleryFS.Feedback.prototype.sendForm = function(){
+		/**
+		 *
+		 * @type {DR.gallery.Feedback}
+		 */
+		var feedbackMethod = new DR.gallery.Feedback;
+		feedbackMethod[this.active] = this.textarea.value();
+		feedbackMethod.select = [
+			new DR.gallery.select.FeedbackRe().all()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				feedbackMethod
+			],
+			onLoad: function(){
+				clearNode(this.window);
+				D.store.set('new_gal_seen_pics', 5);
+				addClassName(this.window, 'thanks');
+				mkE({
+					tag: 'div',
+					className: 'feedbackThanks',
+					text: D.GalleryFS.l.get('gallery_feedback_thanks')
+				}).append(this.window);
+				mkE({
+					tag: 'a',
+					className: 'close radius3',
+					prop: {
+						onclick: D.closure(this, this.hide)
+					}
+				}).append(this.window);
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+
+	/**
+	 *
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Item = function(par){
+		this.data = par.data;
+		this.window = par.window;
+		removeClassName(this.window.tagButton, 'active');
+		addClassName(this.window.tagButton, 'disabled');
+		clearNode(this.window.tagsList);
+		this.window.tagButton.onclick = function(){};
+		if( D.GalleryTagLarge ){
+			D.GalleryTagLarge.activeTagging = false;
+		}
+		if( D.GalleryFS.Item.types[this.data.type] ){
+			this.item = new D.GalleryFS.Item.types[this.data.type](par);
+		}
+	};
+	D.GalleryFS.Item.types = {};
+	D.GalleryFS.Item.prototype = {
+		append: function(parent){
+			this.item.node.append(parent);
+			if( this.item.onShow ){
+				this.item.onShow();
+			}
+			this.item.onResize();
+			return this;
+		},
+		onResize: function(){
+			this.item.onResize();
+		}
+	};
+
+	/**
+	 *
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Item.Picture = function(par){
+		this.data = par.data;
+		/**
+		 * @type {D.GalleryFS}
+		 */
+		this.window = par.window;
+		var src = ( this.window.fastInternet || this.window.isFullScreen ) && (this.window.content.offsetWidth - this.data.image.wLarge > 200 || this.window.content.offsetHeight - this.data.image.hLarge > 200) ? this.data.image.original : this.data.image.uber;
+
+		this.node = mkE({
+			tag: 'div',
+			id: 'galleryLargePicture',
+			els: [
+				this.img = mkE({
+					tag: 'img',
+					src: src,
+					style: {
+						imageOrientation: 'none'
+					},
+					prop: {
+						onload: D.closure(this, function(){
+							if( this.window.nextImage ){
+								var preloadSrc = this.window.fastInternet && this.window.content.offsetWidth > 980 ? this.window.nextImage.original : this.window.nextImage.uber;
+								D.Gallery.preload(preloadSrc);
+							}
+						})
+					}
+				}),
+				this.overlay = mkE({
+					tag: 'div',
+					className: 'overlay'
+				})
+			]
+		});
+	};
+	D.GalleryFS.Item.Picture.prototype = {
+		onShow: function(){
+			if( this.data.selectedUserCount || this.data.canSelectUsers ){
+				D.Gallery.activePicture = {
+					tags: [],
+					id: this.data.id
+				};
+				D.Gallery.onGalleryTag(D.closure(this, this.initTags));
+			}
+		},
+		initTags: function(){
+			this.onResize();
+			if( this.data.selectedUserCount ){
+				this.showTags();
+			}
+			if( this.data.canSelectUsers ){
+				removeClassName(this.window.tagButton, 'disabled');
+				this.window.tagButton.onclick = D.closure(this, this.onStartTag);
+			}
+			if( this.window.tagActive ){
+				this.onStartTag();
+			}
+		},
+		onStartTag: function(){
+			this.window.tagButton.setAttribute('tooltip', D.GalleryFS.l.get('tg_mark_fr_c'));
+			addClassName(this.window.tagButton, 'active');
+			this.window.tagButton.onclick = D.closure(this, this.onEndTag);
+			T.Tooltip.refresh();
+			D.GalleryTagLarge.enable();
+			this.node.style.zIndex = '2';
+		},
+		onEndTag: function(){
+			this.window.tagButton.setAttribute('tooltip', D.GalleryFS.l.get('Picture option select user'));
+			removeClassName(this.window.tagButton, 'active');
+			this.window.tagButton.onclick = D.closure(this, this.onStartTag);
+			T.Tooltip.refresh();
+			D.GalleryTagLarge.disable();
+			this.node.style.zIndex = '';
+		},
+		showTags: function(){
+			this.window.tags(this.data.selectedUsers);
+			for( var k in this.data.selectedUsers ){
+				var userData = this.data.selectedUsers[k];
+
+				var user = {
+					del: userData.canDel,
+					xp: userData.x / this.data.image.wLarge * 100,
+					yp: userData.y / this.data.image.hLarge * 100,
+					wp: userData.w / this.data.image.wLarge * 100,
+					hp: userData.h / this.data.image.hLarge * 100,
+					user: {
+						id: userData.user.id,
+						title: userData.user.title,
+						url: userData.user.url
+					},
+					onDeleteClick: D.closure(this.window, this.window.deleteTag, userData.user.id)
+				};
+
+				var tag = new D.GalleryTagLarge( user );
+				tag.node.appendTo('#galleryLargePicture');
+			}
+		},
+		onResize: function(){
+			var image = this.data.image;
+			var maxWidth = this.window.content.offsetWidth;
+			var maxHeight = this.window.content.offsetHeight;
+			var width = this.window.fastInternet === false ? image.wLarge : image.w;
+			var height = this.window.fastInternet === false ? image.hLarge : image.h;
+			var ratioWidth = maxWidth / width;
+			var ratioHeight = maxHeight / height;
+
+			var ratio = ratioWidth < ratioHeight ? ratioWidth : ratioHeight;
+
+			if( ratio < 1 ){
+				width = width * ratio;
+				height = height * ratio;
+			}
+
+			var left = Math.max(0, (maxWidth - width) / 2);
+			var top = Math.max(0, (maxHeight - height) / 2);
+
+			this.node.style.width = width + 'px';
+			this.node.style.height = height + 'px';
+			this.node.style.top = top + 'px';
+			this.node.style.left = left + 'px';
+
+			this.img.style.width = width + 'px';
+			this.img.style.height = height + 'px';
+
+			this.window.prevButton.style.height = height + 'px';
+			this.window.prevButton.style.top = '50%';
+			this.window.prevButton.style.marginTop = '-' + (height / 2) + 'px';
+			this.window.nextButton.style.height = height + 'px';
+			this.window.nextButton.style.top = '50%';
+			this.window.nextButton.style.marginTop = '-' + (height / 2) + 'px';
+		}
+	};
+	D.GalleryFS.Item.types[0] = D.GalleryFS.Item.Picture;
+
+	/**
+	 *
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Item.Video = function(par){
+		this.data = par.data;
+		this.window = par.window;
+
+		this.node = mkE({
+			tag: 'div',
+			id: 'GalleryVideo111',
+			style: {
+				zIndex: 2
+			}
+		});
+	};
+	D.GalleryFS.Item.Video.prototype = {
+		onShow: function(){
+			var video = this.data.video;
+			if( video.format == 'mp4' ){
+				var videoPlayerPar = new D.VideoPlayerPar();
+				videoPlayerPar.src = video.url;
+				videoPlayerPar.poster = this.data.image.uber;
+				videoPlayerPar.autoplay = this.window.autoPlay;
+				videoPlayerPar.width = video.w;
+				videoPlayerPar.height = video.h;
+				if( D.ID ){
+					videoPlayerPar.stats = {
+						uid: D.ID,
+						pid: this.data.id,
+						type: 8
+					};
+				}
+				if( this.window.startTime ){
+					videoPlayerPar.startTime = this.window.startTime;
+					this.window.startTime = false;
+				}
+				videoPlayerPar.videoReady = video.ready;
+				this.videoPlayer = new D.VideoPlayer(videoPlayerPar);
+				this.videoPlayer.append(this.node);
+				return;
+			}
+			var so = new SWFObject( D.PIMG + 'gallery/swf/v' + D.JS +  '/video_player_v3.swf', 'GalleryVideo111movie', '100%', '100%', 9, '#000000' );
+			so.addVariable( 'videoUrl', video.url );
+			so.addVariable( 'imageUrl' , this.data.image.uber );
+			so.addParam( 'play', 'true' );
+			so.addParam( 'wmode', 'window' );
+			so.addParam( 'allowScriptAccess', 'always' );
+			so.addParam( 'allowfullscreen', 'true' );
+
+			so.addVariable("videoComplete", "javascript: D.Ads.VideoAd.videoComplete();");
+			so.addVariable("adStart", "javascript: D.Ads.VideoAd.adStart();");
+			so.addVariable("adMiddle", "javascript: D.Ads.VideoAd.adMiddle();");
+			so.addVariable("adEnd", "javascript: D.Ads.VideoAd.adEnd();");
+			so.addVariable("adClose", "javascript: D.Ads.VideoAd.adClose();");
+			so.write('GalleryVideo111');
+			if( D.Ads ){
+				D.Ads.VideoAd.videoID = 'GalleryVideo111movie';
+				D.Ads.place(17211);
+				D.Ads.load();
+			}
+		},
+		onResize: function(){
+			var video = this.data.video;
+			var maxWidth = this.window.content.offsetWidth;
+			var maxHeight = this.window.content.offsetHeight;
+			var width = Math.max(video.w, video.h);
+			var height = video.h;
+			var ratioWidth = (maxWidth - 160) / width;
+			var ratioHeight = maxHeight / height;
+
+			var ratio = ratioWidth < ratioHeight ? ratioWidth : ratioHeight;
+
+			if( ratio < 1 ){
+				width = width * ratio;
+				height = height * ratio;
+			}
+
+			var left = Math.max(0, (maxWidth - width) / 2);
+			var top = Math.max(0, (maxHeight - height) / 2);
+
+			this.node.style.width = width + 'px';
+			this.node.style.height = height + 'px';
+			this.node.style.top = top + 'px';
+			this.node.style.left = left + 'px';
+
+			this.window.prevButton.style.height = height + 'px';
+			this.window.prevButton.style.top = '50%';
+			this.window.prevButton.style.marginTop = '-' + (height / 2) + 'px';
+			this.window.nextButton.style.height = height + 'px';
+			this.window.nextButton.style.top = '50%';
+			this.window.nextButton.style.marginTop = '-' + (height / 2) + 'px';
+		}
+	};
+	D.GalleryFS.Item.types[1] = D.GalleryFS.Item.Video;
+
+	/**
+	 *
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Item.Embed = function(par){
+		this.data = par.data;
+		this.window = par.window;
+
+		this.node = mkE({
+			tag: 'div',
+			style: {
+				zIndex: 2
+			}
+		});
+	};
+	D.GalleryFS.Item.Embed.prototype = {
+		onShow: function(){
+			var embed = this.data.embed;
+			if( this[embed.type] ){
+				this[embed.type]().append(this.node);
+			}
+			if( this[embed.type + 'OnShow'] ){
+				this[embed.type + 'OnShow']();
+			}
+		},
+		onResize: function(){
+			var embed = this.data.embed;
+			var maxWidth = this.window.content.offsetWidth;
+			var maxHeight = this.window.content.offsetHeight;
+			var width = embed.w;
+			var height = embed.h;
+			var ratioWidth = (maxWidth - 160) / width;
+			var ratioHeight = maxHeight / height;
+
+			var ratio = ratioWidth < ratioHeight ? ratioWidth : ratioHeight;
+
+			if( ratio < 1 ){
+				width = width * ratio;
+				height = height * ratio;
+			}
+
+			var left = Math.max(0, (maxWidth - width) / 2);
+			var top = Math.max(0, (maxHeight - height) / 2);
+
+			this.node.style.width = width + 'px';
+			this.node.style.height = height + 'px';
+			this.node.style.top = top + 'px';
+			this.node.style.left = left + 'px';
+
+			this.window.prevButton.style.height = height + 'px';
+			this.window.prevButton.style.top = '50%';
+			this.window.prevButton.style.marginTop = '-' + (height / 2) + 'px';
+			this.window.nextButton.style.height = height + 'px';
+			this.window.nextButton.style.top = '50%';
+			this.window.nextButton.style.marginTop = '-' + (height / 2) + 'px';
+		},
+		youtube: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src + '&wmode=windowed' + (this.window.autoPlay ? '&autoplay=1' : ''),
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		vimeo: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src + 'windowed' + (this.window.autoPlay ? '&autoplay=1' : ''),
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		soundcloud: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src,
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		tvplay: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src + 'wmode=windowed' + (this.window.autoPlay ? '&autostart=true' : ''),
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		vine: function(){
+			return mkE({
+				tag: 'div',
+				style: {
+					width: '100%',
+					height: '100%'
+				},
+				els: [
+					{
+						tag:'iframe',
+						attr:{
+							frameborder: '0',
+							width:'100%',
+							height:'100%',
+							src:this.data.embed.src,
+							allowFullScreen:'',
+							webkitAllowFullScreen:'',
+							mozallowfullscreen:''
+						}
+					},
+					{
+						tag: 'script',
+						attr: {
+							src: '//platform.vine.co/static/scripts/embed.js',
+							async: true
+						}
+					}
+				]
+			});
+		},
+		coub: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src + 'wmode=windowed' + (this.window.autoPlay ? '&autostart=true' : ''),
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		slideshare: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src,
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		delfilv: function(){
+			return mkE( {
+				tag:'div',
+				id:'DelfiLV111',
+				style: {
+					width:'100%',
+					height:'100%'
+				}
+			} );
+		},
+		delfilvOnShow: function(){
+			var so = new SWFObject( D.PIMG + 'gallery/swf/v' + D.JS +  '/player-licensed.swf', 'DelfiLV111movie', '100%', '100%', 8, '#FFFFFF' );
+			so.addParam( "wmode", "transparent" );
+			so.addParam( "quality", "low" );
+			so.addParam( "play", "true" );
+			so.addParam( "allowScriptAccess", "always" );
+			so.addParam( 'allowfullscreen', 'true' );
+			so.addVariable( "file", this.data.embed.src );
+			so.addVariable( "image", this.data.image.gm );
+			so.addVariable( "showdigits", "true" );
+			so.addVariable( "logo", "/img/wm.png" );
+			so.addVariable( "backcolor", "000000" );
+			so.addVariable( "lightcolor", "FFFFFF" );
+			so.addVariable( "screencolor", "000000" );
+			so.addVariable( "frontcolor", "FF6600" );
+			so.addVariable( "skin", D.PIMG + 'gallery/swf/modieus.swf' );
+			so.addVariable( "link", "false" );
+			so.addVariable( "recommendation", "false" );
+			so.addVariable( "dock", "false" );
+			so.addVariable( "autostart", "true" );
+			so.write('DelfiLV111');
+		},
+		rutube: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src + '?wmode=windowed' + (this.window.autoPlay ? '&autoStart=true' : ''),
+					allowFullScreen:'',
+					webkitAllowFullScreen:'',
+					mozallowfullscreen:''
+				}
+			} );
+		},
+		endomondo: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src,
+					scrolling: 'no'
+				}
+			} );
+		},
+		special: function(){
+			return mkE( {
+				tag:'iframe',
+				attr:{
+					frameborder: '0',
+					width:'100%',
+					height:'100%',
+					src:this.data.embed.src,
+					scrolling: 'no'
+				}
+			} );
+		}
+	};
+	D.GalleryFS.Item.types[2] = D.GalleryFS.Item.Embed;
+
+	/**
+	 *
+	 * @param {object} par
+	 * @constructor
+	 */
+	D.GalleryFS.Item.Gif = function(par){
+		this.data = par.data;
+		this.window = par.window;
+
+		this.node = mkE({
+			tag: 'div',
+			style: {
+				zIndex: 2
+			}
+		});
+	};
+	D.GalleryFS.Item.Gif.prototype = {
+		onShow: function(){
+			/**
+			 * @type {null|DR.gallery.struct.Gif}
+			 */
+			var gif = this.data.gif;
+			var gifPlayerPar = new D.GifPlayerPar();
+			gifPlayerPar.src = gif.src;
+			gifPlayerPar.poster = this.data.image.original;
+			gifPlayerPar.autoplay = true;
+			gifPlayerPar.videoReady = gif.ready;
+			this.player = new D.GifPlayer(gifPlayerPar);
+			this.player.append(this.node);
+
+			if( this.data.selectedUserCount || this.data.canSelectUsers ){
+				D.Gallery.activePicture = {
+					tags: [],
+					id: this.data.id
+				};
+				D.Gallery.onGalleryTag(D.closure(this, this.initTags));
+			}
+		},
+		initTags: function(){
+			this.onResize();
+			if( this.data.selectedUserCount ){
+				this.showTags();
+			}
+			if( this.data.canSelectUsers ){
+				removeClassName(this.window.tagButton, 'disabled');
+				this.window.tagButton.onclick = D.closure(this, this.onStartTag);
+			}
+			if( this.window.tagActive ){
+				this.onStartTag();
+			}
+		},
+		onStartTag: function(){
+			this.window.tagButton.setAttribute('tooltip', D.GalleryFS.l.get('tg_mark_fr_c'));
+			addClassName(this.window.tagButton, 'active');
+			this.window.tagButton.onclick = D.closure(this, this.onEndTag);
+			T.Tooltip.refresh();
+			D.GalleryTagLarge.enable( this.node );
+			this.node.style.zIndex = '2';
+		},
+		onEndTag: function(){
+			this.window.tagButton.setAttribute('tooltip', D.GalleryFS.l.get('Picture option select user'));
+			removeClassName(this.window.tagButton, 'active');
+			this.window.tagButton.onclick = D.closure(this, this.onStartTag);
+			T.Tooltip.refresh();
+			D.GalleryTagLarge.disable();
+			this.node.style.zIndex = '';
+		},
+		showTags: function(){
+			this.window.tags(this.data.selectedUsers);
+			for( var k in this.data.selectedUsers ){
+				var userData = this.data.selectedUsers[k];
+
+				var user = {
+					del: userData.canDel,
+					xp: userData.x / this.data.gif.w * 100,
+					yp: userData.y / this.data.gif.h * 100,
+					wp: userData.w / this.data.gif.w * 100,
+					hp: userData.h / this.data.gif.h * 100,
+					user: {
+						id: userData.user.id,
+						title: userData.user.title,
+						url: userData.user.url
+					},
+					onDeleteClick: D.closure(this.window, this.window.deleteTag, userData.user.id),
+					appendNode: this.node
+				};
+
+				var tag = new D.GalleryTagLarge( user );
+				tag.node.appendTo( this.node );
+			}
+		},
+		onResize: function(){
+			var gif = this.data.gif;
+			var maxWidth = this.window.content.offsetWidth;
+			var maxHeight = this.window.content.offsetHeight;
+			var width = gif.w;
+			var height = gif.h;
+			var ratioWidth = (maxWidth - 160) / width;
+			var ratioHeight = maxHeight / height;
+
+			var ratio = ratioWidth < ratioHeight ? ratioWidth : ratioHeight;
+
+			if( ratio < 1 ){
+				width = width * ratio;
+				height = height * ratio;
+			}
+
+			var left = Math.max(0, (maxWidth - width) / 2);
+			var top = Math.max(0, (maxHeight - height) / 2);
+
+			this.node.style.width = width + 'px';
+			this.node.style.height = height + 'px';
+			this.node.style.top = top + 'px';
+			this.node.style.left = left + 'px';
+
+			this.window.prevButton.style.height = height + 'px';
+			this.window.prevButton.style.top = '50%';
+			this.window.prevButton.style.marginTop = '-' + (height / 2) + 'px';
+			this.window.nextButton.style.height = height + 'px';
+			this.window.nextButton.style.top = '50%';
+			this.window.nextButton.style.marginTop = '-' + (height / 2) + 'px';
+		}
+	};
+	D.GalleryFS.Item.types[3] = D.GalleryFS.Item.Gif;
+
+
+	/**
+	 *
+	 * @param {DR.gallery.struct.OtherGalleriesLastRe} par
+	 * @param {int} current
+	 * @param {D.GalleryFS} window
+	 * @constructor
+	 */
+	D.GalleryFS.OtherGalleries = function(par, current, window){
+		this.window = window;
+		this.current = current;
+		this.id = par.album.id;
+		this.image = par.album.thumbItem.image.large;
+		this.title = par.album.title || '...';
+		this.name = par.album.thumbItem.user.title;
+		this.prev = par.prevAlbum;
+		this.next = par.nextAlbum;
+		this.fid = par.album.uid;
+		this.count = par.album.count;
+		this.node = mkE({
+			tag: 'div',
+			className: 'otherGalleriesLast',
+			els: [
+				{
+					tag: 'h2',
+					els: [
+						{
+							tag: 'a',
+							href: this.window.item.user.url + 'gallery',
+							text: D.GalleryFS.l.get('Citas šī lietotāja galerijas') + ' (' + par.count + ')'
+						}
+					]
+				},
+				this._prevButton = mkE({
+					tag: 'a',
+					className: 'prev',
+					prop: {
+						onclick: D.closure(this, this.showPrev)
+					},
+					els: [
+						{
+							tag: 'div'
+						}
+					]
+				}),
+				this._picture = mkE({
+					tag: 'div',
+					className: 'image radius3',
+					els: [
+						this._count = mkE({
+							tag: 'span',
+							className: 'itemCount',
+							text: this.count
+						}),
+						{
+							tag: 'div',
+							className: 'overlay radius3'
+						},
+						this._title = mkE({
+							tag: 'div',
+							className: 'title',
+							text: D.shorten(this.title, 25, '...')
+						}),
+						this._name = mkE({
+							tag: 'div',
+							className: 'user',
+							text: this.name
+						})
+					],
+					style: {
+						backgroundImage: 'url(' + this.image + ')'
+					},
+					prop: {
+						onclick: D.closure(this, this.openAlbum)
+					}
+				}),
+				this._nextButton = mkE({
+					tag: 'a',
+					className: 'next',
+					prop: {
+						onclick: D.closure(this, this.showNext)
+					},
+					els: [
+						{
+							tag: 'div'
+						}
+					]
+				})
+			]
+		});
+		if(!this.prev){
+			addClassName(this._prevButton, 'disabled');
+		}
+		if(!this.next){
+			addClassName(this._nextButton, 'disabled');
+		}
+	};
+	D.GalleryFS.OtherGalleries.prototype.append = function(parent){
+		this.node.append(parent);
+		return this;
+	};
+	D.GalleryFS.OtherGalleries.prototype.showPrev = function(){
+		if(existsClassName(this._prevButton, 'disabled')){
+			return;
+		}
+		this.loadOtherGalleries(this.prev);
+	};
+	D.GalleryFS.OtherGalleries.prototype.showNext = function(){
+		if(existsClassName(this._nextButton, 'disabled')){
+			return;
+		}
+		this.loadOtherGalleries(this.next);
+	};
+	D.GalleryFS.OtherGalleries.prototype.openAlbum = function(){
+		this.window.cancelLastScreen();
+		this.window.loadAlbum(this.id, false, 'last');
+	};
+	D.GalleryFS.OtherGalleries.prototype.loadOtherGalleries = function(id){
+		var albumsMethod = new DR.gallery.OtherGalleriesLast;
+		albumsMethod.aid = id;
+		albumsMethod.ignore = this.current;
+		albumsMethod.select = [
+			new DR.gallery.select.OtherGalleriesLastRe().all(),
+			new DR.gallery.select.Album().title().thumbItem().id().count(),
+			new DR.gallery.select.Item().user().image(),
+			new DR.gallery.select.Image().large(),
+			new DR.users.select.User().title()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				albumsMethod
+			],
+			onLoad: function(){
+				if( albumsMethod && !albumsMethod.error && albumsMethod.re ){
+					this.loadOtherGalleriesRe(albumsMethod.re);
+				}
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+	/**
+	 *
+	 * @param {DR.gallery.struct.OtherGalleriesLastRe} re
+	 */
+	D.GalleryFS.OtherGalleries.prototype.loadOtherGalleriesRe = function(re){
+		this.id = re.album.id;
+		this.prev = re.prevAlbum;
+		this.next = re.nextAlbum;
+		this._picture.style.backgroundImage = 'url(' + re.album.thumbItem.image.large + ')';
+		setNodeText(this._title, D.shorten(re.album.title || '...', 25,'...'));
+		D.smileyReplace(this._title);
+		setNodeText(this._count, re.album.count);
+		setNodeText(this._name, re.album.thumbItem.user.title);
+		if(this.prev){
+			removeClassName(this._prevButton, 'disabled');
+		}else{
+			addClassName(this._prevButton, 'disabled');
+		}
+		if(this.next){
+			removeClassName(this._nextButton, 'disabled');
+		}else{
+			addClassName(this._nextButton, 'disabled');
+		}
+	};
+
+
+	/**
+	 *
+	 * @param {DR.gallery.struct.OtherGalleriesLastLargeRe} re
+	 * @param {D.GalleryFS} window
+	 * @constructor
+	 */
+	D.GalleryFS.OtherGalleriesLarge = function(re, window){
+		this.window = window;
+		this.ignoreIndex = window.item.album.profGal ? -1 : re.currentIndex;
+		this.currentOffset = re.currentOffset;
+		this.total = re.count;
+		this.current = window.item.aid;
+		this.fid = window.item.album.uid;
+		this.prev = false;
+		this.next = false;
+		this.toOpen = 0;
+
+		var itemNodes = [];
+		for( var i in re.albums ){
+			var album = re.albums[i];
+			if( !this.toOpen && ( this.current > album.id || window.item.album.profGal ) ){
+				this.toOpen = album.id;
+			}
+			var item = mkE({
+				tag: 'div',
+				className: 'image radius3',
+				els: [
+					{
+						tag: 'span',
+						className: 'itemCount',
+						text: album.count
+					},
+					{
+						tag: 'div',
+						className: 'overlay radius3'
+					},
+					this._title = mkE({
+						tag: 'div',
+						className: 'title',
+						text: D.shorten(album.title || '...', 18, '...')
+					}),
+					this._name = mkE({
+						tag: 'div',
+						className: 'user',
+						text: D.shorten(album.thumbItem.user.title, 18, '...')
+					})
+				],
+				style: {
+					backgroundImage: 'url(' + album.thumbItem.image.gm + ')'
+				},
+				prop: {
+					onclick: D.closure(this, this.openAlbum, album.id)
+				}
+			});
+			itemNodes.push(item);
+		}
+
+		this.node = mkE({
+			tag: 'div',
+			className: 'otherGalleriesLast otherGalleriesLastLarge',
+			els: [
+				{
+					tag: 'h2',
+					els: [
+						{
+							tag: 'a',
+							href: this.window.item.user.url + 'gallery',
+							text: D.GalleryFS.l.get('Citas šī lietotāja galerijas') + ' (' + (re.count - 1) + ')'
+						}
+					]
+				},
+				this._prevButton = mkE({
+					tag: 'a',
+					className: 'prev',
+					prop: {
+						onclick: D.closure(this, this.showPrev)
+					},
+					els: [
+						{
+							tag: 'div'
+						}
+					]
+				}),
+				this._items = mkE({
+					tag: 'div',
+					className: 'items',
+					els: itemNodes
+				}),
+				this._nextButton = mkE({
+					tag: 'a',
+					className: 'next',
+					prop: {
+						onclick: D.closure(this, this.showNext)
+					},
+					els: [
+						{
+							tag: 'div'
+						}
+					]
+				})
+			]
+		});
+
+		this.prev = Boolean(this.currentOffset);
+		this.next = this.currentOffset + 4 < this.total;
+
+		if(!this.prev){
+			addClassName(this._prevButton, 'disabled');
+		}
+		if(!this.next){
+			addClassName(this._nextButton, 'disabled');
+		}
+	};
+	D.GalleryFS.OtherGalleriesLarge.prototype.append = function(parent){
+		this.node.append(parent);
+		return this;
+	};
+	D.GalleryFS.OtherGalleriesLarge.prototype.showPrev = function(){
+		if(existsClassName(this._prevButton, 'disabled')){
+			return;
+		}
+		this.currentOffset -= 4;
+		if( this.ignoreIndex >= this.currentOffset - 4 && (this.ignoreIndex <= this.currentOffset || this.ignoreIndex == this.currentOffset - 1) && !this.window.item.album.profGal ){
+			this.currentOffset--;
+		}
+		this.currentOffset = Math.max(this.currentOffset, 0);
+		this.loadOtherGalleries(this.currentOffset);
+	};
+	D.GalleryFS.OtherGalleriesLarge.prototype.showNext = function(){
+		if(existsClassName(this._nextButton, 'disabled')){
+			return;
+		}
+		this.currentOffset += 4;
+		if( this.ignoreIndex < this.currentOffset && this.ignoreIndex >= this.currentOffset - 4 && !this.window.item.album.profGal ){
+			this.currentOffset++;
+		}
+		this.loadOtherGalleries(this.currentOffset);
+	};
+	D.GalleryFS.OtherGalleriesLarge.prototype.openAlbum = function(id){
+		id = id || this.toOpen;
+		this.window.cancelLastScreen();
+		this.window.loadAlbum(id, false, 'last');
+	};
+	D.GalleryFS.OtherGalleriesLarge.prototype.loadOtherGalleries = function(offset){
+		var albumsMethod = new DR.gallery.GetUserAlbums;
+		albumsMethod.offset = offset;
+		albumsMethod.uid = this.fid;
+		albumsMethod.count = 5;
+		albumsMethod.select = [
+			new DR.gallery.select.GetAlbumsRe().all(),
+			new DR.gallery.select.Album().title().thumbItem().id().count(),
+			new DR.gallery.select.Item().user().image(),
+			new DR.gallery.select.Image().large().gm(),
+			new DR.users.select.User().title()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				albumsMethod
+			],
+			onLoad: function(){
+				if( albumsMethod && !albumsMethod.error && albumsMethod.re ){
+					this.loadOtherGalleriesRe(albumsMethod.re);
+				}
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+	/**
+	 *
+	 * @param {DR.gallery.struct.UserAlbums} re
+	 */
+	D.GalleryFS.OtherGalleriesLarge.prototype.loadOtherGalleriesRe = function(re){
+		clearNode(this._items);
+		this.toOpen = 0;
+		var f = 0;
+		for( var i in re.albums ){
+			var album = re.albums[i];
+			if( album.id == this.current ){
+				continue;
+			}
+			if( !this.toOpen && ( this.toOpen < this.window.item.aid || this.window.item.album.profGal) ){
+				this.toOpen = album.id;
+			}
+			mkE({
+				tag: 'div',
+				className: 'image radius3',
+				els: [
+					{
+						tag: 'span',
+						className: 'itemCount',
+						text: album.count
+					},
+					{
+						tag: 'div',
+						className: 'overlay radius3'
+					},
+					this._title = mkE({
+						tag: 'div',
+						className: 'title',
+						text: D.shorten(album.title || '...', 18, '...')
+					}),
+					this._name = mkE({
+						tag: 'div',
+						className: 'user',
+						text: album.thumbItem.user.title
+					})
+				],
+				style: {
+					backgroundImage: 'url(' + album.thumbItem.image.gm + ')'
+				},
+				prop: {
+					onclick: D.closure(this, this.openAlbum, album.id)
+				}
+			}).append(this._items);
+			if( ++f == 4 ){
+				break;
+			}
+		}
+		this.prev = Boolean(this.currentOffset);
+		this.next = this.currentOffset + 4 < this.total;
+		if(this.prev){
+			removeClassName(this._prevButton, 'disabled');
+		}else{
+			addClassName(this._prevButton, 'disabled');
+		}
+		if(this.next){
+			removeClassName(this._nextButton, 'disabled');
+		}else{
+			addClassName(this._nextButton, 'disabled');
+		}
+	};
+
+
+	/**
+	 *
+	 * @param {DR.gallery.struct.LastViewRe} par
+	 * @param {D.GalleryFS} window
+	 * @constructor
+	 */
+	D.GalleryFS.LastView = function( par, window ){
+		this.data = par;
+		this.window = window;
+		var itemNodes = [];
+		for( var i in this.data.items ){
+			var item = this.data.items[i];
+			var itemNode = mkE({
+				tag: 'div',
+				className: 'item item-' + (parseInt(i) + 1),
+				style: {
+					backgroundImage: 'url(' + item.image.large + ')'
+				},
+				els: [
+					{
+						tag: 'div',
+						className: 'overlay'
+					},
+					{
+						tag: 'a',
+						prop: {
+							onclick: D.closure(this, this.watchAgain)
+						}
+					}
+				]
+			});
+			itemNodes.push(itemNode);
+		}
+		itemNodes.push({
+			tag: 'div',
+			className: 'overlay',
+			els: [
+			]
+		});
+
+		var metaTextPar = {};
+		if ( !empty( this.data.album.place ) ) {
+			metaTextPar.location = {
+				value: this.data.album.place.id,
+				caption: this.data.album.place.name
+			};
+		}
+		if ( !empty( this.data.album.withUsers ) ) {
+			metaTextPar.friends = [];
+			for ( var n = 0; n < this.data.album.withUsers.length; n++ ) {
+				var withItem = this.data.album.withUsers[n];
+				metaTextPar.friends.push({
+					title: withItem.title,
+					uid: withItem.uid,
+					user: withItem.user,
+					aktitle: withItem.user.aktitle
+				});
+			}
+		}
+		var metaNode = D.Gallery.metaText( metaTextPar );
+
+		this.node = mkE({
+			tag: 'div',
+			id: 'LastView',
+			els: [
+				{
+					tag: 'a',
+					className: 'lastPicture',
+					els: [{
+						tag: 'div'
+					}],
+					onclick: D.closure(this, this.goToLast)
+				},
+				{
+					tag: 'div',
+					className: 'lastTitleMetaCont',
+					els: [{
+						tag: 'div',
+						className: 'lastTitleMeta',
+						els: [
+							this._galleryTitleCont = mkE({
+								tag: 'div',
+								className: 'galleryTitleCont',
+								els: [
+									this.lastScreenGalTitle = mkE({
+										tag: 'h2',
+										className: 'galleryTitle',
+										text: this.data.album.title || '...'
+									}),
+									D.closure( this, function() {
+										if ( !this.data.album.description ) {
+											return false;
+										}
+										return {
+											tag: 'a',
+											className: 'readMore',
+											text: D.GalleryFS.l.get('gallery_read_description'),
+											onclick: D.closure( this, this.showFullAlbumDescription )
+										}
+									})
+								]
+							}),
+							metaNode
+						]
+					}]
+				},
+				this.galleryLastMosaicSayCont = mkE({
+					tag: 'div',
+					className: 'galleryLastMosaicSayCont',
+					els: [
+						this.mosaicContainer = mkE({
+							tag: 'div',
+							id: 'galleryLastMosaic',
+							els: itemNodes
+						}),
+						this.sayContainer = mkE({
+							tag: 'div',
+							className: 'sayContainer'
+						}),
+						{
+							tag: 'a',
+							className: 'watch-again radius3',
+							els: [{
+								tag: 'span',
+								className: 'icon',
+								text: D.GalleryFS.l.get('back_to_start')
+							}],
+							onclick: D.closure(this, this.watchAgain)
+						}
+					]
+				}),
+				this.recommendActionsCont = mkE({
+					tag: 'div'
+				})
+			]
+		});
+		D.smileyReplace(this.lastScreenGalTitle);
+		addClassName(this.mosaicContainer, 'items-' + this.data.items.length);
+		this.say();
+
+		if ( !metaNode ) {
+			addClassName( this._galleryTitleCont, 'noMetaText' );
+		}
+	};
+	D.GalleryFS.LastView.prototype = new mkE.Base();
+	/**
+	 *
+	 * @type {DR.gallery.struct.LastViewRe}
+	 */
+	D.GalleryFS.LastView.prototype.data = {};
+	/**
+	 *
+	 * @type {D.GalleryFS}
+	 */
+	D.GalleryFS.LastView.prototype.window = {};
+	D.GalleryFS.LastView.prototype.watchAgain = function(){
+		this.window.cancelLastScreen();
+		this.window.loadItem(this.window.pictures[0] || 0);
+	};
+	D.GalleryFS.LastView.prototype.goToLast = function(){
+		this.window.cancelLastScreen();
+		this.window.loadItem(this.window.pictures[-1] || 0);
+	};
+	D.GalleryFS.LastView.prototype.say = function(){
+		clearNode(this.sayContainer);
+		clearNode(this.recommendActionsCont);
+		if( !this.data.sayItem && !this.data.canLike ){
+			return;
+		}
+		var item = this.data.sayItem;
+		var els = [];
+		var youRec = false;
+		if( this.data.users.length > 0 ){
+			var userLinks = [];
+			for( var i in this.data.users ){
+				var sug = this.data.users[i];
+				var userNode = {
+					tag: 'a',
+					href: sug.url,
+					innerHTML: sug.title
+				};
+				if( sug.id != D.ID ){
+					userLinks.push(userNode);
+					continue;
+				}
+				userNode.innerHTML = D.GalleryFS.l.get('you');
+				userLinks.unshift(userNode);
+				youRec = true;
+			}
+			userLinks = userLinks.slice(0, 2);
+			var moreCount = this.data.rateCount - userLinks.length;
+			if( !moreCount && userLinks.length == 2){
+				userLinks.splice(1, 0, ' ' + D.Lang.get('and') + ' ');
+			}else if( moreCount && userLinks.length == 1){
+				userLinks.push(' ' + D.Lang.get('and') + ' ');
+			}else if( moreCount && userLinks.length == 2){
+				userLinks.splice(1, 0, ', ');
+				userLinks.push(' ' + D.Lang.get('and') + ' ');
+			}
+			if( moreCount && this.data.canOpen ){
+				userLinks.push({
+					tag: 'a',
+					prop: {
+						onclick: D.closure(this, this.showRecs)
+					},
+					els: [
+						D.Lang.nget(moreCount, 'x_more')
+					]
+				})
+			}else if( moreCount ){
+				userLinks.push({
+					tag: 'span',
+					els: [
+						D.Lang.nget(moreCount, 'x_more')
+					]
+				})
+			}
+			userLinks.push(' ');
+			userLinks.push(D.Lang.get('pigsort_gallery_1'));
+			els = userLinks;
+		}else if( this.data.rateCount == 0 ){
+			els.push(D.GalleryFS.l.get('be_first_recommend'));
+		}else{
+			els.push({
+				tag: 'a',
+				prop: {
+					onclick: D.closure(this, this.showRecs)
+				},
+				els: [
+					item.recCount,
+					' ',
+					D.Lang.nget(item.recCount, 'user')
+				]
+			});
+			els.push(' ');
+			els.push(D.Lang.get('pigsort_gallery_1'));
+		}
+		mkE({
+			tag: 'div',
+			className: 'who',
+			els: els
+		}).append(this.sayContainer);
+		var userIcons = [];
+		for( var i in this.data.users ){
+			var user = this.data.users[i];
+			userIcons.push({
+				tag: 'a',
+				href: user.url,
+				els: [
+					{
+						tag: 'img',
+						src: user.image.icon
+					}
+				],
+				attr: {
+					title: user.title
+				}
+			});
+		}
+		if( userIcons ){
+			mkE({
+				tag:'div',
+				className: 'userIcons',
+				els: userIcons
+			}).append(this.sayContainer);
+		}
+		els = [];
+		if( this.data.canLike ){
+			if( this.data.liked ){
+				els.push(this.likeButton = mkE({
+					tag: 'a',
+					className: 'like on',
+					onclick: D.closure(this, this.cancelLike),
+					els: [
+						T.svgIcon({
+							icon: 'like',
+							size: 24
+						}),
+						D.Lang.get('Dislike it'),
+						{
+							tag: 'b',
+							text: this.data.album.like.count ? ' ' + this.data.album.like.count : ''
+						}
+					]
+				}));
+			} else {
+				els.push(this.likeButton = mkE({
+					tag: 'a',
+					className: 'like',
+					onclick: D.closure(this, this.rate),
+					els: [
+						T.svgIcon({
+							icon: 'like',
+							size: 24
+						}),
+						D.Lang.get('I like it'),
+						{
+							tag: 'b',
+							text: this.data.album.like.count ? ' ' + this.data.album.like.count : ''
+						}
+					]
+				}));
+			}
+		}
+		if ( this.data.album.comments.canComment ) {
+			els.push({
+				tag: 'a',
+				href: this.data.album.href + '#addComment',
+				className: 'commentButton',
+				els: [
+					T.svgIcon({
+						icon: 'comments',
+						size: 24
+					}),
+					D.Lang.get('Add comment'),
+					{
+						tag: 'b',
+						text: this.data.album.comments.count ? ' ' + this.data.album.comments.count : ''
+					}
+				]
+			});
+		}
+		if( item && item.canRecommend ){
+			if( item.recommended ){
+				els.push(this.recommendButton = mkE({
+					tag: 'a',
+					className: 'recommendButton on',
+					onclick: D.closure(this, this.cancelRecommend),
+					els: [
+						T.svgIcon({
+							icon: 'recommend',
+							size: 24
+						}),
+						D.Lang.get('cancel'),
+						{
+							tag: 'b',
+							text: item.recCount ? ' ' + item.recCount : ''
+						}
+					]
+				}));
+			}else{
+				els.push(this.recommendButton = mkE({
+					tag: 'a',
+					className: 'recommendButton',
+					onclick: D.closure(this, this.rec, 'lastView'),
+					els: [
+						T.svgIcon({
+							icon: 'recommend',
+							size: 24
+						}),
+						D.Lang.get('Recommend'),
+						{
+							tag: 'b',
+							text: item.recCount ? ' ' + item.recCount : ''
+						}
+					]
+				}));
+			}
+		}
+		if( empty(els) ){
+			return;
+		}
+		mkE({
+			tag: 'div',
+			className: 'recommendActions',
+			els: els
+		}).append(this.recommendActionsCont);
+	};
+	D.GalleryFS.LastView.prototype.showRecs = function(){
+		InfoBox.open('/gallery/rq/albumRates.php?aid=' + this.data.album.id, {width: 730});
+	};
+	D.GalleryFS.LastView.prototype.rec = function(stats, e){
+		e = D.event(e);
+		D.stopPropagation(e);
+		if( !this.data.sayItem ){
+			return;
+		}
+		if( !this.window.sayProfiles || empty(this.window.sayProfiles) || (count(this.window.sayProfiles) == 1 && reset(this.window.sayProfiles).id == D.ID) || (this.window.item.user.type == D.USER_TYPE_DEFAULT && this.window.item.user.isFriend) ){
+			this.recommend(stats);
+			return;
+		}
+		this.showRecommendProfiles(stats);
+	};
+	D.GalleryFS.LastView.prototype.showRecommendProfiles = function(stats){
+		var profiles = this.window.sayProfiles;
+		var pos = D.position(this.recommendButton);
+		D.smallPopUp.open( '', {
+			title:D.Lang.get( 'Say recommend with', 'xGlobal' ),
+			width:200,
+			x: pos.left + (this.recommendButton.offsetWidth / 2) - 4,
+			y: pos.top + 8,
+			forceUp: true
+		} );
+		var form = mkE( {
+			tag:'form'
+		} );
+		var checkBoxes = [];
+		for( var k = 0, l = profiles.length; k < l; k++ ){
+			var r = profiles[k];
+			if( this.data.album.uid == D.ID ){
+				continue;
+			}
+			if( this.data.album.uid != D.ID && this.data.album.uid == r.id ){
+				continue;
+			}
+			var cbx = T.Forms.checkbox( {
+				caption:htmlspecialchars(r.title),
+				_dr:r,
+				checked: r.id == D.ID
+			} ).append(form);
+			checkBoxes.push(cbx);
+		}
+		mkE( {
+			tag:'div',
+			className:'commentsLikeProfiles',
+			els:[
+				form,
+				T.submitButton( {
+					caption:D.Lang.get('Save'),
+					stretch:true,
+					onclick:D.closure(this, this._recommendProfile, checkBoxes, stats)
+				} )
+			]
+		} ).append( D.smallPopUp.content );
+		D.smallPopUp.move();
+	};
+	D.GalleryFS.LastView.prototype._recommendProfile = function(checkBoxes, stats){
+		var uids = [];
+		for( var i = 0, l = checkBoxes.length; i < l; ++ i ){
+			if( checkBoxes[i].checked ){
+				uids.push( checkBoxes[i]._dr.id );
+			}
+		}
+		D.smallPopUp.close();
+		if( empty(uids) ){
+			return;
+		}
+		this._mRecommendArray = new DR.say.Recommend;
+		this._mRecommendArray.pid = this.data.sayItem.id;
+		this._mRecommendArray.uids = uids;
+		this._mRecommendArray.select = [
+			new DR.say.select.RecommendRe().all(),
+			new DR.say.select.Item().canRecommend().recommended().recCount()
+		];
+		this._mRecommendArray.onLoad = D.closure(this, this._onRecommendProfile);
+		this._mRecommendArray.call();
+
+		var ac = new DR.ApiCall();
+		ac.addMethod(this._mRecommendArray);
+
+		if( stats && stats == 'lastView' ){
+			var statsMethod = new DR.gallery.LastViewRecommendStats;
+			ac.addMethod(statsMethod);
+		}
+		ac.call();
+	};
+	D.GalleryFS.LastView.prototype._onRecommendProfile= function(){
+		this._recommend( this._mRecommendArray );
+	};
+	D.GalleryFS.LastView.prototype.recommend = function(stats){
+		/**
+		 *
+		 * @type {DR.say.Recommend}
+		 */
+		var recommendMethod = new DR.say.Recommend;
+		recommendMethod.pid = this.data.sayItem.id;
+		recommendMethod.select = [
+			new DR.say.select.RecommendRe().all(),
+			new DR.say.select.Item().canRecommend().recommended().recCount()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				recommendMethod
+			],
+			onLoad: function(){
+				this._recommend(recommendMethod);
+			},
+			context: this
+		} );
+
+		if( stats && stats == 'lastView' ){
+			var statsMethod = new DR.gallery.LastViewRecommendStats;
+			apiCall.addMethod(statsMethod);
+		}
+
+		apiCall.call();
+	};
+	/**
+	 *
+	 * @param {DR.say.Recommend} method
+	 * @private
+	 */
+	D.GalleryFS.LastView.prototype._recommend = function( method ){
+		if( !method || method.error ){
+			return;
+		}
+
+		this.data.sayItem.canRecommend = method.re.item.canRecommend;
+		this.data.sayItem.recommended = method.re.item.recommended;
+		this.data.sayItem.recCount = method.re.item.recCount;
+		this.say();
+	};
+	D.GalleryFS.LastView.prototype.cancelRecommend = function(){
+		/**
+		 *
+		 * @type {DR.say.CancelRecommend}
+		 */
+		var recommendMethod = new DR.say.CancelRecommend;
+		recommendMethod.pid = this.data.sayItem.id;
+		recommendMethod.select = [
+			new DR.say.select.CancelRecommendRe().all(),
+			new DR.say.select.Item().canRecommend().recommended()
+		];
+
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				recommendMethod
+			],
+			onLoad: function(){
+				this._cancelRecommend(recommendMethod);
+			},
+			context: this
+		} );
+		apiCall.call();
+	};
+	/**
+	 *
+	 * @param {DR.say.CancelRecommend} method
+	 * @private
+	 */
+	D.GalleryFS.LastView.prototype._cancelRecommend = function( method ){
+		if( !method || method.error ){
+			return;
+		}
+
+		this.data.sayItem.canRecommend = method.re.item.canRecommend;
+		this.data.sayItem.recommended = method.re.item.recommended;
+		this.data.sayItem.recCount = method.re.item.recCount;
+		this.say();
+	};
+	D.GalleryFS.LastView.prototype.rate = function(e){
+		e = D.event(e);
+		D.stopPropagation(e);
+		if( !this.data.sayItem ){
+			return;
+		}
+		if( !this.window.sayProfiles || empty(this.window.sayProfiles) || (count(this.window.sayProfiles) == 1 && reset(this.window.sayProfiles).id == D.ID) || (this.window.item.user.type == D.USER_TYPE_DEFAULT && this.window.item.user.isFriend) ){
+			this.like();
+			return;
+		}
+		this.showLikeProfiles();
+	};
+	D.GalleryFS.LastView.prototype.showLikeProfiles = function(){
+		var profiles = this.window.sayProfiles;
+		var pos = D.position(this.likeButton);
+		D.smallPopUp.open( '', {
+			title:D.Lang.get( 'Say like with', 'xGlobal' ),
+			width:200,
+			x: pos.left + (this.likeButton.offsetWidth / 2) - 4,
+			y: pos.top + 8,
+			forceUp: true
+		} );
+		var form = mkE( {
+			tag:'form'
+		} );
+		var checkBoxes = [];
+		for( var k = 0, l = profiles.length; k < l; k++ ){
+			var r = profiles[k];
+			if( this.data.album.uid == D.ID ){
+				continue;
+			}
+			if( this.data.album.uid != D.ID && this.data.album.uid == r.id ){
+				continue;
+			}
+			var cbx = T.Forms.checkbox( {
+				caption:htmlspecialchars(r.title),
+				_dr:r,
+				checked: r.id == D.ID
+			} ).append(form);
+			checkBoxes.push(cbx);
+		}
+		mkE( {
+			tag:'div',
+			className:'commentsLikeProfiles',
+			els:[
+				form,
+				T.submitButton( {
+					caption:D.Lang.get('Save'),
+					stretch:true,
+					onclick:D.closure(this, this._likeProfile, checkBoxes)
+				} )
+			]
+		} ).append( D.smallPopUp.content );
+		D.smallPopUp.move();
+	};
+	D.GalleryFS.LastView.prototype._likeProfile = function(checkBoxes){
+		var uids = [];
+		for( var i = 0, l = checkBoxes.length; i < l; ++ i ){
+			if( checkBoxes[i].checked ){
+				uids.push( checkBoxes[i]._dr.id );
+			}
+		}
+		D.smallPopUp.close();
+		this._mLikeArray = new DR.like.LikeArray();
+		this._mLikeArray.type = this.data.likeType;
+		this._mLikeArray.id = this.data.likeId;
+		this._mLikeArray.uids = uids;
+		this._mLikeArray.select = [
+			new DR.like.select.GetRe().canLike().liked()
+		];
+		this._mLikeArray.onLoad = D.closure(this, this._onLikeProfile);
+
+		this._mLikeStats = new DR.gallery.LastViewLikeStats;
+
+		var ac = new DR.ApiCall();
+		ac.addMethod(this._mLikeArray);
+		ac.addMethod(this._mLikeStats);
+		ac.call();
+	};
+	D.GalleryFS.LastView.prototype._onLikeProfile = function(){
+		this._like( this._mLikeArray );
+	};
+	D.GalleryFS.LastView.prototype.like = function(){
+		var likeMethod = new DR.like.Like;
+		likeMethod.type = this.data.likeType;
+		likeMethod.id = this.data.likeId;
+		likeMethod.select = [
+			new DR.like.select.GetRe().canLike().liked().count()
+		];
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				likeMethod
+			],
+			onLoad: function(){
+				this._like(likeMethod);
+			},
+			context: this
+		} );
+
+		var statsMethod = new DR.gallery.LastViewLikeStats;
+		apiCall.addMethod(statsMethod);
+
+		apiCall.call();
+	};
+	D.GalleryFS.LastView.prototype._like = function(method){
+		if( !method || method.error ){
+			return;
+		}
+
+		this.data.canLike = method.re.canLike;
+		this.data.liked = method.re.liked;
+		this.data.album.like.count = method.re.count;
+		this.say();
+	};
+	D.GalleryFS.LastView.prototype.cancelLike = function(){
+		var likeMethod = new DR.like.Dislike;
+		likeMethod.type = this.data.likeType;
+		likeMethod.id = this.data.likeId;
+		likeMethod.select = [
+			new DR.like.select.GetRe().canLike().liked().count()
+		];
+		var apiCall = new DR.ApiCall( {
+			methods: [
+				likeMethod
+			],
+			onLoad: function(){
+				this._cancelLike(likeMethod);
+			},
+			context: this
+		} );
+
+		var statsMethod = new DR.gallery.LastViewDislikeStats;
+		apiCall.addMethod(statsMethod);
+
+		apiCall.call();
+	};
+	D.GalleryFS.LastView.prototype._cancelLike = function(method){
+		if( !method || method.error ){
+			return;
+		}
+
+		this.data.canLike = method.re.canLike;
+		this.data.liked = method.re.liked;
+		this.data.album.like.count = method.re.count;
+		this.say();
+	};
+	D.GalleryFS.LastView.prototype.showFullAlbumDescription = function(){
+		if ( !empty( this.albumFullDescription ) ) {
+			return;
+		}
+
+		this.albumFullDescription = mkE({
+			tag: 'div',
+			className: 'albumDescription',
+			els: [
+				{
+					tag: 'a',
+					className: 'icon closeIcon',
+					onclick: D.closure( this, function() {
+						removeNode( this.albumFullDescription );
+						this.albumFullDescription = null;
+					})
+				},
+				{
+					tag: 'div',
+					className: 'description',
+					text: this.data.album.description
+				}
+			]
+		}).append( this.galleryLastMosaicSayCont );
+	};
+
+	D.loaded('GalleryFS');
+}
+
+/**
+ * Detect Element Resize
+ *
+ * https://github.com/sdecima/javascript-detect-element-resize
+ * Sebastian Decima
+ *
+ * version: 0.5.3
+ **/
+
+(function () {
+	var attachEvent = document.attachEvent,
+		stylesCreated = false;
+
+	if (!attachEvent) {
+		var requestFrame = (function(){
+			var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+				function(fn){ return window.setTimeout(fn, 20); };
+			return function(fn){ return raf(fn); };
+		})();
+
+		var cancelFrame = (function(){
+			var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame ||
+				window.clearTimeout;
+			return function(id){ return cancel(id); };
+		})();
+
+		function resetTriggers(element){
+			var triggers = element.__resizeTriggers__,
+				expand = triggers.firstElementChild,
+				contract = triggers.lastElementChild,
+				expandChild = expand.firstElementChild;
+			contract.scrollLeft = contract.scrollWidth;
+			contract.scrollTop = contract.scrollHeight;
+			expandChild.style.width = expand.offsetWidth + 1 + 'px';
+			expandChild.style.height = expand.offsetHeight + 1 + 'px';
+			expand.scrollLeft = expand.scrollWidth;
+			expand.scrollTop = expand.scrollHeight;
+		}
+
+		function checkTriggers(element){
+			return element.offsetWidth != element.__resizeLast__.width ||
+				element.offsetHeight != element.__resizeLast__.height;
+		}
+
+		function scrollListener(e){
+			var element = this;
+			resetTriggers(this);
+			if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
+			this.__resizeRAF__ = requestFrame(function(){
+				if (checkTriggers(element)) {
+					element.__resizeLast__.width = element.offsetWidth;
+					element.__resizeLast__.height = element.offsetHeight;
+					element.__resizeListeners__.forEach(function(fn){
+						fn.call(element, e);
+					});
+				}
+			});
+		}
+
+		/* Detect CSS Animations support to detect element display/re-attach */
+		var animation = false,
+			animationstring = 'animation',
+			keyframeprefix = '',
+			animationstartevent = 'animationstart',
+			domPrefixes = 'Webkit Moz O ms'.split(' '),
+			startEvents = 'webkitAnimationStart animationstart oAnimationStart MSAnimationStart'.split(' '),
+			pfx  = '';
+		{
+			var elm = document.createElement('fakeelement');
+			if( elm.style.animationName !== undefined ) { animation = true; }
+
+			if( animation === false ) {
+				for( var i = 0; i < domPrefixes.length; i++ ) {
+					if( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
+						pfx = domPrefixes[ i ];
+						animationstring = pfx + 'Animation';
+						keyframeprefix = '-' + pfx.toLowerCase() + '-';
+						animationstartevent = startEvents[ i ];
+						animation = true;
+						break;
+					}
+				}
+			}
+		}
+
+		var animationName = 'resizeanim';
+		var animationKeyframes = '@' + keyframeprefix + 'keyframes ' + animationName + ' { from { opacity: 0; } to { opacity: 0; } } ';
+		var animationStyle = keyframeprefix + 'animation: 1ms ' + animationName + '; ';
+	}
+
+	function createStyles() {
+		if (!stylesCreated) {
+			//opacity:0 works around a chrome bug https://code.google.com/p/chromium/issues/detail?id=286360
+			var css = (animationKeyframes ? animationKeyframes : '') +
+					'.resize-triggers { ' + (animationStyle ? animationStyle : '') + 'visibility: hidden; opacity: 0; } ' +
+					'.resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
+				head = document.head || document.getElementsByTagName('head')[0],
+				style = document.createElement('style');
+
+			style.type = 'text/css';
+			if (style.styleSheet) {
+				style.styleSheet.cssText = css;
+			} else {
+				style.appendChild(document.createTextNode(css));
+			}
+
+			head.appendChild(style);
+			stylesCreated = true;
+		}
+	}
+
+	window.addResizeListener = function(element, fn){
+		if (attachEvent) element.attachEvent('onresize', fn);
+		else {
+			if (!element.__resizeTriggers__) {
+				if (getComputedStyle(element).position == 'static') element.style.position = 'relative';
+				createStyles();
+				element.__resizeLast__ = {};
+				element.__resizeListeners__ = [];
+				(element.__resizeTriggers__ = document.createElement('div')).className = 'resize-triggers';
+				element.__resizeTriggers__.innerHTML = '<div class="expand-trigger"><div></div></div>' +
+				'<div class="contract-trigger"></div>';
+				element.appendChild(element.__resizeTriggers__);
+				resetTriggers(element);
+				element.addEventListener('scroll', scrollListener, true);
+
+				/* Listen for a css animation to detect element display/re-attach */
+				animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
+					if(e.animationName == animationName)
+						resetTriggers(element);
+				});
+			}
+			element.__resizeListeners__.push(fn);
+		}
+	};
+
+	window.removeResizeListener = function(element, fn){
+		if (attachEvent) element.detachEvent('onresize', fn);
+		else {
+			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
+			if (!element.__resizeListeners__.length) {
+				element.removeEventListener('scroll', scrollListener);
+				element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
+			}
+		}
+	}
+})();
+/** http://stackoverflow.com/a/35765160 */
+function trimHtml(html, options) {
+	options = options || {};
+
+	var limit = options.limit || 100,
+		preserveTags = (typeof options.preserveTags !== 'undefined') ? options.preserveTags : true,
+		wordBreak = (typeof options.wordBreak !== 'undefined') ? options.wordBreak : false,
+		suffix = options.suffix || ' ...';
+
+	var arr = html.replace(/</g, "\n<")
+		.replace(/>/g, ">\n")
+		.replace(/\n\n/g, "\n")
+		.replace(/^\n/g, "")
+		.replace(/\n$/g, "")
+		.split("\n");
+
+	var sum = 0,
+		row, cut, add,
+		tagMatch,
+		tagName,
+		tagStack = [],
+		rowCut;
+
+	for (var i = 0; i < arr.length; i++) {
+
+		row = arr[i];
+		// count multiple spaces as one character
+		rowCut = row.replace(/[ ]+/g, ' ');
+
+		if (!row.length) {
+			continue;
+		}
+
+		if (row[0] !== "<") {
+
+			if (sum >= limit) {
+				row = "";
+			} else if ((sum + rowCut.length) >= limit) {
+
+				cut = limit - sum;
+
+				if (row[cut - 1] === ' ') {
+					while(cut){
+						cut -= 1;
+						if(row[cut - 1] !== ' '){
+							break;
+						}
+					}
+				} else {
+
+					add = row.substring(cut).split('').indexOf(' ');
+
+					// break on halh of word
+					if(!wordBreak) {
+						if (add !== -1) {
+							cut += add;
+						} else {
+							cut = row.length;
+						}
+					}
+				}
+
+				row = row.substring(0, cut) + suffix;
+
+				sum = limit;
+			} else {
+				sum += rowCut.length;
+			}
+		} else if (!preserveTags) {
+			row = '';
+		} else if (sum >= limit) {
+
+			tagMatch = row.match(/[a-zA-Z]+/);
+			tagName = tagMatch ? tagMatch[0] : '';
+
+			if (tagName) {
+				if (row.substring(0, 2) !== '</') {
+
+					tagStack.push(tagName);
+					row = '';
+				} else {
+
+					while (tagStack[tagStack.length - 1] !== tagName && tagStack.length) {
+						tagStack.pop();
+					}
+
+					if (tagStack.length) {
+						row = '';
+					}
+
+					tagStack.pop();
+				}
+			} else {
+				row = '';
+			}
+		}
+
+		arr[i] = row;
+	}
+
+	return arr.join("\n").replace(/\n/g, "");
+}

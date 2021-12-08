@@ -1,0 +1,266 @@
+DR.gallery = DR.gallery || {};
+DR.gallery.struct = DR.gallery.struct || {};
+DR.gallery.select = DR.gallery.select || {};
+DR.gallery.stats = DR.gallery.stats || {};
+DR.gallery.stats.struct = DR.gallery.stats.struct || {};
+DR.gallery.stats.select = DR.gallery.stats.select || {};
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.GetBlockParamsRe = function(par){
+	/** @private */
+	this._t = 301;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.par)) this.par = String(par.par||'');
+};
+DR._Base._types[301] = DR.gallery.stats.struct.GetBlockParamsRe;
+DR.gallery.stats.struct.GetBlockParamsRe[__P] = new DR._Base;
+DR.gallery.stats.struct.GetBlockParamsRe[__P][__C] = DR.gallery.stats.struct.GetBlockParamsRe;
+/** @type {String} */
+DR.gallery.stats.struct.GetBlockParamsRe.prototype.par = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.stats.GetBlockParams = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 302;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[302] = DR.gallery.stats.GetBlockParams;
+DR.gallery.stats.GetBlockParams[__CL] = "Gallery\\Stats__GetBlockParams";
+DR.gallery.stats.GetBlockParams[__P] = new DR._Method;
+DR.gallery.stats.GetBlockParams[__P][__C] = DR.gallery.stats.GetBlockParams;
+/** @type {DR.gallery.stats.struct.GetBlockParamsRe} */
+DR.gallery.stats.GetBlockParams.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.Users = function(par){
+	/** @private */
+	this._t = 1373;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.lastSeen)) this.lastSeen = (parseInt(par.lastSeen)||0);
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[1373] = DR.gallery.stats.struct.Users;
+DR.gallery.stats.struct.Users[__P] = new DR._Base;
+DR.gallery.stats.struct.Users[__P][__C] = DR.gallery.stats.struct.Users;
+/** @type {Boolean} */
+DR.gallery.stats.struct.Users.prototype.fullPg = null;
+/** @type {Number|null} */
+DR.gallery.stats.struct.Users.prototype.lastSeen = null;
+/** @type {Number} */
+DR.gallery.stats.struct.Users.prototype.pg = null;
+/** @type {Array.<DR.gallery.stats.struct.User>} */
+DR.gallery.stats.struct.Users.prototype.users = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.Counts = function(par){
+	/** @private */
+	this._t = 1375;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.active)) this.active = Boolean(par.active);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.unique)) this.unique = (parseInt(par.unique)||0);
+};
+DR._Base._types[1375] = DR.gallery.stats.struct.Counts;
+DR.gallery.stats.struct.Counts[__P] = new DR._Base;
+DR.gallery.stats.struct.Counts[__P][__C] = DR.gallery.stats.struct.Counts;
+/** @type {Boolean} */
+DR.gallery.stats.struct.Counts.prototype.active = null;
+/** @type {Number} */
+DR.gallery.stats.struct.Counts.prototype.count = null;
+/** @type {Number} */
+DR.gallery.stats.struct.Counts.prototype.unique = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.stats.GetCounts = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1376;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1376] = DR.gallery.stats.GetCounts;
+DR.gallery.stats.GetCounts[__CL] = "Gallery\\Stats__GetCounts";
+DR.gallery.stats.GetCounts[__P] = new DR._Method;
+DR.gallery.stats.GetCounts[__P][__C] = DR.gallery.stats.GetCounts;
+/** @type {DR.gallery.stats.struct.Counts} */
+DR.gallery.stats.GetCounts.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.User = function(par){
+	/** @private */
+	this._t = 1377;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.seen)) this.seen = Boolean(par.seen);
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[1377] = DR.gallery.stats.struct.User;
+DR.gallery.stats.struct.User[__P] = new DR._Base;
+DR.gallery.stats.struct.User[__P][__C] = DR.gallery.stats.struct.User;
+/** @type {Array.<DR.gallery.stats.struct.Album>} */
+DR.gallery.stats.struct.User.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.stats.struct.User.prototype.count = null;
+/** @type {Boolean|null} */
+DR.gallery.stats.struct.User.prototype.seen = null;
+/** @type {Number} */
+DR.gallery.stats.struct.User.prototype.ts = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.stats.struct.User.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.stats.select.User = function(){
+	this._fields = {};
+};
+DR.gallery.stats.select.User[__CL] = "Gallery\\Stats__User";
+DR.gallery.stats.select.User[__P] = new DR._Select;
+DR.gallery.stats.select.User[__P][__C] = DR.gallery.stats.select.User;
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.User} */
+DR.gallery.stats.select.User.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.User} */
+DR.gallery.stats.select.User.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.User} */
+DR.gallery.stats.select.User.prototype.seen = function(v){ this._fields.seen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.User} */
+DR.gallery.stats.select.User.prototype.ts = function(v){ this._fields.ts = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.User} */
+DR.gallery.stats.select.User.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.Album = function(par){
+	/** @private */
+	this._t = 1378;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+};
+DR._Base._types[1378] = DR.gallery.stats.struct.Album;
+DR.gallery.stats.struct.Album[__P] = new DR._Base;
+DR.gallery.stats.struct.Album[__P][__C] = DR.gallery.stats.struct.Album;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.stats.struct.Album.prototype.album = null;
+/** @type {DR.gallery.struct.Item|null} */
+DR.gallery.stats.struct.Album.prototype.item = null;
+/** @type {Number} */
+DR.gallery.stats.struct.Album.prototype.ts = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.stats.struct.GetTopUserRe = function(par){
+	/** @private */
+	this._t = 3411;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[3411] = DR.gallery.stats.struct.GetTopUserRe;
+DR.gallery.stats.struct.GetTopUserRe[__P] = new DR._Base;
+DR.gallery.stats.struct.GetTopUserRe[__P][__C] = DR.gallery.stats.struct.GetTopUserRe;
+/** @type {Array.<DR.gallery.stats.struct.Album>} */
+DR.gallery.stats.struct.GetTopUserRe.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.stats.struct.GetTopUserRe.prototype.count = null;
+/** @type {Number} */
+DR.gallery.stats.struct.GetTopUserRe.prototype.pgs = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.stats.struct.GetTopUserRe.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.stats.select.GetTopUserRe = function(){
+	this._fields = {};
+};
+DR.gallery.stats.select.GetTopUserRe[__CL] = "Gallery\\Stats__GetTopUserRe";
+DR.gallery.stats.select.GetTopUserRe[__P] = new DR._Select;
+DR.gallery.stats.select.GetTopUserRe[__P][__C] = DR.gallery.stats.select.GetTopUserRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.GetTopUserRe} */
+DR.gallery.stats.select.GetTopUserRe.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.GetTopUserRe} */
+DR.gallery.stats.select.GetTopUserRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.GetTopUserRe} */
+DR.gallery.stats.select.GetTopUserRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.stats.select.GetTopUserRe} */
+DR.gallery.stats.select.GetTopUserRe.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.base.Pg} */
+DR.gallery.stats.GetList = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1371;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1371] = DR.gallery.stats.GetList;
+DR.gallery.stats.GetList[__CL] = "Gallery\\Stats__GetList";
+DR.gallery.stats.GetList[__P] = new DR.base.Pg;
+DR.gallery.stats.GetList[__P][__C] = DR.gallery.stats.GetList;
+/** @type {DR.gallery.stats.struct.Users} */
+DR.gallery.stats.GetList.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.gallery.stats.GetTop = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1372;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1372] = DR.gallery.stats.GetTop;
+DR.gallery.stats.GetTop[__CL] = "Gallery\\Stats__GetTop";
+DR.gallery.stats.GetTop[__P] = new DR.base.Pg;
+DR.gallery.stats.GetTop[__P][__C] = DR.gallery.stats.GetTop;
+/** @type {DR.gallery.stats.struct.Users} */
+DR.gallery.stats.GetTop.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.gallery.stats.GetTopUser = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3412;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3412] = DR.gallery.stats.GetTopUser;
+DR.gallery.stats.GetTopUser[__CL] = "Gallery\\Stats__GetTopUser";
+DR.gallery.stats.GetTopUser[__P] = new DR.base.Pg;
+DR.gallery.stats.GetTopUser[__P][__C] = DR.gallery.stats.GetTopUser;
+/** @type {Number} */
+DR.gallery.stats.GetTopUser.prototype.date = null;
+/** @type {Number} */
+DR.gallery.stats.GetTopUser.prototype.fid = null;
+/** @type {DR.gallery.stats.struct.GetTopUserRe} */
+DR.gallery.stats.GetTopUser.prototype.re = null;
+ 
+D.loaded();

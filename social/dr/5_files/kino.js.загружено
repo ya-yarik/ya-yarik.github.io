@@ -1,0 +1,1097 @@
+DR.kino = DR.kino || {};
+DR.kino.struct = DR.kino.struct || {};
+DR.kino.select = DR.kino.select || {};
+/** @extends {DR._Base} */
+DR.kino.struct.Movie = function(par){
+	/** @private */
+	this._t = 424;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.actors)){
+		var tmp = [];
+		for( var k in par.actors ) tmp.push(DR._Base.cast(par.actors [k]));
+		this.actors = tmp;
+	}
+	if(DR._Base.is(par.actualRating)) this.actualRating = (parseInt(par.actualRating)||0);
+	if(DR._Base.is(par.cinemas)){
+		var tmp = [];
+		for( var k in par.cinemas ) tmp.push(DR._Base.cast(par.cinemas [k]));
+		this.cinemas = tmp;
+	}
+	if(DR._Base.is(par.comments)) this.comments = (parseInt(par.comments)||0);
+	if(DR._Base.is(par.cover)) this.cover = DR._Base.cast(par.cover);
+	if(DR._Base.is(par.description)) this.description = String(par.description||'');
+	if(DR._Base.is(par.descriptionPlain)) this.descriptionPlain = String(par.descriptionPlain||'');
+	if(DR._Base.is(par.directors)){
+		var tmp = [];
+		for( var k in par.directors ) tmp.push(String(par.directors [k]||''));
+		this.directors = tmp;
+	}
+	if(DR._Base.is(par.friendsCount)) this.friendsCount = (parseInt(par.friendsCount)||0);
+	if(DR._Base.is(par.gallery)){
+		var tmp = [];
+		for( var k in par.gallery ) tmp.push(DR._Base.cast(par.gallery [k]));
+		this.gallery = tmp;
+	}
+	if(DR._Base.is(par.genres)){
+		var tmp = [];
+		for( var k in par.genres ) tmp.push(DR._Base.cast(par.genres [k]));
+		this.genres = tmp;
+	}
+	if(DR._Base.is(par.hasSeen)) this.hasSeen = Boolean(par.hasSeen);
+	if(DR._Base.is(par.hasVoted)) this.hasVoted = (parseInt(par.hasVoted)||0);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.imdbRating)) this.imdbRating = (parseFloat(par.imdbRating)||0);
+	if(DR._Base.is(par.imdbUrl)) this.imdbUrl = String(par.imdbUrl||'');
+	if(DR._Base.is(par.isCurrent)) this.isCurrent = String(par.isCurrent||'');
+	if(DR._Base.is(par.isUpcoming)) this.isUpcoming = Boolean(par.isUpcoming);
+	if(DR._Base.is(par.likes)) this.likes = (parseInt(par.likes)||0);
+	if(DR._Base.is(par.picture)) this.picture = DR._Base.cast(par.picture);
+	if(DR._Base.is(par.pictureCount)) this.pictureCount = (parseInt(par.pictureCount)||0);
+	if(DR._Base.is(par.post)) this.post = (parseInt(par.post)||0);
+	if(DR._Base.is(par.productionDate)) this.productionDate = String(par.productionDate||'');
+	if(DR._Base.is(par.productionDateReadable)) this.productionDateReadable = (parseInt(par.productionDateReadable)||0);
+	if(DR._Base.is(par.rating)) this.rating = (parseFloat(par.rating)||0);
+	if(DR._Base.is(par.recommended)) this.recommended = Boolean(par.recommended);
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.titleOriginal)) this.titleOriginal = String(par.titleOriginal||'');
+	if(DR._Base.is(par.tmdbTrailer)) this.tmdbTrailer = Boolean(par.tmdbTrailer);
+	if(DR._Base.is(par.totalRating)) this.totalRating = (parseInt(par.totalRating)||0);
+	if(DR._Base.is(par.trailer)) this.trailer = String(par.trailer||'');
+	if(DR._Base.is(par.trailerUrl)) this.trailerUrl = String(par.trailerUrl||'');
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+	if(DR._Base.is(par.usersCount)) this.usersCount = (parseInt(par.usersCount)||0);
+	if(DR._Base.is(par.usersPreview)){
+		var tmp = [];
+		for( var k in par.usersPreview ) tmp.push(DR._Base.cast(par.usersPreview [k]));
+		this.usersPreview = tmp;
+	}
+	if(DR._Base.is(par.views)) this.views = (parseInt(par.views)||0);
+	if(DR._Base.is(par.votes)) this.votes = (parseInt(par.votes)||0);
+	if(DR._Base.is(par.wantsToSee)) this.wantsToSee = Boolean(par.wantsToSee);
+	if(DR._Base.is(par.writers)){
+		var tmp = [];
+		for( var k in par.writers ) tmp.push(String(par.writers [k]||''));
+		this.writers = tmp;
+	}
+	if(DR._Base.is(par.year)) this.year = (parseInt(par.year)||0);
+};
+DR._Base._types[424] = DR.kino.struct.Movie;
+DR.kino.struct.Movie[__P] = new DR._Base;
+DR.kino.struct.Movie[__P][__C] = DR.kino.struct.Movie;
+/** @type {Array.<DR.kino.struct.Actor>} */
+DR.kino.struct.Movie.prototype.actors = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.actualRating = null;
+/** @type {Array.<DR.kino.struct.Cinema>} */
+DR.kino.struct.Movie.prototype.cinemas = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.comments = null;
+/** @type {DR.base.struct.Image} */
+DR.kino.struct.Movie.prototype.cover = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.description = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.descriptionPlain = null;
+/** @type {Array.<String>|null} */
+DR.kino.struct.Movie.prototype.directors = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.friendsCount = null;
+/** @type {Array.<DR.base.struct.Image>} */
+DR.kino.struct.Movie.prototype.gallery = null;
+/** @type {Array.<DR.kino.struct.Genre>} */
+DR.kino.struct.Movie.prototype.genres = null;
+/** @type {Boolean} */
+DR.kino.struct.Movie.prototype.hasSeen = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.hasVoted = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.id = null;
+/** @type {Number|null} */
+DR.kino.struct.Movie.prototype.imdbRating = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.imdbUrl = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.isCurrent = null;
+/** @type {Boolean} */
+DR.kino.struct.Movie.prototype.isUpcoming = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.likes = null;
+/** @type {DR.base.struct.Image} */
+DR.kino.struct.Movie.prototype.picture = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.pictureCount = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.post = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.productionDate = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.productionDateReadable = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.rating = null;
+/** @type {Boolean} */
+DR.kino.struct.Movie.prototype.recommended = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.title = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.titleOriginal = null;
+/** @type {Boolean} */
+DR.kino.struct.Movie.prototype.tmdbTrailer = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.totalRating = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.trailer = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.trailerUrl = null;
+/** @type {String} */
+DR.kino.struct.Movie.prototype.url = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.usersCount = null;
+/** @type {Array.<DR.users.struct.UserDefault>} */
+DR.kino.struct.Movie.prototype.usersPreview = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.views = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.votes = null;
+/** @type {Boolean} */
+DR.kino.struct.Movie.prototype.wantsToSee = null;
+/** @type {Array.<String>|null} */
+DR.kino.struct.Movie.prototype.writers = null;
+/** @type {Number} */
+DR.kino.struct.Movie.prototype.year = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Movie = function(){
+	this._fields = {};
+};
+DR.kino.select.Movie[__CL] = "Kino__Movie";
+DR.kino.select.Movie[__P] = new DR._Select;
+DR.kino.select.Movie[__P][__C] = DR.kino.select.Movie;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.actors = function(v){ this._fields.actors = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.actualRating = function(v){ this._fields.actualRating = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.cinemas = function(v){ this._fields.cinemas = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.comments = function(v){ this._fields.comments = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.cover = function(v){ this._fields.cover = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.description = function(v){ this._fields.description = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.descriptionPlain = function(v){ this._fields.descriptionPlain = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.directors = function(v){ this._fields.directors = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.friendsCount = function(v){ this._fields.friendsCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.gallery = function(v){ this._fields.gallery = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.genres = function(v){ this._fields.genres = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.hasSeen = function(v){ this._fields.hasSeen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.hasVoted = function(v){ this._fields.hasVoted = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.imdbRating = function(v){ this._fields.imdbRating = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.imdbUrl = function(v){ this._fields.imdbUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.isCurrent = function(v){ this._fields.isCurrent = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.isUpcoming = function(v){ this._fields.isUpcoming = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.likes = function(v){ this._fields.likes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.picture = function(v){ this._fields.picture = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.pictureCount = function(v){ this._fields.pictureCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.post = function(v){ this._fields.post = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.productionDate = function(v){ this._fields.productionDate = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.productionDateReadable = function(v){ this._fields.productionDateReadable = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.rating = function(v){ this._fields.rating = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.recommended = function(v){ this._fields.recommended = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.titleOriginal = function(v){ this._fields.titleOriginal = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.tmdbTrailer = function(v){ this._fields.tmdbTrailer = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.totalRating = function(v){ this._fields.totalRating = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.trailer = function(v){ this._fields.trailer = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.trailerUrl = function(v){ this._fields.trailerUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.usersCount = function(v){ this._fields.usersCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.usersPreview = function(v){ this._fields.usersPreview = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.views = function(v){ this._fields.views = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.votes = function(v){ this._fields.votes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.wantsToSee = function(v){ this._fields.wantsToSee = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.writers = function(v){ this._fields.writers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movie} */
+DR.kino.select.Movie.prototype.year = function(v){ this._fields.year = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.Movies = function(par){
+	/** @private */
+	this._t = 425;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.movies)){
+		var tmp = [];
+		for( var k in par.movies ) tmp.push(DR._Base.cast(par.movies [k]));
+		this.movies = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[425] = DR.kino.struct.Movies;
+DR.kino.struct.Movies[__P] = new DR._Base;
+DR.kino.struct.Movies[__P][__C] = DR.kino.struct.Movies;
+/** @type {Number|null} */
+DR.kino.struct.Movies.prototype.count = null;
+/** @type {Boolean|null} */
+DR.kino.struct.Movies.prototype.fullPg = null;
+/** @type {Array.<DR.kino.struct.Movie>} */
+DR.kino.struct.Movies.prototype.movies = null;
+/** @type {Number|null} */
+DR.kino.struct.Movies.prototype.pg = null;
+/** @type {Number|null} */
+DR.kino.struct.Movies.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Movies = function(){
+	this._fields = {};
+};
+DR.kino.select.Movies[__CL] = "Kino__Movies";
+DR.kino.select.Movies[__P] = new DR._Select;
+DR.kino.select.Movies[__P][__C] = DR.kino.select.Movies;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movies} */
+DR.kino.select.Movies.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movies} */
+DR.kino.select.Movies.prototype.fullPg = function(v){ this._fields.fullPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movies} */
+DR.kino.select.Movies.prototype.movies = function(v){ this._fields.movies = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movies} */
+DR.kino.select.Movies.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Movies} */
+DR.kino.select.Movies.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.kino.Recommended = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 426;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[426] = DR.kino.Recommended;
+DR.kino.Recommended[__CL] = "Kino__Recommended";
+DR.kino.Recommended[__P] = new DR._Method;
+DR.kino.Recommended[__P][__C] = DR.kino.Recommended;
+/** @type {Number} */
+DR.kino.Recommended.prototype.count = null;
+/** @type {Number} */
+DR.kino.Recommended.prototype.pg = null;
+/** @type {DR.kino.struct.RecommendedRe} */
+DR.kino.Recommended.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.FriendRecommend = function(par){
+	/** @private */
+	this._t = 427;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.movie)) this.movie = DR._Base.cast(par.movie);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[427] = DR.kino.struct.FriendRecommend;
+DR.kino.struct.FriendRecommend[__P] = new DR._Base;
+DR.kino.struct.FriendRecommend[__P][__C] = DR.kino.struct.FriendRecommend;
+/** @type {DR.kino.struct.Movie} */
+DR.kino.struct.FriendRecommend.prototype.movie = null;
+/** @type {DR.users.struct.User} */
+DR.kino.struct.FriendRecommend.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.FriendRecommend = function(){
+	this._fields = {};
+};
+DR.kino.select.FriendRecommend[__CL] = "Kino__FriendRecommend";
+DR.kino.select.FriendRecommend[__P] = new DR._Select;
+DR.kino.select.FriendRecommend[__P][__C] = DR.kino.select.FriendRecommend;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.FriendRecommend} */
+DR.kino.select.FriendRecommend.prototype.movie = function(v){ this._fields.movie = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.FriendRecommend} */
+DR.kino.select.FriendRecommend.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.FriendRecommendedRe = function(par){
+	/** @private */
+	this._t = 428;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.movies)){
+		var tmp = [];
+		for( var k in par.movies ) tmp.push(DR._Base.cast(par.movies [k]));
+		this.movies = tmp;
+	}
+};
+DR._Base._types[428] = DR.kino.struct.FriendRecommendedRe;
+DR.kino.struct.FriendRecommendedRe[__P] = new DR._Base;
+DR.kino.struct.FriendRecommendedRe[__P][__C] = DR.kino.struct.FriendRecommendedRe;
+/** @type {Boolean} */
+DR.kino.struct.FriendRecommendedRe.prototype.fullPg = null;
+/** @type {Array.<DR.kino.struct.FriendRecommend>} */
+DR.kino.struct.FriendRecommendedRe.prototype.movies = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.FriendRecommendedRe = function(){
+	this._fields = {};
+};
+DR.kino.select.FriendRecommendedRe[__CL] = "Kino__FriendRecommendedRe";
+DR.kino.select.FriendRecommendedRe[__P] = new DR._Select;
+DR.kino.select.FriendRecommendedRe[__P][__C] = DR.kino.select.FriendRecommendedRe;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.FriendRecommendedRe} */
+DR.kino.select.FriendRecommendedRe.prototype.fullPg = function(v){ this._fields.fullPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.FriendRecommendedRe} */
+DR.kino.select.FriendRecommendedRe.prototype.movies = function(v){ this._fields.movies = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.RecommendedRe = function(par){
+	/** @private */
+	this._t = 430;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.movies)){
+		var tmp = [];
+		for( var k in par.movies ) tmp.push(DR._Base.cast(par.movies [k]));
+		this.movies = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+};
+DR._Base._types[430] = DR.kino.struct.RecommendedRe;
+DR.kino.struct.RecommendedRe[__P] = new DR._Base;
+DR.kino.struct.RecommendedRe[__P][__C] = DR.kino.struct.RecommendedRe;
+/** @type {Boolean} */
+DR.kino.struct.RecommendedRe.prototype.fullPg = null;
+/** @type {Array.<DR.kino.struct.Movie>} */
+DR.kino.struct.RecommendedRe.prototype.movies = null;
+/** @type {Number} */
+DR.kino.struct.RecommendedRe.prototype.pg = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.RecommendedRe = function(){
+	this._fields = {};
+};
+DR.kino.select.RecommendedRe[__CL] = "Kino__RecommendedRe";
+DR.kino.select.RecommendedRe[__P] = new DR._Select;
+DR.kino.select.RecommendedRe[__P][__C] = DR.kino.select.RecommendedRe;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.RecommendedRe} */
+DR.kino.select.RecommendedRe.prototype.fullPg = function(v){ this._fields.fullPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.RecommendedRe} */
+DR.kino.select.RecommendedRe.prototype.movies = function(v){ this._fields.movies = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.RecommendedRe} */
+DR.kino.select.RecommendedRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.kino.CurrentlyPlaying = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 431;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[431] = DR.kino.CurrentlyPlaying;
+DR.kino.CurrentlyPlaying[__CL] = "Kino__CurrentlyPlaying";
+DR.kino.CurrentlyPlaying[__P] = new DR._Method;
+DR.kino.CurrentlyPlaying[__P][__C] = DR.kino.CurrentlyPlaying;
+/** @type {Number} */
+DR.kino.CurrentlyPlaying.prototype.count = null;
+/** @type {Number} */
+DR.kino.CurrentlyPlaying.prototype.pg = null;
+/** @type {DR.kino.struct.Movies} */
+DR.kino.CurrentlyPlaying.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.Upcoming = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 432;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[432] = DR.kino.Upcoming;
+DR.kino.Upcoming[__CL] = "Kino__Upcoming";
+DR.kino.Upcoming[__P] = new DR._Method;
+DR.kino.Upcoming[__P][__C] = DR.kino.Upcoming;
+/** @type {Number} */
+DR.kino.Upcoming.prototype.count = null;
+/** @type {Number} */
+DR.kino.Upcoming.prototype.pg = null;
+/** @type {DR.kino.struct.Movies} */
+DR.kino.Upcoming.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.GetMovie = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 433;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[433] = DR.kino.GetMovie;
+DR.kino.GetMovie[__CL] = "Kino__GetMovie";
+DR.kino.GetMovie[__P] = new DR._Method;
+DR.kino.GetMovie[__P][__C] = DR.kino.GetMovie;
+/** @type {Number|null} */
+DR.kino.GetMovie.prototype.id = null;
+/** @type {String|null} */
+DR.kino.GetMovie.prototype.seoUrl = null;
+/** @type {DR.kino.struct.Movie} */
+DR.kino.GetMovie.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.SimilarMovies = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 435;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[435] = DR.kino.SimilarMovies;
+DR.kino.SimilarMovies[__CL] = "Kino__SimilarMovies";
+DR.kino.SimilarMovies[__P] = new DR._Method;
+DR.kino.SimilarMovies[__P][__C] = DR.kino.SimilarMovies;
+/** @type {Number} */
+DR.kino.SimilarMovies.prototype.id = null;
+/** @type {DR.kino.struct.Movies} */
+DR.kino.SimilarMovies.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.Genre = function(par){
+	/** @private */
+	this._t = 436;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.blocked)) this.blocked = Boolean(par.blocked);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.nameTranslated)) this.nameTranslated = String(par.nameTranslated||'');
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+};
+DR._Base._types[436] = DR.kino.struct.Genre;
+DR.kino.struct.Genre[__P] = new DR._Base;
+DR.kino.struct.Genre[__P][__C] = DR.kino.struct.Genre;
+/** @type {Boolean} */
+DR.kino.struct.Genre.prototype.blocked = null;
+/** @type {Number} */
+DR.kino.struct.Genre.prototype.id = null;
+/** @type {String} */
+DR.kino.struct.Genre.prototype.name = null;
+/** @type {String} */
+DR.kino.struct.Genre.prototype.nameTranslated = null;
+/** @type {String} */
+DR.kino.struct.Genre.prototype.url = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Genre = function(){
+	this._fields = {};
+};
+DR.kino.select.Genre[__CL] = "Kino__Genre";
+DR.kino.select.Genre[__P] = new DR._Select;
+DR.kino.select.Genre[__P][__C] = DR.kino.select.Genre;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Genre} */
+DR.kino.select.Genre.prototype.blocked = function(v){ this._fields.blocked = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Genre} */
+DR.kino.select.Genre.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Genre} */
+DR.kino.select.Genre.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Genre} */
+DR.kino.select.Genre.prototype.nameTranslated = function(v){ this._fields.nameTranslated = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Genre} */
+DR.kino.select.Genre.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.Actor = function(par){
+	/** @private */
+	this._t = 437;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.picture)) this.picture = DR._Base.cast(par.picture);
+	if(DR._Base.is(par.position)) this.position = (parseInt(par.position)||0);
+	if(DR._Base.is(par.role)) this.role = String(par.role||'');
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+};
+DR._Base._types[437] = DR.kino.struct.Actor;
+DR.kino.struct.Actor[__P] = new DR._Base;
+DR.kino.struct.Actor[__P][__C] = DR.kino.struct.Actor;
+/** @type {Number} */
+DR.kino.struct.Actor.prototype.id = null;
+/** @type {String} */
+DR.kino.struct.Actor.prototype.name = null;
+/** @type {DR.base.struct.Image} */
+DR.kino.struct.Actor.prototype.picture = null;
+/** @type {Number} */
+DR.kino.struct.Actor.prototype.position = null;
+/** @type {String} */
+DR.kino.struct.Actor.prototype.role = null;
+/** @type {String} */
+DR.kino.struct.Actor.prototype.url = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Actor = function(){
+	this._fields = {};
+};
+DR.kino.select.Actor[__CL] = "Kino__Actor";
+DR.kino.select.Actor[__P] = new DR._Select;
+DR.kino.select.Actor[__P][__C] = DR.kino.select.Actor;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.picture = function(v){ this._fields.picture = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.position = function(v){ this._fields.position = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.role = function(v){ this._fields.role = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Actor} */
+DR.kino.select.Actor.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.kino.Rate = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 446;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[446] = DR.kino.Rate;
+DR.kino.Rate[__CL] = "Kino__Rate";
+DR.kino.Rate[__P] = new DR._Method;
+DR.kino.Rate[__P][__C] = DR.kino.Rate;
+/** @type {Number} */
+DR.kino.Rate.prototype.id = null;
+/** @type {Number} */
+DR.kino.Rate.prototype.stars = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.Rate.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.Search = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 541;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[541] = DR.kino.Search;
+DR.kino.Search[__CL] = "Kino__Search";
+DR.kino.Search[__P] = new DR._Method;
+DR.kino.Search[__P][__C] = DR.kino.Search;
+/** @type {Number} */
+DR.kino.Search.prototype.count = null;
+/** @type {Number} */
+DR.kino.Search.prototype.pg = null;
+/** @type {String} */
+DR.kino.Search.prototype.query = null;
+/** @type {DR.kino.struct.Movies} */
+DR.kino.Search.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.AddToSelection = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 542;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[542] = DR.kino.AddToSelection;
+DR.kino.AddToSelection[__CL] = "Kino__AddToSelection";
+DR.kino.AddToSelection[__P] = new DR._Method;
+DR.kino.AddToSelection[__P][__C] = DR.kino.AddToSelection;
+/** @type {Number} */
+DR.kino.AddToSelection.prototype.movieId = null;
+/** @type {Number} */
+DR.kino.AddToSelection.prototype.selectionId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.AddToSelection.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.RemoveFromSelection = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 543;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[543] = DR.kino.RemoveFromSelection;
+DR.kino.RemoveFromSelection[__CL] = "Kino__RemoveFromSelection";
+DR.kino.RemoveFromSelection[__P] = new DR._Method;
+DR.kino.RemoveFromSelection[__P][__C] = DR.kino.RemoveFromSelection;
+/** @type {Number} */
+DR.kino.RemoveFromSelection.prototype.movieId = null;
+/** @type {Number} */
+DR.kino.RemoveFromSelection.prototype.selectionId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.RemoveFromSelection.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.Cinema = function(par){
+	/** @private */
+	this._t = 544;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.buyUrl)) this.buyUrl = String(par.buyUrl||'');
+	if(DR._Base.is(par.closestShowTs)) this.closestShowTs = (parseInt(par.closestShowTs)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[544] = DR.kino.struct.Cinema;
+DR.kino.struct.Cinema[__P] = new DR._Base;
+DR.kino.struct.Cinema[__P][__C] = DR.kino.struct.Cinema;
+/** @type {String} */
+DR.kino.struct.Cinema.prototype.buyUrl = null;
+/** @type {Number} */
+DR.kino.struct.Cinema.prototype.closestShowTs = null;
+/** @type {DR.users.struct.UserBusiness} */
+DR.kino.struct.Cinema.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Cinema = function(){
+	this._fields = {};
+};
+DR.kino.select.Cinema[__CL] = "Kino__Cinema";
+DR.kino.select.Cinema[__P] = new DR._Select;
+DR.kino.select.Cinema[__P][__C] = DR.kino.select.Cinema;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Cinema} */
+DR.kino.select.Cinema.prototype.buyUrl = function(v){ this._fields.buyUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Cinema} */
+DR.kino.select.Cinema.prototype.closestShowTs = function(v){ this._fields.closestShowTs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Cinema} */
+DR.kino.select.Cinema.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.Selection = function(par){
+	/** @private */
+	this._t = 546;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.isDefault)) this.isDefault = Boolean(par.isDefault);
+	if(DR._Base.is(par.movieCount)) this.movieCount = (parseInt(par.movieCount)||0);
+	if(DR._Base.is(par.movies)){
+		var tmp = [];
+		for( var k in par.movies ) tmp.push(DR._Base.cast(par.movies [k]));
+		this.movies = tmp;
+	}
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.type)) this.type = Number(par.type);
+};
+DR._Base._types[546] = DR.kino.struct.Selection;
+DR.kino.struct.Selection.TYPE_CUSTOM = 0;
+DR.kino.struct.Selection.TYPE_LIKED = 1;
+DR.kino.struct.Selection.TYPE_RATED = 2;
+DR.kino.struct.Selection[__P] = new DR._Base;
+DR.kino.struct.Selection[__P][__C] = DR.kino.struct.Selection;
+/** @type {Number|null} */
+DR.kino.struct.Selection.prototype.id = null;
+/** @type {Boolean} */
+DR.kino.struct.Selection.prototype.isDefault = null;
+/** @type {Number} */
+DR.kino.struct.Selection.prototype.movieCount = null;
+/** @type {Array.<DR.kino.struct.Movie>} */
+DR.kino.struct.Selection.prototype.movies = null;
+/** @type {String} */
+DR.kino.struct.Selection.prototype.name = null;
+/** @type {Number} */
+DR.kino.struct.Selection.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.Selection = function(){
+	this._fields = {};
+};
+DR.kino.select.Selection[__CL] = "Kino__Selection";
+DR.kino.select.Selection[__P] = new DR._Select;
+DR.kino.select.Selection[__P][__C] = DR.kino.select.Selection;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.isDefault = function(v){ this._fields.isDefault = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.movieCount = function(v){ this._fields.movieCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.movies = function(v){ this._fields.movies = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.name = function(v){ this._fields.name = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.kino.select.Selection} */
+DR.kino.select.Selection.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.GetSelectionsRe = function(par){
+	/** @private */
+	this._t = 547;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.selections)){
+		var tmp = [];
+		for( var k in par.selections ) tmp.push(DR._Base.cast(par.selections [k]));
+		this.selections = tmp;
+	}
+};
+DR._Base._types[547] = DR.kino.struct.GetSelectionsRe;
+DR.kino.struct.GetSelectionsRe[__P] = new DR._Base;
+DR.kino.struct.GetSelectionsRe[__P][__C] = DR.kino.struct.GetSelectionsRe;
+/** @type {Array.<DR.kino.struct.Selection>} */
+DR.kino.struct.GetSelectionsRe.prototype.selections = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.GetSelectionsRe = function(){
+	this._fields = {};
+};
+DR.kino.select.GetSelectionsRe[__CL] = "Kino__GetSelectionsRe";
+DR.kino.select.GetSelectionsRe[__P] = new DR._Select;
+DR.kino.select.GetSelectionsRe[__P][__C] = DR.kino.select.GetSelectionsRe;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.GetSelectionsRe} */
+DR.kino.select.GetSelectionsRe.prototype.selections = function(v){ this._fields.selections = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.kino.GetSelections = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 548;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[548] = DR.kino.GetSelections;
+DR.kino.GetSelections[__CL] = "Kino__GetSelections";
+DR.kino.GetSelections[__P] = new DR._Method;
+DR.kino.GetSelections[__P][__C] = DR.kino.GetSelections;
+/** @type {Number|null} */
+DR.kino.GetSelections.prototype.uid = null;
+/** @type {DR.kino.struct.GetSelectionsRe} */
+DR.kino.GetSelections.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.CreateSelection = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 549;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[549] = DR.kino.CreateSelection;
+DR.kino.CreateSelection[__CL] = "Kino__CreateSelection";
+DR.kino.CreateSelection[__P] = new DR._Method;
+DR.kino.CreateSelection[__P][__C] = DR.kino.CreateSelection;
+/** @type {String} */
+DR.kino.CreateSelection.prototype.name = null;
+/** @type {DR.kino.struct.CreateSelectionRe} */
+DR.kino.CreateSelection.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.kino.struct.CreateSelectionRe = function(par){
+	/** @private */
+	this._t = 550;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.selection)) this.selection = DR._Base.cast(par.selection);
+};
+DR._Base._types[550] = DR.kino.struct.CreateSelectionRe;
+DR.kino.struct.CreateSelectionRe[__P] = new DR._Base;
+DR.kino.struct.CreateSelectionRe[__P][__C] = DR.kino.struct.CreateSelectionRe;
+/** @type {DR.kino.struct.Selection} */
+DR.kino.struct.CreateSelectionRe.prototype.selection = null;
+ 
+/** @extends {DR._Select} */
+DR.kino.select.CreateSelectionRe = function(){
+	this._fields = {};
+};
+DR.kino.select.CreateSelectionRe[__CL] = "Kino__CreateSelectionRe";
+DR.kino.select.CreateSelectionRe[__P] = new DR._Select;
+DR.kino.select.CreateSelectionRe[__P][__C] = DR.kino.select.CreateSelectionRe;
+/** @param {boolean} [v]
+  * @return {DR.kino.select.CreateSelectionRe} */
+DR.kino.select.CreateSelectionRe.prototype.selection = function(v){ this._fields.selection = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.kino.GetSelectionMovies = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 551;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[551] = DR.kino.GetSelectionMovies;
+DR.kino.GetSelectionMovies[__CL] = "Kino__GetSelectionMovies";
+DR.kino.GetSelectionMovies[__P] = new DR._Method;
+DR.kino.GetSelectionMovies[__P][__C] = DR.kino.GetSelectionMovies;
+/** @type {Number} */
+DR.kino.GetSelectionMovies.prototype.count = null;
+/** @type {Number} */
+DR.kino.GetSelectionMovies.prototype.pg = null;
+/** @type {Number} */
+DR.kino.GetSelectionMovies.prototype.selectionId = null;
+/** @type {DR.kino.struct.Movies} */
+DR.kino.GetSelectionMovies.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.EditSelection = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 552;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[552] = DR.kino.EditSelection;
+DR.kino.EditSelection[__CL] = "Kino__EditSelection";
+DR.kino.EditSelection[__P] = new DR._Method;
+DR.kino.EditSelection[__P][__C] = DR.kino.EditSelection;
+/** @type {String} */
+DR.kino.EditSelection.prototype.name = null;
+/** @type {Number} */
+DR.kino.EditSelection.prototype.selectionId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.EditSelection.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.DeleteSelection = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 553;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[553] = DR.kino.DeleteSelection;
+DR.kino.DeleteSelection[__CL] = "Kino__DeleteSelection";
+DR.kino.DeleteSelection[__P] = new DR._Method;
+DR.kino.DeleteSelection[__P][__C] = DR.kino.DeleteSelection;
+/** @type {Number} */
+DR.kino.DeleteSelection.prototype.selectionId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.DeleteSelection.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.Recommend = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 554;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[554] = DR.kino.Recommend;
+DR.kino.Recommend[__CL] = "Kino__Recommend";
+DR.kino.Recommend[__P] = new DR._Method;
+DR.kino.Recommend[__P][__C] = DR.kino.Recommend;
+/** @type {Number} */
+DR.kino.Recommend.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.Recommend.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.CancelRecommend = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 555;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[555] = DR.kino.CancelRecommend;
+DR.kino.CancelRecommend[__CL] = "Kino__CancelRecommend";
+DR.kino.CancelRecommend[__P] = new DR._Method;
+DR.kino.CancelRecommend[__P][__C] = DR.kino.CancelRecommend;
+/** @type {Number} */
+DR.kino.CancelRecommend.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.CancelRecommend.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.AddToSeen = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 556;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[556] = DR.kino.AddToSeen;
+DR.kino.AddToSeen[__CL] = "Kino__AddToSeen";
+DR.kino.AddToSeen[__P] = new DR._Method;
+DR.kino.AddToSeen[__P][__C] = DR.kino.AddToSeen;
+/** @type {Number} */
+DR.kino.AddToSeen.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.AddToSeen.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.AddToWantSee = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 557;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[557] = DR.kino.AddToWantSee;
+DR.kino.AddToWantSee[__CL] = "Kino__AddToWantSee";
+DR.kino.AddToWantSee[__P] = new DR._Method;
+DR.kino.AddToWantSee[__P][__C] = DR.kino.AddToWantSee;
+/** @type {Number} */
+DR.kino.AddToWantSee.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.AddToWantSee.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.RemoveFromSeen = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 563;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[563] = DR.kino.RemoveFromSeen;
+DR.kino.RemoveFromSeen[__CL] = "Kino__RemoveFromSeen";
+DR.kino.RemoveFromSeen[__P] = new DR._Method;
+DR.kino.RemoveFromSeen[__P][__C] = DR.kino.RemoveFromSeen;
+/** @type {Number} */
+DR.kino.RemoveFromSeen.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.RemoveFromSeen.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.kino.RemoveFromWantSee = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 564;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[564] = DR.kino.RemoveFromWantSee;
+DR.kino.RemoveFromWantSee[__CL] = "Kino__RemoveFromWantSee";
+DR.kino.RemoveFromWantSee[__P] = new DR._Method;
+DR.kino.RemoveFromWantSee[__P][__C] = DR.kino.RemoveFromWantSee;
+/** @type {Number} */
+DR.kino.RemoveFromWantSee.prototype.movieId = null;
+/** @type {DR.base.struct.Status} */
+DR.kino.RemoveFromWantSee.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.kino.FriendRecommended = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 429;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[429] = DR.kino.FriendRecommended;
+DR.kino.FriendRecommended[__CL] = "Kino__FriendRecommended";
+DR.kino.FriendRecommended[__P] = new DR.base.Pg;
+DR.kino.FriendRecommended[__P][__C] = DR.kino.FriendRecommended;
+/** @type {DR.kino.struct.FriendRecommendedRe} */
+DR.kino.FriendRecommended.prototype.re = null;
+ 
+D.loaded();

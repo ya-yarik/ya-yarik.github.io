@@ -1,0 +1,645 @@
+DR.say = DR.say || {};
+DR.say.struct = DR.say.struct || {};
+DR.say.select = DR.say.select || {};
+DR.say.events = DR.say.events || {};
+DR.say.events.struct = DR.say.events.struct || {};
+DR.say.events.select = DR.say.events.select || {};
+/** @extends {DR._Base} */
+DR.say.events.struct.Base = function(par){
+	/** @private */
+	this._t = 239;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.type)) this.type = Number(par.type);
+};
+DR._Base._types[239] = DR.say.events.struct.Base;
+DR.say.events.struct.Base.TYPE_GALLERY = 1;
+DR.say.events.struct.Base.TYPE_POSTS = 2;
+DR.say.events.struct.Base.TYPE_GROUPS = 3;
+DR.say.events.struct.Base.TYPE_RATE = 5;
+DR.say.events.struct.Base.TYPE_GALLERYUSER = 8;
+DR.say.events.struct.Base.TYPE_PROFGAL = 9;
+DR.say.events.struct.Base.TYPE_MUSIC = 10;
+DR.say.events.struct.Base.TYPE_MUSICTOP = 11;
+DR.say.events.struct.Base.TYPE_EVENT = 12;
+DR.say.events.struct.Base.TYPE_EMO = 17;
+DR.say.events.struct.Base.TYPE_BIZPOLL = 19;
+DR.say.events.struct.Base.TYPE_SKIN = 20;
+DR.say.events.struct.Base.TYPE_BIZMAGAZINE = 21;
+DR.say.events.struct.Base.TYPE_RELSHIP = 22;
+DR.say.events.struct.Base.TYPE_FRIEND = 24;
+DR.say.events.struct.Base.TYPE_BIZMARKET = 32;
+DR.say.events.struct.Base.TYPE_SKINRATE = 36;
+DR.say.events.struct.Base.TYPE_SKINCHANGED = 37;
+DR.say.events.struct.Base.TYPE_KINO = 38;
+DR.say.events.struct.Base.TYPE_EVENTFORUM = 39;
+DR.say.events.struct.Base.TYPE_API_ADSBRAND = 41;
+DR.say.events.struct.Base.TYPE_KINOCHECK = 44;
+DR.say.events.struct.Base.TYPE_D_XMAS13 = 45;
+DR.say.events.struct.Base.TYPE_D_XMASKARTE = 47;
+DR.say.events.struct.Base.TYPE_SPECIAL_KINO2013 = 49;
+DR.say.events.struct.Base.TYPE_D_STATS2013 = 50;
+DR.say.events.struct.Base.TYPE_D_SOCHI = 51;
+DR.say.events.struct.Base.TYPE_SPECIAL_KINOOSCARS2014 = 52;
+DR.say.events.struct.Base.TYPE_SPECIAL_KEKAVA = 54;
+DR.say.events.struct.Base.TYPE_SPECIAL_SMILTENESPIENS = 55;
+DR.say.events.struct.Base.TYPE_SPECIAL_MCDONALDS = 56;
+DR.say.events.struct.Base.TYPE_SPECIAL_TELE2 = 57;
+DR.say.events.struct.Base.TYPE_ENDOMONDO = 59;
+DR.say.events.struct.Base.TYPE_D_LIELDIENAS14 = 60;
+DR.say.events.struct.Base.TYPE_SPECIAL_LMT = 62;
+DR.say.events.struct.Base.TYPE_D_APTAUJAS = 63;
+DR.say.events.struct.Base.TYPE_SPECIAL_MANASLECAS = 64;
+DR.say.events.struct.Base.TYPE_SPECIAL_ELEKTRODROSIBA = 65;
+DR.say.events.struct.Base.TYPE_SPECIAL_HOCKEY = 66;
+DR.say.events.struct.Base.TYPE_SPECIAL_MANASLECAS2 = 67;
+DR.say.events.struct.Base.TYPE_SPECIAL_EXPERIMENTS = 69;
+DR.say.events.struct.Base.TYPE_SPECIAL_ONETOUCHRADARS = 71;
+DR.say.events.struct.Base.TYPE_SPECIAL_TELE2PARZINI = 72;
+DR.say.events.struct.Base.TYPE_SPECIAL_COCACOLA = 73;
+DR.say.events.struct.Base.TYPE_BIZHOURS = 74;
+DR.say.events.struct.Base.TYPE_SPECIAL_BITE = 75;
+DR.say.events.struct.Base.TYPE_BCARD = 76;
+DR.say.events.struct.Base.TYPE_D = 77;
+DR.say.events.struct.Base.TYPE_SPECIAL_MCDONALDS2 = 78;
+DR.say.events.struct.Base.TYPE_GROUPS_MEMBER = 79;
+DR.say.events.struct.Base.TYPE_ACHIEVEMENT = 80;
+DR.say.events.struct.Base.TYPE_SPECIAL_RATE = 81;
+DR.say.events.struct.Base.TYPE_SPECIAL_AMIGOKARTINAS = 82;
+DR.say.events.struct.Base.TYPE_SPECIAL_AMIGOKARTINASS = 83;
+DR.say.events.struct.Base.TYPE_SPECIAL_ALKOUTLETDZERIENS = 84;
+DR.say.events.struct.Base.TYPE_SPECIAL_TOPPANTINI = 85;
+DR.say.events.struct.Base.TYPE_SPECIAL_LATVIJA = 86;
+DR.say.events.struct.Base.TYPE_SPECIAL_DOMAGUDRI = 87;
+DR.say.events.struct.Base.TYPE_SPECIAL_BINGO = 88;
+DR.say.events.struct.Base.TYPE_SAYPIC = 89;
+DR.say.events.struct.Base.TYPE_SPECIAL_PHONEADPACMAN = 90;
+DR.say.events.struct.Base.TYPE_SPECIAL_PRIVATADZIVECEPUMS = 91;
+DR.say.events.struct.Base.TYPE_SPECIAL_TOPZINULATVIJU = 92;
+DR.say.events.struct.Base.TYPE_SPECIAL_ATKLAJLATVIJASGARSU = 93;
+DR.say.events.struct.Base.TYPE_SPECIAL_DZEJANOSIRDS = 94;
+DR.say.events.struct.Base.TYPE_EVENTATTENDING = 95;
+DR.say.events.struct.Base.TYPE_GROUPS_AUTO = 96;
+DR.say.events.struct.Base.TYPE_GALLERYAPPEND = 97;
+DR.say.events.struct.Base.TYPE_PROFILECOVER = 98;
+DR.say.events.struct.Base.TYPE_SPECIAL_DZEJANOSIRDS2017 = 99;
+DR.say.events.struct.Base.TYPE_SPECIAL_DZEJANOSIRDS2018 = 100;
+DR.say.events.struct.Base.TYPE_ZINAS = 101;
+DR.say.events.struct.Base[__P] = new DR._Base;
+DR.say.events.struct.Base[__P][__C] = DR.say.events.struct.Base;
+/** @type {Number} */
+DR.say.events.struct.Base.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.say.events.select.Base = function(){
+	this._fields = {};
+};
+DR.say.events.select.Base[__CL] = "Say\\Events__Base";
+DR.say.events.select.Base[__P] = new DR._Select;
+DR.say.events.select.Base[__P][__C] = DR.say.events.select.Base;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Base} */
+DR.say.events.select.Base.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.say.events.struct.FriendItem = function(par){
+	/** @private */
+	this._t = 2249;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.commonFriends)) this.commonFriends = (parseInt(par.commonFriends)||0);
+	if(DR._Base.is(par.friendsPreview)){
+		var tmp = [];
+		for( var k in par.friendsPreview ) tmp.push(DR._Base.cast(par.friendsPreview [k]));
+		this.friendsPreview = tmp;
+	}
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[2249] = DR.say.events.struct.FriendItem;
+DR.say.events.struct.FriendItem[__P] = new DR._Base;
+DR.say.events.struct.FriendItem[__P][__C] = DR.say.events.struct.FriendItem;
+/** @type {Number} */
+DR.say.events.struct.FriendItem.prototype.commonFriends = null;
+/** @type {Array.<DR.users.struct.UserDefault>} */
+DR.say.events.struct.FriendItem.prototype.friendsPreview = null;
+/** @type {DR.users.struct.UserDefault} */
+DR.say.events.struct.FriendItem.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.say.events.select.FriendItem = function(){
+	this._fields = {};
+};
+DR.say.events.select.FriendItem[__CL] = "Say\\Events__FriendItem";
+DR.say.events.select.FriendItem[__P] = new DR._Select;
+DR.say.events.select.FriendItem[__P][__C] = DR.say.events.select.FriendItem;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.FriendItem} */
+DR.say.events.select.FriendItem.prototype.commonFriends = function(v){ this._fields.commonFriends = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.FriendItem} */
+DR.say.events.select.FriendItem.prototype.friendsPreview = function(v){ this._fields.friendsPreview = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.FriendItem} */
+DR.say.events.select.FriendItem.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.say.events.struct.GroupsMemberItem = function(par){
+	/** @private */
+	this._t = 2437;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[2437] = DR.say.events.struct.GroupsMemberItem;
+DR.say.events.struct.GroupsMemberItem[__P] = new DR._Base;
+DR.say.events.struct.GroupsMemberItem[__P][__C] = DR.say.events.struct.GroupsMemberItem;
+/** @type {DR.users.struct.UserDefault} */
+DR.say.events.struct.GroupsMemberItem.prototype.user = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Gallery = function(par){
+	/** @private */
+	this._t = 240;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.mosaicItems)){
+		var tmp = [];
+		for( var k in par.mosaicItems ) tmp.push(DR._Base.cast(par.mosaicItems [k]));
+		this.mosaicItems = tmp;
+	}
+};
+DR._Base._types[240] = DR.say.events.struct.Gallery;
+DR.say.events.struct.Gallery[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Gallery[__P][__C] = DR.say.events.struct.Gallery;
+/** @type {DR.gallery.struct.Album} */
+DR.say.events.struct.Gallery.prototype.album = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.say.events.struct.Gallery.prototype.mosaicItems = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.SayPic = function(par){
+	/** @private */
+	this._t = 251;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[251] = DR.say.events.struct.SayPic;
+DR.say.events.struct.SayPic[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.SayPic[__P][__C] = DR.say.events.struct.SayPic;
+/** @type {DR.gallery.struct.Item} */
+DR.say.events.struct.SayPic.prototype.item = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.KinoRecommend = function(par){
+	/** @private */
+	this._t = 491;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.movie)) this.movie = DR._Base.cast(par.movie);
+};
+DR._Base._types[491] = DR.say.events.struct.KinoRecommend;
+DR.say.events.struct.KinoRecommend[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.KinoRecommend[__P][__C] = DR.say.events.struct.KinoRecommend;
+/** @type {DR.kino.struct.Movie} */
+DR.say.events.struct.KinoRecommend.prototype.movie = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.KinoWatching = function(par){
+	/** @private */
+	this._t = 492;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.movie)) this.movie = DR._Base.cast(par.movie);
+};
+DR._Base._types[492] = DR.say.events.struct.KinoWatching;
+DR.say.events.struct.KinoWatching[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.KinoWatching[__P][__C] = DR.say.events.struct.KinoWatching;
+/** @type {DR.kino.struct.Movie} */
+DR.say.events.struct.KinoWatching.prototype.movie = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Event = function(par){
+	/** @private */
+	this._t = 493;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.event)) this.event = DR._Base.cast(par.event);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[493] = DR.say.events.struct.Event;
+DR.say.events.struct.Event[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Event[__P][__C] = DR.say.events.struct.Event;
+/** @type {DR.events.struct.Event} */
+DR.say.events.struct.Event.prototype.event = null;
+/** @type {DR.event.struct.Item} */
+DR.say.events.struct.Event.prototype.item = null;
+ 
+/** @extends {DR.say.events.select.Base} */
+DR.say.events.select.Event = function(){
+	this._fields = {};
+};
+DR.say.events.select.Event[__CL] = "Say\\Events__Event";
+DR.say.events.select.Event[__P] = new DR.say.events.select.Base;
+DR.say.events.select.Event[__P][__C] = DR.say.events.select.Event;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Event} */
+DR.say.events.select.Event.prototype.event = function(v){ this._fields.event = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Event} */
+DR.say.events.select.Event.prototype.item = function(v){ this._fields.item = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.ChangedPicture = function(par){
+	/** @private */
+	this._t = 495;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[495] = DR.say.events.struct.ChangedPicture;
+DR.say.events.struct.ChangedPicture[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.ChangedPicture[__P][__C] = DR.say.events.struct.ChangedPicture;
+/** @type {DR.gallery.struct.Item} */
+DR.say.events.struct.ChangedPicture.prototype.item = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Relationship = function(par){
+	/** @private */
+	this._t = 499;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.status)) this.status = (parseInt(par.status)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[499] = DR.say.events.struct.Relationship;
+DR.say.events.struct.Relationship[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Relationship[__P][__C] = DR.say.events.struct.Relationship;
+/** @type {Number} */
+DR.say.events.struct.Relationship.prototype.status = null;
+/** @type {DR.users.struct.User} */
+DR.say.events.struct.Relationship.prototype.user = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Rate = function(par){
+	/** @private */
+	this._t = 501;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.picture)) this.picture = DR._Base.cast(par.picture);
+};
+DR._Base._types[501] = DR.say.events.struct.Rate;
+DR.say.events.struct.Rate[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Rate[__P][__C] = DR.say.events.struct.Rate;
+/** @type {DR.rate.struct.Picture} */
+DR.say.events.struct.Rate.prototype.picture = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Post = function(par){
+	/** @private */
+	this._t = 503;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.blog)) this.blog = DR._Base.cast(par.blog);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[503] = DR.say.events.struct.Post;
+DR.say.events.struct.Post[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Post[__P][__C] = DR.say.events.struct.Post;
+/** @type {DR.blogs.struct.Item} */
+DR.say.events.struct.Post.prototype.blog = null;
+/** @type {DR.posts.struct.Item} */
+DR.say.events.struct.Post.prototype.item = null;
+ 
+/** @extends {DR.say.events.select.Base} */
+DR.say.events.select.Post = function(){
+	this._fields = {};
+};
+DR.say.events.select.Post[__CL] = "Say\\Events__Post";
+DR.say.events.select.Post[__P] = new DR.say.events.select.Base;
+DR.say.events.select.Post[__P][__C] = DR.say.events.select.Post;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Post} */
+DR.say.events.select.Post.prototype.blog = function(v){ this._fields.blog = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Post} */
+DR.say.events.select.Post.prototype.item = function(v){ this._fields.item = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Magazine = function(par){
+	/** @private */
+	this._t = 511;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[511] = DR.say.events.struct.Magazine;
+DR.say.events.struct.Magazine[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Magazine[__P][__C] = DR.say.events.struct.Magazine;
+/** @type {DR.magazine.struct.Article} */
+DR.say.events.struct.Magazine.prototype.item = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.GalleryTagged = function(par){
+	/** @private */
+	this._t = 519;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.friend)) this.friend = DR._Base.cast(par.friend);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.otherUsers)){
+		var tmp = [];
+		for( var k in par.otherUsers ) tmp.push(DR._Base.cast(par.otherUsers [k]));
+		this.otherUsers = tmp;
+	}
+};
+DR._Base._types[519] = DR.say.events.struct.GalleryTagged;
+DR.say.events.struct.GalleryTagged[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.GalleryTagged[__P][__C] = DR.say.events.struct.GalleryTagged;
+/** @type {DR.gallery.struct.Album} */
+DR.say.events.struct.GalleryTagged.prototype.album = null;
+/** @type {DR.users.struct.User} */
+DR.say.events.struct.GalleryTagged.prototype.friend = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.say.events.struct.GalleryTagged.prototype.items = null;
+/** @type {Array.<DR.users.struct.User>|null} */
+DR.say.events.struct.GalleryTagged.prototype.otherUsers = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Friends = function(par){
+	/** @private */
+	this._t = 568;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[568] = DR.say.events.struct.Friends;
+DR.say.events.struct.Friends[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Friends[__P][__C] = DR.say.events.struct.Friends;
+/** @type {Array.<DR.say.events.struct.FriendItem>} */
+DR.say.events.struct.Friends.prototype.items = null;
+/** @type {Array.<DR.users.struct.UserDefault>} */
+DR.say.events.struct.Friends.prototype.users = null;
+ 
+/** @extends {DR.say.events.select.Base} */
+DR.say.events.select.Friends = function(){
+	this._fields = {};
+};
+DR.say.events.select.Friends[__CL] = "Say\\Events__Friends";
+DR.say.events.select.Friends[__P] = new DR.say.events.select.Base;
+DR.say.events.select.Friends[__P][__C] = DR.say.events.select.Friends;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Friends} */
+DR.say.events.select.Friends.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.Friends} */
+DR.say.events.select.Friends.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.PagePoll = function(par){
+	/** @private */
+	this._t = 1195;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.poll)) this.poll = DR._Base.cast(par.poll);
+};
+DR._Base._types[1195] = DR.say.events.struct.PagePoll;
+DR.say.events.struct.PagePoll[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.PagePoll[__P][__C] = DR.say.events.struct.PagePoll;
+/** @type {DR.pages.struct.Poll} */
+DR.say.events.struct.PagePoll.prototype.poll = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Endomondo = function(par){
+	/** @private */
+	this._t = 1284;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[1284] = DR.say.events.struct.Endomondo;
+DR.say.events.struct.Endomondo[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Endomondo[__P][__C] = DR.say.events.struct.Endomondo;
+/** @type {DR.endomondo.struct.Workout} */
+DR.say.events.struct.Endomondo.prototype.item = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.GroupsOldTopic = function(par){
+	/** @private */
+	this._t = 1450;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.topic)) this.topic = DR._Base.cast(par.topic);
+};
+DR._Base._types[1450] = DR.say.events.struct.GroupsOldTopic;
+DR.say.events.struct.GroupsOldTopic[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.GroupsOldTopic[__P][__C] = DR.say.events.struct.GroupsOldTopic;
+/** @type {DR.groupsold.struct.Topic} */
+DR.say.events.struct.GroupsOldTopic.prototype.topic = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.D = function(par){
+	/** @private */
+	this._t = 2154;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.buttonBg)) this.buttonBg = String(par.buttonBg||'');
+	if(DR._Base.is(par.buttonText)) this.buttonText = String(par.buttonText||'');
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.image)) this.image = String(par.image||'');
+	if(DR._Base.is(par.imageSay)) this.imageSay = String(par.imageSay||'');
+	if(DR._Base.is(par.link)) this.link = String(par.link||'');
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[2154] = DR.say.events.struct.D;
+DR.say.events.struct.D[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.D[__P][__C] = DR.say.events.struct.D;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.buttonBg = null;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.buttonText = null;
+/** @type {Number|null} */
+DR.say.events.struct.D.prototype.h = null;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.image = null;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.imageSay = null;
+/** @type {String} */
+DR.say.events.struct.D.prototype.link = null;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.text = null;
+/** @type {String|null} */
+DR.say.events.struct.D.prototype.title = null;
+/** @type {Number|null} */
+DR.say.events.struct.D.prototype.w = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.Groups = function(par){
+	/** @private */
+	this._t = 2374;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.topic)) this.topic = DR._Base.cast(par.topic);
+};
+DR._Base._types[2374] = DR.say.events.struct.Groups;
+DR.say.events.struct.Groups[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.Groups[__P][__C] = DR.say.events.struct.Groups;
+/** @type {DR.groups.struct.Topic} */
+DR.say.events.struct.Groups.prototype.topic = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.GroupsMember = function(par){
+	/** @private */
+	this._t = 2438;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[2438] = DR.say.events.struct.GroupsMember;
+DR.say.events.struct.GroupsMember[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.GroupsMember[__P][__C] = DR.say.events.struct.GroupsMember;
+/** @type {Array.<DR.say.events.struct.GroupsMemberItem>} */
+DR.say.events.struct.GroupsMember.prototype.items = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.GroupsAuto = function(par){
+	/** @private */
+	this._t = 2596;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.auto)) this.auto = DR._Base.cast(par.auto);
+};
+DR._Base._types[2596] = DR.say.events.struct.GroupsAuto;
+DR.say.events.struct.GroupsAuto[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.GroupsAuto[__P][__C] = DR.say.events.struct.GroupsAuto;
+/** @type {DR.groups.struct.AutoItem} */
+DR.say.events.struct.GroupsAuto.prototype.auto = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.EventAttending = function(par){
+	/** @private */
+	this._t = 2738;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.event)) this.event = DR._Base.cast(par.event);
+	if(DR._Base.is(par.isInterested)) this.isInterested = Boolean(par.isInterested);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[2738] = DR.say.events.struct.EventAttending;
+DR.say.events.struct.EventAttending[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.EventAttending[__P][__C] = DR.say.events.struct.EventAttending;
+/** @type {DR.events.struct.Event} */
+DR.say.events.struct.EventAttending.prototype.event = null;
+/** @type {Boolean} */
+DR.say.events.struct.EventAttending.prototype.isInterested = null;
+/** @type {DR.event.struct.Item} */
+DR.say.events.struct.EventAttending.prototype.item = null;
+ 
+/** @extends {DR.say.events.select.Base} */
+DR.say.events.select.EventAttending = function(){
+	this._fields = {};
+};
+DR.say.events.select.EventAttending[__CL] = "Say\\Events__EventAttending";
+DR.say.events.select.EventAttending[__P] = new DR.say.events.select.Base;
+DR.say.events.select.EventAttending[__P][__C] = DR.say.events.select.EventAttending;
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.EventAttending} */
+DR.say.events.select.EventAttending.prototype.event = function(v){ this._fields.event = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.EventAttending} */
+DR.say.events.select.EventAttending.prototype.isInterested = function(v){ this._fields.isInterested = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.say.events.select.EventAttending} */
+DR.say.events.select.EventAttending.prototype.item = function(v){ this._fields.item = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.SpecialRate = function(par){
+	/** @private */
+	this._t = 2768;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.picture)) this.picture = DR._Base.cast(par.picture);
+};
+DR._Base._types[2768] = DR.say.events.struct.SpecialRate;
+DR.say.events.struct.SpecialRate[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.SpecialRate[__P][__C] = DR.say.events.struct.SpecialRate;
+/** @type {DR.rate.struct.Picture} */
+DR.say.events.struct.SpecialRate.prototype.picture = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.GalleryAppend = function(par){
+	/** @private */
+	this._t = 2770;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.mosaicItems)){
+		var tmp = [];
+		for( var k in par.mosaicItems ) tmp.push(DR._Base.cast(par.mosaicItems [k]));
+		this.mosaicItems = tmp;
+	}
+	if(DR._Base.is(par.pics)) this.pics = (parseInt(par.pics)||0);
+	if(DR._Base.is(par.video)) this.video = (parseInt(par.video)||0);
+};
+DR._Base._types[2770] = DR.say.events.struct.GalleryAppend;
+DR.say.events.struct.GalleryAppend[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.GalleryAppend[__P][__C] = DR.say.events.struct.GalleryAppend;
+/** @type {DR.gallery.struct.Album} */
+DR.say.events.struct.GalleryAppend.prototype.album = null;
+/** @type {Number} */
+DR.say.events.struct.GalleryAppend.prototype.count = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.say.events.struct.GalleryAppend.prototype.mosaicItems = null;
+/** @type {Number} */
+DR.say.events.struct.GalleryAppend.prototype.pics = null;
+/** @type {Number} */
+DR.say.events.struct.GalleryAppend.prototype.video = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.ProfileCover = function(par){
+	/** @private */
+	this._t = 2816;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[2816] = DR.say.events.struct.ProfileCover;
+DR.say.events.struct.ProfileCover[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.ProfileCover[__P][__C] = DR.say.events.struct.ProfileCover;
+/** @type {DR.gallery.struct.Item} */
+DR.say.events.struct.ProfileCover.prototype.item = null;
+ 
+/** @extends {DR.say.events.struct.Base} */
+DR.say.events.struct.BusinessCard = function(par){
+	/** @private */
+	this._t = 3888;
+	if(!par || typeof par != 'object'){return;}
+	DR.say.events.struct.Base.call(this,par);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+};
+DR._Base._types[3888] = DR.say.events.struct.BusinessCard;
+DR.say.events.struct.BusinessCard[__P] = new DR.say.events.struct.Base;
+DR.say.events.struct.BusinessCard[__P][__C] = DR.say.events.struct.BusinessCard;
+/** @type {DR.bcard.struct.Item} */
+DR.say.events.struct.BusinessCard.prototype.item = null;
+ 
+D.loaded();

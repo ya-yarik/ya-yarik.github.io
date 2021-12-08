@@ -1,0 +1,248 @@
+// +++ D.Drag +++
+/*
+	par = {
+		node: (elements kurā piesaista drag&drop),
+		query: dragojamu elementu mekēšanas jquery.
+		[onDrag]:
+		[onDragEnd_]: izsaucās arī, ja nav mainīta secība
+		[onDragEnd]:
+	}
+*/
+if( !D.Drag ){
+	D.Drag = function( par ){
+		var this_ = this;
+		D.Drag.init();
+		if( typeof par.node == 'string' ){
+			par.node = document.getElementById( par.node );
+		}
+		if( ! par.node ){
+			D.console.warn( 'D.Drag empty par.node' );
+			return;
+		}
+		if( getStyle( par.node, 'position' ) == 'static' ){
+			par.node.style.position = 'relative';
+		}
+		this.par = par;
+		if( ! par.query ){
+			D.console.warn	( 'D.Drag empty par.query' );
+		}
+
+		this.par = par;
+		this.reload();
+		this.insertBeforeElement = function(){
+			var pos = D.position( this, par.node );
+			if( D.dragElements ){
+				for( var i = 0; i < D.dragElements.length; i ++ ){
+					var el = D.dragElements[ i ];
+					if( this === el ){
+						break;
+					}
+					var elPos = D.position( el, par.node );
+					var elReplPos = D.position( el.D.replNode, par.node );
+					var halfWidth = this.offsetWidth / 2;
+					var halfHeight = this.offsetHeight / 2;
+					if( elPos.left > pos.left - halfWidth && elPos.left < pos.left + halfWidth && elPos.top > pos.top - halfHeight && elPos.top < pos.top + halfHeight ){
+						if( elReplPos.left > elPos.left ){
+							D.insertBefore( el.D.replNode, this );
+						} else {
+							D.insertAfter( el.D.replNode, this );
+						}
+						this_.changed = true;
+					}
+				}
+			}
+		}; // this.insertBeforeElement
+		var handleMove = function(e){
+			var changed = false;
+			for( var i = 0; i < D.dragElements.length; i ++ ){
+				var el = D.dragElements[i];
+				if( el.style.left != D.mouseX + el.D.dx + 'px' ){
+					el.style.left = D.mouseX + el.D.dx + 'px';
+					if( Math.abs( el.D.replNode.offsetLeft - el.offsetLeft ) > 10 ){
+						changed = true;
+					}
+				}
+				if( el.style.top != D.mouseY + el.D.dy + 'px' ){
+					el.style.top = D.mouseY + el.D.dy + 'px';
+					if( Math.abs( el.D.replNode.offsetTop - el.offsetTop ) > 10 ){
+						changed = true;
+					}
+				}
+				this_.jq.each( this_.insertBeforeElement );
+			}
+			if( changed && par.onDrag ){
+				par.onDrag( e );
+			}
+		};
+		$( par.node ).mousemove( function( e ){
+			if( empty( D.dragElements ) ){
+				par.node.style.cursor = 'default';
+			} else {
+				par.node.style.cursor = 'move';
+				handleMove(e);
+			}
+		} );
+		$( window ).on('scroll', D.closure(this, function(e){
+			if( !D.dragElements ){
+				return;
+			}
+			var scrollTop = this.scrollTop();
+			var scrollLeft = this.scrollLeft();
+			var deltaY = scrollTop - D.dragScrollTop;
+			var deltaX = scrollLeft - D.dragScrollLeft;
+			D.dragScrollTop = scrollTop;
+			D.dragScrollLeft = scrollLeft;
+			for( var i = 0; i < D.dragElements.length; i ++ ){
+				var el = D.dragElements[i];
+				D.log(el.style.left, el.style.top, deltaX, deltaY);
+				el.D.dx += deltaX;
+				el.D.dy += deltaY;
+			}
+			handleMove(e);
+		}));
+	};
+
+	D.Drag.prototype.scrollTop = function(){
+		if( InfoBox.opened && !empty(D.Modal._inst) ){
+			var modals = D.Modal._inst.length;
+			return D.Modal._inst[modals - 1].node.scrollTop;
+		}
+		return document.documentElement.scrollTop || document.body.scrollTop || 0;
+	};
+
+	D.Drag.prototype.scrollLeft = function(){
+		if( InfoBox.opened && !empty(D.Modal._inst) ){
+			var modals = D.Modal._inst.length;
+			return D.Modal._inst[modals - 1].node.scrollLeft;
+		}
+		return document.documentElement.scrollLeft || document.body.scrollLeft || 0;
+	};
+
+	D.Drag.prototype.reload = function(){
+		var this_ = this;
+		var par = this.par;
+		this.jq = $( par.query, par.node );
+		this.unbind();
+		this.jq.each( function(){
+			var $dragNode = this;
+			this.onselectstart = function(){ return false; };
+			if( par.dragWithQuery ){
+				var r = $( par.dragWithQuery, this );
+			} else {
+				var r = $(this);
+			}
+			if( D.DEV ){
+				//D.console.info(r);
+			}
+			r._drDragMouseDown = function( e ){
+				if( D.Drag._dragTimeout ){
+					clearTimeout(D.Drag._dragTimeout);
+				}
+                D.Drag._dragTimeout = setTimeout(D.closure(this, function(e){
+                    $dragNode.D = this.D || {};
+                    var pos = D.position( $dragNode, par.node );
+                    D.console.info( pos );
+                    this_.changed = false;
+                    $dragNode.D.Drag = this_;
+                    D.dragElements = [ $dragNode ];
+                    D.dragScrollTop = this_.scrollTop();
+                    D.dragScrollLeft = this_.scrollLeft();
+                    $dragNode.D.replNode = mkE( {
+                        tag:$dragNode.tagName,
+                        className:$dragNode.className + ' dragReplace',
+                        prop:{
+                            style:{
+                                border:'none',
+                                width:$dragNode.offsetWidth + 'px',
+                                height:$dragNode.offsetHeight + 'px'
+                            }
+                        }
+                    } );
+                    addClassName( $dragNode, 'dragActive' );
+                    D.insertBefore( $dragNode.D.replNode, $dragNode );
+                    $dragNode.D.dx = pos.left - D.mouseX;
+                    $dragNode.D.dy = pos.top - D.mouseY;
+                    $dragNode.style.position = 'absolute';
+                    $dragNode.style.left = pos.left + 'px';
+                    $dragNode.style.top = pos.top + 'px';
+                    par.node.appendChild( $dragNode );
+                    return false;
+				}, e), this_.par.timeout || 250);
+			};
+			r.mousedown( r._drDragMouseDown );
+		} );
+	};
+
+	D.Drag.prototype.unbind = function(){
+		var par = this.par;
+		this.jq.each( function(){
+			if( par.dragWithQuery ){
+				var r = $( par.dragWithQuery, this );
+			} else {
+				var r = $( this );
+			}
+			if( r._drDragMouseDown ){
+				return;
+			}
+			r.unbind( 'mousedown', r._drDragMouseDown );
+		} );
+	};
+
+	D.Drag.init = function(){
+		if( D.Drag.initOk ){
+			return;
+		}
+		$( document.body ).mouseup( function(){
+			if( D.Drag._dragTimeout ){
+				clearTimeout(D.Drag._dragTimeout);
+			}
+			if( D.dragElements ){
+				for( var i = 0; i < D.dragElements.length; i ++ ){
+					var el = D.dragElements[ i ];
+					el.style.position = '';
+					el.style.top = '';
+					el.style.left = '';
+					D.insertBefore( el, el.D.replNode );
+					removeNode( el.D.replNode );
+					removeClassName( el, 'dragActive' );
+					if( el.D.Drag.par.onDragEnd_ ){
+						el.D.Drag.par.onDragEnd_(el);
+					}
+					if( el.D.Drag.par.onDragEnd && el.D.Drag.changed ){
+						el.D.Drag.par.onDragEnd( el, array_search( el, el.parentNode.childNodes, true ) );
+					}
+				}
+			}
+			D.dragElements = [];
+		} );
+		D.Drag.initOk = true;
+	};
+
+	D.Drag.col = function( el1, el2 ){
+		var pos1 = D.position( el1 );
+		var pos2 = D.position( el2 );
+		var x1 = pos1.x;
+		var w1 = el1.offsetWidth;
+		var y1 = pos1.y;
+		var h1 = el1.offsetHeight;
+		var x2 = pos2.x;
+		var w2 = el2.offsetWidth;
+		var y2 = pos2.y;
+		var h2 = el2.offsetHeight;
+		if( x1 + w1 <= x2 ){
+			return false;
+		}
+		if( x1 >= x2 + w2 ){
+			return false;
+		}
+		if( y1 + h1 <= y2 ){
+			return false;
+		}
+		if( y1 >= y2 + h2 ){
+			return false;
+		}
+		return true;
+	};
+	D.loaded('Drag');
+}
+// --- D.Drag ---
