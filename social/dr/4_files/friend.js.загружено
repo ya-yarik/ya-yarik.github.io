@@ -1,0 +1,122 @@
+D.Friend = {
+
+	rpc: new RPC('/friend/rq/app.php'),
+
+	followSay: function(fid, sender) {
+		this.rpc.send(
+			'followSay',
+			{
+				fid: fid
+			},
+			D.closure(this, this._onFollowSay, sender, fid)
+		);
+	},
+
+	_onFollowSay: function(sender, fid, re) {
+		if ( !re ) {
+			return;
+		}
+
+		sender._form.node.remove();
+	},
+
+	unfollowSay: function(fid, sender) {
+		D.confirmDelete(
+			D.closure(this, this._unfollowSay, { fid: fid, sender: sender }),
+			{
+				text: D.Lang.get('confirm_unfollow', 'xFriend'),
+				width: 300
+			}
+		);
+	},
+
+	_unfollowSay: function(par) {
+		this.rpc.send(
+			'unfollowSay',
+			{
+				fid: par.fid
+			},
+			D.closure(this, this._onUnfollowSay, par.sender, par.fid)
+		);
+	},
+
+	_onUnfollowSay: function(sender, fid, re) {
+		if ( !re ) {
+			return;
+		}
+
+		sender.parentNode.remove();
+	},
+
+	reloadPymk: function(par) {
+		rq(par.url, par.container,{overlay:true, replace:true, hash:false});
+		return false;
+	},
+
+	acceptInvite: function( id, sender, multiboxId ) {
+		var groups = [];
+		$('#' + multiboxId + ' :checked').each(function(i, o) {
+			groups.push( o.value );
+		});
+		var u = multiboxId.split('_');
+		var uid = u[1];
+
+		this.rpc.send(
+			'acceptInvite',
+			{
+				id: id,
+				uid: uid,
+				groups: groups
+			},
+			function ( re ) {
+				if ( re ) {
+					$( sender ).closest( '.inviteConfirmBox' ).html( T.success( re.message ? re.message : D.Lang.get( 'invite_confirmed', 'xInvite' ) ) );
+				} else {
+					$( sender ).closest( '.inviteConfirmBox' ).html( T.error( 'invitation error!' ) );
+				}
+			}
+		);
+	},
+
+	denyInvite: function( id, sender ) {
+		this.rpc.send(
+			'denyInvite',
+			{
+				id: id
+			},
+			function () {
+				$( sender ).closest( '.inviteConfirmBox' ).remove();
+			}
+		);
+	},
+
+	wave: function ( uid, isRe, node ) {
+		if( node._waved ) {
+			return;
+		}
+		node._waved = true;
+
+		D.onLoad('DR.users', D.closure(this, function ( uid ) {
+			var m = new DR.users.Wave();
+			m.uid = uid;
+			m.call();
+		}, uid));
+
+		$.get('/stats/ping.php', {key: 'wave_frbtn' + (isRe ? 're' : '')});
+
+		new T.Form.Button({
+			caption: D.Lang.get('Pamāji'),
+			color: 'link',
+			icon: 'check',
+			stretch: true
+		}).replace(node.parentElement.parentElement);
+		return false;
+	},
+
+	openSettings: function () {
+		D.addCSS('/account/css/settings.css');
+		D.addJS('/account/js/settings.js', function () {
+			D.FriendSettings.open(false);
+		});
+	}
+};

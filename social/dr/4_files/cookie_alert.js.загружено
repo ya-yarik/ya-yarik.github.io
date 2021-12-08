@@ -1,0 +1,243 @@
+'use strict';
+
+D.CookieAlert = {
+	ALL: 7,
+	BASE: 1,
+	ANALYTICS: 2,
+	MARKETING: 4,
+	useStorage: true,
+	init: function () {
+		this.useStorage = D.store._useStorage();
+		if( this.closed() ) {
+			return;
+		}
+		D.CookieAlert.node = mkE({
+			tag: 'div',
+			id: 'cookieAlert',
+			className: 'cookieAlert',
+			els: [
+				{
+					tag: 'div',
+					className: 'textContent',
+					els: [
+						{
+							tag: 'div',
+							className: 'cookieText',
+							els: [
+								D.Lang.get('cookie_info_new'),
+								' ',
+								{
+									tag: 'a',
+									text: D.Lang.get('cookie_terms_new'),
+									target: '_blank',
+									href: '/help/?tab=9'
+								},
+								"."
+							]
+						},
+						{
+							tag: 'div',
+							className: 'buttonContainer',
+							els: [
+								new T.Form.Button({
+									caption: D.Lang.get('agree_cookie'),
+									color: 'submit',
+									onclick: D.closure(this, this.close, this.ALL),
+									size: 'large'
+								}),
+								{
+									tag: 'a',
+									onclick: D.closure(this, this.showSettings),
+									text: D.Lang.get('agree_cookies_settings')
+								}
+							]
+						}
+					]
+				}
+			]
+		}).append(document.body);
+		addClassName(document.body, 'withCookieAlert');
+	},
+	close: function ( cookies ) {
+		if( isNaN(cookies) ) {
+			cookies = 1;
+		}
+		if( D.CookieAlert.node ) {
+			removeNode(D.CookieAlert.node);
+			D.CookieAlert.node = null;
+		}
+		removeClassName(document.body, 'withCookieAlert');
+		if( this.useStorage ) {
+			try {
+				localStorage.setItem('cookieAlertCookie', cookies)
+			} catch( e ) {
+			}
+		}
+		D.Cookie.set('CAC', cookies, D.TIME + (86400 * 365));
+		if( !D.ID ) {
+			D.Cookie.create('CACA', 1); // tmp cookie
+		}
+		this.save(cookies);
+	},
+	closed: function () {
+		return Boolean(this.get());
+	},
+	get: function () {
+		var re;
+		re = parseInt(D.Cookie.read('CAC'));
+		if( re ) {
+			return re;
+		}
+		if( this.useStorage ) {
+			re = parseInt(localStorage.getItem('cookieAlertCookie'));
+			if( re ) {
+				return re;
+			}
+		}
+		return 0;
+	},
+	has: function ( cookie ) {
+		return (this.get() & cookie) === cookie;
+	},
+	save: function ( cookies ) {
+		if( !this._mSetCookies ) {
+			this._mSetCookies = new DR.users.SetCookies();
+		}
+		if( this._mSetCookies.processing ) {
+			return;
+		}
+		this._mSetCookies.cookies = new DR.users.struct.Cookies();
+		this._mSetCookies.cookies.basic = true;
+		this._mSetCookies.cookies.analytics = (cookies & this.ANALYTICS) === this.ANALYTICS;
+		this._mSetCookies.cookies.marketing = (cookies & this.MARKETING) === this.MARKETING;
+		this._mSetCookies.call();
+	},
+	showSettings: function () {
+		var els = mkE({
+			tag: 'div',
+			els: [
+				{
+					tag: 'div',
+					className: 'header',
+					els: [
+						{
+							tag: 'h1',
+							text: D.Lang.get('cookies_settings_title')
+						},
+						{
+							tag: 'p',
+							text: D.Lang.get('cookies_settings_descr')
+						}
+					]
+				},
+				{
+					tag: 'div',
+					className: 'options',
+					els: [
+						{
+							tag: 'div',
+							className: 'option',
+							els: [
+								new T.Form.CheckBox({
+									caption: D.Lang.get('cookies_settings_c_base'),
+									checked: true,
+									disabled: true,
+									value: this.BASE
+								}),
+								{
+									tag: 'p',
+									text: D.Lang.get('cookies_settings_c_base_descr')
+								}
+							]
+						},
+						{
+							tag: 'div',
+							className: 'option',
+							els: [
+								this._fAnalytics = new T.Form.CheckBox({
+									caption: D.Lang.get('cookies_settings_c_analytics'),
+									checked: this.has(this.ANALYTICS)
+								}),
+								{
+									tag: 'p',
+									text: D.Lang.get('cookies_settings_c_analytics_descr')
+								}
+							]
+						},
+						{
+							tag: 'div',
+							className: 'option',
+							els: [
+								this._fMarketing = new T.Form.CheckBox({
+									caption: D.Lang.get('cookies_settings_c_marketing'),
+									checked: this.has(this.MARKETING)
+								}),
+								{
+									tag: 'p',
+									text: D.Lang.get('cookies_settings_c_marketing_descr')
+								}
+							]
+						}
+					]
+				},
+				{
+					tag: 'div',
+					className: 'footer',
+					els: [
+						{
+							tag: 'div',
+							className: 'left',
+							els: [
+								{
+									tag: 'a',
+									text: D.Lang.get('Cookie Terms'),
+									target: '_blank',
+									href: '/help/?tab=9'
+								}
+							]
+						},
+						{
+							tag: 'div',
+							className: 'right',
+							els: [
+								new T.Form.Button({
+									caption: D.Lang.get('cookies_save_all'),
+									size: 'large',
+									onclick: D.closure(this, this._onClickSaveAll)
+								}),
+								new T.Form.Button({
+									caption: D.Lang.get('Save'),
+									size: 'large',
+									onclick: D.closure(this, this._onClickSave)
+								})
+							]
+						}
+					]
+				}
+			]
+		});
+
+		var w = document.body.offsetWidth;
+		InfoBox.els(els, {
+			width: w >= 1200 ? 1040 : null,
+			className: 'CookieSettingsInfoBox'
+		});
+	},
+	_onClickSaveAll: function () {
+		this.close(this.ALL);
+		InfoBox.close();
+	},
+	_onClickSave: function () {
+		var cookies = this.BASE;
+		if( this._fAnalytics.value() ) {
+			cookies |= this.ANALYTICS;
+		}
+		if( this._fMarketing.value() ) {
+			cookies |= this.MARKETING;
+		}
+		this.close(cookies);
+		InfoBox.close();
+	}
+};
+
+D.CookieAlert.init();
