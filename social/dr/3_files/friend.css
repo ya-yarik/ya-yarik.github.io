@@ -1,0 +1,132 @@
+.galleryProfile > li > a{
+	width: 168px;
+}
+
+.galleryAlbumThumbsPage > li {
+	width: 161px;
+	margin-right: 8px;
+}
+
+.galleryAlbumThumbsPage > li:first-child {
+	width: 162px;
+}
+
+.galleryAlbumThumbsPage > li:last-child {
+	margin-right: 0;
+}
+
+.galleryAlbumThumbsPage > li > a {
+	width: 100%
+}
+
+.galleryAlbumThumbsPage > li > a:first-child {
+	height: 161px;
+}
+
+.galleryAlbumThumbsPage > li > a > img {
+	width: 161px;
+	height: 161px;
+}
+
+.galleryAlbumThumbsPage > li:first-child > a > img {
+	width: 162px;
+}
+
+.galleryAlbumThumbsPage > li > a .galAlbInfo {
+	height: 161px;
+}
+
+#lt .picture .picOverlay{
+	opacity:0;
+	filter:alpha(opacity=0);
+}
+#lt .picture:hover .picOverlay{
+	filter:alpha(opacity=100);
+	opacity:1;
+}
+#lt {
+	overflow:visible;
+	word-wrap: break-word;
+}
+
+.inlineList .seperator {
+	background:url("//ifrype.com/i/sbook/activeArrow.png") no-repeat center;
+	width:10px;
+	height: 50px;
+}
+
+
+#lt .picture{
+	position:relative;
+}
+
+#lt #profilePicture .picOverlay{
+	opacity:0;
+	filter:alpha(opacity=0);
+	display: none;
+}
+
+#lt #profilePicture:hover .picOverlay{
+	filter:alpha(opacity=100);
+	opacity:1;
+	color: #445F96;
+	display: block;
+}
+
+#lt h3 a {
+	font-weight: normal;
+}
+ 
+#lt .relationshipBox .profileSmallIcon, #lt .relationshipBox .relationshipInfo {
+	float: left;
+}
+#lt .relationshipBox .relationshipInfo {
+	margin-left: 10px;
+	padding-top: 8px;
+	width: 180px;
+}
+
+.inviteConfirmBox {
+	margin-top: 16px;
+}
+
+.changeSettingsCont {
+    margin-bottom: 10px;
+}
+
+#lt .button.ltInviteBtn{
+	width:auto;
+	margin-bottom:10px;
+}
+
+.verifiedUserProfileIcn {
+	background: url('/special/verifikacija/assets/img/icn_18.png') no-repeat;
+	width: 18px;
+	height: 20px;
+	display: inline-block;
+}
+
+.pendingInviteBlock {
+	border-radius: 3px;
+	background-color: #e1eef9;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+	padding: 12px;
+	margin-bottom: 16px;
+	text-align: center;
+}
+
+.pendingInviteBlock .buttons {
+	margin-top: 12px;
+}
+
+#lt .pendingInviteBlock .formItemMultiCheckbox {
+	margin-bottom: 4px;
+}
+
+#lt .pendingInviteBlock .button {
+	margin-bottom: 8px;
+}
+
+#lt .pendingInviteBlock .button + .buttonStretch {
+	margin-top: 8px;
+}

@@ -1,0 +1,3616 @@
+DR.gallery = DR.gallery || {};
+DR.gallery.struct = DR.gallery.struct || {};
+DR.gallery.select = DR.gallery.select || {};
+/** @extends {DR._Base} */
+DR.gallery.struct.Item = function(par){
+	/** @private */
+	this._t = 70;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.aid)) this.aid = (parseInt(par.aid)||0);
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.canComment)) this.canComment = Boolean(par.canComment);
+	if(DR._Base.is(par.canDelete)) this.canDelete = Boolean(par.canDelete);
+	if(DR._Base.is(par.canDownload)) this.canDownload = Boolean(par.canDownload);
+	if(DR._Base.is(par.canEdit)) this.canEdit = Boolean(par.canEdit);
+	if(DR._Base.is(par.canSelectUsers)) this.canSelectUsers = Boolean(par.canSelectUsers);
+	if(DR._Base.is(par.canSetAsCover)) this.canSetAsCover = Boolean(par.canSetAsCover);
+	if(DR._Base.is(par.canSetAsProfile)) this.canSetAsProfile = Boolean(par.canSetAsProfile);
+	if(DR._Base.is(par.canShowCreator)) this.canShowCreator = Boolean(par.canShowCreator);
+	if(DR._Base.is(par.com)) this.com = DR._Base.cast(par.com);
+	if(DR._Base.is(par.comments)) this.comments = (parseInt(par.comments)||0);
+	if(DR._Base.is(par.cover)) this.cover = Boolean(par.cover);
+	if(DR._Base.is(par.created)) this.created = (parseInt(par.created)||0);
+	if(DR._Base.is(par.creator)) this.creator = (parseInt(par.creator)||0);
+	if(DR._Base.is(par.creatorUser)) this.creatorUser = DR._Base.cast(par.creatorUser);
+	if(DR._Base.is(par.deleted)) this.deleted = String(par.deleted||'');
+	if(DR._Base.is(par.deleteUser)) this.deleteUser = DR._Base.cast(par.deleteUser);
+	if(DR._Base.is(par.descr)) this.descr = DR._Base.hsd(par.descr);
+	if(DR._Base.is(par.description)) this.description = String(par.description||'');
+	if(DR._Base.is(par.descriptionEdit)) this.descriptionEdit = String(par.descriptionEdit||'');
+	if(DR._Base.is(par.descriptionPlain)) this.descriptionPlain = String(par.descriptionPlain||'');
+	if(DR._Base.is(par.embed)) this.embed = DR._Base.cast(par.embed);
+	if(DR._Base.is(par.galleryAd)) this.galleryAd = Boolean(par.galleryAd);
+	if(DR._Base.is(par.galleryAdTitle)) this.galleryAdTitle = String(par.galleryAdTitle||'');
+	if(DR._Base.is(par.galleryAppHash)) this.galleryAppHash = String(par.galleryAppHash||'');
+	if(DR._Base.is(par.gif)) this.gif = DR._Base.cast(par.gif);
+	if(DR._Base.is(par.hLarge)) this.hLarge = (parseInt(par.hLarge)||0);
+	if(DR._Base.is(par.href)) this.href = String(par.href||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.index)) this.index = (parseInt(par.index)||0);
+	if(DR._Base.is(par.like)) this.like = DR._Base.cast(par.like);
+	if(DR._Base.is(par.nextImage)) this.nextImage = DR._Base.cast(par.nextImage);
+	if(DR._Base.is(par.permissions)) this.permissions = DR._Base.cast(par.permissions);
+	if(DR._Base.is(par.place)) this.place = DR._Base.cast(par.place);
+	if(DR._Base.is(par.rate)) this.rate = (parseInt(par.rate)||0);
+	if(DR._Base.is(par.rateCount)) this.rateCount = (parseInt(par.rateCount)||0);
+	if(DR._Base.is(par.sayItem)) this.sayItem = DR._Base.cast(par.sayItem);
+	if(DR._Base.is(par.selectedUserCount)) this.selectedUserCount = (parseInt(par.selectedUserCount)||0);
+	if(DR._Base.is(par.selectedUsers)){
+		var tmp = {};
+		for( var k in par.selectedUsers ) tmp[k] = DR._Base.cast(par.selectedUsers [k]);
+		this.selectedUsers = tmp;
+	}
+	if(DR._Base.is(par.shortLink)) this.shortLink = String(par.shortLink||'');
+	if(DR._Base.is(par.spamPic)) this.spamPic = String(par.spamPic||'');
+	if(DR._Base.is(par.type)) this.type = Number(par.type);
+	if(DR._Base.is(par.uid)) this.uid = (parseInt(par.uid)||0);
+	if(DR._Base.is(par.uids)){
+		var tmp = [];
+		for( var k in par.uids ) tmp.push((parseInt(par.uids [k])||0));
+		this.uids = tmp;
+	}
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+	if(DR._Base.is(par.video)) this.video = DR._Base.cast(par.video);
+	if(DR._Base.is(par.views)) this.views = (parseInt(par.views)||0);
+	if(DR._Base.is(par.withUsers)){
+		var tmp = [];
+		for( var k in par.withUsers ) tmp.push(DR._Base.cast(par.withUsers [k]));
+		this.withUsers = tmp;
+	}
+	if(DR._Base.is(par.wLarge)) this.wLarge = (parseInt(par.wLarge)||0);
+};
+DR._Base._types[70] = DR.gallery.struct.Item;
+DR.gallery.struct.Item.TYPE_PIC = 0;
+DR.gallery.struct.Item.TYPE_VIDEO = 1;
+DR.gallery.struct.Item.TYPE_EMBED = 2;
+DR.gallery.struct.Item.TYPE_GIF = 3;
+DR.gallery.struct.Item.TYPE_ALL_VIDEO = 254;
+DR.gallery.struct.Item.TYPE_ALL = 255;
+DR.gallery.struct.Item[__P] = new DR._Base;
+DR.gallery.struct.Item[__P][__C] = DR.gallery.struct.Item;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.aid = null;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.struct.Item.prototype.album = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canComment = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canDelete = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canDownload = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canEdit = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canSelectUsers = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canSetAsCover = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canSetAsProfile = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.canShowCreator = null;
+/** @type {DR.comments.struct.Base} */
+DR.gallery.struct.Item.prototype.com = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.comments = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.cover = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.created = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.creator = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.Item.prototype.creatorUser = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.deleted = null;
+/** @type {DR.users.struct.User|null} */
+DR.gallery.struct.Item.prototype.deleteUser = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.descr = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.description = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.descriptionEdit = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.descriptionPlain = null;
+/** @type {DR.gallery.struct.Embed} */
+DR.gallery.struct.Item.prototype.embed = null;
+/** @type {Boolean} */
+DR.gallery.struct.Item.prototype.galleryAd = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.galleryAdTitle = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.galleryAppHash = null;
+/** @type {DR.gallery.struct.Gif} */
+DR.gallery.struct.Item.prototype.gif = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.hLarge = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.href = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.id = null;
+/** @type {DR.gallery.struct.Image} */
+DR.gallery.struct.Item.prototype.image = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.index = null;
+/** @type {DR.like.struct.GetRe} */
+DR.gallery.struct.Item.prototype.like = null;
+/** @type {DR.gallery.struct.Image} */
+DR.gallery.struct.Item.prototype.nextImage = null;
+/** @type {DR.base.struct.Permissions} */
+DR.gallery.struct.Item.prototype.permissions = null;
+/** @type {DR.places.struct.Item} */
+DR.gallery.struct.Item.prototype.place = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.rate = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.rateCount = null;
+/** @type {DR.say.struct.Item|null} */
+DR.gallery.struct.Item.prototype.sayItem = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.selectedUserCount = null;
+/** @type {Object.<Number,DR.gallery.struct.SelectedUser>} */
+DR.gallery.struct.Item.prototype.selectedUsers = null;
+/** @type {String} */
+DR.gallery.struct.Item.prototype.shortLink = null;
+/** @type {String|null} */
+DR.gallery.struct.Item.prototype.spamPic = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.type = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.uid = null;
+/** @type {Array.<Number>} */
+DR.gallery.struct.Item.prototype.uids = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.Item.prototype.user = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.gallery.struct.Item.prototype.users = null;
+/** @type {DR.gallery.struct.Video} */
+DR.gallery.struct.Item.prototype.video = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.views = null;
+/** @type {Array.<DR.say.struct.With>} */
+DR.gallery.struct.Item.prototype.withUsers = null;
+/** @type {Number} */
+DR.gallery.struct.Item.prototype.wLarge = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Item = function(){
+	this._fields = {};
+};
+DR.gallery.select.Item[__CL] = "Gallery__Item";
+DR.gallery.select.Item[__P] = new DR._Select;
+DR.gallery.select.Item[__P][__C] = DR.gallery.select.Item;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.aid = function(v){ this._fields.aid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.album = function(v){ this._fields.album = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canComment = function(v){ this._fields.canComment = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canDelete = function(v){ this._fields.canDelete = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canDownload = function(v){ this._fields.canDownload = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canEdit = function(v){ this._fields.canEdit = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canSelectUsers = function(v){ this._fields.canSelectUsers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canSetAsCover = function(v){ this._fields.canSetAsCover = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canSetAsProfile = function(v){ this._fields.canSetAsProfile = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.canShowCreator = function(v){ this._fields.canShowCreator = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.com = function(v){ this._fields.com = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.comments = function(v){ this._fields.comments = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.cover = function(v){ this._fields.cover = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.created = function(v){ this._fields.created = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.creator = function(v){ this._fields.creator = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.creatorUser = function(v){ this._fields.creatorUser = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.deleted = function(v){ this._fields.deleted = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.deleteUser = function(v){ this._fields.deleteUser = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.descr = function(v){ this._fields.descr = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.description = function(v){ this._fields.description = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.descriptionEdit = function(v){ this._fields.descriptionEdit = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.descriptionPlain = function(v){ this._fields.descriptionPlain = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.embed = function(v){ this._fields.embed = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.galleryAd = function(v){ this._fields.galleryAd = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.galleryAdTitle = function(v){ this._fields.galleryAdTitle = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.galleryAppHash = function(v){ this._fields.galleryAppHash = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.gif = function(v){ this._fields.gif = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.hLarge = function(v){ this._fields.hLarge = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.href = function(v){ this._fields.href = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.index = function(v){ this._fields.index = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.like = function(v){ this._fields.like = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.nextImage = function(v){ this._fields.nextImage = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.permissions = function(v){ this._fields.permissions = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.place = function(v){ this._fields.place = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.rate = function(v){ this._fields.rate = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.rateCount = function(v){ this._fields.rateCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.sayItem = function(v){ this._fields.sayItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.selectedUserCount = function(v){ this._fields.selectedUserCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.selectedUsers = function(v){ this._fields.selectedUsers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.shortLink = function(v){ this._fields.shortLink = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.spamPic = function(v){ this._fields.spamPic = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.uid = function(v){ this._fields.uid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.uids = function(v){ this._fields.uids = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.video = function(v){ this._fields.video = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.views = function(v){ this._fields.views = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.withUsers = function(v){ this._fields.withUsers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Item} */
+DR.gallery.select.Item.prototype.wLarge = function(v){ this._fields.wLarge = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.base.struct.Image} */
+DR.gallery.struct.EmbedImage = function(par){
+	/** @private */
+	this._t = 1311;
+	if(!par || typeof par != 'object'){return;}
+	DR.base.struct.Image.call(this,par);
+};
+DR._Base._types[1311] = DR.gallery.struct.EmbedImage;
+DR.gallery.struct.EmbedImage[__P] = new DR.base.struct.Image;
+DR.gallery.struct.EmbedImage[__P][__C] = DR.gallery.struct.EmbedImage;
+ 
+/** @extends {DR.base.select.Image} */
+DR.gallery.select.EmbedImage = function(){
+	this._fields = {};
+};
+DR.gallery.select.EmbedImage[__CL] = "Gallery__EmbedImage";
+DR.gallery.select.EmbedImage[__P] = new DR.base.select.Image;
+DR.gallery.select.EmbedImage[__P][__C] = DR.gallery.select.EmbedImage;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Embed = function(par){
+	/** @private */
+	this._t = 85;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.autoplay)) this.autoplay = Boolean(par.autoplay);
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.html)) this.html = String(par.html||'');
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.src)) this.src = String(par.src||'');
+	if(DR._Base.is(par.type)) this.type = String(par.type||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[85] = DR.gallery.struct.Embed;
+DR.gallery.struct.Embed[__P] = new DR._Base;
+DR.gallery.struct.Embed[__P][__C] = DR.gallery.struct.Embed;
+/** @type {Boolean} */
+DR.gallery.struct.Embed.prototype.autoplay = null;
+/** @type {Number} */
+DR.gallery.struct.Embed.prototype.h = null;
+/** @type {String|null} */
+DR.gallery.struct.Embed.prototype.html = null;
+/** @type {DR.gallery.struct.EmbedImage} */
+DR.gallery.struct.Embed.prototype.image = null;
+/** @type {String} */
+DR.gallery.struct.Embed.prototype.src = null;
+/** @type {String} */
+DR.gallery.struct.Embed.prototype.type = null;
+/** @type {Number} */
+DR.gallery.struct.Embed.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Embed = function(){
+	this._fields = {};
+};
+DR.gallery.select.Embed[__CL] = "Gallery__Embed";
+DR.gallery.select.Embed[__P] = new DR._Select;
+DR.gallery.select.Embed[__P][__C] = DR.gallery.select.Embed;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.autoplay = function(v){ this._fields.autoplay = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.html = function(v){ this._fields.html = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.src = function(v){ this._fields.src = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Embed} */
+DR.gallery.select.Embed.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Album = function(par){
+	/** @private */
+	this._t = 72;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.advert)) this.advert = Boolean(par.advert);
+	if(DR._Base.is(par.canAddItem)) this.canAddItem = Boolean(par.canAddItem);
+	if(DR._Base.is(par.canComment)) this.canComment = Boolean(par.canComment);
+	if(DR._Base.is(par.canDelete)) this.canDelete = Boolean(par.canDelete);
+	if(DR._Base.is(par.canDownload)) this.canDownload = Boolean(par.canDownload);
+	if(DR._Base.is(par.canEdit)) this.canEdit = Boolean(par.canEdit);
+	if(DR._Base.is(par.canSelectUsers)) this.canSelectUsers = Boolean(par.canSelectUsers);
+	if(DR._Base.is(par.canSetPermissions)) this.canSetPermissions = Boolean(par.canSetPermissions);
+	if(DR._Base.is(par.comments)) this.comments = DR._Base.cast(par.comments);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.created)) this.created = (parseInt(par.created)||0);
+	if(DR._Base.is(par.creatorUser)) this.creatorUser = DR._Base.cast(par.creatorUser);
+	if(DR._Base.is(par.description)) this.description = String(par.description||'');
+	if(DR._Base.is(par.descriptionUsers)){
+		var tmp = {};
+		for( var k in par.descriptionUsers ) tmp[k] = DR._Base.cast(par.descriptionUsers [k]);
+		this.descriptionUsers = tmp;
+	}
+	if(DR._Base.is(par.href)) this.href = String(par.href||'');
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.is18)) this.is18 = Boolean(par.is18);
+	if(DR._Base.is(par.like)) this.like = DR._Base.cast(par.like);
+	if(DR._Base.is(par.mosaicItems)){
+		var tmp = [];
+		for( var k in par.mosaicItems ) tmp.push(DR._Base.cast(par.mosaicItems [k]));
+		this.mosaicItems = tmp;
+	}
+	if(DR._Base.is(par.movie)) this.movie = DR._Base.cast(par.movie);
+	if(DR._Base.is(par.nextAlbum)) this.nextAlbum = (parseInt(par.nextAlbum)||0);
+	if(DR._Base.is(par.perm)) this.perm = DR._Base.cast(par.perm);
+	if(DR._Base.is(par.permissions)) this.permissions = (parseInt(par.permissions)||0);
+	if(DR._Base.is(par.picCount)) this.picCount = (parseInt(par.picCount)||0);
+	if(DR._Base.is(par.place)) this.place = DR._Base.cast(par.place);
+	if(DR._Base.is(par.prevAlbum)) this.prevAlbum = (parseInt(par.prevAlbum)||0);
+	if(DR._Base.is(par.profGal)) this.profGal = Boolean(par.profGal);
+	if(DR._Base.is(par.profileCoverGal)) this.profileCoverGal = Boolean(par.profileCoverGal);
+	if(DR._Base.is(par.sayGal)) this.sayGal = Boolean(par.sayGal);
+	if(DR._Base.is(par.sayItem)) this.sayItem = DR._Base.cast(par.sayItem);
+	if(DR._Base.is(par.seen)) this.seen = Boolean(par.seen);
+	if(DR._Base.is(par.shortUrl)) this.shortUrl = String(par.shortUrl||'');
+	if(DR._Base.is(par.showVisitors)) this.showVisitors = Boolean(par.showVisitors);
+	if(DR._Base.is(par.tab)) this.tab = (parseInt(par.tab)||0);
+	if(DR._Base.is(par.thumbItem)) this.thumbItem = DR._Base.cast(par.thumbItem);
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.uid)) this.uid = (parseInt(par.uid)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+	if(DR._Base.is(par.videoCount)) this.videoCount = (parseInt(par.videoCount)||0);
+	if(DR._Base.is(par.views)) this.views = (parseInt(par.views)||0);
+	if(DR._Base.is(par.withUsers)){
+		var tmp = [];
+		for( var k in par.withUsers ) tmp.push(DR._Base.cast(par.withUsers [k]));
+		this.withUsers = tmp;
+	}
+};
+DR._Base._types[72] = DR.gallery.struct.Album;
+DR.gallery.struct.Album[__P] = new DR._Base;
+DR.gallery.struct.Album[__P][__C] = DR.gallery.struct.Album;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.advert = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canAddItem = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canComment = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canDelete = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canDownload = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canEdit = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canSelectUsers = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.canSetPermissions = null;
+/** @type {DR.comments.struct.Base} */
+DR.gallery.struct.Album.prototype.comments = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.count = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.created = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.Album.prototype.creatorUser = null;
+/** @type {String} */
+DR.gallery.struct.Album.prototype.description = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.gallery.struct.Album.prototype.descriptionUsers = null;
+/** @type {String} */
+DR.gallery.struct.Album.prototype.href = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.id = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.is18 = null;
+/** @type {DR.like.struct.GetRe} */
+DR.gallery.struct.Album.prototype.like = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.gallery.struct.Album.prototype.mosaicItems = null;
+/** @type {DR.kino.struct.Movie|null} */
+DR.gallery.struct.Album.prototype.movie = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.nextAlbum = null;
+/** @type {DR.base.struct.Permissions} */
+DR.gallery.struct.Album.prototype.perm = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.permissions = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.picCount = null;
+/** @type {DR.places.struct.Item|null} */
+DR.gallery.struct.Album.prototype.place = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.prevAlbum = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.profGal = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.profileCoverGal = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.sayGal = null;
+/** @type {DR.say.struct.Item} */
+DR.gallery.struct.Album.prototype.sayItem = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.seen = null;
+/** @type {String} */
+DR.gallery.struct.Album.prototype.shortUrl = null;
+/** @type {Boolean} */
+DR.gallery.struct.Album.prototype.showVisitors = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.tab = null;
+/** @type {DR.gallery.struct.Item} */
+DR.gallery.struct.Album.prototype.thumbItem = null;
+/** @type {String} */
+DR.gallery.struct.Album.prototype.title = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.uid = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.Album.prototype.user = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.videoCount = null;
+/** @type {Number} */
+DR.gallery.struct.Album.prototype.views = null;
+/** @type {Array.<DR.say.struct.With>|null} */
+DR.gallery.struct.Album.prototype.withUsers = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Album = function(){
+	this._fields = {};
+};
+DR.gallery.select.Album[__CL] = "Gallery__Album";
+DR.gallery.select.Album[__P] = new DR._Select;
+DR.gallery.select.Album[__P][__C] = DR.gallery.select.Album;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.advert = function(v){ this._fields.advert = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canAddItem = function(v){ this._fields.canAddItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canComment = function(v){ this._fields.canComment = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canDelete = function(v){ this._fields.canDelete = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canDownload = function(v){ this._fields.canDownload = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canEdit = function(v){ this._fields.canEdit = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canSelectUsers = function(v){ this._fields.canSelectUsers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.canSetPermissions = function(v){ this._fields.canSetPermissions = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.comments = function(v){ this._fields.comments = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.created = function(v){ this._fields.created = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.creatorUser = function(v){ this._fields.creatorUser = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.description = function(v){ this._fields.description = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.descriptionUsers = function(v){ this._fields.descriptionUsers = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.href = function(v){ this._fields.href = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.is18 = function(v){ this._fields.is18 = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.like = function(v){ this._fields.like = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.mosaicItems = function(v){ this._fields.mosaicItems = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.movie = function(v){ this._fields.movie = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.nextAlbum = function(v){ this._fields.nextAlbum = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.perm = function(v){ this._fields.perm = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.permissions = function(v){ this._fields.permissions = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.picCount = function(v){ this._fields.picCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.place = function(v){ this._fields.place = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.prevAlbum = function(v){ this._fields.prevAlbum = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.profGal = function(v){ this._fields.profGal = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.profileCoverGal = function(v){ this._fields.profileCoverGal = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.sayGal = function(v){ this._fields.sayGal = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.sayItem = function(v){ this._fields.sayItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.seen = function(v){ this._fields.seen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.shortUrl = function(v){ this._fields.shortUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.showVisitors = function(v){ this._fields.showVisitors = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.tab = function(v){ this._fields.tab = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.thumbItem = function(v){ this._fields.thumbItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.uid = function(v){ this._fields.uid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.videoCount = function(v){ this._fields.videoCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.views = function(v){ this._fields.views = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Album} */
+DR.gallery.select.Album.prototype.withUsers = function(v){ this._fields.withUsers = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Gif = function(par){
+	/** @private */
+	this._t = 86;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.ready)) this.ready = Boolean(par.ready);
+	if(DR._Base.is(par.src)) this.src = String(par.src||'');
+	if(DR._Base.is(par.thumb)) this.thumb = String(par.thumb||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[86] = DR.gallery.struct.Gif;
+DR.gallery.struct.Gif[__P] = new DR._Base;
+DR.gallery.struct.Gif[__P][__C] = DR.gallery.struct.Gif;
+/** @type {Number} */
+DR.gallery.struct.Gif.prototype.h = null;
+/** @type {Boolean} */
+DR.gallery.struct.Gif.prototype.ready = null;
+/** @type {String} */
+DR.gallery.struct.Gif.prototype.src = null;
+/** @type {String} */
+DR.gallery.struct.Gif.prototype.thumb = null;
+/** @type {Number} */
+DR.gallery.struct.Gif.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Gif = function(){
+	this._fields = {};
+};
+DR.gallery.select.Gif[__CL] = "Gallery__Gif";
+DR.gallery.select.Gif[__P] = new DR._Select;
+DR.gallery.select.Gif[__P][__C] = DR.gallery.select.Gif;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Gif} */
+DR.gallery.select.Gif.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Gif} */
+DR.gallery.select.Gif.prototype.ready = function(v){ this._fields.ready = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Gif} */
+DR.gallery.select.Gif.prototype.src = function(v){ this._fields.src = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Gif} */
+DR.gallery.select.Gif.prototype.thumb = function(v){ this._fields.thumb = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Gif} */
+DR.gallery.select.Gif.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR.base.struct.Image} */
+DR.gallery.struct.Image = function(par){
+	/** @private */
+	this._t = 75;
+	if(!par || typeof par != 'object'){return;}
+	DR.base.struct.Image.call(this,par);
+	if(DR._Base.is(par.hLarge)) this.hLarge = (parseInt(par.hLarge)||0);
+	if(DR._Base.is(par.wLarge)) this.wLarge = (parseInt(par.wLarge)||0);
+};
+DR._Base._types[75] = DR.gallery.struct.Image;
+DR.gallery.struct.Image[__P] = new DR.base.struct.Image;
+DR.gallery.struct.Image[__P][__C] = DR.gallery.struct.Image;
+/** @type {Number} */
+DR.gallery.struct.Image.prototype.hLarge = null;
+/** @type {Number} */
+DR.gallery.struct.Image.prototype.wLarge = null;
+ 
+/** @extends {DR.base.select.Image} */
+DR.gallery.select.Image = function(){
+	this._fields = {};
+};
+DR.gallery.select.Image[__CL] = "Gallery__Image";
+DR.gallery.select.Image[__P] = new DR.base.select.Image;
+DR.gallery.select.Image[__P][__C] = DR.gallery.select.Image;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Image} */
+DR.gallery.select.Image.prototype.hLarge = function(v){ this._fields.hLarge = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Image} */
+DR.gallery.select.Image.prototype.wLarge = function(v){ this._fields.wLarge = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.SelectedUser = function(par){
+	/** @private */
+	this._t = 83;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.canDel)) this.canDel = Boolean(par.canDel);
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.hp)) this.hp = (parseInt(par.hp)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+	if(DR._Base.is(par.wp)) this.wp = (parseInt(par.wp)||0);
+	if(DR._Base.is(par.x)) this.x = (parseInt(par.x)||0);
+	if(DR._Base.is(par.xp)) this.xp = (parseInt(par.xp)||0);
+	if(DR._Base.is(par.y)) this.y = (parseInt(par.y)||0);
+	if(DR._Base.is(par.yp)) this.yp = (parseInt(par.yp)||0);
+};
+DR._Base._types[83] = DR.gallery.struct.SelectedUser;
+DR.gallery.struct.SelectedUser[__P] = new DR._Base;
+DR.gallery.struct.SelectedUser[__P][__C] = DR.gallery.struct.SelectedUser;
+/** @type {Boolean} */
+DR.gallery.struct.SelectedUser.prototype.canDel = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.h = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.hp = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.SelectedUser.prototype.user = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.w = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.wp = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.x = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.xp = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.y = null;
+/** @type {Number} */
+DR.gallery.struct.SelectedUser.prototype.yp = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.SelectedUser = function(){
+	this._fields = {};
+};
+DR.gallery.select.SelectedUser[__CL] = "Gallery__SelectedUser";
+DR.gallery.select.SelectedUser[__P] = new DR._Select;
+DR.gallery.select.SelectedUser[__P][__C] = DR.gallery.select.SelectedUser;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.canDel = function(v){ this._fields.canDel = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.hp = function(v){ this._fields.hp = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.wp = function(v){ this._fields.wp = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.x = function(v){ this._fields.x = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.xp = function(v){ this._fields.xp = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.y = function(v){ this._fields.y = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.SelectedUser} */
+DR.gallery.select.SelectedUser.prototype.yp = function(v){ this._fields.yp = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Video = function(par){
+	/** @private */
+	this._t = 84;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.format)) this.format = String(par.format||'');
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.iphoneReady)) this.iphoneReady = Boolean(par.iphoneReady);
+	if(DR._Base.is(par.iphoneUrl)) this.iphoneUrl = String(par.iphoneUrl||'');
+	if(DR._Base.is(par.ready)) this.ready = Boolean(par.ready);
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[84] = DR.gallery.struct.Video;
+DR.gallery.struct.Video[__P] = new DR._Base;
+DR.gallery.struct.Video[__P][__C] = DR.gallery.struct.Video;
+/** @type {String} */
+DR.gallery.struct.Video.prototype.format = null;
+/** @type {Number} */
+DR.gallery.struct.Video.prototype.h = null;
+/** @type {Boolean} */
+DR.gallery.struct.Video.prototype.iphoneReady = null;
+/** @type {String} */
+DR.gallery.struct.Video.prototype.iphoneUrl = null;
+/** @type {Boolean} */
+DR.gallery.struct.Video.prototype.ready = null;
+/** @type {String} */
+DR.gallery.struct.Video.prototype.url = null;
+/** @type {Number} */
+DR.gallery.struct.Video.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Video = function(){
+	this._fields = {};
+};
+DR.gallery.select.Video[__CL] = "Gallery__Video";
+DR.gallery.select.Video[__P] = new DR._Select;
+DR.gallery.select.Video[__P][__C] = DR.gallery.select.Video;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.format = function(v){ this._fields.format = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.iphoneReady = function(v){ this._fields.iphoneReady = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.iphoneUrl = function(v){ this._fields.iphoneUrl = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.ready = function(v){ this._fields.ready = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Video} */
+DR.gallery.select.Video.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.FaceRegion = function(par){
+	/** @private */
+	this._t = 3146;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.hp)) this.hp = (parseInt(par.hp)||0);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.wp)) this.wp = (parseInt(par.wp)||0);
+	if(DR._Base.is(par.xp)) this.xp = (parseInt(par.xp)||0);
+	if(DR._Base.is(par.yp)) this.yp = (parseInt(par.yp)||0);
+};
+DR._Base._types[3146] = DR.gallery.struct.FaceRegion;
+DR.gallery.struct.FaceRegion[__P] = new DR._Base;
+DR.gallery.struct.FaceRegion[__P][__C] = DR.gallery.struct.FaceRegion;
+/** @type {Number} */
+DR.gallery.struct.FaceRegion.prototype.hp = null;
+/** @type {Number} */
+DR.gallery.struct.FaceRegion.prototype.id = null;
+/** @type {Number} */
+DR.gallery.struct.FaceRegion.prototype.wp = null;
+/** @type {Number} */
+DR.gallery.struct.FaceRegion.prototype.xp = null;
+/** @type {Number} */
+DR.gallery.struct.FaceRegion.prototype.yp = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Thumbnail = function(par){
+	/** @private */
+	this._t = 80;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.pid)) this.pid = (parseInt(par.pid)||0);
+	if(DR._Base.is(par.type)) this.type = String(par.type||'');
+};
+DR._Base._types[80] = DR.gallery.struct.Thumbnail;
+DR.gallery.struct.Thumbnail.TYPE_PIC = "0";
+DR.gallery.struct.Thumbnail.TYPE_VIDEO = "1";
+DR.gallery.struct.Thumbnail.TYPE_EMBED = "2";
+DR.gallery.struct.Thumbnail.TYPE_GIF = "3";
+DR.gallery.struct.Thumbnail[__P] = new DR._Base;
+DR.gallery.struct.Thumbnail[__P][__C] = DR.gallery.struct.Thumbnail;
+/** @type {DR.gallery.struct.Image} */
+DR.gallery.struct.Thumbnail.prototype.image = null;
+/** @type {Number} */
+DR.gallery.struct.Thumbnail.prototype.pid = null;
+/** @type {String} */
+DR.gallery.struct.Thumbnail.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Thumbnail = function(){
+	this._fields = {};
+};
+DR.gallery.select.Thumbnail[__CL] = "Gallery__Thumbnail";
+DR.gallery.select.Thumbnail[__P] = new DR._Select;
+DR.gallery.select.Thumbnail[__P][__C] = DR.gallery.select.Thumbnail;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Thumbnail} */
+DR.gallery.select.Thumbnail.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Thumbnail} */
+DR.gallery.select.Thumbnail.prototype.pid = function(v){ this._fields.pid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Thumbnail} */
+DR.gallery.select.Thumbnail.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.PYMK = function(par){
+	/** @private */
+	this._t = 234;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.mutualFriends)) this.mutualFriends = (parseInt(par.mutualFriends)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[234] = DR.gallery.struct.PYMK;
+DR.gallery.struct.PYMK[__P] = new DR._Base;
+DR.gallery.struct.PYMK[__P][__C] = DR.gallery.struct.PYMK;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.PYMK.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.struct.PYMK.prototype.mutualFriends = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.PYMK.prototype.user = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.PYMK = function(){
+	this._fields = {};
+};
+DR.gallery.select.PYMK[__CL] = "Gallery__PYMK";
+DR.gallery.select.PYMK[__P] = new DR._Select;
+DR.gallery.select.PYMK[__P][__C] = DR.gallery.select.PYMK;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.PYMK} */
+DR.gallery.select.PYMK.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.PYMK} */
+DR.gallery.select.PYMK.prototype.mutualFriends = function(v){ this._fields.mutualFriends = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.PYMK} */
+DR.gallery.select.PYMK.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.AlbumVisitor = function(par){
+	/** @private */
+	this._t = 1380;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.ts)) this.ts = (parseInt(par.ts)||0);
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+};
+DR._Base._types[1380] = DR.gallery.struct.AlbumVisitor;
+DR.gallery.struct.AlbumVisitor[__P] = new DR._Base;
+DR.gallery.struct.AlbumVisitor[__P][__C] = DR.gallery.struct.AlbumVisitor;
+/** @type {Number} */
+DR.gallery.struct.AlbumVisitor.prototype.ts = null;
+/** @type {DR.users.struct.User} */
+DR.gallery.struct.AlbumVisitor.prototype.user = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetFacesRe = function(par){
+	/** @private */
+	this._t = 3147;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.faces)){
+		var tmp = [];
+		for( var k in par.faces ) tmp.push(DR._Base.cast(par.faces [k]));
+		this.faces = tmp;
+	}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[3147] = DR.gallery.struct.GetFacesRe;
+DR.gallery.struct.GetFacesRe[__P] = new DR._Base;
+DR.gallery.struct.GetFacesRe[__P][__C] = DR.gallery.struct.GetFacesRe;
+/** @type {Array.<DR.gallery.struct.FaceRegion>} */
+DR.gallery.struct.GetFacesRe.prototype.faces = null;
+/** @type {Number} */
+DR.gallery.struct.GetFacesRe.prototype.h = null;
+/** @type {Number} */
+DR.gallery.struct.GetFacesRe.prototype.w = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.UploadOption = function(par){
+	/** @private */
+	this._t = 4370;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.checked)) this.checked = Boolean(par.checked);
+	if(DR._Base.is(par.info)) this.info = String(par.info||'');
+	if(DR._Base.is(par.moreInfo)) this.moreInfo = String(par.moreInfo||'');
+	if(DR._Base.is(par.name)) this.name = String(par.name||'');
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+};
+DR._Base._types[4370] = DR.gallery.struct.UploadOption;
+DR.gallery.struct.UploadOption[__P] = new DR._Base;
+DR.gallery.struct.UploadOption[__P][__C] = DR.gallery.struct.UploadOption;
+/** @type {Boolean} */
+DR.gallery.struct.UploadOption.prototype.checked = null;
+/** @type {String|null} */
+DR.gallery.struct.UploadOption.prototype.info = null;
+/** @type {String|null} */
+DR.gallery.struct.UploadOption.prototype.moreInfo = null;
+/** @type {String} */
+DR.gallery.struct.UploadOption.prototype.name = null;
+/** @type {String} */
+DR.gallery.struct.UploadOption.prototype.title = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetItemsRe = function(par){
+	/** @private */
+	this._t = 73;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = {};
+		for( var k in par.items ) tmp[k] = DR._Base.cast(par.items [k]);
+		this.items = tmp;
+	}
+};
+DR._Base._types[73] = DR.gallery.struct.GetItemsRe;
+DR.gallery.struct.GetItemsRe[__P] = new DR._Base;
+DR.gallery.struct.GetItemsRe[__P][__C] = DR.gallery.struct.GetItemsRe;
+/** @type {Object.<Number,DR.gallery.struct.Item>} */
+DR.gallery.struct.GetItemsRe.prototype.items = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetPidsRe = function(par){
+	/** @private */
+	this._t = 95;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.firstIndex)) this.firstIndex = (parseInt(par.firstIndex)||0);
+	if(DR._Base.is(par.ids)){
+		var tmp = [];
+		for( var k in par.ids ) tmp.push((parseInt(par.ids [k])||0));
+		this.ids = tmp;
+	}
+	if(DR._Base.is(par.lastIndex)) this.lastIndex = (parseInt(par.lastIndex)||0);
+	if(DR._Base.is(par.perPage)) this.perPage = (parseInt(par.perPage)||0);
+	if(DR._Base.is(par.search)) this.search = String(par.search||'');
+	if(DR._Base.is(par.searchType)) this.searchType = String(par.searchType||'');
+};
+DR._Base._types[95] = DR.gallery.struct.GetPidsRe;
+DR.gallery.struct.GetPidsRe[__P] = new DR._Base;
+DR.gallery.struct.GetPidsRe[__P][__C] = DR.gallery.struct.GetPidsRe;
+/** @type {Number} */
+DR.gallery.struct.GetPidsRe.prototype.count = null;
+/** @type {Number} */
+DR.gallery.struct.GetPidsRe.prototype.firstIndex = null;
+/** @type {Array.<Number>} */
+DR.gallery.struct.GetPidsRe.prototype.ids = null;
+/** @type {Number} */
+DR.gallery.struct.GetPidsRe.prototype.lastIndex = null;
+/** @type {Number} */
+DR.gallery.struct.GetPidsRe.prototype.perPage = null;
+/** @type {String|null} */
+DR.gallery.struct.GetPidsRe.prototype.search = null;
+/** @type {String|null} */
+DR.gallery.struct.GetPidsRe.prototype.searchType = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetPidsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetPidsRe[__CL] = "Gallery__GetPidsRe";
+DR.gallery.select.GetPidsRe[__P] = new DR._Select;
+DR.gallery.select.GetPidsRe[__P][__C] = DR.gallery.select.GetPidsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.firstIndex = function(v){ this._fields.firstIndex = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.ids = function(v){ this._fields.ids = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.lastIndex = function(v){ this._fields.lastIndex = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.perPage = function(v){ this._fields.perPage = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.search = function(v){ this._fields.search = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPidsRe} */
+DR.gallery.select.GetPidsRe.prototype.searchType = function(v){ this._fields.searchType = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.ThumbnailsRe = function(par){
+	/** @private */
+	this._t = 78;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = {};
+		for( var k in par.items ) tmp[k] = DR._Base.cast(par.items [k]);
+		this.items = tmp;
+	}
+};
+DR._Base._types[78] = DR.gallery.struct.ThumbnailsRe;
+DR.gallery.struct.ThumbnailsRe[__P] = new DR._Base;
+DR.gallery.struct.ThumbnailsRe[__P][__C] = DR.gallery.struct.ThumbnailsRe;
+/** @type {Object.<Number,DR.gallery.struct.Thumbnail>} */
+DR.gallery.struct.ThumbnailsRe.prototype.items = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.ThumbnailsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.ThumbnailsRe[__CL] = "Gallery__ThumbnailsRe";
+DR.gallery.select.ThumbnailsRe[__P] = new DR._Select;
+DR.gallery.select.ThumbnailsRe[__P][__C] = DR.gallery.select.ThumbnailsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.ThumbnailsRe} */
+DR.gallery.select.ThumbnailsRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetTagsRe = function(par){
+	/** @private */
+	this._t = 89;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+};
+DR._Base._types[89] = DR.gallery.struct.GetTagsRe;
+DR.gallery.struct.GetTagsRe[__P] = new DR._Base;
+DR.gallery.struct.GetTagsRe[__P][__C] = DR.gallery.struct.GetTagsRe;
+/** @type {Number} */
+DR.gallery.struct.GetTagsRe.prototype.count = null;
+/** @type {Object.<Number,DR.gallery.struct.SelectedUser>} */
+DR.gallery.struct.GetTagsRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetTagsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetTagsRe[__CL] = "Gallery__GetTagsRe";
+DR.gallery.select.GetTagsRe[__P] = new DR._Select;
+DR.gallery.select.GetTagsRe[__P][__C] = DR.gallery.select.GetTagsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetTagsRe} */
+DR.gallery.select.GetTagsRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetTagsRe} */
+DR.gallery.select.GetTagsRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.OtherGalleriesLastRe = function(par){
+	/** @private */
+	this._t = 98;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.nextAlbum)) this.nextAlbum = (parseInt(par.nextAlbum)||0);
+	if(DR._Base.is(par.prevAlbum)) this.prevAlbum = (parseInt(par.prevAlbum)||0);
+};
+DR._Base._types[98] = DR.gallery.struct.OtherGalleriesLastRe;
+DR.gallery.struct.OtherGalleriesLastRe[__P] = new DR._Base;
+DR.gallery.struct.OtherGalleriesLastRe[__P][__C] = DR.gallery.struct.OtherGalleriesLastRe;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.struct.OtherGalleriesLastRe.prototype.album = null;
+/** @type {Number} */
+DR.gallery.struct.OtherGalleriesLastRe.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.struct.OtherGalleriesLastRe.prototype.nextAlbum = null;
+/** @type {Number|null} */
+DR.gallery.struct.OtherGalleriesLastRe.prototype.prevAlbum = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.OtherGalleriesLastRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.OtherGalleriesLastRe[__CL] = "Gallery__OtherGalleriesLastRe";
+DR.gallery.select.OtherGalleriesLastRe[__P] = new DR._Select;
+DR.gallery.select.OtherGalleriesLastRe[__P][__C] = DR.gallery.select.OtherGalleriesLastRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastRe} */
+DR.gallery.select.OtherGalleriesLastRe.prototype.album = function(v){ this._fields.album = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastRe} */
+DR.gallery.select.OtherGalleriesLastRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastRe} */
+DR.gallery.select.OtherGalleriesLastRe.prototype.nextAlbum = function(v){ this._fields.nextAlbum = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastRe} */
+DR.gallery.select.OtherGalleriesLastRe.prototype.prevAlbum = function(v){ this._fields.prevAlbum = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.FeedbackRe = function(par){
+	/** @private */
+	this._t = 100;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.added)) this.added = Boolean(par.added);
+};
+DR._Base._types[100] = DR.gallery.struct.FeedbackRe;
+DR.gallery.struct.FeedbackRe[__P] = new DR._Base;
+DR.gallery.struct.FeedbackRe[__P][__C] = DR.gallery.struct.FeedbackRe;
+/** @type {Boolean} */
+DR.gallery.struct.FeedbackRe.prototype.added = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.FeedbackRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.FeedbackRe[__CL] = "Gallery__FeedbackRe";
+DR.gallery.select.FeedbackRe[__P] = new DR._Select;
+DR.gallery.select.FeedbackRe[__P][__C] = DR.gallery.select.FeedbackRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.FeedbackRe} */
+DR.gallery.select.FeedbackRe.prototype.added = function(v){ this._fields.added = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.LastViewRe = function(par){
+	/** @private */
+	this._t = 103;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.canLike)) this.canLike = Boolean(par.canLike);
+	if(DR._Base.is(par.canOpen)) this.canOpen = Boolean(par.canOpen);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.liked)) this.liked = Boolean(par.liked);
+	if(DR._Base.is(par.likeId)) this.likeId = (parseInt(par.likeId)||0);
+	if(DR._Base.is(par.likeType)) this.likeType = (parseInt(par.likeType)||0);
+	if(DR._Base.is(par.rateCount)) this.rateCount = (parseInt(par.rateCount)||0);
+	if(DR._Base.is(par.sayItem)) this.sayItem = DR._Base.cast(par.sayItem);
+	if(DR._Base.is(par.uids)){
+		var tmp = [];
+		for( var k in par.uids ) tmp.push((parseInt(par.uids [k])||0));
+		this.uids = tmp;
+	}
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[103] = DR.gallery.struct.LastViewRe;
+DR.gallery.struct.LastViewRe[__P] = new DR._Base;
+DR.gallery.struct.LastViewRe[__P][__C] = DR.gallery.struct.LastViewRe;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.struct.LastViewRe.prototype.album = null;
+/** @type {Boolean} */
+DR.gallery.struct.LastViewRe.prototype.canLike = null;
+/** @type {Boolean} */
+DR.gallery.struct.LastViewRe.prototype.canOpen = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.gallery.struct.LastViewRe.prototype.items = null;
+/** @type {Boolean} */
+DR.gallery.struct.LastViewRe.prototype.liked = null;
+/** @type {Number|null} */
+DR.gallery.struct.LastViewRe.prototype.likeId = null;
+/** @type {Number|null} */
+DR.gallery.struct.LastViewRe.prototype.likeType = null;
+/** @type {Number} */
+DR.gallery.struct.LastViewRe.prototype.rateCount = null;
+/** @type {DR.say.struct.Item|null} */
+DR.gallery.struct.LastViewRe.prototype.sayItem = null;
+/** @type {Array.<Number>|null} */
+DR.gallery.struct.LastViewRe.prototype.uids = null;
+/** @type {Array.<DR.users.struct.User>|null} */
+DR.gallery.struct.LastViewRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.LastViewRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.LastViewRe[__CL] = "Gallery__LastViewRe";
+DR.gallery.select.LastViewRe[__P] = new DR._Select;
+DR.gallery.select.LastViewRe[__P][__C] = DR.gallery.select.LastViewRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.album = function(v){ this._fields.album = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.canLike = function(v){ this._fields.canLike = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.canOpen = function(v){ this._fields.canOpen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.liked = function(v){ this._fields.liked = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.likeId = function(v){ this._fields.likeId = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.likeType = function(v){ this._fields.likeType = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.rateCount = function(v){ this._fields.rateCount = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.sayItem = function(v){ this._fields.sayItem = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.uids = function(v){ this._fields.uids = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.LastViewRe} */
+DR.gallery.select.LastViewRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetFirstPidRe = function(par){
+	/** @private */
+	this._t = 105;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.pid)) this.pid = (parseInt(par.pid)||0);
+};
+DR._Base._types[105] = DR.gallery.struct.GetFirstPidRe;
+DR.gallery.struct.GetFirstPidRe[__P] = new DR._Base;
+DR.gallery.struct.GetFirstPidRe[__P][__C] = DR.gallery.struct.GetFirstPidRe;
+/** @type {Number} */
+DR.gallery.struct.GetFirstPidRe.prototype.pid = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetFirstPidRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetFirstPidRe[__CL] = "Gallery__GetFirstPidRe";
+DR.gallery.select.GetFirstPidRe[__P] = new DR._Select;
+DR.gallery.select.GetFirstPidRe[__P][__C] = DR.gallery.select.GetFirstPidRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetFirstPidRe} */
+DR.gallery.select.GetFirstPidRe.prototype.pid = function(v){ this._fields.pid = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.OtherGalleriesRe = function(par){
+	/** @private */
+	this._t = 110;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[110] = DR.gallery.struct.OtherGalleriesRe;
+DR.gallery.struct.OtherGalleriesRe[__P] = new DR._Base;
+DR.gallery.struct.OtherGalleriesRe[__P][__C] = DR.gallery.struct.OtherGalleriesRe;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.OtherGalleriesRe.prototype.items = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.OtherGalleriesRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.OtherGalleriesRe[__CL] = "Gallery__OtherGalleriesRe";
+DR.gallery.select.OtherGalleriesRe[__P] = new DR._Select;
+DR.gallery.select.OtherGalleriesRe[__P][__C] = DR.gallery.select.OtherGalleriesRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesRe} */
+DR.gallery.select.OtherGalleriesRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Settings = function(par){
+	/** @private */
+	this._t = 118;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.colorScheme)) this.colorScheme = String(par.colorScheme||'');
+	if(DR._Base.is(par.hideLikeRecommend)) this.hideLikeRecommend = Boolean(par.hideLikeRecommend);
+	if(DR._Base.is(par.seenTour)) this.seenTour = Boolean(par.seenTour);
+};
+DR._Base._types[118] = DR.gallery.struct.Settings;
+DR.gallery.struct.Settings[__P] = new DR._Base;
+DR.gallery.struct.Settings[__P][__C] = DR.gallery.struct.Settings;
+/** @type {String} */
+DR.gallery.struct.Settings.prototype.colorScheme = null;
+/** @type {Boolean} */
+DR.gallery.struct.Settings.prototype.hideLikeRecommend = null;
+/** @type {Boolean} */
+DR.gallery.struct.Settings.prototype.seenTour = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Settings = function(){
+	this._fields = {};
+};
+DR.gallery.select.Settings[__CL] = "Gallery__Settings";
+DR.gallery.select.Settings[__P] = new DR._Select;
+DR.gallery.select.Settings[__P][__C] = DR.gallery.select.Settings;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Settings} */
+DR.gallery.select.Settings.prototype.colorScheme = function(v){ this._fields.colorScheme = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Settings} */
+DR.gallery.select.Settings.prototype.hideLikeRecommend = function(v){ this._fields.hideLikeRecommend = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Settings} */
+DR.gallery.select.Settings.prototype.seenTour = function(v){ this._fields.seenTour = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.OtherGalleriesLastLargeRe = function(par){
+	/** @private */
+	this._t = 121;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.currentIndex)) this.currentIndex = (parseInt(par.currentIndex)||0);
+	if(DR._Base.is(par.currentOffset)) this.currentOffset = (parseInt(par.currentOffset)||0);
+};
+DR._Base._types[121] = DR.gallery.struct.OtherGalleriesLastLargeRe;
+DR.gallery.struct.OtherGalleriesLastLargeRe[__P] = new DR._Base;
+DR.gallery.struct.OtherGalleriesLastLargeRe[__P][__C] = DR.gallery.struct.OtherGalleriesLastLargeRe;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.OtherGalleriesLastLargeRe.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.struct.OtherGalleriesLastLargeRe.prototype.count = null;
+/** @type {Number} */
+DR.gallery.struct.OtherGalleriesLastLargeRe.prototype.currentIndex = null;
+/** @type {Number} */
+DR.gallery.struct.OtherGalleriesLastLargeRe.prototype.currentOffset = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.OtherGalleriesLastLargeRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.OtherGalleriesLastLargeRe[__CL] = "Gallery__OtherGalleriesLastLargeRe";
+DR.gallery.select.OtherGalleriesLastLargeRe[__P] = new DR._Select;
+DR.gallery.select.OtherGalleriesLastLargeRe[__P][__C] = DR.gallery.select.OtherGalleriesLastLargeRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastLargeRe} */
+DR.gallery.select.OtherGalleriesLastLargeRe.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastLargeRe} */
+DR.gallery.select.OtherGalleriesLastLargeRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastLargeRe} */
+DR.gallery.select.OtherGalleriesLastLargeRe.prototype.currentIndex = function(v){ this._fields.currentIndex = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.OtherGalleriesLastLargeRe} */
+DR.gallery.select.OtherGalleriesLastLargeRe.prototype.currentOffset = function(v){ this._fields.currentOffset = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetAlbumsRe = function(par){
+	/** @private */
+	this._t = 524;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.advert)) this.advert = DR._Base.cast(par.advert);
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[524] = DR.gallery.struct.GetAlbumsRe;
+DR.gallery.struct.GetAlbumsRe[__P] = new DR._Base;
+DR.gallery.struct.GetAlbumsRe[__P][__C] = DR.gallery.struct.GetAlbumsRe;
+/** @type {DR.ads.struct.GetPlaceAdRe|null} */
+DR.gallery.struct.GetAlbumsRe.prototype.advert = null;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.GetAlbumsRe.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumsRe.prototype.count = null;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumsRe.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetAlbumsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetAlbumsRe[__CL] = "Gallery__GetAlbumsRe";
+DR.gallery.select.GetAlbumsRe[__P] = new DR._Select;
+DR.gallery.select.GetAlbumsRe[__P][__C] = DR.gallery.select.GetAlbumsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumsRe} */
+DR.gallery.select.GetAlbumsRe.prototype.advert = function(v){ this._fields.advert = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumsRe} */
+DR.gallery.select.GetAlbumsRe.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumsRe} */
+DR.gallery.select.GetAlbumsRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumsRe} */
+DR.gallery.select.GetAlbumsRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.EditDescriptionRe = function(par){
+	/** @private */
+	this._t = 157;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+};
+DR._Base._types[157] = DR.gallery.struct.EditDescriptionRe;
+DR.gallery.struct.EditDescriptionRe[__P] = new DR._Base;
+DR.gallery.struct.EditDescriptionRe[__P][__C] = DR.gallery.struct.EditDescriptionRe;
+/** @type {String} */
+DR.gallery.struct.EditDescriptionRe.prototype.text = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.EditDescriptionRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.EditDescriptionRe[__CL] = "Gallery__EditDescriptionRe";
+DR.gallery.select.EditDescriptionRe[__P] = new DR._Select;
+DR.gallery.select.EditDescriptionRe[__P][__C] = DR.gallery.select.EditDescriptionRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.EditDescriptionRe} */
+DR.gallery.select.EditDescriptionRe.prototype.text = function(v){ this._fields.text = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.UserStatsRe = function(par){
+	/** @private */
+	this._t = 225;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)) this.albums = (parseInt(par.albums)||0);
+	if(DR._Base.is(par.pictures)) this.pictures = (parseInt(par.pictures)||0);
+	if(DR._Base.is(par.videos)) this.videos = (parseInt(par.videos)||0);
+};
+DR._Base._types[225] = DR.gallery.struct.UserStatsRe;
+DR.gallery.struct.UserStatsRe[__P] = new DR._Base;
+DR.gallery.struct.UserStatsRe[__P][__C] = DR.gallery.struct.UserStatsRe;
+/** @type {Number} */
+DR.gallery.struct.UserStatsRe.prototype.albums = null;
+/** @type {Number} */
+DR.gallery.struct.UserStatsRe.prototype.pictures = null;
+/** @type {Number} */
+DR.gallery.struct.UserStatsRe.prototype.videos = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.UserStatsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.UserStatsRe[__CL] = "Gallery__UserStatsRe";
+DR.gallery.select.UserStatsRe[__P] = new DR._Select;
+DR.gallery.select.UserStatsRe[__P][__C] = DR.gallery.select.UserStatsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.UserStatsRe} */
+DR.gallery.select.UserStatsRe.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.UserStatsRe} */
+DR.gallery.select.UserStatsRe.prototype.pictures = function(v){ this._fields.pictures = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.UserStatsRe} */
+DR.gallery.select.UserStatsRe.prototype.videos = function(v){ this._fields.videos = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Items = function(par){
+	/** @private */
+	this._t = 229;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[229] = DR.gallery.struct.Items;
+DR.gallery.struct.Items[__P] = new DR._Base;
+DR.gallery.struct.Items[__P][__C] = DR.gallery.struct.Items;
+/** @type {Number} */
+DR.gallery.struct.Items.prototype.count = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.gallery.struct.Items.prototype.items = null;
+/** @type {Number} */
+DR.gallery.struct.Items.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Items = function(){
+	this._fields = {};
+};
+DR.gallery.select.Items[__CL] = "Gallery__Items";
+DR.gallery.select.Items[__P] = new DR._Select;
+DR.gallery.select.Items[__P][__C] = DR.gallery.select.Items;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Items} */
+DR.gallery.select.Items.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Items} */
+DR.gallery.select.Items.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Items} */
+DR.gallery.select.Items.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.PopularAlbums = function(par){
+	/** @private */
+	this._t = 261;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+};
+DR._Base._types[261] = DR.gallery.struct.PopularAlbums;
+DR.gallery.struct.PopularAlbums[__P] = new DR._Base;
+DR.gallery.struct.PopularAlbums[__P][__C] = DR.gallery.struct.PopularAlbums;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.PopularAlbums.prototype.albums = null;
+/** @type {Boolean} */
+DR.gallery.struct.PopularAlbums.prototype.fullPg = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.PopularAlbums = function(){
+	this._fields = {};
+};
+DR.gallery.select.PopularAlbums[__CL] = "Gallery__PopularAlbums";
+DR.gallery.select.PopularAlbums[__P] = new DR._Select;
+DR.gallery.select.PopularAlbums[__P][__C] = DR.gallery.select.PopularAlbums;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.PopularAlbums} */
+DR.gallery.select.PopularAlbums.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.PopularAlbums} */
+DR.gallery.select.PopularAlbums.prototype.fullPg = function(v){ this._fields.fullPg = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetPYMKRe = function(par){
+	/** @private */
+	this._t = 235;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.fullPg)) this.fullPg = Boolean(par.fullPg);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[235] = DR.gallery.struct.GetPYMKRe;
+DR.gallery.struct.GetPYMKRe[__P] = new DR._Base;
+DR.gallery.struct.GetPYMKRe[__P][__C] = DR.gallery.struct.GetPYMKRe;
+/** @type {Boolean} */
+DR.gallery.struct.GetPYMKRe.prototype.fullPg = null;
+/** @type {Array.<DR.gallery.struct.PYMK>} */
+DR.gallery.struct.GetPYMKRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetPYMKRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetPYMKRe[__CL] = "Gallery__GetPYMKRe";
+DR.gallery.select.GetPYMKRe[__P] = new DR._Select;
+DR.gallery.select.GetPYMKRe[__P][__C] = DR.gallery.select.GetPYMKRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPYMKRe} */
+DR.gallery.select.GetPYMKRe.prototype.fullPg = function(v){ this._fields.fullPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetPYMKRe} */
+DR.gallery.select.GetPYMKRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.AlbumItems = function(par){
+	/** @private */
+	this._t = 256;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+};
+DR._Base._types[256] = DR.gallery.struct.AlbumItems;
+DR.gallery.struct.AlbumItems[__P] = new DR._Base;
+DR.gallery.struct.AlbumItems[__P][__C] = DR.gallery.struct.AlbumItems;
+/** @type {Number} */
+DR.gallery.struct.AlbumItems.prototype.count = null;
+/** @type {Array.<DR.gallery.struct.Item>} */
+DR.gallery.struct.AlbumItems.prototype.items = null;
+/** @type {Number|null} */
+DR.gallery.struct.AlbumItems.prototype.pg = null;
+/** @type {Number|null} */
+DR.gallery.struct.AlbumItems.prototype.pgs = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.AlbumItems = function(){
+	this._fields = {};
+};
+DR.gallery.select.AlbumItems[__CL] = "Gallery__AlbumItems";
+DR.gallery.select.AlbumItems[__P] = new DR._Select;
+DR.gallery.select.AlbumItems[__P][__C] = DR.gallery.select.AlbumItems;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.AlbumItems} */
+DR.gallery.select.AlbumItems.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.AlbumItems} */
+DR.gallery.select.AlbumItems.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.AlbumItems} */
+DR.gallery.select.AlbumItems.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.AlbumItems} */
+DR.gallery.select.AlbumItems.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.Albums = function(par){
+	/** @private */
+	this._t = 230;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = {};
+		for( var k in par.albums ) tmp[k] = DR._Base.cast(par.albums [k]);
+		this.albums = tmp;
+	}
+};
+DR._Base._types[230] = DR.gallery.struct.Albums;
+DR.gallery.struct.Albums[__P] = new DR._Base;
+DR.gallery.struct.Albums[__P][__C] = DR.gallery.struct.Albums;
+/** @type {Object.<Number,DR.gallery.struct.Album>} */
+DR.gallery.struct.Albums.prototype.albums = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.Albums = function(){
+	this._fields = {};
+};
+DR.gallery.select.Albums[__CL] = "Gallery__Albums";
+DR.gallery.select.Albums[__P] = new DR._Select;
+DR.gallery.select.Albums[__P][__C] = DR.gallery.select.Albums;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.Albums} */
+DR.gallery.select.Albums.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.SaveItem = function(par){
+	/** @private */
+	this._t = 296;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.description)) this.description = String(par.description||'');
+	if(DR._Base.is(par.pid)) this.pid = (parseInt(par.pid)||0);
+	if(DR._Base.is(par.placeId)) this.placeId = String(par.placeId||'');
+	if(DR._Base.is(par.withUsers)){
+		var tmp = [];
+		for( var k in par.withUsers ) tmp.push(DR._Base.cast(par.withUsers [k]));
+		this.withUsers = tmp;
+	}
+};
+DR._Base._types[296] = DR.gallery.struct.SaveItem;
+DR.gallery.struct.SaveItem[__P] = new DR._Base;
+DR.gallery.struct.SaveItem[__P][__C] = DR.gallery.struct.SaveItem;
+/** @type {String|null} */
+DR.gallery.struct.SaveItem.prototype.description = null;
+/** @type {Number} */
+DR.gallery.struct.SaveItem.prototype.pid = null;
+/** @type {String|null} */
+DR.gallery.struct.SaveItem.prototype.placeId = null;
+/** @type {Array.<DR.say.struct.WithItem>|null} */
+DR.gallery.struct.SaveItem.prototype.withUsers = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetAlbumVisitorsRe = function(par){
+	/** @private */
+	this._t = 1381;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = [];
+		for( var k in par.users ) tmp.push(DR._Base.cast(par.users [k]));
+		this.users = tmp;
+	}
+};
+DR._Base._types[1381] = DR.gallery.struct.GetAlbumVisitorsRe;
+DR.gallery.struct.GetAlbumVisitorsRe[__P] = new DR._Base;
+DR.gallery.struct.GetAlbumVisitorsRe[__P][__C] = DR.gallery.struct.GetAlbumVisitorsRe;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.struct.GetAlbumVisitorsRe.prototype.album = null;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumVisitorsRe.prototype.pg = null;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumVisitorsRe.prototype.pgs = null;
+/** @type {Array.<DR.gallery.struct.AlbumVisitor>} */
+DR.gallery.struct.GetAlbumVisitorsRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetAlbumVisitorsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetAlbumVisitorsRe[__CL] = "Gallery__GetAlbumVisitorsRe";
+DR.gallery.select.GetAlbumVisitorsRe[__P] = new DR._Select;
+DR.gallery.select.GetAlbumVisitorsRe[__P][__C] = DR.gallery.select.GetAlbumVisitorsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumVisitorsRe} */
+DR.gallery.select.GetAlbumVisitorsRe.prototype.album = function(v){ this._fields.album = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumVisitorsRe} */
+DR.gallery.select.GetAlbumVisitorsRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumVisitorsRe} */
+DR.gallery.select.GetAlbumVisitorsRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumVisitorsRe} */
+DR.gallery.select.GetAlbumVisitorsRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.HasProfileAlbumRe = function(par){
+	/** @private */
+	this._t = 1397;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.aid)) this.aid = (parseInt(par.aid)||0);
+	if(DR._Base.is(par.pid)) this.pid = (parseInt(par.pid)||0);
+};
+DR._Base._types[1397] = DR.gallery.struct.HasProfileAlbumRe;
+DR.gallery.struct.HasProfileAlbumRe[__P] = new DR._Base;
+DR.gallery.struct.HasProfileAlbumRe[__P][__C] = DR.gallery.struct.HasProfileAlbumRe;
+/** @type {Number|null} */
+DR.gallery.struct.HasProfileAlbumRe.prototype.aid = null;
+/** @type {Number|null} */
+DR.gallery.struct.HasProfileAlbumRe.prototype.pid = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.AddAlbumRe = function(par){
+	/** @private */
+	this._t = 2260;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.aid)) this.aid = (parseInt(par.aid)||0);
+	if(DR._Base.is(par.album)) this.album = DR._Base.cast(par.album);
+};
+DR._Base._types[2260] = DR.gallery.struct.AddAlbumRe;
+DR.gallery.struct.AddAlbumRe[__P] = new DR._Base;
+DR.gallery.struct.AddAlbumRe[__P][__C] = DR.gallery.struct.AddAlbumRe;
+/** @type {Number} */
+DR.gallery.struct.AddAlbumRe.prototype.aid = null;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.struct.AddAlbumRe.prototype.album = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetTenYearsInfoRe = function(par){
+	/** @private */
+	this._t = 2389;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.thumbs)){
+		var tmp = [];
+		for( var k in par.thumbs ) tmp.push(DR._Base.cast(par.thumbs [k]));
+		this.thumbs = tmp;
+	}
+};
+DR._Base._types[2389] = DR.gallery.struct.GetTenYearsInfoRe;
+DR.gallery.struct.GetTenYearsInfoRe[__P] = new DR._Base;
+DR.gallery.struct.GetTenYearsInfoRe[__P][__C] = DR.gallery.struct.GetTenYearsInfoRe;
+/** @type {Number} */
+DR.gallery.struct.GetTenYearsInfoRe.prototype.count = null;
+/** @type {Array.<DR.gallery.struct.Thumbnail>} */
+DR.gallery.struct.GetTenYearsInfoRe.prototype.thumbs = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetStaticUserAlbumsRe = function(par){
+	/** @private */
+	this._t = 3065;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+};
+DR._Base._types[3065] = DR.gallery.struct.GetStaticUserAlbumsRe;
+DR.gallery.struct.GetStaticUserAlbumsRe[__P] = new DR._Base;
+DR.gallery.struct.GetStaticUserAlbumsRe[__P][__C] = DR.gallery.struct.GetStaticUserAlbumsRe;
+/** @type {Array.<DR.gallery.struct.Album>|null} */
+DR.gallery.struct.GetStaticUserAlbumsRe.prototype.items = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.BadgesRe = function(par){
+	/** @private */
+	this._t = 3221;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.profile)) this.profile = (parseInt(par.profile)||0);
+	if(DR._Base.is(par.stats)) this.stats = (parseInt(par.stats)||0);
+};
+DR._Base._types[3221] = DR.gallery.struct.BadgesRe;
+DR.gallery.struct.BadgesRe[__P] = new DR._Base;
+DR.gallery.struct.BadgesRe[__P][__C] = DR.gallery.struct.BadgesRe;
+/** @type {Number|null} */
+DR.gallery.struct.BadgesRe.prototype.profile = null;
+/** @type {Number|null} */
+DR.gallery.struct.BadgesRe.prototype.stats = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.BadgesRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.BadgesRe[__CL] = "Gallery__BadgesRe";
+DR.gallery.select.BadgesRe[__P] = new DR._Select;
+DR.gallery.select.BadgesRe[__P][__C] = DR.gallery.select.BadgesRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.BadgesRe} */
+DR.gallery.select.BadgesRe.prototype.profile = function(v){ this._fields.profile = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.BadgesRe} */
+DR.gallery.select.BadgesRe.prototype.stats = function(v){ this._fields.stats = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetGalExtraJSRe = function(par){
+	/** @private */
+	this._t = 3426;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.js)) this.js = String(par.js||'');
+};
+DR._Base._types[3426] = DR.gallery.struct.GetGalExtraJSRe;
+DR.gallery.struct.GetGalExtraJSRe[__P] = new DR._Base;
+DR.gallery.struct.GetGalExtraJSRe[__P][__C] = DR.gallery.struct.GetGalExtraJSRe;
+/** @type {String} */
+DR.gallery.struct.GetGalExtraJSRe.prototype.js = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetItemDownloadUrlRe = function(par){
+	/** @private */
+	this._t = 4018;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+};
+DR._Base._types[4018] = DR.gallery.struct.GetItemDownloadUrlRe;
+DR.gallery.struct.GetItemDownloadUrlRe[__P] = new DR._Base;
+DR.gallery.struct.GetItemDownloadUrlRe[__P][__C] = DR.gallery.struct.GetItemDownloadUrlRe;
+/** @type {String} */
+DR.gallery.struct.GetItemDownloadUrlRe.prototype.url = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.UploadOptions = function(par){
+	/** @private */
+	this._t = 4371;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.options)){
+		var tmp = [];
+		for( var k in par.options ) tmp.push(DR._Base.cast(par.options [k]));
+		this.options = tmp;
+	}
+};
+DR._Base._types[4371] = DR.gallery.struct.UploadOptions;
+DR.gallery.struct.UploadOptions[__P] = new DR._Base;
+DR.gallery.struct.UploadOptions[__P][__C] = DR.gallery.struct.UploadOptions;
+/** @type {Array.<DR.gallery.struct.UploadOption>} */
+DR.gallery.struct.UploadOptions.prototype.options = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetItems = function(par){
+	this.select = [];
+	this.ids = [];
+	/** @private */
+	this._t = 71;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[71] = DR.gallery.GetItems;
+DR.gallery.GetItems[__CL] = "Gallery__GetItems";
+DR.gallery.GetItems[__P] = new DR._Method;
+DR.gallery.GetItems[__P][__C] = DR.gallery.GetItems;
+/** @type {Boolean|null} */
+DR.gallery.GetItems.prototype.fromSay = null;
+/** @type {String|null} */
+DR.gallery.GetItems.prototype.hash = null;
+/** @type {Array.<Number>} */
+DR.gallery.GetItems.prototype.ids = null;
+/** @type {Array.<Number>|null} */
+DR.gallery.GetItems.prototype.pids = null;
+/** @type {Boolean|null} */
+DR.gallery.GetItems.prototype.showDeleted = null;
+/** @type {DR.gallery.struct.GetItemsRe} */
+DR.gallery.GetItems.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.GetAlbumPidsRe = function(par){
+	/** @private */
+	this._t = 76;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.ids)){
+		var tmp = [];
+		for( var k in par.ids ) tmp.push((parseInt(par.ids [k])||0));
+		this.ids = tmp;
+	}
+	if(DR._Base.is(par.perPage)) this.perPage = (parseInt(par.perPage)||0);
+};
+DR._Base._types[76] = DR.gallery.struct.GetAlbumPidsRe;
+DR.gallery.struct.GetAlbumPidsRe[__P] = new DR._Base;
+DR.gallery.struct.GetAlbumPidsRe[__P][__C] = DR.gallery.struct.GetAlbumPidsRe;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumPidsRe.prototype.count = null;
+/** @type {Array.<Number>} */
+DR.gallery.struct.GetAlbumPidsRe.prototype.ids = null;
+/** @type {Number} */
+DR.gallery.struct.GetAlbumPidsRe.prototype.perPage = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.GetAlbumPidsRe = function(){
+	this._fields = {};
+};
+DR.gallery.select.GetAlbumPidsRe[__CL] = "Gallery__GetAlbumPidsRe";
+DR.gallery.select.GetAlbumPidsRe[__P] = new DR._Select;
+DR.gallery.select.GetAlbumPidsRe[__P][__C] = DR.gallery.select.GetAlbumPidsRe;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumPidsRe} */
+DR.gallery.select.GetAlbumPidsRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumPidsRe} */
+DR.gallery.select.GetAlbumPidsRe.prototype.ids = function(v){ this._fields.ids = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.GetAlbumPidsRe} */
+DR.gallery.select.GetAlbumPidsRe.prototype.perPage = function(v){ this._fields.perPage = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetAlbumPids = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 77;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[77] = DR.gallery.GetAlbumPids;
+DR.gallery.GetAlbumPids[__CL] = "Gallery__GetAlbumPids";
+DR.gallery.GetAlbumPids[__P] = new DR._Method;
+DR.gallery.GetAlbumPids[__P][__C] = DR.gallery.GetAlbumPids;
+/** @type {Number|null} */
+DR.gallery.GetAlbumPids.prototype.aid = null;
+/** @type {Number|null} */
+DR.gallery.GetAlbumPids.prototype.pid = null;
+/** @type {DR.gallery.struct.GetPidsRe} */
+DR.gallery.GetAlbumPids.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Thumbnails = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 79;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[79] = DR.gallery.Thumbnails;
+DR.gallery.Thumbnails[__CL] = "Gallery__Thumbnails";
+DR.gallery.Thumbnails[__P] = new DR._Method;
+DR.gallery.Thumbnails[__P][__C] = DR.gallery.Thumbnails;
+/** @type {Number|null} */
+DR.gallery.Thumbnails.prototype.aid = null;
+/** @type {Number|null} */
+DR.gallery.Thumbnails.prototype.count = null;
+/** @type {String|null} */
+DR.gallery.Thumbnails.prototype.hash = null;
+/** @type {Array.<Number>|null} */
+DR.gallery.Thumbnails.prototype.ids = null;
+/** @type {Number|null} */
+DR.gallery.Thumbnails.prototype.pid = null;
+/** @type {Array.<Number>|null} */
+DR.gallery.Thumbnails.prototype.pids = null;
+/** @type {DR.gallery.struct.ThumbnailsRe} */
+DR.gallery.Thumbnails.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetTags = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 90;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[90] = DR.gallery.GetTags;
+DR.gallery.GetTags[__CL] = "Gallery__GetTags";
+DR.gallery.GetTags[__P] = new DR._Method;
+DR.gallery.GetTags[__P][__C] = DR.gallery.GetTags;
+/** @type {Number} */
+DR.gallery.GetTags.prototype.pid = null;
+/** @type {DR.gallery.struct.GetTagsRe} */
+DR.gallery.GetTags.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetTabPids = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 96;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[96] = DR.gallery.GetTabPids;
+DR.gallery.GetTabPids[__CL] = "Gallery__GetTabPids";
+DR.gallery.GetTabPids[__P] = new DR._Method;
+DR.gallery.GetTabPids[__P][__C] = DR.gallery.GetTabPids;
+/** @type {Number|null} */
+DR.gallery.GetTabPids.prototype.aid = null;
+/** @type {Number|null} */
+DR.gallery.GetTabPids.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.GetTabPids.prototype.fid = null;
+/** @type {Boolean|null} */
+DR.gallery.GetTabPids.prototype.first = null;
+/** @type {Number|null} */
+DR.gallery.GetTabPids.prototype.i = null;
+/** @type {Number|null} */
+DR.gallery.GetTabPids.prototype.pid = null;
+/** @type {String|null} */
+DR.gallery.GetTabPids.prototype.placeId = null;
+/** @type {String|null} */
+DR.gallery.GetTabPids.prototype.search = null;
+/** @type {String|null} */
+DR.gallery.GetTabPids.prototype.searchType = null;
+/** @type {Number} */
+DR.gallery.GetTabPids.prototype.tab = null;
+/** @type {Boolean|null} */
+DR.gallery.GetTabPids.prototype.top = null;
+/** @type {DR.gallery.struct.GetPidsRe} */
+DR.gallery.GetTabPids.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.OtherGalleriesLast = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 99;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[99] = DR.gallery.OtherGalleriesLast;
+DR.gallery.OtherGalleriesLast[__CL] = "Gallery__OtherGalleriesLast";
+DR.gallery.OtherGalleriesLast[__P] = new DR._Method;
+DR.gallery.OtherGalleriesLast[__P][__C] = DR.gallery.OtherGalleriesLast;
+/** @type {Number} */
+DR.gallery.OtherGalleriesLast.prototype.aid = null;
+/** @type {Number} */
+DR.gallery.OtherGalleriesLast.prototype.ignore = null;
+/** @type {DR.gallery.struct.OtherGalleriesLastRe} */
+DR.gallery.OtherGalleriesLast.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Feedback = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 101;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[101] = DR.gallery.Feedback;
+DR.gallery.Feedback[__CL] = "Gallery__Feedback";
+DR.gallery.Feedback[__P] = new DR._Method;
+DR.gallery.Feedback[__P][__C] = DR.gallery.Feedback;
+/** @type {Boolean|null} */
+DR.gallery.Feedback.prototype.discard = null;
+/** @type {String|null} */
+DR.gallery.Feedback.prototype.negative = null;
+/** @type {String|null} */
+DR.gallery.Feedback.prototype.positive = null;
+/** @type {DR.gallery.struct.FeedbackRe} */
+DR.gallery.Feedback.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastViewAlbum = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 102;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[102] = DR.gallery.LastViewAlbum;
+DR.gallery.LastViewAlbum[__CL] = "Gallery__LastViewAlbum";
+DR.gallery.LastViewAlbum[__P] = new DR._Method;
+DR.gallery.LastViewAlbum[__P][__C] = DR.gallery.LastViewAlbum;
+/** @type {Number} */
+DR.gallery.LastViewAlbum.prototype.aid = null;
+/** @type {DR.gallery.struct.OtherGalleriesLastRe} */
+DR.gallery.LastViewAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastView = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 104;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[104] = DR.gallery.LastView;
+DR.gallery.LastView[__CL] = "Gallery__LastView";
+DR.gallery.LastView[__P] = new DR._Method;
+DR.gallery.LastView[__P][__C] = DR.gallery.LastView;
+/** @type {Number} */
+DR.gallery.LastView.prototype.aid = null;
+/** @type {DR.gallery.struct.LastViewRe} */
+DR.gallery.LastView.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetFirstPid = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 106;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[106] = DR.gallery.GetFirstPid;
+DR.gallery.GetFirstPid[__CL] = "Gallery__GetFirstPid";
+DR.gallery.GetFirstPid[__P] = new DR._Method;
+DR.gallery.GetFirstPid[__P][__C] = DR.gallery.GetFirstPid;
+/** @type {Number} */
+DR.gallery.GetFirstPid.prototype.aid = null;
+/** @type {Boolean|null} */
+DR.gallery.GetFirstPid.prototype.lastPid = null;
+/** @type {DR.gallery.struct.GetFirstPidRe} */
+DR.gallery.GetFirstPid.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SetAlbumThumb = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 107;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[107] = DR.gallery.SetAlbumThumb;
+DR.gallery.SetAlbumThumb[__CL] = "Gallery__SetAlbumThumb";
+DR.gallery.SetAlbumThumb[__P] = new DR._Method;
+DR.gallery.SetAlbumThumb[__P][__C] = DR.gallery.SetAlbumThumb;
+/** @type {Number} */
+DR.gallery.SetAlbumThumb.prototype.pid = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SetAsProfile = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 108;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[108] = DR.gallery.SetAsProfile;
+DR.gallery.SetAsProfile[__CL] = "Gallery__SetAsProfile";
+DR.gallery.SetAsProfile[__P] = new DR._Method;
+DR.gallery.SetAsProfile[__P][__C] = DR.gallery.SetAsProfile;
+/** @type {Number} */
+DR.gallery.SetAsProfile.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.SetAsProfile.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.OtherGalleries = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 111;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[111] = DR.gallery.OtherGalleries;
+DR.gallery.OtherGalleries[__CL] = "Gallery__OtherGalleries";
+DR.gallery.OtherGalleries[__P] = new DR._Method;
+DR.gallery.OtherGalleries[__P][__C] = DR.gallery.OtherGalleries;
+/** @type {Number|null} */
+DR.gallery.OtherGalleries.prototype.aid = null;
+/** @type {Number|null} */
+DR.gallery.OtherGalleries.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.OtherGalleries.prototype.fid = null;
+/** @type {Number|null} */
+DR.gallery.OtherGalleries.prototype.pid = null;
+/** @type {DR.gallery.struct.OtherGalleriesRe} */
+DR.gallery.OtherGalleries.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetSettings = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 119;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[119] = DR.gallery.GetSettings;
+DR.gallery.GetSettings[__CL] = "Gallery__GetSettings";
+DR.gallery.GetSettings[__P] = new DR._Method;
+DR.gallery.GetSettings[__P][__C] = DR.gallery.GetSettings;
+/** @type {Number|null} */
+DR.gallery.GetSettings.prototype.uid = null;
+/** @type {DR.gallery.struct.Settings} */
+DR.gallery.GetSettings.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SaveSettings = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 120;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[120] = DR.gallery.SaveSettings;
+DR.gallery.SaveSettings[__CL] = "Gallery__SaveSettings";
+DR.gallery.SaveSettings[__P] = new DR._Method;
+DR.gallery.SaveSettings[__P][__C] = DR.gallery.SaveSettings;
+/** @type {String} */
+DR.gallery.SaveSettings.prototype.colorScheme = null;
+/** @type {Boolean|null} */
+DR.gallery.SaveSettings.prototype.hideLikeRecommend = null;
+/** @type {Number|null} */
+DR.gallery.SaveSettings.prototype.uid = null;
+/** @type {DR.gallery.struct.Settings} */
+DR.gallery.SaveSettings.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastViewAlbumLarge = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 122;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[122] = DR.gallery.LastViewAlbumLarge;
+DR.gallery.LastViewAlbumLarge[__CL] = "Gallery__LastViewAlbumLarge";
+DR.gallery.LastViewAlbumLarge[__P] = new DR._Method;
+DR.gallery.LastViewAlbumLarge[__P][__C] = DR.gallery.LastViewAlbumLarge;
+/** @type {Number} */
+DR.gallery.LastViewAlbumLarge.prototype.aid = null;
+/** @type {DR.gallery.struct.OtherGalleriesLastLargeRe} */
+DR.gallery.LastViewAlbumLarge.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.gallery.struct.UserAlbums = function(par){
+	/** @private */
+	this._t = 123;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.albums)){
+		var tmp = [];
+		for( var k in par.albums ) tmp.push(DR._Base.cast(par.albums [k]));
+		this.albums = tmp;
+	}
+};
+DR._Base._types[123] = DR.gallery.struct.UserAlbums;
+DR.gallery.struct.UserAlbums[__P] = new DR._Base;
+DR.gallery.struct.UserAlbums[__P][__C] = DR.gallery.struct.UserAlbums;
+/** @type {Array.<DR.gallery.struct.Album>} */
+DR.gallery.struct.UserAlbums.prototype.albums = null;
+ 
+/** @extends {DR._Select} */
+DR.gallery.select.UserAlbums = function(){
+	this._fields = {};
+};
+DR.gallery.select.UserAlbums[__CL] = "Gallery__UserAlbums";
+DR.gallery.select.UserAlbums[__P] = new DR._Select;
+DR.gallery.select.UserAlbums[__P][__C] = DR.gallery.select.UserAlbums;
+/** @param {boolean} [v]
+  * @return {DR.gallery.select.UserAlbums} */
+DR.gallery.select.UserAlbums.prototype.albums = function(v){ this._fields.albums = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetUserAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 124;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[124] = DR.gallery.GetUserAlbums;
+DR.gallery.GetUserAlbums[__CL] = "Gallery__GetUserAlbums";
+DR.gallery.GetUserAlbums[__P] = new DR._Method;
+DR.gallery.GetUserAlbums[__P][__C] = DR.gallery.GetUserAlbums;
+/** @type {Number|null} */
+DR.gallery.GetUserAlbums.prototype.count = null;
+/** @type {Boolean|null} */
+DR.gallery.GetUserAlbums.prototype.my = null;
+/** @type {Number|null} */
+DR.gallery.GetUserAlbums.prototype.offset = null;
+/** @type {Number|null} */
+DR.gallery.GetUserAlbums.prototype.pg = null;
+/** @type {Number|null} */
+DR.gallery.GetUserAlbums.prototype.type = null;
+/** @type {Number|null} */
+DR.gallery.GetUserAlbums.prototype.uid = null;
+/** @type {Boolean|null} */
+DR.gallery.GetUserAlbums.prototype.unpublished = null;
+/** @type {DR.gallery.struct.GetAlbumsRe} */
+DR.gallery.GetUserAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.DeleteItem = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 125;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[125] = DR.gallery.DeleteItem;
+DR.gallery.DeleteItem[__CL] = "Gallery__DeleteItem";
+DR.gallery.DeleteItem[__P] = new DR._Method;
+DR.gallery.DeleteItem[__P][__C] = DR.gallery.DeleteItem;
+/** @type {Boolean|null} */
+DR.gallery.DeleteItem.prototype.keepAlbum = null;
+/** @type {Number} */
+DR.gallery.DeleteItem.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.DeleteItem.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.MiniAdsStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 128;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[128] = DR.gallery.MiniAdsStats;
+DR.gallery.MiniAdsStats[__CL] = "Gallery__MiniAdsStats";
+DR.gallery.MiniAdsStats[__P] = new DR._Method;
+DR.gallery.MiniAdsStats[__P][__C] = DR.gallery.MiniAdsStats;
+/** @type {Boolean} */
+DR.gallery.MiniAdsStats.prototype.scroll = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.CloseStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 129;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[129] = DR.gallery.CloseStats;
+DR.gallery.CloseStats[__CL] = "Gallery__CloseStats";
+DR.gallery.CloseStats.TYPE_ESC = "esc";
+DR.gallery.CloseStats.TYPE_X = "x";
+DR.gallery.CloseStats.TYPE_OVERLAY = "overlay";
+DR.gallery.CloseStats[__P] = new DR._Method;
+DR.gallery.CloseStats[__P][__C] = DR.gallery.CloseStats;
+/** @type {String} */
+DR.gallery.CloseStats.prototype.type = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.FullScreenStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 131;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[131] = DR.gallery.FullScreenStats;
+DR.gallery.FullScreenStats[__CL] = "Gallery__FullScreenStats";
+DR.gallery.FullScreenStats[__P] = new DR._Method;
+DR.gallery.FullScreenStats[__P][__C] = DR.gallery.FullScreenStats;
+ 
+/** @extends {DR._Method} */
+DR.gallery.NextImage = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 132;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[132] = DR.gallery.NextImage;
+DR.gallery.NextImage[__CL] = "Gallery__NextImage";
+DR.gallery.NextImage[__P] = new DR._Method;
+DR.gallery.NextImage[__P][__C] = DR.gallery.NextImage;
+/** @type {Number} */
+DR.gallery.NextImage.prototype.pid = null;
+/** @type {DR.gallery.struct.Image} */
+DR.gallery.NextImage.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.OtherGalleriesStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 133;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[133] = DR.gallery.OtherGalleriesStats;
+DR.gallery.OtherGalleriesStats[__CL] = "Gallery__OtherGalleriesStats";
+DR.gallery.OtherGalleriesStats[__P] = new DR._Method;
+DR.gallery.OtherGalleriesStats[__P][__C] = DR.gallery.OtherGalleriesStats;
+/** @type {String|null} */
+DR.gallery.OtherGalleriesStats.prototype.type = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.EditDescription = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 134;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[134] = DR.gallery.EditDescription;
+DR.gallery.EditDescription[__CL] = "Gallery__EditDescription";
+DR.gallery.EditDescription[__P] = new DR._Method;
+DR.gallery.EditDescription[__P][__C] = DR.gallery.EditDescription;
+/** @type {String} */
+DR.gallery.EditDescription.prototype.description = null;
+/** @type {Number} */
+DR.gallery.EditDescription.prototype.pid = null;
+/** @type {DR.gallery.struct.EditDescriptionRe} */
+DR.gallery.EditDescription.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastViewRecommendStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 135;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[135] = DR.gallery.LastViewRecommendStats;
+DR.gallery.LastViewRecommendStats[__CL] = "Gallery__LastViewRecommendStats";
+DR.gallery.LastViewRecommendStats[__P] = new DR._Method;
+DR.gallery.LastViewRecommendStats[__P][__C] = DR.gallery.LastViewRecommendStats;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastViewLikeStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 140;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[140] = DR.gallery.LastViewLikeStats;
+DR.gallery.LastViewLikeStats[__CL] = "Gallery__LastViewLikeStats";
+DR.gallery.LastViewLikeStats[__P] = new DR._Method;
+DR.gallery.LastViewLikeStats[__P][__C] = DR.gallery.LastViewLikeStats;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LastViewDislikeStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 141;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[141] = DR.gallery.LastViewDislikeStats;
+DR.gallery.LastViewDislikeStats[__CL] = "Gallery__LastViewDislikeStats";
+DR.gallery.LastViewDislikeStats[__P] = new DR._Method;
+DR.gallery.LastViewDislikeStats[__P][__C] = DR.gallery.LastViewDislikeStats;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LikeRecommendStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 147;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[147] = DR.gallery.LikeRecommendStats;
+DR.gallery.LikeRecommendStats[__CL] = "Gallery__LikeRecommendStats";
+DR.gallery.LikeRecommendStats[__P] = new DR._Method;
+DR.gallery.LikeRecommendStats[__P][__C] = DR.gallery.LikeRecommendStats;
+ 
+/** @extends {DR._Method} */
+DR.gallery.LikeRecommendSeen = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 148;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[148] = DR.gallery.LikeRecommendSeen;
+DR.gallery.LikeRecommendSeen[__CL] = "Gallery__LikeRecommendSeen";
+DR.gallery.LikeRecommendSeen[__P] = new DR._Method;
+DR.gallery.LikeRecommendSeen[__P][__C] = DR.gallery.LikeRecommendSeen;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Stats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 207;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[207] = DR.gallery.Stats;
+DR.gallery.Stats[__CL] = "Gallery__Stats";
+DR.gallery.Stats[__P] = new DR._Method;
+DR.gallery.Stats[__P][__C] = DR.gallery.Stats;
+/** @type {String} */
+DR.gallery.Stats.prototype.key = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.UserStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 226;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[226] = DR.gallery.UserStats;
+DR.gallery.UserStats[__CL] = "Gallery__UserStats";
+DR.gallery.UserStats[__P] = new DR._Method;
+DR.gallery.UserStats[__P][__C] = DR.gallery.UserStats;
+/** @type {Number} */
+DR.gallery.UserStats.prototype.uid = null;
+/** @type {DR.gallery.struct.UserStatsRe} */
+DR.gallery.UserStats.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetVideoTop = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 231;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[231] = DR.gallery.GetVideoTop;
+DR.gallery.GetVideoTop[__CL] = "Gallery__GetVideoTop";
+DR.gallery.GetVideoTop.TYPE_RATE = "rate";
+DR.gallery.GetVideoTop.TYPE_VIEWS = "views";
+DR.gallery.GetVideoTop[__P] = new DR._Method;
+DR.gallery.GetVideoTop[__P][__C] = DR.gallery.GetVideoTop;
+/** @type {Number} */
+DR.gallery.GetVideoTop.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetVideoTop.prototype.pg = null;
+/** @type {String} */
+DR.gallery.GetVideoTop.prototype.type = null;
+/** @type {DR.gallery.struct.Items} */
+DR.gallery.GetVideoTop.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetPopularAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 232;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[232] = DR.gallery.GetPopularAlbums;
+DR.gallery.GetPopularAlbums[__CL] = "Gallery__GetPopularAlbums";
+DR.gallery.GetPopularAlbums[__P] = new DR._Method;
+DR.gallery.GetPopularAlbums[__P][__C] = DR.gallery.GetPopularAlbums;
+/** @type {Number} */
+DR.gallery.GetPopularAlbums.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetPopularAlbums.prototype.pg = null;
+/** @type {Boolean|null} */
+DR.gallery.GetPopularAlbums.prototype.pictures = null;
+/** @type {Boolean|null} */
+DR.gallery.GetPopularAlbums.prototype.videos = null;
+/** @type {DR.gallery.struct.PopularAlbums} */
+DR.gallery.GetPopularAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetLatestItems = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 233;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[233] = DR.gallery.GetLatestItems;
+DR.gallery.GetLatestItems[__CL] = "Gallery__GetLatestItems";
+DR.gallery.GetLatestItems.TYPE_PIC = 0;
+DR.gallery.GetLatestItems.TYPE_VIDEO = 1;
+DR.gallery.GetLatestItems.TYPE_EMBED = 2;
+DR.gallery.GetLatestItems.TYPE_GIF = 3;
+DR.gallery.GetLatestItems.TYPE_ALL_VIDEO = 254;
+DR.gallery.GetLatestItems.TYPE_ALL = 255;
+DR.gallery.GetLatestItems[__P] = new DR._Method;
+DR.gallery.GetLatestItems[__P][__C] = DR.gallery.GetLatestItems;
+/** @type {Number} */
+DR.gallery.GetLatestItems.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetLatestItems.prototype.pg = null;
+/** @type {Number|null} */
+DR.gallery.GetLatestItems.prototype.type = null;
+/** @type {DR.gallery.struct.Items} */
+DR.gallery.GetLatestItems.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetPYMK = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 236;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[236] = DR.gallery.GetPYMK;
+DR.gallery.GetPYMK[__CL] = "Gallery__GetPYMK";
+DR.gallery.GetPYMK[__P] = new DR._Method;
+DR.gallery.GetPYMK[__P][__C] = DR.gallery.GetPYMK;
+/** @type {Number} */
+DR.gallery.GetPYMK.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetPYMK.prototype.pg = null;
+/** @type {DR.gallery.struct.GetPYMKRe} */
+DR.gallery.GetPYMK.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetAlbumItems = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 257;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[257] = DR.gallery.GetAlbumItems;
+DR.gallery.GetAlbumItems[__CL] = "Gallery__GetAlbumItems";
+DR.gallery.GetAlbumItems[__P] = new DR._Method;
+DR.gallery.GetAlbumItems[__P][__C] = DR.gallery.GetAlbumItems;
+/** @type {Number|null} */
+DR.gallery.GetAlbumItems.prototype.aid = null;
+/** @type {Number} */
+DR.gallery.GetAlbumItems.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetAlbumItems.prototype.pg = null;
+/** @type {Number|null} */
+DR.gallery.GetAlbumItems.prototype.pid = null;
+/** @type {Number|null} */
+DR.gallery.GetAlbumItems.prototype.type = null;
+/** @type {DR.gallery.struct.AlbumItems} */
+DR.gallery.GetAlbumItems.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetAlbums = function(par){
+	this.select = [];
+	this.aids = [];
+	/** @private */
+	this._t = 262;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[262] = DR.gallery.GetAlbums;
+DR.gallery.GetAlbums[__CL] = "Gallery__GetAlbums";
+DR.gallery.GetAlbums[__P] = new DR._Method;
+DR.gallery.GetAlbums[__P][__C] = DR.gallery.GetAlbums;
+/** @type {Array.<Number>} */
+DR.gallery.GetAlbums.prototype.aids = null;
+/** @type {DR.gallery.struct.Albums} */
+DR.gallery.GetAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SaveAlbum = function(par){
+	this.select = [];
+	this.items = [];
+	/** @private */
+	this._t = 297;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[297] = DR.gallery.SaveAlbum;
+DR.gallery.SaveAlbum[__CL] = "Gallery__SaveAlbum";
+DR.gallery.SaveAlbum[__P] = new DR._Method;
+DR.gallery.SaveAlbum[__P][__C] = DR.gallery.SaveAlbum;
+/** @type {Number} */
+DR.gallery.SaveAlbum.prototype.aid = null;
+/** @type {Boolean|null} */
+DR.gallery.SaveAlbum.prototype.defaultPerms = null;
+/** @type {String|null} */
+DR.gallery.SaveAlbum.prototype.description = null;
+/** @type {Boolean|null} */
+DR.gallery.SaveAlbum.prototype.galleryContest = null;
+/** @type {Array.<DR.gallery.struct.SaveItem>} */
+DR.gallery.SaveAlbum.prototype.items = null;
+/** @type {Number|null} */
+DR.gallery.SaveAlbum.prototype.movieId = null;
+/** @type {DR.base.struct.Permissions|null} */
+DR.gallery.SaveAlbum.prototype.permissions = null;
+/** @type {String|null} */
+DR.gallery.SaveAlbum.prototype.placeId = null;
+/** @type {String|null} */
+DR.gallery.SaveAlbum.prototype.title = null;
+/** @type {Number|null} */
+DR.gallery.SaveAlbum.prototype.uid = null;
+/** @type {Array.<DR.say.struct.WithItem>|null} */
+DR.gallery.SaveAlbum.prototype.withUsers = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.SaveAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddView = function(par){
+	this.select = [];
+	this.pids = [];
+	/** @private */
+	this._t = 310;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[310] = DR.gallery.AddView;
+DR.gallery.AddView[__CL] = "Gallery__AddView";
+DR.gallery.AddView[__P] = new DR._Method;
+DR.gallery.AddView[__P][__C] = DR.gallery.AddView;
+/** @type {Boolean|null} */
+DR.gallery.AddView.prototype.fromSay = null;
+/** @type {Array.<Number>} */
+DR.gallery.AddView.prototype.pids = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.AddView.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.DeleteAlbum = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 326;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[326] = DR.gallery.DeleteAlbum;
+DR.gallery.DeleteAlbum[__CL] = "Gallery__DeleteAlbum";
+DR.gallery.DeleteAlbum[__P] = new DR._Method;
+DR.gallery.DeleteAlbum[__P][__C] = DR.gallery.DeleteAlbum;
+/** @type {Number} */
+DR.gallery.DeleteAlbum.prototype.aid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.DeleteAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetFriendAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 523;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[523] = DR.gallery.GetFriendAlbums;
+DR.gallery.GetFriendAlbums[__CL] = "Gallery__GetFriendAlbums";
+DR.gallery.GetFriendAlbums[__P] = new DR._Method;
+DR.gallery.GetFriendAlbums[__P][__C] = DR.gallery.GetFriendAlbums;
+/** @type {Number|null} */
+DR.gallery.GetFriendAlbums.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.GetFriendAlbums.prototype.pg = null;
+/** @type {DR.gallery.struct.GetAlbumsRe} */
+DR.gallery.GetFriendAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Report = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 942;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[942] = DR.gallery.Report;
+DR.gallery.Report[__CL] = "Gallery__Report";
+DR.gallery.Report[__P] = new DR._Method;
+DR.gallery.Report[__P][__C] = DR.gallery.Report;
+/** @type {Number} */
+DR.gallery.Report.prototype.pid = null;
+/** @type {String|null} */
+DR.gallery.Report.prototype.reason = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.Report.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetLatestAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 943;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[943] = DR.gallery.GetLatestAlbums;
+DR.gallery.GetLatestAlbums[__CL] = "Gallery__GetLatestAlbums";
+DR.gallery.GetLatestAlbums.TYPE_PIC = 0;
+DR.gallery.GetLatestAlbums.TYPE_VIDEO = 1;
+DR.gallery.GetLatestAlbums.TYPE_EMBED = 2;
+DR.gallery.GetLatestAlbums.TYPE_GIF = 3;
+DR.gallery.GetLatestAlbums.TYPE_ALL_VIDEO = 254;
+DR.gallery.GetLatestAlbums.TYPE_ALL = 255;
+DR.gallery.GetLatestAlbums[__P] = new DR._Method;
+DR.gallery.GetLatestAlbums[__P][__C] = DR.gallery.GetLatestAlbums;
+/** @type {Number|null} */
+DR.gallery.GetLatestAlbums.prototype.count = null;
+/** @type {Number} */
+DR.gallery.GetLatestAlbums.prototype.pg = null;
+/** @type {Number} */
+DR.gallery.GetLatestAlbums.prototype.type = null;
+/** @type {DR.gallery.struct.GetAlbumsRe} */
+DR.gallery.GetLatestAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetAlbumByPid = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1016;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1016] = DR.gallery.GetAlbumByPid;
+DR.gallery.GetAlbumByPid[__CL] = "Gallery__GetAlbumByPid";
+DR.gallery.GetAlbumByPid[__P] = new DR._Method;
+DR.gallery.GetAlbumByPid[__P][__C] = DR.gallery.GetAlbumByPid;
+/** @type {Number} */
+DR.gallery.GetAlbumByPid.prototype.pid = null;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.GetAlbumByPid.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.gallery.GetProfileItems = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1329;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1329] = DR.gallery.GetProfileItems;
+DR.gallery.GetProfileItems[__CL] = "Gallery__GetProfileItems";
+DR.gallery.GetProfileItems[__P] = new DR.base.Pg;
+DR.gallery.GetProfileItems[__P][__C] = DR.gallery.GetProfileItems;
+/** @type {DR.gallery.struct.AlbumItems} */
+DR.gallery.GetProfileItems.prototype.re = null;
+ 
+/** @extends {DR.base.Pg} */
+DR.gallery.GetAlbumVisitors = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1379;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1379] = DR.gallery.GetAlbumVisitors;
+DR.gallery.GetAlbumVisitors[__CL] = "Gallery__GetAlbumVisitors";
+DR.gallery.GetAlbumVisitors[__P] = new DR.base.Pg;
+DR.gallery.GetAlbumVisitors[__P][__C] = DR.gallery.GetAlbumVisitors;
+/** @type {Number} */
+DR.gallery.GetAlbumVisitors.prototype.aid = null;
+/** @type {DR.gallery.struct.GetAlbumVisitorsRe} */
+DR.gallery.GetAlbumVisitors.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.HasProfileAlbum = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1398;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1398] = DR.gallery.HasProfileAlbum;
+DR.gallery.HasProfileAlbum[__CL] = "Gallery__HasProfileAlbum";
+DR.gallery.HasProfileAlbum[__P] = new DR._Method;
+DR.gallery.HasProfileAlbum[__P][__C] = DR.gallery.HasProfileAlbum;
+/** @type {Number} */
+DR.gallery.HasProfileAlbum.prototype.uid = null;
+/** @type {DR.gallery.struct.HasProfileAlbumRe} */
+DR.gallery.HasProfileAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SearchUserAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2149;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2149] = DR.gallery.SearchUserAlbums;
+DR.gallery.SearchUserAlbums[__CL] = "Gallery__SearchUserAlbums";
+DR.gallery.SearchUserAlbums[__P] = new DR._Method;
+DR.gallery.SearchUserAlbums[__P][__C] = DR.gallery.SearchUserAlbums;
+/** @type {Number|null} */
+DR.gallery.SearchUserAlbums.prototype.count = null;
+/** @type {Boolean|null} */
+DR.gallery.SearchUserAlbums.prototype.my = null;
+/** @type {Number|null} */
+DR.gallery.SearchUserAlbums.prototype.offset = null;
+/** @type {Number|null} */
+DR.gallery.SearchUserAlbums.prototype.pg = null;
+/** @type {String} */
+DR.gallery.SearchUserAlbums.prototype.search = null;
+/** @type {Number|null} */
+DR.gallery.SearchUserAlbums.prototype.type = null;
+/** @type {Number|null} */
+DR.gallery.SearchUserAlbums.prototype.uid = null;
+/** @type {DR.gallery.struct.Items} */
+DR.gallery.SearchUserAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddAlbum = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2261;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2261] = DR.gallery.AddAlbum;
+DR.gallery.AddAlbum[__CL] = "Gallery__AddAlbum";
+DR.gallery.AddAlbum[__P] = new DR._Method;
+DR.gallery.AddAlbum[__P][__C] = DR.gallery.AddAlbum;
+/** @type {Boolean|null} */
+DR.gallery.AddAlbum.prototype.canComment = null;
+/** @type {Boolean|null} */
+DR.gallery.AddAlbum.prototype.canDownload = null;
+/** @type {Boolean|null} */
+DR.gallery.AddAlbum.prototype.canSelectUsers = null;
+/** @type {Boolean|null} */
+DR.gallery.AddAlbum.prototype.is18 = null;
+/** @type {DR.base.struct.Permissions|null} */
+DR.gallery.AddAlbum.prototype.permissions = null;
+/** @type {String|null} */
+DR.gallery.AddAlbum.prototype.title = null;
+/** @type {Number|null} */
+DR.gallery.AddAlbum.prototype.uid = null;
+/** @type {DR.gallery.struct.AddAlbumRe} */
+DR.gallery.AddAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetTenYearsAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2388;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2388] = DR.gallery.GetTenYearsAlbums;
+DR.gallery.GetTenYearsAlbums[__CL] = "Gallery__GetTenYearsAlbums";
+DR.gallery.GetTenYearsAlbums[__P] = new DR._Method;
+DR.gallery.GetTenYearsAlbums[__P][__C] = DR.gallery.GetTenYearsAlbums;
+/** @type {Number|null} */
+DR.gallery.GetTenYearsAlbums.prototype.count = null;
+/** @type {Boolean|null} */
+DR.gallery.GetTenYearsAlbums.prototype.my = null;
+/** @type {Number|null} */
+DR.gallery.GetTenYearsAlbums.prototype.pg = null;
+/** @type {DR.gallery.struct.GetAlbumsRe} */
+DR.gallery.GetTenYearsAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetTenYearsInfo = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2390;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2390] = DR.gallery.GetTenYearsInfo;
+DR.gallery.GetTenYearsInfo[__CL] = "Gallery__GetTenYearsInfo";
+DR.gallery.GetTenYearsInfo[__P] = new DR._Method;
+DR.gallery.GetTenYearsInfo[__P][__C] = DR.gallery.GetTenYearsInfo;
+/** @type {DR.gallery.struct.GetTenYearsInfoRe} */
+DR.gallery.GetTenYearsInfo.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.CloseTenYearsBlock = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2391;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2391] = DR.gallery.CloseTenYearsBlock;
+DR.gallery.CloseTenYearsBlock[__CL] = "Gallery__CloseTenYearsBlock";
+DR.gallery.CloseTenYearsBlock[__P] = new DR._Method;
+DR.gallery.CloseTenYearsBlock[__P][__C] = DR.gallery.CloseTenYearsBlock;
+/** @type {DR.base.struct.Status} */
+DR.gallery.CloseTenYearsBlock.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetStaticUserAlbums = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3066;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3066] = DR.gallery.GetStaticUserAlbums;
+DR.gallery.GetStaticUserAlbums[__CL] = "Gallery__GetStaticUserAlbums";
+DR.gallery.GetStaticUserAlbums[__P] = new DR._Method;
+DR.gallery.GetStaticUserAlbums[__P][__C] = DR.gallery.GetStaticUserAlbums;
+/** @type {Number|null} */
+DR.gallery.GetStaticUserAlbums.prototype.uid = null;
+/** @type {DR.gallery.struct.GetStaticUserAlbumsRe} */
+DR.gallery.GetStaticUserAlbums.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SetPermissions = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3127;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3127] = DR.gallery.SetPermissions;
+DR.gallery.SetPermissions[__CL] = "Gallery__SetPermissions";
+DR.gallery.SetPermissions[__P] = new DR._Method;
+DR.gallery.SetPermissions[__P][__C] = DR.gallery.SetPermissions;
+/** @type {Number} */
+DR.gallery.SetPermissions.prototype.aid = null;
+/** @type {DR.base.struct.Permissions} */
+DR.gallery.SetPermissions.prototype.permissions = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.SetPermissions.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetAlbum = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3131;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3131] = DR.gallery.GetAlbum;
+DR.gallery.GetAlbum[__CL] = "Gallery__GetAlbum";
+DR.gallery.GetAlbum[__P] = new DR._Method;
+DR.gallery.GetAlbum[__P][__C] = DR.gallery.GetAlbum;
+/** @type {Number} */
+DR.gallery.GetAlbum.prototype.aid = null;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.GetAlbum.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddItemPlace = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3136;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3136] = DR.gallery.AddItemPlace;
+DR.gallery.AddItemPlace[__CL] = "Gallery__AddItemPlace";
+DR.gallery.AddItemPlace[__P] = new DR._Method;
+DR.gallery.AddItemPlace[__P][__C] = DR.gallery.AddItemPlace;
+/** @type {Number} */
+DR.gallery.AddItemPlace.prototype.pid = null;
+/** @type {String} */
+DR.gallery.AddItemPlace.prototype.placeId = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.AddItemPlace.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.RemoveItemPlace = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3137;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3137] = DR.gallery.RemoveItemPlace;
+DR.gallery.RemoveItemPlace[__CL] = "Gallery__RemoveItemPlace";
+DR.gallery.RemoveItemPlace[__P] = new DR._Method;
+DR.gallery.RemoveItemPlace[__P][__C] = DR.gallery.RemoveItemPlace;
+/** @type {Number} */
+DR.gallery.RemoveItemPlace.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.RemoveItemPlace.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Publish = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3140;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3140] = DR.gallery.Publish;
+DR.gallery.Publish[__CL] = "Gallery__Publish";
+DR.gallery.Publish[__P] = new DR._Method;
+DR.gallery.Publish[__P][__C] = DR.gallery.Publish;
+/** @type {Number} */
+DR.gallery.Publish.prototype.aid = null;
+/** @type {DR.gallery.struct.Album} */
+DR.gallery.Publish.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetFaces = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3148;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3148] = DR.gallery.GetFaces;
+DR.gallery.GetFaces[__CL] = "Gallery__GetFaces";
+DR.gallery.GetFaces[__P] = new DR._Method;
+DR.gallery.GetFaces[__P][__C] = DR.gallery.GetFaces;
+/** @type {Number} */
+DR.gallery.GetFaces.prototype.pid = null;
+/** @type {DR.gallery.struct.GetFacesRe} */
+DR.gallery.GetFaces.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.RemoveUserTag = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3150;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3150] = DR.gallery.RemoveUserTag;
+DR.gallery.RemoveUserTag[__CL] = "Gallery__RemoveUserTag";
+DR.gallery.RemoveUserTag[__P] = new DR._Method;
+DR.gallery.RemoveUserTag[__P][__C] = DR.gallery.RemoveUserTag;
+/** @type {Number} */
+DR.gallery.RemoveUserTag.prototype.fid = null;
+/** @type {Number} */
+DR.gallery.RemoveUserTag.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.RemoveUserTag.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddUserTag = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3151;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3151] = DR.gallery.AddUserTag;
+DR.gallery.AddUserTag[__CL] = "Gallery__AddUserTag";
+DR.gallery.AddUserTag[__P] = new DR._Method;
+DR.gallery.AddUserTag[__P][__C] = DR.gallery.AddUserTag;
+/** @type {Number|null} */
+DR.gallery.AddUserTag.prototype.faceId = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.fid = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.hp = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.pid = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.wp = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.xp = null;
+/** @type {Number} */
+DR.gallery.AddUserTag.prototype.yp = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.AddUserTag.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddAlbumView = function(par){
+	this.select = [];
+	this.aids = [];
+	/** @private */
+	this._t = 3202;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3202] = DR.gallery.AddAlbumView;
+DR.gallery.AddAlbumView[__CL] = "Gallery__AddAlbumView";
+DR.gallery.AddAlbumView[__P] = new DR._Method;
+DR.gallery.AddAlbumView[__P][__C] = DR.gallery.AddAlbumView;
+/** @type {Array.<Number>} */
+DR.gallery.AddAlbumView.prototype.aids = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.AddAlbumView.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Badges = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3222;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3222] = DR.gallery.Badges;
+DR.gallery.Badges[__CL] = "Gallery__Badges";
+DR.gallery.Badges[__P] = new DR._Method;
+DR.gallery.Badges[__P][__C] = DR.gallery.Badges;
+/** @type {DR.gallery.struct.BadgesRe} */
+DR.gallery.Badges.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetItem = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3269;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3269] = DR.gallery.GetItem;
+DR.gallery.GetItem[__CL] = "Gallery__GetItem";
+DR.gallery.GetItem[__P] = new DR._Method;
+DR.gallery.GetItem[__P][__C] = DR.gallery.GetItem;
+/** @type {Number} */
+DR.gallery.GetItem.prototype.pid = null;
+/** @type {DR.gallery.struct.Item} */
+DR.gallery.GetItem.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.AddEmbed = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3353;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3353] = DR.gallery.AddEmbed;
+DR.gallery.AddEmbed[__CL] = "Gallery__AddEmbed";
+DR.gallery.AddEmbed[__P] = new DR._Method;
+DR.gallery.AddEmbed[__P][__C] = DR.gallery.AddEmbed;
+/** @type {Number|null} */
+DR.gallery.AddEmbed.prototype.aid = null;
+/** @type {Boolean|null} */
+DR.gallery.AddEmbed.prototype.createGallery = null;
+/** @type {Boolean|null} */
+DR.gallery.AddEmbed.prototype.createTmpGallery = null;
+/** @type {String} */
+DR.gallery.AddEmbed.prototype.url = null;
+/** @type {DR.gallery.struct.Item} */
+DR.gallery.AddEmbed.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetGalExtraJS = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3427;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3427] = DR.gallery.GetGalExtraJS;
+DR.gallery.GetGalExtraJS[__CL] = "Gallery__GetGalExtraJS";
+DR.gallery.GetGalExtraJS[__P] = new DR._Method;
+DR.gallery.GetGalExtraJS[__P][__C] = DR.gallery.GetGalExtraJS;
+/** @type {Number} */
+DR.gallery.GetGalExtraJS.prototype.uid = null;
+/** @type {DR.gallery.struct.GetGalExtraJSRe} */
+DR.gallery.GetGalExtraJS.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SearchIds = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3461;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3461] = DR.gallery.SearchIds;
+DR.gallery.SearchIds[__CL] = "Gallery__SearchIds";
+DR.gallery.SearchIds[__P] = new DR._Method;
+DR.gallery.SearchIds[__P][__C] = DR.gallery.SearchIds;
+/** @type {Number|null} */
+DR.gallery.SearchIds.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.SearchIds.prototype.offset = null;
+/** @type {Number|null} */
+DR.gallery.SearchIds.prototype.pg = null;
+/** @type {String|null} */
+DR.gallery.SearchIds.prototype.placeId = null;
+/** @type {String|null} */
+DR.gallery.SearchIds.prototype.query = null;
+/** @type {DR.gallery.struct.GetPidsRe} */
+DR.gallery.SearchIds.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.Search = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3462;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3462] = DR.gallery.Search;
+DR.gallery.Search[__CL] = "Gallery__Search";
+DR.gallery.Search[__P] = new DR._Method;
+DR.gallery.Search[__P][__C] = DR.gallery.Search;
+/** @type {Number|null} */
+DR.gallery.Search.prototype.count = null;
+/** @type {Number|null} */
+DR.gallery.Search.prototype.offset = null;
+/** @type {Number|null} */
+DR.gallery.Search.prototype.pg = null;
+/** @type {String|null} */
+DR.gallery.Search.prototype.placeId = null;
+/** @type {String|null} */
+DR.gallery.Search.prototype.query = null;
+/** @type {DR.gallery.struct.Items} */
+DR.gallery.Search.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.SetLayout = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3510;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3510] = DR.gallery.SetLayout;
+DR.gallery.SetLayout[__CL] = "Gallery__SetLayout";
+DR.gallery.SetLayout.LAYOUT_GRID = "grid";
+DR.gallery.SetLayout.LAYOUT_LIST = "list";
+DR.gallery.SetLayout[__P] = new DR._Method;
+DR.gallery.SetLayout[__P][__C] = DR.gallery.SetLayout;
+/** @type {String} */
+DR.gallery.SetLayout.prototype.layout = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.SetLayout.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetItemDownloadUrl = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4019;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4019] = DR.gallery.GetItemDownloadUrl;
+DR.gallery.GetItemDownloadUrl[__CL] = "Gallery__GetItemDownloadUrl";
+DR.gallery.GetItemDownloadUrl[__P] = new DR._Method;
+DR.gallery.GetItemDownloadUrl[__P][__C] = DR.gallery.GetItemDownloadUrl;
+/** @type {Number} */
+DR.gallery.GetItemDownloadUrl.prototype.pid = null;
+/** @type {DR.gallery.struct.GetItemDownloadUrlRe} */
+DR.gallery.GetItemDownloadUrl.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetCompetitionPics = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4369;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4369] = DR.gallery.GetCompetitionPics;
+DR.gallery.GetCompetitionPics[__CL] = "Gallery__GetCompetitionPics";
+DR.gallery.GetCompetitionPics[__P] = new DR._Method;
+DR.gallery.GetCompetitionPics[__P][__C] = DR.gallery.GetCompetitionPics;
+/** @type {Number} */
+DR.gallery.GetCompetitionPics.prototype.pg = null;
+/** @type {Boolean|null} */
+DR.gallery.GetCompetitionPics.prototype.top = null;
+/** @type {Boolean|null} */
+DR.gallery.GetCompetitionPics.prototype.winners = null;
+/** @type {DR.gallery.struct.AlbumItems} */
+DR.gallery.GetCompetitionPics.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.GetUploadOptions = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4372;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4372] = DR.gallery.GetUploadOptions;
+DR.gallery.GetUploadOptions[__CL] = "Gallery__GetUploadOptions";
+DR.gallery.GetUploadOptions[__P] = new DR._Method;
+DR.gallery.GetUploadOptions[__P][__C] = DR.gallery.GetUploadOptions;
+/** @type {DR.gallery.struct.UploadOptions} */
+DR.gallery.GetUploadOptions.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.UnspamItem = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4381;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4381] = DR.gallery.UnspamItem;
+DR.gallery.UnspamItem[__CL] = "Gallery__UnspamItem";
+DR.gallery.UnspamItem[__P] = new DR._Method;
+DR.gallery.UnspamItem[__P][__C] = DR.gallery.UnspamItem;
+/** @type {Number} */
+DR.gallery.UnspamItem.prototype.pid = null;
+/** @type {DR.base.struct.Status} */
+DR.gallery.UnspamItem.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.gallery.ToggleContestSubscription = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 4382;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[4382] = DR.gallery.ToggleContestSubscription;
+DR.gallery.ToggleContestSubscription[__CL] = "Gallery__ToggleContestSubscription";
+DR.gallery.ToggleContestSubscription[__P] = new DR._Method;
+DR.gallery.ToggleContestSubscription[__P][__C] = DR.gallery.ToggleContestSubscription;
+/** @type {DR.base.struct.Status} */
+DR.gallery.ToggleContestSubscription.prototype.re = null;
+ 
+D.loaded();

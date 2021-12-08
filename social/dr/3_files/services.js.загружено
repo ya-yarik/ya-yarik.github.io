@@ -1,0 +1,7447 @@
+/**
+ * @constructor
+ * @param {Object} par
+ */
+D.services = function (par) {
+	if( par.error ){
+		par.node.innerHTML = par.error;
+		par.node.style.padding = '10px';
+		par.node.style.boxSizing = 'border-box';
+		if( par.modal ){
+			par.modal.setTitle(D.services.l.get('Buy service'));
+		}
+		return;
+	}
+	for (var i=0; i< par.co.length;i++){
+		if(par.co[i].number == par.count) {
+			this.cardAmount = par.co[i].price;
+		}
+	}
+	this.dayCount = par.count;
+	this.specType = par.type;
+	this.euro_rate = 0.702804;
+	this.name = par.name;
+	this.par = par;
+	this.nonce = par.nonce;
+	this.customNode = par.customNode;
+	this.callback = new Function(par.callback || '');
+	this.canAddAuto = false;
+	par.customId = par.customId || 0;
+	this.reason = (par.reason != null) ? par.reason : null;
+	this.disablePhoneReg = par.disablePhoneReg || false;
+	this.lottery = par.lottery || false;
+	this.donationBox = par.donationBox || false;
+    this.isLiktendarzs = par.isLiktendarzs || false;
+	this.transactionId = false;
+	this.transactionComplete = false;
+	this.auto_isset = false;
+	this.hasPhone = par.hasPhone || false;
+	D.services.blockedPaymentMethods = par.blockedPaymentMethods;
+	if( this.name == 'gifts_year' || this.name == 'gifts_half_year' ){
+		par.icon = D.PIMG + 'services/img/icons/gifts_month128.png';
+	}
+	/** @type {D.Modal} _modal */
+	this._modal = par.modal || null;
+	if (this._modal) {
+		this._modal.setTitle(this.donationBox ? D.services.l.get('Make a donation') : D.services.l.get('Buy service'));
+	}
+	this.discountDescr = D.services.descr || par.short;
+	//expire
+	if (this.name=='karsts_pack') {
+		this.discountDescr = 'VIP Premium paka: <br/>- Abonements (7 dienas); <br/>- Dāvanas (5 gab.); <br/>- Izcelts dalībnieks (3 dienas); <br/>- Mega miedziens (1 gab.); <br/>- Tevi redz saņēmējs (7 dienas)';
+	}
+	/*if (this.specType == "cred") {
+		par.co.pop();
+	}*/
+	if (this.specType == D.services.TYPE_DISCOUNT && this.dayCount == 60) {
+		this.discountDescr = this.discountDescr.replace("30", "60");
+	}
+	if (this.customNode) {
+		mkE(this.customNode).appendTo(par.node);
+	} else {
+        this._serviceDescr = mkE({
+			tag: 'table',
+			className: 'pbDescr',
+			els: [
+				{
+					tag: 'tbody',
+					els: [
+						{
+							tag: 'tr',
+							els: [
+								{
+									tag: 'td',
+									attr: {
+										width: 140
+									},
+									els: [
+										{
+											tag: 'img',
+											className: 'serviceIcon',
+											src: par.icon || D.PIMG + 'services/img/icons/' + this.name + '128.png'
+										} // img
+									]
+								}, // td
+								{
+									tag: 'td',
+									els: [
+										this._hNode = mkE({
+											tag: 'h1',
+											id: 'pbCaption',
+											text: par.caption
+										}),
+										this._descrNode = mkE({
+											tag: 'p',
+											innerHTML: this.discountDescr
+										})
+									]
+								} // td
+							]
+						} // tr
+					]
+				} // tbody
+			]
+		}).appendTo(par.node);
+	}
+	var h1 = mkE({
+		tag: 'h2',
+		className: 'pbTabsContainer',
+		//text:InfoBox.opened ? '' : par.caption,
+		els: [
+			{
+				tag: 'div',
+				className: 'pbTabs',
+				els: [
+					this.loadContent()
+				]
+			}
+		]
+	}).appendTo(par.node);
+
+	if( par.recommendedServices && par.recommendedServices.length > 0 ) {
+		this.recommendations = new D.services.Recommendations(par.recommendedServices);
+	}
+
+	if (empty(par.co) || par.disableCredits) {
+		if (this._tabCredit) {
+			this._tabCredit.style.display = 'none';
+		}
+	}
+	if (!par.canPayCard || par.disableCard || D.services.blockedPaymentMethods.card) {
+		if (this._tabCC) {
+			this._tabCC.style.display = 'none';
+		}
+	} else if (this._tabCC && par.lottery2018) {
+		D.insertBefore(mkE({
+			tag: 'div',
+			className: 'lottery-2018-banner',
+			els: [
+				{
+					tag: 'div',
+					els: [
+						{
+							tag: 'div',
+							className: 'lottery-title',
+							els: [
+								'Maksā ar bankas karti un laimē ',
+								{
+									tag: 'strong',
+									text: '100 EUR!'
+								}
+							]
+						},
+						{
+							tag: 'a',
+							href: '/services/?tab=bank_lottery',
+							target: '_blank',
+							text: 'Noteikumi'
+						}
+					]
+				}
+			]
+		}), h1);
+	} else if( this._tabCC && D.LV && !par.cardSaved ) {
+		D.insertBefore(this._saveCardBanner =  mkE({
+			tag: 'div',
+			className: 'saveCard-banner',
+			onclick: D.closure(this, function() {
+				this.show('cc');
+			}),
+			els: [
+				{
+					tag: 'div',
+					className: 'saveCard-title',
+					text: D.Lang.get('save_card_banner', 'xServices2')
+				},
+				{
+					tag: 'div',
+					className: 'saveCard-img'
+				}
+			]
+		}), h1);
+	}
+	if (!par.canPayBanklink || !par.banklinks || par.disableBanklinks || D.services.blockedPaymentMethods.ibank) {
+		if (this._tabBanklink) {
+			this._tabBanklink.style.display = 'none';
+		}
+	}
+
+	var hasSO = true;
+	if(!empty(this.par.so) && this.par.donationBox && this.par.count) {
+		hasSO = false;
+		for(var so in this.par.so) {
+			if (this.par.count == this.par.so[so].number) {
+				this.par.so = {0:this.par.so[so]};
+				hasSO = true;
+				break;
+			}
+		}
+	}
+
+	if (empty(par.so) || par.disableSms || !hasSO) {
+		if (this._tabSMS) {
+			this._tabSMS.style.display = 'none';
+		}
+	}
+
+	var minCreditPayment = 0;
+	if( !empty(par.co) ){
+		for( var c = 0, lc = par.co.length; c < lc; c++ ){
+			if( !minCreditPayment ){
+				minCreditPayment = par.co[c].price;
+			}else{
+				minCreditPayment = Math.min(minCreditPayment, par.co[c].price);
+			}
+		}
+	}
+
+	this.setCreditCount(par.credits);
+	// sms cc
+	if( !empty( par.so ) ){
+		var smsOption = reset( par.so );
+		var items = [];
+		var r;
+		for (var k in par.ccs) {
+			r = par.ccs[ k ];
+			items.push({
+				caption: '<img src="' + D.PIMG + 'i/flags/' + r + '.png" />',
+				onclick:D.closure( this, function(r){
+					this.rpc.send(
+						'getCCSMSOptions',
+						{
+							name:this.name,
+							cc:r
+						},
+						function(re){
+							if(re.so) {
+								this.par.so = re.so;
+								this.smsPaymentDrawOptions();
+							}
+						},
+						this
+					);
+				}, r ),
+				selected: smsOption.cc == r
+			});
+		}
+		this.ccDropDown = T.dropDown(items);
+		this.ccDropDown.style.display = 'none';
+		if (count( par.ccs ) > 1 || D.DEV) {
+			this.ccDropDown.append(h1);
+		}
+	}
+	/*if( D.ID != par.uid  ){
+	 this.statusNode.style.display = 'none';
+	 }*/
+	this.isCredit = !empty(par.co);
+	this.isSMS = !empty(par.so);
+	this.banklinks = par.banklinks || {};
+	this.content = mkE({
+		tag: 'div',
+		className: 'pbCont'
+	}).appendTo(par.node);
+	if (this.isSMS && par.showSMS) {
+		this.show('sms');
+		return;
+	}
+	if (this.specType == 'sms') {
+		this.show('sms');
+	}
+	else if (this.specType == "cred") {
+		this._tabSMS.style.display = 'none';
+		this.show('credit');
+	}
+	else if (this.specType == D.services.TYPE_DISCOUNT) {
+		this._tabSMS.style.display = 'none';
+		this.show('credit');
+	}
+	else if ( !par.disableCredits && this.isCredit ) {
+		if( this.par.pagePayment != 1 && par.credits < minCreditPayment && par.canPayCard && !par.disableCard ){
+			this.show('cc');
+		}else{
+			this.show('credit');
+		}
+	}
+	else if( par.canPayCard && !par.disableCard ) {
+		this.show('cc');
+	}
+	else if( par.canPayBanklink && !par.disableBanklinks ) {
+		this.show('banklink');
+	} else if( !par.disableSms ) {
+		this.show('sms');
+	}
+};
+
+D.services.l = new D.Lang('xServices2');
+D.services.rpc = new RPC('/services/rq/app.php');
+if ( window.CPM_ADS_SAY_HIGHLIGHT ) {
+	D.services.rpc = new RPC( '//' + window.CPM_ADS_SAY_HIGHLIGHT_WWW_DOMAIN + '/services/rq/app.php', { withCredentials: true } );
+}
+D.services.TYPE_DISCOUNT = "cardBank";
+D.services.BID_NEW = '-1'; // ja no miniads tiek veidota jauna lapa
+
+D.services.CURRENCY_EUR = 'EUR';
+D.services.CURRENCY_USD = 'USD';
+D.services.CURRENCY_GBP = 'GBP';
+
+D.services.TYPE_CARD = 'card';
+D.services.TYPE_HANZANET = 'hanzanet';
+D.services.TYPE_ELINK = 'elink';
+D.services.TYPE_NORDEA = 'nordea';
+D.services.TYPE_DIGILINK = 'digilink';
+D.services.TYPE_INORD = 'inord';
+D.services.TYPE_PAYPAL = 'paypal';
+D.services.TYPE_MOBILLY = 'mobilly';
+
+D.services.prototype = {
+
+	rpc: D.services.rpc,
+
+	loadContent:function() {
+		var titleText = '';
+		if (this.par.pagePayment == 1) {
+			titleText = D.services.l.get(D.LV ? 'page_wallet' : 'Credits');
+			if ( this.par.nobizPayment ) {
+				titleText = D.services.l.get('nobiz_wallet');
+			}
+			if (this.specType == D.services.TYPE_DISCOUNT) {
+				titleText = "Karte un internetbanka";
+			}
+			return [
+				this._tabCredit = mkE({
+					tag: 'span',
+					className: 'radius3top pbTabsSel',
+					text: titleText,
+					prop: {
+						onclick:D.closure( this, function () {
+							this.show('credit');
+						} )
+					}
+				})
+			]
+		} else {
+			titleText = D.services.l.get(D.LV ? 'my_wallet' : 'Credits');
+			if (this.specType == D.services.TYPE_DISCOUNT) {
+				titleText = "Karte un internetbanka";
+			}
+			return [
+				this._tabCredit = mkE({
+					tag: 'span',
+					className: 'radius3top pbTabsSel',
+					text: titleText,//D.services.l.get(D.LV ? 'my_wallet' : 'Credits'),
+					prop: {
+						onclick:D.closure( this, function(){
+							this.show('credit');
+						} )
+					}
+				}),
+				this._tabCC = mkE({
+					tag: 'span',
+					className: 'radius3top',
+					text: D.services.l.get('method_group_card'),
+					prop: {
+						onclick:D.closure( this, function(){
+							this.show('cc');
+						} )
+					}
+				}),
+				this._tabBanklink = mkE({
+					tag: 'span',
+					className: 'radius3top',
+					text: D.services.l.get('method_group_banks'),
+					prop: {
+						onclick:D.closure( this, function(){
+							this.show('banklink');
+						} )
+					}
+				}),
+				this._tabSMS = mkE({
+					tag: 'span',
+					className: 'radius3top',
+					text: 'SMS',
+					prop: {
+						onclick:D.closure( this, function(){
+							this.show('sms');
+						} )
+					}
+				})
+			]
+		}
+	},
+
+	_tab: function (type) {
+		switch (type) {
+			case 'credit':
+				addClassName(this._tabCredit, 'pbTabsSel');
+				if (this._tabSMS) {
+					removeClassName(this._tabSMS, 'pbTabsSel');
+				}
+				if (this._tabCC) {
+					removeClassName(this._tabCC, 'pbTabsSel');
+				}
+				if (this._tabBanklink) {
+					removeClassName(this._tabBanklink, 'pbTabsSel');
+				}
+				break;
+			case 'cc':
+				addClassName(this._tabCC, 'pbTabsSel');
+				if (this._tabSMS) {
+					removeClassName(this._tabSMS, 'pbTabsSel');
+				}
+				if (this._tabCredit) {
+					removeClassName(this._tabCredit, 'pbTabsSel');
+				}
+				if (this._tabBanklink) {
+					removeClassName(this._tabBanklink, 'pbTabsSel');
+				}
+				break;
+			case 'banklink':
+				addClassName(this._tabBanklink, 'pbTabsSel');
+				if (this._tabSMS) {
+					removeClassName(this._tabSMS, 'pbTabsSel');
+				}
+				if (this._tabCredit) {
+					removeClassName(this._tabCredit, 'pbTabsSel');
+				}
+				if (this._tabCC) {
+					removeClassName(this._tabCC, 'pbTabsSel');
+				}
+				break;
+			case 'sms':
+				if ( this._tabSMS ) {
+					addClassName(this._tabSMS, 'pbTabsSel');
+					removeClassName(this._tabCredit, 'pbTabsSel');
+					if (this._tabCC) {
+						removeClassName(this._tabCC, 'pbTabsSel');
+					}
+					if (this._tabBanklink) {
+						removeClassName(this._tabBanklink, 'pbTabsSel');
+					}
+				}
+				break;
+		}
+	},
+
+	show: function (type) {
+		this.type = type;
+		clearNode(this.content);
+		if (this.ccDropDown) {
+			this.ccDropDown.style.display = 'none';
+		}
+		if( this._saveCardBanner ) {
+			removeClassName(this._saveCardBanner, 'cc');
+		}
+		switch (type) {
+			case 'credit':
+				if (this.creditPayment_node) {
+					this.creditPayment_node.append(this.content);
+				} else {
+					this.creditPayment();
+				}
+				this._creditPayment_onShow();
+				break;
+			case 'cc':
+				if( this._saveCardBanner ) {
+					addClassName(this._saveCardBanner, 'cc');
+				}
+				if (this.ccPayment_node) {
+					this.ccPayment_node.append(this.content);
+				} else {
+					this.ccPayment();
+				}
+				if(this.purchaseWithCard) {
+					this.purchaseWithCard.onShow();
+				}
+				break;
+			case 'banklink':
+				if (this.banklinkPayment_node) {
+					this.banklinkPayment_node.append(this.content);
+				} else {
+					this.banklinkPayment();
+				}
+				if(this.purchaseWithBanklink) {
+					this.purchaseWithBanklink.onShow();
+				}
+				break;
+			case 'sms':
+				if (this.ccDropDown) {
+					this.ccDropDown.style.display = '';
+				}
+				if (this.smsPayment_node) {
+					this.smsPayment_node.append(this.content);
+					break;
+				}
+				this.smsPayment();
+				break;
+		}
+		this._tab(type);
+		this.setTitle();
+	},
+
+	setTitle:function(){
+		if( !this.par.apiTrId ){
+			return;
+		}
+		switch( this.type ){
+			case 'credit':
+				this._hNode.innerHTML = this.creditOption.caption.split(' - ')[0];
+				this._descrNode.innerHTML = this.par.short_credit;
+				break;
+			case 'sms':
+				this._hNode.innerHTML = this.smsOption.caption.split(' - ')[0];
+				this._descrNode.innerHTML = this.par.short;
+				break;
+		}
+	},
+
+	_selectedCreditOption: null,
+
+	setSelectedCreditOption: function(creditOption) {
+		this._selectedCreditOption = creditOption;
+		if( creditOption ) {
+			this.par.count = creditOption.number;
+		}
+	},
+
+	// +++ credit +++
+	setCreditCount: function(c){
+		this.credits = c;
+		if( !this.creditCount ){
+			return;
+		}
+		if( D.LV ){
+			if(c){
+				this.creditCount.innerHTML = D.services.l.get('you_have_wallet_balance') + ' <span>&euro;</span> <b>' + parseFloat( c / 100 ).toFixed(2) + '</b>';
+			} else {
+				this.creditCount.innerHTML = D.services.l.get('you_have_empty_wallet');
+			}
+			return;
+		}
+		this.creditCount.innerHTML = D.services.l.get('You have') + ' <b>' + String(c) + '</b> ' + D.services.l.nget(c, 'credit');
+	},
+
+	loterijaNode: function(type){
+		return mkE({
+			tag: 'a',
+			className: 'dr_lottery_banner_pb',
+			href: '/stats/click.php?key=loterija_from_pb&url=' + encodeURIComponent('/d/loterija/?f=' + type + '_banner'),
+			attr: {
+				target: '_blank'
+			},
+			els: [
+				{
+					tag: 'h2',
+					text: 'Draugiem.lv loterija'
+				},
+				{
+					tag: 'ul',
+					els: [
+						{
+							tag: 'li',
+							els: [
+								{
+									tag: 'span',
+									text: 'Pērc ar maciņu, karti vai internetbanku'
+								}
+							]
+						},
+						{
+							tag: 'li',
+							els: [
+								{
+									tag: 'span',
+									text: 'Katrs pirkums - 1 biļete loterijas kastē'
+								}
+							]
+						},
+						{
+							tag: 'li',
+							els: [
+								{
+									tag: 'span',
+									els: [
+										'Laimē ',
+										{
+											tag: 'strong',
+											text: '100€'
+										},
+										' naudas balvu'
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		});
+	},
+
+	// @todo refactor to own class
+	creditPayment: function(){
+		var form;
+		this.creditPayment_table = mkE({
+			tag: 'div',
+			className: 'pbCredits',
+			els: [
+				{
+					tag: 'div',
+					className: 'service-title',
+					text: this.par.caption
+				},
+				{
+					tag: 'div',
+					className: 'options-container',
+					els: [
+						form = mkE({
+							tag: 'form'
+						})
+					]
+				},
+				this.creditCount = mkE({
+					tag: 'div',
+					className: 'pbUserCredits'
+				}),
+				this.creditPaymet_submitButton = T.submitButton({
+					//caption:D.services.l.get('create_order'),
+					type: 'html',
+					color: 'buy',
+					onclick:D.closure( this, this._creditPayment_onClickBuy ), // onclick
+					els: [
+						this._creditOptionsBuyButtonCaption = mkE({
+							tag: 'span',
+							// TODO notulkot - izravēt
+							text: D.services.l.get('create_order'),
+							className: 'pbButtonCaption'
+						}),
+						this._creditOptionsBuyButtonPrice = mkE({
+							tag: 'span',
+							className: 'pbButtonPrice'
+						})
+					],
+					stretch: true
+				}) // submitButton
+			]
+		});
+
+		// this.creditPayment_table.style.marginLeft = '120px';
+		// this.creditPayment_table.style.marginRight = '120px';
+		if(!this.par.addAuto && this.par.auto && D.LV) {
+			this.creditPayment_autoSubmitButton = T.submitButton({
+				type: 'html',
+				color: 'buy',
+				title: D.services.l.get('Maksāt un un pieteikties automātiskajam maksājumam'),
+				onclick: D.closure(this, this._creditPayment_onClickBuyAuto), // onclick
+				els: [
+					{
+						tag: 'span',
+						text: D.services.l.get('buy_and_subscribe'),
+						className: 'pbButtonCaption'
+					},
+					this._creditOptionsBuyAutoButtonPrice = mkE({
+						tag: 'span',
+						className: 'pbButtonPrice'
+					})
+				],
+				stretch: true
+			}).append(this.creditPayment_table);
+		}
+
+		this.setCreditCount(this.credits);
+		this.creditDelayInfo = T.info(D.services.l.get('Buy credits delay info'));
+		this.creditDelayInfo.style.display = 'none';
+		this.creditPayment_node = mkE({
+			tag: 'div',
+			els: [
+				this.creditDelayInfo,
+				this.creditPayment_table
+			]
+		}).appendTo(this.content);
+		if( this.lottery && !this.donationBox ){
+			D.insertBefore(this.loterijaNode('wallet'), this.creditDelayInfo);
+		}
+		if( count( this.par.co ) == 1 ){
+			var r = reset( this.par.co );
+			this._creditPayment_setSelectedCreditOption(r);
+			mkE({
+				tag: 'div',
+				prop: {
+					innerHTML: r.caption
+				}
+			}).append(form);
+		} else {
+			this.options = {};
+			var first = true;
+			for( var k in this.par.co ){
+				var r = this.par.co[ k ];
+				var input = T.Forms.radio({
+					caption: r.caption,
+					name: 'services[count]',
+					value: r.number,
+					onclick:D.closure( this, this._creditPayment_setSelectedCreditOption, r )
+				}).append(form);
+				if (this.par.count) {
+					if (this.par.count == r.number) {
+						input.checked = true;
+						input.defaultChecked = true;
+						input.onclick();
+					}
+				} else if (first) {
+					input.checked = true;
+					input.defaultChecked = true;
+					input.onclick();
+				}
+				first = false;
+				this.options[r.number] = input;
+			}
+		}
+		var $this = this;
+		if (this.specType == D.services.TYPE_DISCOUNT) {
+
+			var onBuyCb = function(){
+				$this.payTr();
+//				buy.remove();
+//				window.location = "/visitors";
+			};
+			var onCloseCb = function () {
+				//$this.creditDelayInfo.style.display = '';
+				//$this.creditPayment_table.style.display = '';
+				//buy.remove();
+			};
+			var p = new D.services.PurchaseCredits__par;
+			p.dayCount = this.dayCount;
+			p.count = this.creditOption.price;
+			p.onBuy = onBuyCb;
+			p.onClose = onCloseCb;
+			p.cardAmount = this.cardAmount;
+			p.specType = this.specType;
+			p.credits = this.credits;
+			p.service = new D.services.PurchaseCredits__service({
+				caption: this.par.caption,
+				name: this.name,
+				options: this.par.co,
+				creditOption: this.creditOption
+			});
+			this.rpc.send(
+				'createTransaction',
+				{
+					name:this.name,
+					count: this.name == "visitors" ? this.dayCount : this.creditOption.number,
+					customId:this.par.customId,
+					uid:this.par.uid
+				},
+				function(re) {
+					D.removeLoadingOverlay(this.content);
+					if( re.errorNr ){
+						alert('Create Bank Transaction error #' + re.errorNr);
+						return;
+					}
+					if( !re.trid ){
+						return;
+					}
+					this.trid = re.trid;
+					p.drTrans = re.trid;
+					var buy = new D.services.PurchaseCredits(p);
+					this.creditPayment_table.style.display = 'none';
+					D.insertAfter( buy.node, this.creditPayment_table );
+				},
+				this
+			);
+
+			/*var buy = new D.services.PurchaseCredits(p);
+			this.creditPayment_table.style.display = 'none';
+			D.insertAfter( buy.node, this.creditPayment_table );*/
+		}
+	},
+
+	_creditPayment_onShow: function () {
+		if( this._selectedCreditOption && this.options ) {
+			var input = this.options[this._selectedCreditOption.number];
+			if( input ) {
+				input.checked = true;
+				input.onclick();
+			}
+		}
+		if( this.recommendations ) {
+			D.insertBefore(this.recommendations.node, this.creditCount);
+			this.recommendations.onChange = D.closure(this, this._creditPayment_setBuyButtonPrice);
+			this._creditPayment_setBuyButtonPrice();
+		}
+	},
+
+	_creditPayment_setSelectedCreditOption: function(r) {
+		this.creditOption = r;
+		if( this.recommendations && r ) {
+			this.recommendations.defaultOption = r.number;
+		}
+		this._creditPayment_setBuyButtonPrice();
+		this.setSelectedCreditOption(r);
+	},
+
+	_creditPayment_setBuyButtonPrice: function() {
+		this.setTitle();
+		var text = '';
+		var autoText = '';
+
+		var price = this.creditOption.price;
+
+		var hideDays = false;
+		if( this.recommendations && this.recommendations.hasOrder() ) {
+			price += this.recommendations.getPrice();
+			hideDays = true;
+		}
+
+		if( D.LV ){
+			text = '&euro; ' + ( price / 100 ).toFixed(2);
+			autoText = text;
+		} else {
+			text = String( price ) + ' ' + D.services.l.nget( price, 'credit');
+			autoText = String( price ) + ' ' + D.services.l.nget(price, 'credit').substr(0, 1) + '.';
+		}
+		if( !hideDays ) {
+			autoText += ' / ' + this.creditOption.number + ' ' + '' + (D.LANG === 'ru' ? 'д.' : 'd.');
+		}
+
+		this.setCreditCount(this.credits);
+		if( price > this.credits ){
+			removeClassName(this.creditPaymet_submitButton, 'buttonBuy');
+			addClassName(this.creditCount, 'notEnough');
+			this._creditOptionsBuyButtonPrice.innerHTML = D.services.l.get('Papildināt maciņu un pirkt');
+			this._creditOptionsBuyButtonCaption.style.display = 'none';
+			removeClassName(this._creditOptionsBuyButtonPrice, 'pbButtonPrice');
+			if( this.credits ){
+				this.creditCount.innerHTML += '<b> / ' + D.services.l.get('Nepietiek līdzekļu') + '</b>';
+			}
+			this.creditPayment_autoSubmitButton?(this.creditPayment_autoSubmitButton.style.display = 'none'):'';
+		}else{
+			addClassName(this.creditPaymet_submitButton, 'buttonBuy');
+			this._creditOptionsBuyButtonPrice.innerHTML = text;
+			this._creditOptionsBuyButtonCaption.style.display = '';
+			if( this._creditOptionsBuyAutoButtonPrice ){
+				this._creditOptionsBuyAutoButtonPrice.innerHTML = autoText;
+			}
+			addClassName(this._creditOptionsBuyButtonPrice, 'pbButtonPrice');
+			removeClassName(this.creditCount, 'notEnough');
+			this.creditPayment_autoSubmitButton?(this.creditPayment_autoSubmitButton.style.display = ''):'';
+		}
+	},
+
+	_creditPayment_onClickBuy: function(){
+		if( this.trid ){
+			this.payTr();
+			return;
+		}
+		if( this.par.apiTrId ){
+			this.payApiTr();
+			return;
+		}
+		D.loadingOverlay(this.content);
+		var data = {
+			name:this.name,
+			count:this.creditOption.number,
+			customId:this.par.customId,
+			uid:this.par.uid
+		};
+		if( this.recommendations && this.recommendations.hasOrder() ) {
+			data = {
+				name: 'batch',
+				count: 1,
+				customId: null,
+				uid: this.par.uid,
+				batch: {
+					services: [{
+						name:this.name,
+						count:this.creditOption.number,
+					}].concat(this.recommendations.getOrderServices())
+				}
+			};
+		}
+		this.rpc.send(
+			'createTransaction',
+			data,
+			function(re) {
+				D.removeLoadingOverlay(this.content);
+				if( re.errorNr ){
+					alert('Create Bank Transaction error #' + re.errorNr);
+					return;
+				}
+				if( !re.trid ){
+					return;
+				}
+				this.trid = re.trid;
+				this.payTr();
+			},
+			this
+		);
+	},
+
+	_creditPayment_onClickBuyAuto: function () {
+		if (this.trid) {
+			this.payTr();
+			return;
+		}
+		if (this.par.apiTrId) {
+			this.payApiTr();
+			return;
+		}
+		D.loadingOverlay(this.content);
+		this.auto_isset = true;
+		var data = {
+			name: this.name,
+			count: this.creditOption.number,
+			customId: this.par.customId,
+			uid: this.par.uid,
+			set_auto: true
+		};
+		if( this.recommendations && this.recommendations.hasOrder() ) {
+			data = {
+				name: 'batch',
+				count: 1,
+				customId: null,
+				uid: this.par.uid,
+				set_auto: false,
+				batch: {
+					set_auto: true,
+					services: [{
+						name:this.name,
+						count:this.creditOption.number,
+					}].concat(this.recommendations.getOrderServices())
+				}
+			};
+		}
+		this.rpc.send(
+			'createTransaction',
+			data,
+			function (re) {
+				D.removeLoadingOverlay(this.content);
+				if (re.errorNr) {
+					alert('Create Bank Transaction error #' + re.errorNr);
+					return;
+				}
+				if (!re.trid) {
+					return;
+				}
+				this.trid = re.trid;
+				this.payTr();
+			},
+			this
+		);
+	},
+
+	payTr:function(){
+		D.loadingOverlay(this.content);
+		this.rpc.send(
+			'payTr',
+			{
+				page_id:this.par.uid,
+				trid:this.trid
+			},
+			this._payTr,
+			this
+		);
+	},
+
+	_payTr:function(re){
+		var $pb = this;
+		if(!re) {
+			InfoBox.close();
+		}
+		D.removeLoadingOverlay(this.content);
+		this.credits = re.credits;
+		if( re.ok ){
+			this.setCreditCount(re.credits);
+			this.canAddAuto = true;
+			if( re.api_lottery ){
+				this.apiLottery = re.api_lottery;
+			}
+			this.paymentOk();
+			return;
+		}
+		var bid = ( this.par.pagePayment && this.par.uid ? this.par.uid : 0 );
+		var buy;
+		var onBuyCb = function(){
+			$pb.payTr();
+			buy.remove();
+			$pb.setCreditCount( $pb.credits );
+		};
+		var onCloseCb = function (noDelay, option) {
+			noDelay = noDelay || false;
+			if( !noDelay ){
+				$pb.creditDelayInfo.style.display = '';
+			}
+			if( option && $pb.options && $pb.options[option.number] ){
+				$pb.options[option.number].checked = true;
+				$pb.options[option.number].onclick();
+			}
+			$pb.creditPayment_table.style.display = '';
+			buy.remove();
+		};
+		if ( bid ) {
+			buy = new D.services.BuyCredits( {
+				count: this.creditOption.price - this.credits,
+				bid:( this.par.pagePayment && this.par.uid ? this.par.uid : 0 ),
+				hideSteps:( this.par.pagePayment && this.par.uid ),
+				onBuy: onBuyCb,
+				onClose: onCloseCb,
+				donationBox: this.donationBox,
+                isLiktendarzs: this.isLiktendarzs
+			} );
+		} else {
+			var p = new D.services.PurchaseCredits__par;
+			p.count = this.creditOption.price - this.credits;
+			p.totalCount = this.creditOption.price;
+			p.onBuy = onBuyCb;
+			p.onClose = onCloseCb;
+			p.credits = this.credits;
+			if( this.recommendations && this.recommendations.hasOrder() ) {
+				p.price = this.creditOption.price + this.recommendations.getPrice();
+				p.service = new D.services.PurchaseCredits__service({
+					caption: [this.par.caption].concat(this.recommendations.getCaption()).join(', '),
+					name: 'batch',
+					options: [{
+						captionShort: 'Paka',
+						price: p.price
+					}]
+				});
+			} else {
+				p.service = new D.services.PurchaseCredits__service({
+					caption: this.par.caption,
+					name: this.name,
+					options: this.par.co,
+					creditOption: this.creditOption
+				});
+			}
+			p.services = this;
+			p.drTrans = this.trid;
+			buy = new D.services.PurchaseCredits(p);
+		}
+		this.creditPayment_table.style.display = 'none';
+		D.insertAfter( buy.node, this.creditPayment_table );
+	},
+
+	payApiTr:function(){
+		D.loadingOverlay(this.content);
+		this.rpc.send(
+			'payApiTr',
+			{
+				trid:this.par.apiTrId
+			},
+			this._payApiTr,
+			this
+		);
+	},
+
+	_payApiTr:function(re){
+		var $pb = this;
+		D.removeLoadingOverlay(this.content);
+		if( this.credits ){
+			this.setCreditCount(re.credits);
+		}
+		if( re.ok ){
+			if( re.canAddAuto ){
+				this.canAddAuto = true;
+			}
+			if( re.api_lottery ){
+				this.apiLottery = re.api_lottery;
+			}
+			this.paymentOk();
+			return;
+		}
+		var buy;
+		var onBuyCb = function(){
+			$pb.payApiTr();
+			buy.remove();
+			$pb.setCreditCount($pb.credits);
+		};
+		var onCloseCb = function(){
+			$pb.creditDelayInfo.style.display = '';
+			$pb.creditPayment_table.style.display = '';
+			buy.remove();
+		};
+		var p = new D.services.PurchaseCredits__par;
+		p.count = $pb.creditOption.price;
+		p.services = this;
+		p.onBuy = onBuyCb;
+		p.onClose = onCloseCb;
+		buy = new D.services.PurchaseCredits(p);
+
+		$pb.creditPayment_table.style.display = 'none';
+		D.insertAfter(buy.node, this.creditPayment_table);
+	},
+	// --- credit ---
+
+	// +++ card +++
+	ccPayment: function(){
+		var p = new D.services.PurchaseWithCard__par;
+		p.service = new D.services.PurchaseCredits__service({
+			caption: this.par.caption,
+			name: this.name,
+			options: this.par.co
+		});
+		p.apiTrId = this.par.apiTrId || 0;
+		p.services = this;
+		p.onClose = D.closure( this, function(){
+			this.purchaseWithCard.remove();
+			this.cardDelayInfo.style.display = '';
+		} );
+		p.onBuy = D.closure( this, function(tid, saveCard, apiLottery){
+			this.purchaseWithCard.remove();
+			this.canAddAuto = saveCard === true;
+			if (!this.transactionId && tid && this.donationBox) {
+				this.transactionId = tid;
+			}
+			this.apiLottery = apiLottery;
+			this.paymentOk();
+		} );
+		p.addAuto = this.par.addAuto;
+		p.auto = this.par.auto;
+
+		this.purchaseWithCard = new D.services.PurchaseWithCard(p);
+
+		this.cardDelayInfo = T.info(D.services.l.get('card_delay_info'));
+		this.cardDelayInfo.style.display = 'none';
+
+		this.ccPayment_node = mkE({
+			tag: 'div',
+			els: [
+				this.cardDelayInfo,
+				this.purchaseWithCard
+			]
+		}).appendTo(this.content);
+		if( this.lottery && !this.donationBox ){
+			D.insertBefore(this.loterijaNode('wallet'), this.cardDelayInfo);
+		}
+	},
+	// --- card ---
+
+	// +++ banklink +++
+	banklinkPayment: function(){
+		var p = new D.services.PurchaseWithBanklink__par;
+		p.service = new D.services.PurchaseCredits__service({
+			caption: this.par.caption,
+			name: this.name,
+			options: this.par.co
+		});
+		p.apiTrId = this.par.apiTrId || 0;
+		p.services = this;
+		p.onClose = D.closure( this, function(){
+			this.purchaseWithBanklink.remove();
+			this.banklinkDelayInfo.style.display = '';
+		} );
+		p.onBuy = D.closure( this, function(apiLottery){
+			this.purchaseWithBanklink.remove();
+			this.canAddAuto = false;
+			this.apiLottery = apiLottery;
+			this.paymentOk();
+		} );
+
+		this.purchaseWithBanklink = new D.services.PurchaseWithBanklink(p);
+
+		this.banklinkDelayInfo = T.info(D.services.l.get('card_delay_info'));
+		this.banklinkDelayInfo.style.display = 'none';
+
+		this.banklinkPayment_node = mkE({
+			tag: 'div',
+			els: [
+				this.banklinkDelayInfo,
+				this.purchaseWithBanklink
+			]
+		}).appendTo(this.content);
+		if( this.lottery && !this.donationBox ){
+			D.insertBefore(this.loterijaNode('wallet'), this.banklinkDelayInfo);
+		}
+	},
+	// --- banklink ---
+
+	// +++ sms +++
+	smsPayment:function(){
+		var donationSpecifics = false;
+		if(this.donationBox) {
+			// Save checkboxes before transaction for those wholl send the code
+			donationSpecifics = mkE({
+				tag: 'div',
+				style: {'margin':'0 0 20px 140px'},
+				els: [
+					this._donateAutoCheck = new T.Form.CheckBox({
+						//@todo lang
+						caption: D.services.l.get('Veikt automātiskos ziedojumu'),
+						checked: false,
+						visible: true,
+						onclick: D.closure(this, this.smsSetDonationAuto),
+						help: [{
+							//@todo rules?
+							tag: 'a',
+							text: 'Noteikumi',
+							prop: {
+								onclick: function () {
+									if (InfoBox.opened) {
+										var modal = new D.Modal({
+											width: 500,
+											title: 'Noteikumi'
+										});
+										modal.open('/services/save_card_help.php');
+										return
+									}
+									InfoBox.open( '/services/save_card_help.php', { width: 500, title: 'Noteikumi' });
+								}
+							}
+						}]
+					}),
+					this._donateAnonymCheck = new T.Form.CheckBox({
+						caption: D.services.l.get('Donate anonymously'),
+						checked: false,
+						visible: true,
+						onclick: D.closure(this, this.smsSetDonationAnonimity)
+					})
+				]
+			});
+		}
+		this.smsPayment_node = mkE({
+			tag: 'div',
+			className: 'pbSMS',
+			els: [
+				{
+					tag: 'div',
+					className: 'service-title',
+					text: this.par.caption
+				},
+				{
+					tag: 'div',
+					className: 'options-container',
+					els: [
+						this.smsPayment_form = mkE({
+							tag: 'form'
+						})
+					]
+				},
+				donationSpecifics,
+				this.smsStep2 = mkE({
+					tag: 'div'
+				})
+			]
+		}).appendTo(this.content);
+		if( this.par.biteMaintenance ){
+			var biteInfo = T.info('Uzmanību!', ' Sakarā ar plānotiem BITE operatora remontdarbiem, 4. decembrī laika posmā no 00:00 līdz 7:00 BITE klientiem nebūs iespējams norēķināties par pakalpojumiem ar SMS.');
+			D.insertBefore(biteInfo, this.smsPayment_form);
+		}
+		if( this.par.smsDownText ){
+			clearNode( this.smsPayment_node );
+			T.error( this.par.smsDownText ).append(this.smsPayment_node);
+		}
+		if( D.LV && this.name == 'visitors_year_2018' ){
+			D.insertBefore(mkE({
+				tag: 'p',
+				style: {
+					fontSize: '14px',
+					textAlign: 'center',
+					padding: '10px'
+				},
+				els: [
+					{
+						tag: 'b',
+						text: 'Uzmanību:'
+					},
+					{
+						tag: 'br'
+					},
+					'Apmaksājot pakalpojumu ar SMS, atlaide nav spēkā!'
+				]
+			}), this.smsPayment_form);
+		}
+		this.smsPaymentDrawOptions();
+	},
+
+	smsSetDonationAnonimity: function() {
+		if(this._donateAnonymCheck) {
+			this._donateAnonymCheck.disable(true);
+			this.rpc.send(
+				'smsSetDonationAnonimity',
+				{
+					anon: this._donateAnonymCheck.value(),
+					tid: this.transactionId
+				},
+				function(re) {
+					this._donateAnonymCheck.disable(false);
+					if(!re) {
+						//@todo lang
+						alert("Neizdevās uzlikt anonimitāti");
+					}
+				},
+				this
+			)
+		}
+	},
+
+	smsSetDonationAuto: function() {
+		if(this._donateAutoCheck) {
+			this._donateAutoCheck.disable(true);
+			this.rpc.send(
+				'smsSetDonationAuto',
+				{
+					auto: this._donateAutoCheck.value(),
+					tid: this.transactionId
+				},
+				function(re) {
+					this._donateAutoCheck.disable(false);
+					if(!re) {
+						//@todo lang
+						alert("Neizdevās uzlikt automātiskos maksājumus");
+					}
+				},
+				this
+			)
+		}
+	},
+
+	smsPaymentDrawOptions:function(){
+		this.smsOptions = {};
+		clearNode(this.smsPayment_form);
+		if( this._saveMoneyNode ){
+			this._saveMoneyNode.remove();
+		}
+		var saveMoney = false;
+		if( count(this.par.so) == 1 ){
+			var r = reset(this.par.so);
+			var optCaption = r.caption;
+			if (this.donationBox) {
+				optCaption = '<b>' + D.services.l.get('donation') + ' - &euro;' + (r.price / 100).toFixed(2) + '</b>';
+			}
+			mkE({
+				tag: 'div',
+				prop: {
+					innerHTML: optCaption
+				}
+			}).append( this.smsPayment_form );
+			if( r.walletPrice ){
+				mkE({
+					tag: 'span',
+					className: 'help',
+					els: [
+						{
+							tag: 'a',
+							onclick: D.closure(this, function(){
+								this.show('cc');
+								D.services.rpc.send('addStats', {
+									key: 'sms_click_1'
+								});
+								return false;
+							}),
+							els: [
+								{
+									tag: 'strong',
+									els: [
+										D.services.l.get('paying_with_card') + ' ',
+										{
+											tag: 'span',
+											text: r.captionWalletPrice,
+											style: {
+												color: '#ff6600'
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}).append( this.smsPayment_form );
+			}
+			this.smsOption = r;
+			this.smsPaymentChange();
+		} else {
+			var first = true;
+			var r;
+			for( var k in this.par.so ){
+				r = this.par.so[ k ];
+				var help = '';
+				if( r.walletPrice ){
+					help = mkE({
+						tag: 'a',
+						style: {
+							marginLeft: '24px'
+						},
+						onclick: D.closure(this, function(){
+							this.show('cc');
+							D.services.rpc.send('addStats', {
+								key: 'sms_click_1'
+							});
+							return false;
+						}),
+						els: [
+							{
+								tag: 'strong',
+								els: [
+									D.services.l.get('paying_with_card') + ' ',
+									{
+										tag: 'span',
+										text: r.captionWalletPrice,
+										style: {
+											color: '#ff6600'
+										}
+									}
+								]
+							}
+						]
+					});
+				}
+				var input = T.Forms.radio({
+					caption: r.caption,
+					name: 'services[count]',
+					value: r.number,
+					checked: first,
+					help: help,
+					onclick:D.closure( this, function (r){
+						this.smsOption = r;
+						this.smsPaymentChange();
+					}, r )
+				}).append( this.smsPayment_form );
+				if (this.par.count) {
+					if (this.par.count == r.number) {
+						input.checked = true;
+						input.defaultChecked = true;
+						input.onclick();
+					}
+				} else if (first) {
+					input.checked = true;
+					input.defaultChecked = true;
+					input.onclick();
+				}
+				first = false;
+				this.smsOptions[r.number] = input;
+			}
+		}
+	},
+
+	smsPaymentChange: function(){
+		this.setTitle();
+		D.loadingOverlay(this.content);
+		this.rpc.send(
+			'smsPaymentOption',
+			{
+				apiTrId: this.par.apiTrId || false,
+				name: this.name,
+				count: this.smsOption.number,
+				cc: this.smsOption.cc,
+				customId: this.par.customId,
+				uid: this.par.uid
+			},
+			this._smsPaymentChange,
+			this
+		)
+	},
+
+	_smsPaymentChange:function(re){
+		var $pb = this;
+		D.removeLoadingOverlay( this.content );
+		clearNode( this.smsStep2 );
+		var vai = false;
+		if( re.item.canAddAuto ){
+			this.canAddAuto = true;
+		}
+		if (this.name == 'labodarbubiedriba') {
+			this.transactionId = re.item.num;
+		}
+		if( !this.disablePhoneReg && re.item.keyword != 'LDA' && re.poga && !re.poga.phone && ( D.LV || D.RU ) && typeof(re.poga.disabled) == "undefined" ){
+			this.phoneReg = mkE({
+				tag: 'div',
+				className: 'phone-reg-form',
+				els: [
+					mkE({
+						tag: 'b',
+						text: D.services.l.get('Reg your phone')
+					}),
+					mkE({
+						tag: 'p',
+						text: D.services.l.get('Reg your phone info')
+					}),
+					new D.services.SmsPhoneReg({
+						onReg: function (par) {
+							if (par.poga) {
+								T.success(D.services.l.get('Reg your phone ok')).replace($pb.phoneReg);
+								setTimeout(function () {
+									$pb.smsPaymentChange();
+								}, 2000);
+								return;
+							}
+							T.info(D.services.l.get('Reg your phone ok without button')).replace($pb.phoneReg);
+						}
+					})
+				]
+			}).append( this.smsStep2 );
+			vai = true;
+		} else if (re.item.keyword != 'LDA' && re.poga && re.poga.available) {
+			new D.services.SmsButton( {
+				phone: re.poga.phone,
+				price: re.poga.price,
+				keyword: re.item.keyword,
+				num: re.item.num,
+				nonce: $pb.nonce,
+				number: this.smsOption.number,
+				donation: this.name == 'labodarbubiedriba',
+				can_set_auto: !this.par.addAuto && this.par.auto && D.LV,
+				onBuy: function (par) {
+					$pb.canAddAuto = true;
+					$pb.auto_isset = par.auto_isset;
+					$pb.paymentOk();
+				},
+				onFail: function (par) {
+					$pb.paymentFail(par);
+				}
+			} ).append( this.smsStep2 );
+			vai = true;
+		}
+		if(vai){
+			T.hrText(D.services.l.get('or send sms')).append(this.smsStep2);
+		}
+		var phone = re.item.phone;
+		phone = '<span style="font-weight: bold;">'+ phone +'</span>';
+		var text = D.services.l.get('Code CODE send to PHONE').replace( 'CODE', re.item.keyword + ' ' + re.item.num ).replace( 'PHONE', phone );
+		if ( re.item.opers ) {
+			text += ' (' + re.item.opers + ')';
+		}
+		if ( re.item.phone2 ) {
+			text += ', <b>'+ re.item.phone2 +'</b> (' + re.item.opers2 + ')';
+		}
+		mkE({
+			tag: 'center',
+			els: [
+				mkE({
+					tag: 'div',
+					prop: {
+						innerHTML: text
+					}
+				}),
+				mkE({
+					tag: 'a',
+					text: D.services.l.get('Recive reply sms'),
+					href: 'javascript:',
+					prop: {
+						onclick: function () {
+							D.loadingOverlay($pb.content);
+							$pb.rpc.send(
+								'smsPaymentOk',
+								{
+									keyword: re.item.keyword,
+									num: re.item.num,
+									time: $pb.par.time
+								},
+								function (re) {
+									D.removeLoadingOverlay($pb.content);
+									if (re.charged > 0) {
+										$pb.paymentOk();
+									} else if (re.charged < 0) {
+										$pb.paymentFail(re);
+										//alert( D.services.l.get('sms payment not charged') );
+									} else {
+										alert( D.services.l.get('sms payment not recived') );
+									}
+								}
+							);
+						}
+					}
+				})
+			]
+		}).append(this.smsStep2);
+	},
+	// --- sms ---
+
+	paymentOk: function(){
+		var $pb = this;
+		this.transactionComplete = true;
+		//this.updateStatus();
+		clearNode(this.content);
+		if (this.more) {
+			this.more.remove();
+		}
+		if (this.specType == D.services.TYPE_DISCOUNT) {
+			window.location = "/visitors";
+			return;
+		}
+		if (this.donationBox) {
+			this.callback(this.transactionId + '_' + this.type);
+			return;
+		}
+
+		if(this.auto_isset) {
+			var text = 'Paldies! Pakalpojums veiksmīgi apmaksāts. Nākamreiz pakalpojums tiks apmaksāts automātiski. ';
+			text += 'Savus automātiskos maksājumus vari redzēt <a href="/services/?tab=auto">šeit</a>.';
+			T.success(text).append(this.content);
+			mkE( {
+				tag:'center',
+				els:[
+					T.submitButton({
+						caption: D.Lang.get('Continue'),
+						color: 'link',
+						onclick: function () {
+							$pb.callback();
+						}
+					})
+				]
+			} ).append(this.content);
+			return;
+		}
+
+		var cbTimeout = 2000;
+
+		if( this.apiLottery ){
+			if( this._serviceDescr && this.name != 'duraks_vip' ){
+				this._serviceDescr.remove();
+			}
+			var amountFormatted = (this.apiLottery.price / 100).toFixed(2).replace('.', ',');
+			if( this.apiLottery.won ){
+				cbTimeout = 10000;
+				mkE({
+					tag: 'div',
+					className: 'ApiLottery won',
+					els: [
+						'Urā - Tu esi ' + this.apiLottery.lucky + '. maksātājs.',
+						{
+							tag: 'br'
+						},
+						'Mēs Tavā maciņā ieskaitījām € ' + amountFormatted + '!',
+						{
+							tag: 'img',
+							src: '/services/img/lottery/kreditu_kampana_emoji.png'
+						}
+					]
+				}).append(this.content);
+			}else{
+				cbTimeout = 15000;
+				mkE({
+					tag: 'div',
+					className: 'ApiLottery lost',
+					els: [
+						{
+							tag: 'strong',
+							text: 'Maksājums ir veiksmīgs.'
+						},
+						{
+							tag: 'br'
+						},
+						{
+							tag: 'strong',
+							text: 'AKCIJA'
+						},
+						{
+							tag: 'strong',
+							text: ': '
+						},
+						'Diemžēl Tu neesi ' + this.apiLottery.lucky + '. maksātājs, tāpēc šoreiz mēs Tavā maciņā nevaram atgriezt € ' + amountFormatted + '. Mēģini vēl - varbūt nākamreiz viss izdosies!'
+					]
+				}).append(this.content);
+			}
+
+			mkE({
+				tag: 'div',
+				className: 'ApiLotteryRules',
+				els: [
+					{
+						tag: 'h3',
+						text: 'Akcijas noteikumi'
+					},
+					{
+						tag: 'ul',
+						className: 'simpleList',
+						els: [
+							{
+								tag: 'li',
+								els: [
+									'Lai piedalītos akcijā, Tev tikai jāveic pirkums jebkurā spēļu sadaļā atrodamajā spēlē.',
+									{
+										tag: 'span',
+										text: '*',
+										style: {
+											color: 'red'
+										}
+									}
+								]
+							},
+							{
+								tag: 'li',
+								els: [
+									'Akcijā nepiedalās maksājumi, kas veikti ar ',
+									{
+										tag: 'strong',
+										text: 'SMS'
+									},
+									'.'
+								]
+							},
+							{
+								tag: 'li',
+								els: [
+									{
+										tag: 'strong',
+										text: 'Katrs 10. maksājums'
+									},
+									', kas veikts spēļu sadaļā, iegūst dāvanu no draugiem.lv - atgriezīsim maciņā tikpat lielu summu, cik iztērēts, veicot laimīgo maksājumu.'
+								]
+							},
+							{
+								tag: 'li',
+								text: 'Jāievēro godīgas spēles nosacījumi - maksājumu shēmas nav atļautas.'
+							},
+							{
+								tag: 'li',
+								els: [
+									'Akcijas norises laiks: ',
+									{
+										tag: 'strong',
+										text: 'no 7. līdz 11. februārim'
+									},
+									'.'
+								]
+							}
+						]
+					},
+					{
+						tag: 'br'
+					},
+					{
+						tag: 'p',
+						els: [
+							{
+								tag: 'span',
+								text: '*',
+								style: {
+									color: 'red'
+								}
+							},
+							' Akcija neattiecas uz spēli Kuģu kaujas un aplikāciju Pudeles griešana'
+						]
+					}
+				],
+				style: {
+					marginTop: '10px'
+				}
+			}).append(this.content);
+
+			if( this.par.callback == 'D.reload(true)' ){
+				cbTimeout = 0;
+			}
+		}else{
+			if ( D.me ) {
+				var greetingText = D.LV ? ( D.me.sex == 2 )?
+					( D.me.age > 40 ?
+						'Vienmēr prieks Tevi te redzēt! Lai Tev veicas!':
+						'Draudzīgs portāls, vēl draudzīgāki lietotāji. Tu esi labākā!') :
+					( D.me.age > 40 ?
+						'Super! Tu vienmēr esi bijis viens no mūsu labākajiem lietotājiem!':
+						'Labs darbiņš, kas padarīts. Aiziet, laižam piedzīvojumos!' ) : '';
+				mkE({
+					tag: 'div',
+					className: 'paymentSuccess',
+					els: [
+						{tag: 'div', className: 'illustration att_' + (D.me.sex==2?2:1) + "_" + (D.me.age>40?2:1)},
+						{tag: 'p', className: 'info', text: D.services.l.get('Payment success')},
+						{tag: 'p', className: 'greeting', text: greetingText}
+					]
+				}).append(this.content);
+			} else {
+				T.success(D.services.l.get('Payment success')).append(this.content);
+			}
+		}
+		if( !this.par.addAuto && this.par.auto && this.canAddAuto ){
+			var rpcCall = 'addAuto';
+			if (this.par.apiAuto) {
+				rpcCall = 'addApiAuto';
+			}
+			if (this.par.apiAuto) {
+				var txt = 'Ērtāks risinājums - pagarināt automātiski, tiklīdz beidzas pakalpojuma termiņš.';
+			} else {
+				var txt = D.services.l.get('Do you want add auto');
+			}
+			mkE({
+				tag: 'div',
+				text: txt,
+				className: 'hintText'
+			}).append(this.content);
+			if( rpcCall == 'addApiAuto' ){
+				if (this.par.apiAuto == 'day') {
+					var per = 'diena';
+				} else if (this.par.apiAuto == 'week') {
+					var per = 'nedēļa';
+				} else {
+					var per = '30 dienas';
+				}
+				mkE({
+					tag: 'div',
+					innerHTML: 'Maksājuma periods: <b>' + per + '</b>',
+					style: {
+						marginBottom: '20px'
+					}
+				}).append(this.content);
+			}
+			mkE( {
+				tag:'center',
+				els:[
+					T.submitButton({
+						caption: D.Lang.get('Continue'),
+						color: 'link',
+						onclick: function () {
+							$pb.callback();
+						}
+					}),
+					T.submitButton( {
+						caption: D.services.l.get('Pb add auto'),
+						onclick: function(){
+							$pb.rpc.send(
+								rpcCall,
+								{
+									type:$pb.type,
+									pak:$pb.par.auto
+								},
+								function () {
+									$pb.callback();
+								}
+							);
+						}
+					} )
+				]
+			} ).append(this.content);
+		} else if( this.par.addAuto && this.par.auto && this.canAddAuto ){
+			this.rpc.send(
+				'addAuto',
+				{
+					type:this.type,
+					pak:this.par.auto
+				},
+				function(re) {
+					setTimeout( D.closure( this, this.callback ), 2000 );
+				},
+				this
+			);
+		} else {
+			if( cbTimeout ){
+				setTimeout( D.closure( this, this.callback ), cbTimeout );
+			}
+		}
+	},
+
+	paymentFail:function (par){
+		clearNode(this.content);
+		var text = D.services.l.get('Payment error');
+		if (par.extra && D.services.l.exists('king_sms_' + par.extra)) {
+			text += ': ' + D.services.l.get('king_sms_' + par.extra);
+		}
+		T.error(text).append(this.content);
+	},
+
+	getOptions:function(){
+		this.types.disabled = true;
+		this.rpc.send(
+			'buyCreditsOptions',
+			{
+				type: this.types.value,
+				id: D.Biz.id
+			},
+			this.getOptionsRe,
+			this
+		);
+	}
+};
+
+// +++ buy credit +++
+
+D.services.BuyCredits = function(par){
+	this.callback = par.callback || function () {};
+	this.onBuy = par.onBuy || function () {};
+	this.onClose = par.onClose || function () {};
+	this.onFailed = par.onFailed || function () {};
+	this.count = par.count || 0;
+	this.long = par.long || false;
+	this.donationBox = par.donationBox || false;
+	this.bid = par.bid || 0;
+	this.hideSteps = par.hideSteps || false;
+	//this.trid = par.trid || 0;
+	//this.apiTrId = par.apiTrId || 0;
+	this.minAmount = par.minAmount || 0;
+	this.countries = {};
+	this.node = mkE( {
+		tag: 'div'
+	} );
+	if( this.bid ){
+		this.rpc.send(
+			'getPages',
+			{
+				bid:this.bid,
+				count:this.count
+			},
+			D.closure( this, this._getPagesRe, par )
+		);
+	} else {
+		this._init(par);
+	}
+};
+
+D.services.BuyCredits.prototype = {
+
+	rpc: D.services.rpc,
+
+	_getPagesRe:function( par, re ){
+		if(re){
+			this.user = re.user;
+			this.pages = re.pages;
+			this.countries = re.countries;
+		}
+		this._init(par);
+		if( this.user.payer == 'private' ){
+			this._userTypeSelectReset();
+			this._userType.privateRadio.value(true);
+			this._userType.privateRadio.onchange();
+		}
+	},
+
+	_init:function(par){
+		var $buyCredits = this;
+		var els =	[
+			this._errorNode = T.error( D.services.l.get('Card payment failed') ),
+			this._userTypeSelect(),
+			this._pageTransfer(),
+			this._optionsTableNode = mkE({
+				tag: 'table',
+				className: 'pbTable formTable',
+				els: [
+					mkE({
+						tag: 'tbody',
+						els: [
+							mkE({
+								tag: 'tr',
+								els: [
+									mkE({
+										tag: 'td',
+										className: 'pbCol1',
+										style: {
+											display: this.hideSteps ? 'none' : ''
+										},
+										els: [
+											T.step(1)
+										]
+									}),
+									mkE({
+										tag: 'td',
+										prop: {
+											colSpan: 2
+										},
+										els: [
+											this.types = T.Forms.select({
+												caption:( D.LV ? D.Lang.get('fill_wallet_with', 'xGlobal') : D.services.l.get('Buy credits with') ) + ':',
+												onchange: function () {
+													$buyCredits.getOptions();
+												}
+											})
+										]
+									}) // td
+								]
+							}), // tr
+							mkE({
+								tag: 'tr',
+								els: [
+									mkE({
+										tag: 'td',
+										className: 'pbCol1',
+										style: {
+											display: this.hideSteps ? 'none' : ''
+										},
+										els: [
+											T.step(2)
+										]
+									}),
+									mkE({
+										tag: 'td',
+										els: [
+											this.counts = T.Forms.select({
+												caption:( D.LV ? D.Lang.get('fill_wallet_count', 'xGlobal') : D.services.l.get('Buy credits count') ) + ':',
+												onchange: function () {
+													$buyCredits._countSelected = this.value;
+												}
+											})
+										]
+									}),
+									mkE({
+										tag: 'td',
+										attr: {
+											width: '60'
+										},
+										els: [
+											this.curs = T.Forms.select({
+												caption:( D.LV ? D.Lang.get('fill_wallet_cur', 'xGlobal') : D.services.l.get('Buy credits cur') ) + ':',
+												onchange: function () {
+													$buyCredits.getOptions();
+												}
+											})
+										]
+									})
+								]
+							}), // tr
+							{
+								tag: 'tr',
+								els: [
+									{
+										tag: 'td',
+										style: {
+											display: this.hideSteps ? 'none' : ''
+										}
+									}, // td
+									{
+										tag: 'td',
+										attr: {
+											colSpan: 2
+										},
+										els: [
+											{
+												tag: 'div',
+												style: {
+													display: D.me.age < 16 ? 'none' : ''
+												},
+												els: [
+													this.saveCardCbx = T.Forms.checkbox({
+														caption: this.donationBox ? D.services.l.get('Save card and donate') : D.services.l.get('Save card'),
+														help: [
+															{
+																tag: 'a',
+																text: 'Noteikumi',
+																prop: {
+																	onclick: function () {
+																		if (InfoBox.opened) {
+																			var modal = new D.Modal({
+																				width: 500,
+																				title: 'Noteikumi'
+																			});
+																			modal.open('/services/save_card_help.php');
+																			return
+																		}
+																		InfoBox.open( '/services/save_card_help.php', { width: 500, title: 'Noteikumi' });
+																	}
+																}
+															} // a
+														]
+													})
+												]
+											},
+											this.savedCardDel = mkE({
+												tag: 'div',
+												els: [
+													D.services.l.get('Card is saved'),
+													' ',
+													{
+														tag: 'a',
+														text: D.Lang.get('delete'),
+														prop: {
+															onclick: function () {
+																if (!D.confirmDelete()) {
+																	return;
+																}
+																D.services.rpc.send(
+																	'delSavedCard',
+																	{},
+																	function (re) {
+																		$(this.saveCardCbx.node).show();
+																		$(this.savedCardDel).hide();
+																	},
+																	$buyCredits
+																);
+															}
+														}
+													} // a
+												]
+											}) // div
+										]
+									} // td
+								]
+							}, // tr
+							mkE({
+								tag: 'tr',
+								els: [
+									mkE({
+										tag: 'td',
+										className: 'pbCol1',
+										style: {
+											display: this.hideSteps ? 'none' : ''
+										},
+										els: [
+											T.step(3)
+										]
+									}),
+									mkE({
+										tag: 'td',
+										prop: {
+											colSpan: 2
+										},
+										els: [
+											this._button = T.submitButton({
+												caption:( D.LV ? D.Lang.get('add_to_wallet', 'xGlobal') : D.services.l.get('buy credits') ),
+												stretch:true,
+												onclick:D.closure( this, this.openPayment )
+											})
+										]
+									})
+								]
+							}) // tr
+						]
+					})
+				]
+			}) // table
+		];
+		mkE.appendTypeElement( this.node, els );
+		$( this.saveCardCbx.node ).hide();
+		$( this.savedCardDel ).hide();
+		this._errorNode.style.display = 'none';
+		this.getOptions();
+	},
+
+	_userTypeSelect:function(){
+		if(!this.bid){
+			return null;
+		}
+		this._userType = {
+			type:'legal'
+		};
+		var legal = this.user && this.user.legal ? this.user.legal : false;
+		var countryOptions = [];
+		for ( var c in this.countries ) {
+			countryOptions.push({
+				caption: this.countries[c],
+				value: c.toUpperCase()
+			});
+		}
+		var form = mkE( {
+			tag:'form',
+			els:[
+				this._userType.pageName = new T.Form.Input({
+					caption: 'Uzņēmuma maciņa nosaukums',
+					require: true
+				} ),
+				this._userType.privateRadio = new T.Form.RadioBox( {
+					caption:'Fiziska persona',
+					name:'userType',
+					onchange:D.closure( this, this._userTypeChange, 'private' )
+				} ),
+				this._userType.legalRadio = new T.Form.RadioBox( {
+					caption:'Juridiska persona',
+					name:'userType',
+					checked:true,
+					onchange:D.closure( this, this._userTypeChange, 'legal' )
+				} ),
+				this._userType.otherPageRadio = new T.Form.RadioBox( {
+					caption:'No citas lapas',
+					name:'userType',
+					onchange:D.closure( this, this._userTypeChange, 'page' )
+				} ),
+				this._userType.legalFormNode = mkE( {
+					tag:'div',
+					els:[
+						this._userType.nameInput = new T.Form.Input( {
+							caption:'Nosaukums:',
+							require:true,
+							value:legal ? legal.legal_title : ''
+						} ),
+						this._userType.addressInput = new T.Form.Input( {
+							caption:'Juridiskā adrese:',
+							require:true,
+							value:legal ? legal.legal_address : ''
+						} ),
+						this._userType.countrySelect = new T.Form.Select( {
+							caption: 'Valsts',
+							require: true,
+							value: legal && !empty(legal.legal_country) ? legal.legal_country : 'LV',
+							options: countryOptions
+						} ),
+						this._userType.vatInput = new T.Form.Input( {
+							caption:'PVN reģistrācijas nr.:',
+							require:true,
+							value:legal ? legal.legal_vatnum : ''
+						} ),
+						this._userType.emailInput = new T.Form.Input( {
+							caption:'E-pasts:',
+							require:true,
+							value:legal ? legal.legal_email : ''
+						} )
+					]
+				} ),
+				this._userType.privateFormNode = mkE({
+					tag: 'div',
+					style: {
+						display: 'none'
+					},
+					els: [
+						this._userType.privateNameSurnameInput = new T.Form.Input( {
+							caption:'Vārds, uzvārds:',
+							require:true,
+							value: this.user.payer == 'private' && isset( this.user.private.private_title ) ? this.user.private.private_title : D.me.title
+						} ),
+						this._userType.privatePersonIdInput = new T.Form.Input( {
+							caption:'Personas kods:',
+							require:true,
+							value: this.user.payer == 'private' && isset( this.user.private.private_personid ) ? this.user.private.private_personid : ''
+						} )
+					]
+				})
+			],
+			style:{
+				marginBottom:'10px'
+			}
+		} );
+		if( empty( this.pages ) ){
+			this._userType.otherPageRadio.hide();
+		}
+		if( this.bid != D.services.BID_NEW ) {
+			this._userType.pageName.hide();
+		}
+		return form;
+	},
+
+	_userTypeSelectReset:function(){
+		this._userType.privateRadio.value(false);
+		this._userType.legalRadio.value(false);
+		this._userType.otherPageRadio.value(false);
+	},
+
+	_userTypeChange:function(type){
+		this._userType.type = type;
+		if( type == 'legal' ){
+			$( this._userType.legalFormNode ).slideDown();
+		} else {
+			$( this._userType.legalFormNode ).slideUp();
+		}
+		if ( type == 'private' ) {
+			$( this._userType.privateFormNode ).slideDown();
+		} else {
+			$( this._userType.privateFormNode ).slideUp();
+		}
+		if( type == 'page' ){
+			$( this._optionsTableNode ).slideUp();
+			$( this._pageTranferNode ).slideDown();
+		} else {
+			$( this._optionsTableNode ).slideDown();
+			$( this._pageTranferNode ).slideUp();
+		}
+	},
+
+	_pageTransfer:function(){
+		if( empty( this.pages ) ){
+			return null;
+		}
+		var sp = new T.Form.SelectPar;
+		sp.options = [];
+		for( var k in this.pages ){
+			var page = this.pages[k];
+			var op = new T.Form.Option;
+			op.caption = htmlspecialchars_decode( page.title ) + ' (' + ( page.credits / 100 ).toFixed(2) + '€)';
+			op.value = k;
+			op.disabled = !page.credits || page.credits < this.count;
+			sp.options.push(op);
+		}
+		sp.onchange = D.closure( this, this._pageOnchange );
+		this._pageTranferNode = mkE( {
+			tag:'div',
+			els:[
+				this._pageTranferSelect = new T.Form.Select(sp),
+				this._pageTranferTextArea = new T.Form.TextArea( {
+					caption:'Apraksts',
+					require:true
+				} ),
+				this._pageTranferButton = new T.Form.Button( {
+					caption:'Pārskaitīt',
+					onclick:D.closure( this, this._pageTransferDo ),
+					stretch:true
+				} )
+			],
+			style:{
+				display:'none'
+			}
+		} );
+		this._pageTranferSelect.onchange();
+		return this._pageTranferNode;
+	},
+
+	_pageOnchange:function(){
+		var page = this.pages[ this._pageTranferSelect.value() ];
+		var slp = new T.Form.SliderPar;
+		slp.min = this.count;
+		slp.max = page.credits;
+		slp.displayFn = function(v){
+			return ( v / 100 ).toFixed(2) + '€';
+		};
+		if( this._pageSlider ){
+			this._pageSlider.remove();
+		}
+        slp.onchange = D.closure(this, function() {
+           var amount = parseInt(this._pageSlider.value());
+            if(!amount) {
+                amount = 0;
+            }
+            this._pageSliderInput.value(amount);
+        });
+		this._pageSlider = new T.Form.Slider(slp);
+		D.insertAfter( this._pageSlider.node, this._pageTranferSelect.node );
+
+
+        var inp = new T.Form.InputPar;
+        inp.onchange = D.closure(this, function() {
+			this._pageSliderInput.value( this._pageSliderInput.value().replace(/[^0-9]/, '') );
+            var amount = parseInt(this._pageSliderInput.value().replace(".", "").replace(",", ""));
+            if(!amount) {
+                amount = 0;
+            }
+            this._pageSlider.value(amount);
+        });
+        this._pageSliderInput = new T.Form.Input(inp);
+        D.insertAfter(this._pageSliderInput.node, this._pageSlider.node);
+	},
+
+	_pageTransferDo:function(){
+		var amount = this._pageSliderInput.value();
+		if( !amount ){
+			this._pageSlider.error();
+			return;
+		}
+		if ( this.minAmount && amount < this.minAmount ) {
+			this._pageSlider.error('Minimālā summa maksājumam ir ' + ( this.minAmount / 100 ).toFixed(2) + '€' );
+			return;
+		}
+		this._pageSlider.error(false);
+		if( !this._pageTranferTextArea.value() ){
+			this._pageTranferTextArea.error();
+			return;
+		}
+		this._pageTranferTextArea.error(false);
+		if ( this.bid == D.services.BID_NEW ) {
+			this._userType.pageName.error( false );
+			if( !this._userType.pageName.value() ){
+				this._userType.pageName.error();
+				return;
+			}
+		}
+		D.loadingOverlay( this._pageTranferNode );
+		this._pageTranferButton.disable(true);
+		var page = this.pages[ this._pageTranferSelect.value() ];
+		this.rpc.send(
+			'bizTransfer',
+			{
+				from:page.id,
+				to:this.bid,
+				count:amount,
+				descr:this._pageTranferTextArea.value(),
+				page_name: this._userType.pageName.value()
+			},
+			this._pageTransferRe,
+			this
+		);
+	},
+
+	_pageTransferRe:function(re){
+		if( !re || !re.ok ){
+			this.onFailed();
+		}
+		this.onBuy();
+	},
+
+	getOptions: function(){
+		this.types.disabled = true;
+		this.counts.disabled = true;
+		this.curs.disabled = true;
+		this.rpc.send(
+			'buyCreditsOptions',
+			{
+				type: this.types.value,
+				cur: this.curs.value,
+				count: this.count,
+				long: this.long,
+				bid: this.bid,
+				minAmount: this.minAmount
+			},
+			this.getOptionsRe,
+			this
+		);
+	},
+
+	getOptionsRe:function (re){
+		if( this._infoNode ){
+			this._infoNode.remove();
+			this._infoNode = null;
+		}
+		if( re.info ){
+			this._infoNode = T.info( re.info );
+			D.insertBefore( this._infoNode, this._errorNode );
+		}
+		clearNode(this.types);
+		clearNode(this.counts);
+		clearNode(this.curs);
+		var r;
+		for (var k in re.types) {
+			mkE({
+				tag: 'option',
+				text: re.types[ k ],
+				prop: {
+					value: k
+				}
+			}).append(this.types);
+		}
+		this.types.disabled = count( re.types ) < 2;
+		this.types.value = re.type;
+		$(this._button).removeClass('buttonBuy');
+		if (re.auto) {
+			if (re.savedCard) {
+				$(this.savedCardDel).show();
+				$(this._button).addClass('buttonBuy');
+			} else {
+				$(this.saveCardCbx.node).show();
+			}
+		} else {
+			$(this.saveCardCbx.node).hide();
+			$(this.savedCardDel).hide();
+		}
+		for (var k in re.curs) {
+			r = re.curs[ k ];
+			mkE({
+				tag: 'option',
+				text: this.long == true ? r.name : r.display,
+				prop: {
+					value: r.name
+				}
+			}).append(this.curs);
+		}
+		this.curs.disabled = count(re.curs) < 2;
+		this.curs.value = re.cur;
+		var v = this._countSelected || false;
+		// overraid
+		var tCount = this.count;
+		if( re.cur == 'EUR' && this.count < 300 ) {
+			tCount = 300;
+		}
+		for( var k in re.counts ){
+			r = re.counts[ k ];
+			mkE({
+				tag: 'option',
+				prop: {
+					innerHTML: r.caption,
+					value: r.price
+				}
+			}).append( this.counts );
+			if( !v && r.count >= tCount ){
+				v = r.price;
+			}
+		}
+		this.counts.value = v;
+		this.counts.disabled = count( re.counts ) < 2;
+	},
+
+	openPayment:function(){
+		if( empty( this.types.value ) ){
+			return;
+		}
+		this._errorNode.style.display = 'none';
+		this.rpc.async = false;
+		var p = {
+			type:this.types.value,
+			price:this.counts.value,
+			cur:this.curs.value,
+			saveCard: D.me.age >= 16 && this.saveCardCbx.checked
+			//trid:this.trid,
+			//apiTrId:this.apiTrId
+		};
+		if( this.bid ){
+			p.page_id = this.bid;
+
+			if ( this.bid == D.services.BID_NEW ) {
+				this._userType.pageName.error( false );
+				if( !this._userType.pageName.value() ){
+					this._userType.pageName.error();
+					return;
+				}
+				p.page_name = this._userType.pageName.value();
+			}
+		}
+		if( this.bid && this._userType ){
+			p.page_id = this.bid;
+
+			if ( this._userType.type == 'legal' ) {
+				var fields = {
+					legal_title: this._userType.nameInput,
+					legal_address: this._userType.addressInput,
+					legal_country: this._userType.countrySelect,
+					legal_vatnum: this._userType.vatInput,
+					legal_email: this._userType.emailInput
+				};
+				p.user_data = {
+					payer: 'legal',
+					legal: {}
+				};
+				for ( var k in fields ) {
+					fields[k].error( false );
+				}
+				for ( var k in fields ) {
+					if ( !fields[k].value() ) {
+						fields[k].error();
+						return;
+					}
+					p.user_data.legal[k] = trim( fields[k].value() );
+					if ( k == 'legal_vatnum' && !D.Vat.isValidEUVAT( this._userType.vatInput._inputNode, this._userType.countrySelect._inputNode ) ) {
+						return;
+					}
+				}
+			} else if ( this._userType.type == 'private' ) {
+				var fields = {
+					private_title: this._userType.privateNameSurnameInput,
+					private_personid: this._userType.privatePersonIdInput
+				};
+				p.user_data = {
+					payer:'private',
+					'private':{}
+				};
+				for( var k in fields ){
+					fields[k].error(false);
+				}
+				for( var k in fields ){
+					if( !fields[k].value() ){
+						fields[k].error();
+						return;
+					}
+					p.user_data.private[k] = trim( fields[k].value() );
+				}
+			}
+		}
+		D.loadingOverlay(this.node);
+
+		var buttonPar = new T.Form.ButtonPar;
+		buttonPar.caption = D.services.l.get('cancel_payment_loading');
+		buttonPar.stretch = true;
+		buttonPar.className = 'paymentCancelBtn';
+		var button = new T.Form.Button( buttonPar );
+		button.onclick = D.closure( this, function() {
+			D.removeLoadingOverlay( this.node );
+			button.remove();
+		});
+		button.append( this.node );
+
+		this.rpc.send(
+			'buyCreditsForm',
+			p,
+			function(re){
+				if( re.error && re.error == 'down' ){
+					D.removeLoadingOverlay( this.node );
+					alert('Šobrīd bankas veic pāreju uz eiro valūtu, izmantojiet maksājumu karšu norēķinus, PayPal vai SMS norēķinus.');
+					return;
+				}
+				if (re.errorNr) {
+					D.removeLoadingOverlay( this.node );
+					alert('Create Bank Transaction error #' + re.errorNr);
+					return;
+				}
+				if( re.chargeAuto ){
+					this.checkAutoStatus.n = 0;
+					this.checkAutoStatus( re.tid );
+					return;
+				}
+				if( re.serviceAdded ){
+					this._checkAutoStatus.n = 0;
+					this._checkAutoStatus( re.tid );
+					return;
+				}
+				var wName = 'draugiemServicesWindow' + ( new Date() ).getTime();
+				var w = D.newWindow('', wName, { width: 1050, height: 650, toolbar: 0 } );
+				this.credits = re.credits;
+				var node = mkE({
+					tag: 'div',
+					prop: {
+						innerHTML: re.form
+					}
+				}).append( this.node );
+				var form = node.getElementsByTagName('form')[0];
+				form.target = wName;
+				form.submit();
+				node.remove();
+				var interval = setInterval( D.closure( this, function(){
+					if( !w.closed ){
+						try {
+							w.document;
+							if (empty( w.document.body.innerHTML ) ){
+								return;
+							}
+						} catch (e) {
+							return;
+						}
+					}
+					clearInterval(interval);
+					w.close();
+					window.focus();
+					/*
+					$buyCredits.rpc.send(
+						'getCredits',
+						{},
+						function (re) {
+							D.removeLoadingOverlay($buyCredits.node);
+							var before = $buyCredits.credits;
+							$buyCredits.credits = re.credits;
+							if (re.credits > before) {
+								$buyCredits.onBuy();
+							} else {
+								$buyCredits.onClose();
+							}
+						}
+					);
+					*/
+					this.checkAutoStatus.n = 0;
+					this.checkAutoStatus( re.tid );
+					this._progressBar = new D.services.ProgressBar({
+						maxValue: 30,
+						onCancel: D.closure(this, function() {
+							this._checkAutoStatus.n = 31;
+						})
+					}).append( this.node );
+					this.callback();
+				} ), 500 );
+			},
+			this
+		);
+		this.rpc.async = true;
+	},
+
+	checkAutoStatus:function(tid){
+		this.checkAutoStatus._tid = tid || this.checkAutoStatus._tid;
+		++ this.checkAutoStatus.n;
+		D.services.rpc.send(
+			'getOrderStatus',
+			{
+				tid:this.checkAutoStatus._tid,
+				bid:this.bid
+			},
+			this._checkAutoStatus,
+			this
+		);
+		if ( this._progressBar ) {
+			this._progressBar.setValue( this._checkAutoStatus.n );
+		}
+	},
+
+	_checkAutoStatus:function(re){
+		if( re.status == 'E' ){
+			D.removeLoadingOverlay(this.node);
+			this._errorNode.style.display = '';
+			this.onFailed();
+			return;
+		}
+		if( re.status == 'Y' ){
+			D.removeLoadingOverlay(this.node);
+			this.onBuy();
+			return;
+		}
+		setTimeout( D.closure( this, function(){
+			if( this.checkAutoStatus.n > 30 ){
+				this.onClose();
+				return;
+			}
+			this.checkAutoStatus();
+		} ), 1000 );
+	},
+
+	append: function (jq) {
+		this.node.appendTo(jq);
+	},
+
+	remove: function () {
+		this.node.remove();
+	}
+
+};
+// --- buy credit ---
+
+// +++ sms button +++
+/*
+ par = {
+ keyword:
+ num:,
+ phone:,
+ price:
+ onBuy:[function(){}],
+ nonce:
+ }
+ */
+D.services.SmsButton = function (par) {
+	par = par || {};
+	var $smsButton = this;
+	this.nonce = par.nonce;
+	this.keyword = par.keyword;
+	this.num = par.num;
+	this.isDonation = par.donation;
+	this.can_set_auto = par.can_set_auto;
+	this.number = par.number;
+	this.onBuy = par.onBuy || function () {
+	};
+	this.onFail = par.onFail || function () {
+	};
+	this.phone = par.phone;
+	var buyButtonPrice;
+	this.node = mkE({
+		tag: 'div',
+		className: 'pbSmsButton',
+		els: [
+			this.button = T.submitButton({
+				//caption:par.caption || D.services.l.get('create_order'),
+				type: 'html',
+				stretch: true,
+				color: 'buy',
+				onclick: function () {
+					this.onclick = function () {
+					};
+					$smsButton.set_auto = false;
+					$smsButton.pay();
+				},
+				els: [
+					{
+						tag: 'span',
+						// TODO notulkot - izravēt
+						text: ( par.caption || D.services.l.get(D.services.l.exists('Pay with sms') ? 'Pay with sms' : 'create_order') ),
+						className: 'pbButtonCaption'
+					},
+					buyButtonPrice = mkE({
+						tag: 'span',
+						className: 'pbButtonPrice',
+						innerHTML: par.price
+					})
+				]
+			}),
+			this.infoTextNode = mkE({
+				tag: 'center',
+				className: 'color2 smallText',
+				prop: {
+					innerHTML: D.services.l.get(this.isDonation?'sms button text donation':'sms button text').replace('PHONE', this.phone).replace('PRICE', par.price)
+				}
+			})
+		]
+	});
+
+	if(this.can_set_auto && D.LV) {
+		this.autoButton = T.submitButton({
+			type: 'html',
+			stretch: true,
+			color: 'buy',
+			className: 'buttonBuyAuto',
+			onclick: function () {
+				this.onclick = function () {
+				};
+				$smsButton.set_auto = true;
+				$smsButton.pay();
+			},
+			els: [
+				{
+					tag: 'span',
+					text: D.services.l.get('buy_and_subscribe'),
+					className: 'pbButtonCaption'
+				},
+				{
+					tag: 'span',
+					className: 'pbButtonPrice',
+					innerHTML: par.price + ' / ' + par.number + ' ' + (D.LANG === 'ru' ? 'д.' : 'd.')
+				}
+			]
+		});
+		D.insertBefore(this.autoButton, this.infoTextNode);
+	}
+};
+
+D.services.SmsButton.prototype = {
+
+	rpc: D.services.rpc,
+
+	pay: function () {
+		if( this._lock ){
+			return;
+		}
+		this._lock = true;
+		D.loadingOverlay(this.node);
+		this.auto_isset = this.set_auto;
+		this.rpc.send(
+			'smsButtonPay',
+			{
+				keyword: this.keyword,
+				num: this.num,
+				nonce: this.nonce,
+				set_auto: this.set_auto
+			},
+			function (re) {
+				if (re.error == 'flood') {
+					alert(D.services.l.get('Try later'));
+					return;
+				}
+				if (re.id) {
+					this.id = re.id;
+					this.check();
+					return;
+				}
+				this.button.remove();
+				this._lock = false;
+				D.removeLoadingOverlay(this.node);
+				if (re.error == 1) {
+					this.phone = re.phone;
+					this.numberAccept();
+					return;
+				}
+				T.error('Errro: #' + re.error).append(this.node);
+			},
+			this
+		);
+	},
+
+	check: function () {
+		var $smsButton = this;
+		this.rpc.send(
+			'smsButtonStatus',
+			{
+				id: this.id
+			},
+			function (re) {
+				if (re.charged == -1) {
+					this.onFail(re);
+					return;
+				}
+				if (Number(re.charged) < 1) {
+					setTimeout(function () {
+						$smsButton.check();
+					}, 1000);
+					return;
+				}
+				this.button.remove();
+				this._lock = false;
+				D.removeLoadingOverlay(this.node);
+				//T.success('Pakalpojums veiksmīgi apmaksāts!').prepend( this.node );
+				this.onBuy({auto_isset:$smsButton.auto_isset});
+			},
+			this
+		);
+	},
+
+	append: function (node) {
+		this.node.append(node);
+		return this;
+	},
+
+	remove: function () {
+		this.node.remove();
+		return this;
+	},
+
+	numberAccept: function () {
+		var $smsButton = this;
+		clearNode(this.node);
+		var l = D.services.l;
+		this.numberAcceptNode = mkE({
+			tag: 'div',
+			els: [
+				mkE({
+					tag: 'b',
+					prop: {
+						innerHTML: this.phone
+					}
+				}),
+				mkE({
+					tag: 'div',
+					text: l.get('poga_tavs_nr')
+				}),
+				mkE({
+					tag: 'div',
+					els: [
+						T.submitButton({
+							caption: l.get('poga_yes'),
+							color: 'submit',
+							onclick: function () {
+								$smsButton.numberAcceptSend();
+							}
+						}),
+						T.submitButton({
+							caption: l.get('poga_no'),
+							color: 'link',
+							onclick: function () {
+								clearNode($smsButton.node);
+								$smsButton.rpc.send(
+									'smsButtonAcceptNo',
+									{},
+									function () {
+									},
+									$smsButton
+								);
+							}
+						})
+					]
+				})
+			]
+		}).append(this.node);
+	},
+
+	numberAcceptSend: function () {
+		var $smsButton = this;
+		clearNode(this.numberAcceptNode);
+		this.rpc.send(
+			'smsButtonAcceptCode',
+			{},
+			function (re) {
+			},
+			this
+		);
+		mkE({
+			tag: 'div',
+			className: 'color2 smallText',
+			text: D.services.l.get('poga_kad_sanem_kodu')
+		}).append(this.numberAcceptNode);
+		mkE({
+			tag: 'table',
+			className: 'formTable',
+			els: [
+				mkE({
+					tag: 'tbody',
+					els: [
+						mkE({
+							tag: 'tr',
+							els: [
+								mkE({
+									tag: 'td',
+									els: [
+										this.numberAcceptCodeNode = T.Forms.input({
+											maxLength: 8,
+											placeholder: D.services.l.get('phone_accept_code')
+										})
+									]
+								}),
+								mkE({
+									tag: 'td',
+									els: [
+										T.submitButton({
+											caption: D.services.l.get('poga_accept'),
+											onclick: function () {
+												$smsButton.rpc.send(
+													'smsButtonCheckAcceptCode',
+													{
+														code: $smsButton.numberAcceptCodeNode.value
+													},
+													function (re) {
+														if (!re.ok) {
+															D.blink({
+																node: this.numberAcceptCodeNode
+															});
+															return;
+														}
+														clearNode(this.node);
+														this.button.append(this.node);
+														this.infoTextNode.append(this.node);
+														this.pay();
+													},
+													$smsButton
+												);
+											}
+										})
+									]
+								})
+							]
+						}) // tr
+					]
+				})
+			]
+		}).append(this.numberAcceptNode);
+
+	}
+
+};
+// --- sms button ---
+
+// +++ sms phone reg +++
+/*{
+ par = {
+ onReg:[function]
+ }
+ }*/
+D.services.SmsPhoneReg = function (par) {
+	var $smsPhoneReg = this;
+	par = par || {};
+	this.onReg = par.onReg || function () {
+	};
+	this.node = mkE({
+		tag: 'div',
+		els: [
+			mkE({
+				tag: 'table',
+				className: 'formTable',
+				els: [
+					this.tbody = mkE({
+						tag: 'tbody',
+						els: [
+							mkE({
+								tag: 'tr',
+								els: [
+									mkE({
+										tag: 'td',
+										els: [
+											this.phone = T.Forms.input({
+												maxLength: 14
+											})
+										]
+									}),
+									mkE({
+										tag: 'td',
+										els: [
+											T.submitButton({
+												caption: D.services.l.get('Reg phone'),
+												stretch: true,
+												onclick: function () {
+													$smsPhoneReg.reg();
+												}
+											})
+										]
+									})
+								]
+							}) // tr
+						]
+					}) // tbody
+				]
+			}) // table
+		]
+	});
+	switch (D.LANG) {
+		case 'hu':
+			this.phone.value = '+36 ';
+			break;
+		case 'lt':
+			this.phone.value = '+372 ';
+			break;
+		default:
+			this.phone.value = '+371 ';
+			break;
+	}
+};
+
+D.services.SmsPhoneReg.prototype = {
+
+	rpc: D.services.rpc,
+
+	reg: function () {
+		var $smsPhoneReg = this;
+		D.loadingOverlay(this.node);
+		this.rpc.send(
+			'sendPhoneAcceptCode',
+			{
+				phone: this.phone.value
+			},
+			function (re) {
+				D.removeLoadingOverlay($smsPhoneReg.node);
+				if (!re.ok) {
+					D.blink({
+						node: $smsPhoneReg.phone
+					});
+					return;
+				}
+				$smsPhoneReg.showAcceptCode();
+			}
+		);
+	},
+
+	showAcceptCode: function () {
+		var $smsPhoneReg = this;
+		clearNode($smsPhoneReg.tbody);
+		mkE({
+			tag: 'tr',
+			els: [
+				mkE({
+					tag: 'td',
+					els: [
+						this.code = T.Forms.input({
+							maxLength: 8,
+							placeholder: D.services.l.get('phone_accept_code')
+						})
+					]
+				}),
+				mkE({
+					tag: 'td',
+					els: [
+						T.submitButton({
+							caption: D.Lang.get('Continue'),
+							stretch: true,
+							onclick: function () {
+								$smsPhoneReg.check();
+							}
+						})
+					]
+				})
+			]
+		}).append(this.tbody);
+	},
+
+	check: function () {
+		var $smsPhoneReg = this;
+		this.rpc.send(
+			'checkPhoneAcceptCode',
+			{
+				phone: this.phone.value,
+				code: this.code.value
+			},
+			function (re) {
+				if (!re.ok) {
+					D.blink({
+						node: $smsPhoneReg.code
+					});
+					return;
+				}
+				$smsPhoneReg.onReg(re.smsUser);
+				clearNode($smsPhoneReg.node);
+			}
+		);
+	},
+
+	append: function (node) {
+		this.node.append(node);
+		return this;
+	},
+
+	remove: function(){
+		this.node.remove();
+		return this;
+	}
+
+};
+// --- sms phone reg ---
+
+// +++ add credits +++
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCredits__par = function( par ) {
+	O2O( this, par || {} );
+};
+D.services.PurchaseCredits__par.prototype.bid = 0;
+D.services.PurchaseCredits__par.prototype.price = 0;
+/** @deprecated */
+D.services.PurchaseCredits__par.prototype.count = 0;
+D.services.PurchaseCredits__par.prototype.callback = function(){};
+D.services.PurchaseCredits__par.prototype.onBuy = function(){};
+D.services.PurchaseCredits__par.prototype.onClose = function(){};
+D.services.PurchaseCredits__par.prototype.onFailed = function(){};
+/** @type {D.services.PurchaseCredits__service} */
+D.services.PurchaseCredits__par.prototype.service = null;
+D.services.PurchaseCredits__par.prototype.credits = 0;
+D.services.PurchaseCredits__par.prototype.drTrans = null;
+D.services.PurchaseCredits__par.prototype.apiTrans = null;
+D.services.PurchaseCredits__par.prototype.services = null;
+
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCredits__service = function( par ) {
+	O2O( this, par || {} );
+};
+D.services.PurchaseCredits__service.prototype.caption = '';
+D.services.PurchaseCredits__service.prototype.name = '';
+D.services.PurchaseCredits__service.prototype.options = [];
+D.services.PurchaseCredits__service.prototype.creditOption = {};
+
+/**
+ * @param {Object} [re]
+ * @constructor
+ */
+D.services.PurchaseCredits__getDataRe = function( re ) {
+	this.methods = [];
+	this.rates = [];
+	O2O( this, re || {} );
+};
+D.services.PurchaseCredits__getDataRe.prototype.methods = [];
+D.services.PurchaseCredits__getDataRe.prototype.rates = [];
+D.services.PurchaseCredits__getDataRe.prototype.currency = D.services.CURRENCY_EUR;
+D.services.PurchaseCredits__getDataRe.prototype.method = D.services.TYPE_CARD;
+D.services.PurchaseCredits__getDataRe.prototype.savedCard = false;
+D.services.PurchaseCredits__getDataRe.prototype.auto = false;
+D.services.PurchaseCredits__getDataRe.prototype.extra = {};
+
+/**
+ * @param {Object} [re]
+ * @constructor
+ */
+D.services.PurchaseCredits__purchaseCreditsRe = function( re ) {
+	O2O( this, re || {} );
+};
+D.services.PurchaseCredits__purchaseCreditsRe.errorNr = 0;
+D.services.PurchaseCredits__purchaseCreditsRe.tid = 0;
+D.services.PurchaseCredits__purchaseCreditsRe.chargeAuto = false;
+D.services.PurchaseCredits__purchaseCreditsRe.form = '';
+D.services.PurchaseCredits__purchaseCreditsRe.price = 0;
+D.services.PurchaseCredits__purchaseCreditsRe.credits = 0;
+
+D.services.PurchaseCredits__getOrderStatusRe = function( re ) {
+	O2O( this, re || {} );
+};
+D.services.PurchaseCredits__getOrderStatusRe.prototype.status = '';
+
+/**
+ * @extends {mkE.Base}
+ * @param {D.services.PurchaseCredits__par|Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCredits = function( par ) {
+	// par = new D.services.PurchaseCredits__par( par ); possible O2O error
+	this.callback = par.callback;
+	this.specType = par.specType;
+	this.cardAmount = par.cardAmount;
+	this.dayCount = par.dayCount;
+	this.onBuy = par.onBuy;
+	this.onClose = par.onClose;
+	this.onFailed = par.onFailed;
+	this.price = par.price || par.count || 0;
+	this.totalCount = par.totalCount || 0;
+	this._steps = {};
+	this.service = par.service;
+	this.services = par.services;
+	this.credits = par.credits || 0;
+	this.drTrans = par.drTrans;
+	this.apiTrans = par.apiTrans;
+	this.node = mkE( {
+		tag: 'div',
+		className: 'purchaseCredits'
+	} );
+	this._draw();
+	this._getData();
+};
+D.services.PurchaseCredits.prototype = new mkE.Base;
+D.services.PurchaseCredits.prototype.rpc = D.services.rpc;
+/** @type {Object.<string,mkE.Base>} */
+D.services.PurchaseCredits.prototype._steps = {};
+D.services.PurchaseCredits.prototype._pb = {};
+/** @type {Object.<number,T.Form.Button>} */
+D.services.PurchaseCredits.prototype._amountBtns = {};
+D.services.PurchaseCredits.prototype._selectedAmount = null;
+D.services.PurchaseCredits.prototype._selectedMethod = null;
+D.services.PurchaseCredits.prototype.creditOption = {};
+
+D.services.PurchaseCredits.prototype._draw = function() {
+	var p;
+
+	if( this.service ){
+		p = new D.services.PurchaseCreditsStep__par;
+		p.title = '';
+		p.titleNode = mkE({
+			tag: 'span',
+			els: [
+				'1. ' + this.service.caption,
+				' ',
+				this._serviceTitleAmount = mkE({
+					tag: 'span'
+				})
+			]
+		});
+		p.rightTitle = this._servicePrice = mkE({
+			tag: 'span'
+		});
+		p.className = 'service';
+		p.collapsed = true;
+
+		var optionEls = [];
+		if( count( this.service.options ) == 1 ){
+			var r = reset( this.service.options );
+			this.creditOption = r;
+			setNodeText(this._serviceTitleAmount, '- ' + this.creditOption.captionShort);
+			this._servicePrice.innerHTML = '&euro; ' + ( this.creditOption.price / 100 ).toFixed(2);
+			p.disabled = true;
+		} else {
+			var first = true;
+			for( var k in this.service.options ){
+				var r = this.service.options[ k ];
+				if( r.price <= this.credits ){
+					//continue;
+				}
+				var input = T.Forms.radio({
+					caption: r.caption,
+					name: 'services[count]',
+					value: r.number,
+					onclick:D.closure( this, function(r, e){
+						if( r.price <= this.credits ){
+							this.onClose(true, r);
+							return;
+						}
+						e = D.event(e);
+						this.creditOption = r;
+						setNodeText(this._serviceTitleAmount, '- ' + this.creditOption.captionShort);
+						this._servicePrice.innerHTML = '&euro; ' + ( this.creditOption.price / 100 ).toFixed(2);
+						this.price = r.price - this.credits;
+						this.totalCount = r.price;
+						if( e.target ){
+							if( this.drTrans ){
+								this._updateServiceTrans(r);
+								return;
+							}
+							this._onSelectService();
+						}
+					}, r )
+				});
+				if (this.service.creditOption) {
+					if (this.service.creditOption.number == r.number) {
+						input.checked = true;
+						input.defaultChecked = true;
+						input.onclick();
+					}
+				} else if (first) {
+					input.checked = true;
+					input.defaultChecked = true;
+					input.onclick();
+				}
+				optionEls.push(input);
+				first = false;
+			}
+		}
+
+		p.els = [
+			{
+				tag: 'div',
+				els: optionEls
+			}
+		];
+		this._steps.service = new D.services.PurchaseCreditsStep(p);
+	}
+
+	p = new D.services.PurchaseCreditsStep__par;
+	if (this.specType == D.services.TYPE_DISCOUNT) {
+		if (this.price == 599 || this.price == 550) {
+			p.title = 'Summa par gada statistiku';
+		}
+		else {
+			p.title = 'Summa ' + this.dayCount +' dienām';//'1. ' + D.services.l.get('choose_amount');
+		}
+		p.disabled = true;
+	}
+	else {
+		p.title = (this.service ? '2' : '1') + '. ' + D.services.l.get('choose_amount');
+	}
+	p.className = 'amount';
+	p.els = [
+		this._amountOptions = mkE( {
+			tag: 'div',
+			className: 'amountOptions'
+		} ),
+		this._bonusTextNode = mkE({
+			tag: 'div',
+			className: 'bonusInfoText25'
+		})
+	];
+	p.rightTitle = this._selectedAmountNode = mkE( {
+		tag: 'span',
+		className: 'selectedAmount'
+	} );
+	this._steps.amount = new D.services.PurchaseCreditsStep(p);
+
+	p = new D.services.PurchaseCreditsStep__par;
+	p.title = (this.service ? '3' : '2') + '. ' + D.services.l.get('choose_method');
+	p.className = 'method';
+	if (this.specType == D.services.TYPE_DISCOUNT) {
+		p.disabled = false;
+	}
+	else {
+		p.disabled = true;
+	}
+	p.els = [
+		this._methods = new D.services.PurchaseCreditsMethods,
+		this._userCountry = this._drawUserCountry(),
+		{
+			tag: 'div',
+			style: {
+				display: D.me.age < 16 ? 'none' : ''
+			},
+			els: [
+				this._saveCardCB = this._drawSaveCard()
+			]
+		},
+		this._deleteCard = this._drawDeleteCard()
+	];
+
+	new T.Tooltip({
+		node: this._secureNode,
+		content: mkE({
+			tag: 'div',
+			style: {
+				maxWidth: '320px',
+				whiteSpace: 'normal'
+			},
+			text: D.services.l.get('secure_text')
+		})
+	});
+
+	this._steps.method = new D.services.PurchaseCreditsStep(p);
+
+	p = new T.Form.ButtonPar;
+	p.caption = D.services.l.get('increase_wallet_by') + ' 3 &euro;';
+	if (this.specType == D.services.TYPE_DISCOUNT) {
+		p.caption = 'Maksāt';
+	}
+	p.captionHTML = true;
+	p.className = 'purchaseBtn';
+	p.size = 'large';
+	p.onclick = D.closure( this, this._purchaseCredits );
+	p.disabled = true;
+	p.color = 'buy';
+
+	this._footer = new T.Form.Footer( {
+		className: 'purchaseContainer',
+		els: [
+			this._purchaseBtn = new T.Form.Button(p)
+		]
+	} );
+	this._footer.hide();
+
+	var els = [
+		this._errorNode = T.error( D.services.l.get('Card payment failed') ),
+		{
+			tag: 'ul',
+			els: this._steps
+		},
+		this._footer
+	];
+	mkE.appendTypeElement( this.node, els );
+	this._errorNode.style.display = 'none';
+	if (this.specType == D.services.TYPE_DISCOUNT) {
+		this._currentCurrency = D.services.CURRENCY_EUR;
+		this._selectedAmount = this.cardAmount;
+		this._updateAmountRightTitle();
+		this._purchaseBtn.disable(false);
+		this._footer.show();
+	}
+};
+/**
+ * @returns {T.Form.CheckBox}
+ * @private
+ */
+D.services.PurchaseCredits.prototype._drawSaveCard = function() {
+	var p = new T.Form.CheckBoxPar;
+	p.caption = this.services.donationBox ? D.services.l.get('Save card and donate') : D.services.l.get('Save card');
+	p.checked = D.me.age < 16 ? false : false;
+	p.visible = false;
+	p.help = D.services.l.get('save_card_help_text');
+	var checkbox = new T.Form.CheckBox(p);
+
+	this._secureNode = mkE({
+		tag: 'div',
+		className: 'secure',
+		text: D.services.l.get('secure')
+	}).append(checkbox.node);
+	return checkbox;
+};
+/**
+ * @returns {T.Form.Item}
+ * @private
+ */
+D.services.PurchaseCredits.prototype._drawDeleteCard = function() {
+	var p = new T.Form.ItemPar;
+	p.els = [
+		{
+			tag: 'div',
+			className: 'saved-card-info',
+			els: [
+				{
+					tag: 'div',
+					className: 'saved-card-image'
+				},
+				{
+					tag: 'div',
+					className: 'saved-card-text',
+					els: [
+						this._savedCardCaption = mkE({
+							tag: 'div',
+							text: D.services.l.get('Card is saved')
+						}),
+						this._savedCardTime = mkE({
+							tag: 'div',
+							els: [
+								D.services.l.get('card_added') + ' '
+							]
+						}),
+						this._savedCardNumber = mkE({
+							tag: 'div',
+							className: 'saved-card-number'
+						})
+					]
+				}
+			]
+		},
+		{
+			tag: 'div',
+			className: 'saved-card-delete',
+			els: [
+				{
+					tag: 'a',
+					text: D.services.l.get('delete_card_data'),
+					prop: {
+						onclick: D.closure( this, this._deleteSavedCard )
+					}
+				}
+			]
+		}
+	];
+	p.visible = false;
+	return new T.Form.Item(p);
+};
+D.services.PurchaseCredits.prototype._drawUserCountry = function() {
+	return mkE({
+		tag: 'div',
+		className: 'userCountrySelect',
+		els: [
+			{
+				tag: 'div',
+				text: D.services.l.get('user_country_select_title')
+			},
+			{
+				tag: 'span',
+				className: 'color2',
+				text: D.services.l.get('user_country_select_desc')
+			}
+		]
+	});
+};
+D.services.PurchaseCredits.prototype._drawAmounts = function() {
+	clearNode( this._amountOptions );
+	clearNode( this._bonusTextNode );
+
+	var amounts = this._selectedMethod.amounts[this._currentCurrency];
+	var c = 0;
+
+	if (amounts.indexOf(this._selectedAmount)==-1) {
+		this._selectedAmount = 0;
+	}
+	var defaultAmountIdx = 3;
+	if ( D.services.E25 ) {
+		defaultAmountIdx = 5;
+	}
+	for ( var k in amounts ) {
+		var amount = amounts[k];
+
+		var p = new T.Form.ButtonPar;
+		p.caption = '<sup>' + this._getCurrencySymbol( this._currentCurrency ) + '</sup>' + (amount / 100).toFixed(0);
+		if( amount / 100 % 1 ) {
+			p.caption += '<small>.' + String(amount).substr(-2) + '</small>';
+		}
+		p.captionHTML = true;
+		p.className = 'amountItem amountBtn' + ( ++c == 3 ? ' popularItem' : '' ) + ( c == 5 ? ' bulkItem' : '' );
+		if ( this._selectedAmount ) {
+			if (this._selectedAmount == amount ) {
+				p.className += ' selected';
+			}
+		} else if (c == defaultAmountIdx) {
+			this._selectedAmount = amount;
+			p.className += ' selected';
+			this._steps.method.enable();
+			this._updatePurchaseBtn();
+			this._purchaseBtn.disable(false);
+			this._footer.show();
+		}
+		p.size = 'large';
+		p.color = 'link';
+		p.onclick = D.closure( this, this._selectAmount, amount );
+
+		var btn = new T.Form.Button(p);
+        btn.append( this._amountOptions );
+
+        if ( c == 5 && D.DATE_TODAY <= 20210616 ) {
+        	mkE({
+				tag: 'span',
+				className: 'bonusInfo',
+				els: [
+					{
+						tag: 'span',
+						className: 'ic',
+						text: '2€ '
+					},
+					{
+						tag: 'span',
+						text: 'bonuss*'
+					}
+				]
+			}).append( btn._buttonWrapNode );
+
+        	setNodeText(this._bonusTextNode, '* No 9. līdz 16. jūnijam papildini savu maciņu par 25€ un saņem 2€ bonusā. Par katriem 25€ (papildinot vienā reizē) saņemsi maciņā papildus 2€. Neierobežoti!');
+		}
+
+		this._amountBtns[amount] = btn;
+	}
+};
+D.services.PurchaseCredits.prototype._mouseOverAmount = function(amount) {
+	return;
+  if ( this._pbMouseOutT ) {
+    clearTimeout( this._pbMouseOutT );
+  }
+	amount = amount * this._rates[this._currentCurrency];
+	amount = parseInt( amount / 100, 10 ) || 0;
+	this._pbReceiveText.innerHTML = D.services.l.nget( amount, 'pb_receive_points' );
+};
+D.services.PurchaseCredits.prototype._drawPbReceiveText = function() {
+	return;
+  var text = '';
+  if ( !this._selectedAmount ) {
+    text = D.services.l.get('pb_receive_txt');
+  } else {
+	  var amount = this._selectedAmount;
+	  amount = amount * this._rates[this._currentCurrency];
+	  amount = parseInt( amount / 100, 10 ) || 0;
+    text = D.services.l.nget( amount, 'pb_receive_points' );
+  }
+  this._pbMouseOutT = setTimeout( D.closure( this, function() {
+    this._pbReceiveText.innerHTML = text;
+  } ), 100 );
+};
+D.services.PurchaseCredits.prototype._showCardRules = function(){
+	if ( InfoBox.opened ) {
+		var modal = new D.Modal({
+			width: 500,
+			title: 'Noteikumi'
+		});
+		modal.open('/services/save_card_help.php');
+		return
+	}
+
+	InfoBox.open( '/services/save_card_help.php', {
+		width: 500,
+		title: 'Noteikumi'
+	} );
+};
+D.services.PurchaseCredits.prototype._deleteSavedCard = function() {
+	if ( !D.confirmDelete() ) {
+		return;
+	}
+	this.rpc.send( 'delSavedCard',
+		{},
+		this._deleteSavedCardRe,
+		this
+	);
+};
+D.services.PurchaseCredits.prototype._deleteSavedCardRe = function() {
+	if(!D.services.blockedPaymentMethods['card']) {
+		this._saveCardCB.show();
+	}
+	this._deleteCard.hide();
+};
+D.services.PurchaseCredits.prototype._getData = function() {
+	D.loadingOverlay( this.node );
+	this.rpc.send( 'getPurchaseOptions',
+		{
+			price: this.price,
+			amount: this.totalCount
+		},
+		this._getDataRe,
+		this
+	);
+};
+/**
+ * @param {D.services.PurchaseCredits__getDataRe} re
+ * @private
+ */
+D.services.PurchaseCredits.prototype._getDataRe = function( re ) {
+	re = new D.services.PurchaseCredits__getDataRe(re);
+
+	this._currentMethod = re.method;
+	this._currentCurrency = re.currency;
+	this._savedCard = re.savedCard;
+	this._autoAvailable = re.auto;
+	this._rates = re.rates;
+	this._countries = re.countries;
+	this._userSelectedCountry = re.selectedCountry;
+
+	this._extra = re.extra;
+
+	clearNode(this._methods._cards);
+	clearNode(this._methods._banks);
+	clearNode(this._methods._other);
+
+	for ( var type in re.methods ) {
+		var method = re.methods[type];
+
+		var p = new D.services.PurchaseCreditsMethodItem__par;
+		p.type = type;
+		p.caption = method.name;
+		p.currencies = method.currencies;
+		p.amounts = method.amounts;
+		p.onclick = D.closure( this, this._selectPaymentMethod );
+		p.selected = ( type == this._currentMethod );
+		if(this.specType == D.services.TYPE_DISCOUNT) {
+			p.specType = this.specType;
+		}
+
+		var item = new D.services.PurchaseCreditsMethodItem( p );
+		this._methods.addMethod( item );
+
+		if ( type == this._currentMethod ) {
+			this._selectedMethod = item;
+		}
+	}
+
+	if ( this._autoAvailable ) {
+		if ( this._savedCard ) {
+			if( re.registerDate ){
+				mkE.appendTypeElement(this._savedCardTime, re.registerDate);
+			}
+			if( re.cardInfo ){
+				setNodeText(this._savedCardNumber, re.cardInfo);
+			}
+			if( re.registerDate && re.cardInfo ){
+				this._savedCardCaption.remove();
+			}
+			this._deleteCard.show();
+		} else {
+			if(!D.services.blockedPaymentMethods['card']) {
+				this._saveCardCB.show();
+			}
+		}
+	}
+
+	var ddPar = new T.DropDown__par;
+	ddPar.caption = this._currentCurrency;
+	ddPar.visible = ( this._currentMethod == D.services.TYPE_PAYPAL );
+	ddPar.items = [];
+
+	if( re.methods[ D.services.TYPE_PAYPAL ] ){
+		for ( var j in re.methods[ D.services.TYPE_PAYPAL ].currencies ) {
+			var currency = re.methods[ D.services.TYPE_PAYPAL ].currencies[j];
+			var p = new T.DropDownItem__par;
+			p.caption = currency;
+			p.selected = (currency == this._currentCurrency);
+			p.onclick = D.closure( this, this._changeCurrency, currency );
+			ddPar.items.push( new T.DropDownItem(p) );
+		}
+	}
+
+	this._currencyDD = new T.DropDown( ddPar );
+	this._currencyDD.append( this._steps.amount._rightTitle );
+
+	if( this._countries && count(this._countries) > 1 && !this._userSelectedCountry ){
+		var p = new T.Form.SelectPar();
+		p.options = this._countries;
+		p.style = 'margin-top: 8px;';
+		this._countrySelect = new T.Form.Select(p).append(this._userCountry);
+	}else{
+		this._userCountry.remove();
+	}
+
+	this._drawAmounts();
+	D.removeLoadingOverlay( this.node );
+};
+
+D.services.PurchaseCredits.prototype._getCurrencySymbol = function( currency ) {
+	currency = currency || this._currentCurrency;
+	if ( currency == D.services.CURRENCY_EUR ) {
+		return '€';
+	} else if ( currency == D.services.CURRENCY_USD ) {
+		return '$';
+	} else if ( currency == D.services.CURRENCY_GBP ) {
+		return '£';
+	} else {
+		return '';
+	}
+};
+D.services.PurchaseCredits.prototype._changeCurrency = function( currency ) {
+	this._currencyDD.setCaption( currency );
+	this._currentCurrency = currency;
+	this._drawAmounts();
+
+	var amounts = this._selectedMethod.amounts;
+	if ( !isset( amounts[ this._currentCurrency ] )
+		|| array_search( this._selectedAmount, amounts[ this._currentCurrency ] ) === false ) {
+
+		this._selectedAmount = null;
+		this._steps.amount.expand();
+		this._steps.method.disable();
+		this._footer.hide();
+		this._purchaseBtn.disable(true);
+		this._updateAmountRightTitle();
+		return;
+	}
+
+	this._drawPbReceiveText();
+	this._updatePurchaseBtn();
+};
+D.services.PurchaseCredits.prototype._selectAmount = function( amount ) {
+	if ( this._selectedAmount && this._selectedAmount == amount ) {
+		return;
+	}
+	for ( var i in this._amountBtns ) {
+		var btn = this._amountBtns[i];
+		btn.removeClassName('selected');
+	}
+	var amountBtn = this._amountBtns[amount];
+	amountBtn.addClassName('selected');
+	//this._steps.method.enable();
+	this._purchaseBtn.disable(false);
+	this._footer.show();
+	//this._steps.amount.collapse();
+	if( this._steps.service ){
+		this._steps.service.collapse();
+	}
+	this._selectedAmount = amount;
+	this._updatePurchaseBtn();
+	this._drawPbReceiveText();
+	//this._updateAmountRightTitle();
+	if( this._extra.firstDataDisabled && this._currentMethod == D.services.TYPE_CARD ){
+		if( this._errorNode ){
+			this._errorNode.remove();
+		}
+		this._errorNode = T.error('Sakarā ar Firstdata sistēmas uzlabošanas darbiem, šobrīd iespējami pārtraukumi bankas karšu norēķinu sistēmas darbībā. Pēc dažām minūtēm viss atkal būs kārtībā :)');
+		D.insertBefore(this._errorNode, this._steps.method._content);
+		this._purchaseBtn.disable(true);
+	}
+	if( this._extra.dnbNordeaDisabled && (this._currentMethod == D.services.TYPE_INORD || this._currentMethod == D.services.TYPE_NORDEA) ){
+		if( this._errorNode ){
+			this._errorNode.remove();
+		}
+		this._errorNode = T.error('Sakarā ar Nordea un DNB banku darbības apvienošanu, iespējami īslaicīgi sistēmas darbības traucējumi. Ja Tev rodas kādas problēmas - pamēģini mazliet vēlāk.');
+		D.insertBefore(this._errorNode, this._steps.method._content);
+	}
+};
+D.services.PurchaseCredits.prototype._updatePurchaseBtn = function() {
+	var amount = (this._selectedAmount / 100).toFixed(2);
+	this._purchaseBtn.caption( D.services.l.get('increase_wallet_by') + ' '+ amount +' ' + this._getCurrencySymbol(), true );
+};
+D.services.PurchaseCredits.prototype._updateAmountRightTitle = function() {
+	var amountText;
+	if ( this._selectedAmount ) {
+		if ( this._currentMethod == D.services.TYPE_PAYPAL ) {
+			amountText = (this._selectedAmount / 100).toFixed(2);
+		} else {
+			amountText = (this._selectedAmount / 100).toFixed(2) + ' ' + this._currentCurrency
+		}
+	} else {
+		amountText = '';
+	}
+
+	setNodeText( this._selectedAmountNode, amountText );
+};
+D.services.PurchaseCredits.prototype._selectPaymentMethod = function( method ) {
+	if ( this._selectedMethod && this._selectedMethod.type == method.type ) {
+		return;
+	}
+
+	if( this._errorNode ){
+		this._errorNode.remove();
+		this._purchaseBtn.disable(false);
+	}
+
+	if ( this._selectedMethod.type == D.services.TYPE_PAYPAL
+		|| method.type == D.services.TYPE_PAYPAL ) {
+
+		if ( method.type != D.services.TYPE_PAYPAL ) {
+			if ( this._currentCurrency != D.services.CURRENCY_EUR ) {
+				this._changeCurrency( D.services.CURRENCY_EUR );
+				this._steps.amount.expand();
+			}
+			this._currencyDD.hide();
+		} else {
+			this._currencyDD.show();
+		}
+
+		if ( !isset( method.amounts[ this._currentCurrency ] )
+			|| array_search( this._selectedAmount, method.amounts[ this._currentCurrency ] ) === false ) {
+
+			this._selectedAmount = null;
+			this._steps.amount.expand();
+			this._steps.method.disable();
+			this._footer.hide();
+			this._purchaseBtn.disable(true);
+		}
+	} else {
+		if ( this._selectedAmount ) {
+			this._purchaseBtn.disable(false);
+		}
+	}
+
+	if ( method.type == D.services.TYPE_CARD ) {
+		if ( this._savedCard ) {
+			this._saveCardCB.hide();
+			this._deleteCard.show();
+		} else {
+			this._deleteCard.hide();
+			this._saveCardCB.show();
+		}
+	} else {
+		this._deleteCard.hide();
+		this._saveCardCB.hide();
+	}
+
+	if( this._extra.firstDataDisabled && method.type == D.services.TYPE_CARD ){
+		if( this._errorNode ){
+			this._errorNode.remove();
+		}
+		this._errorNode = T.error('Sakarā ar Firstdata sistēmas uzlabošanas darbiem, šobrīd iespējami pārtraukumi bankas karšu norēķinu sistēmas darbībā. Pēc dažām minūtēm viss atkal būs kārtībā :)');
+		D.insertBefore(this._errorNode, this._steps.method._content);
+		this._purchaseBtn.disable(true);
+	}
+	if( this._extra.dnbNordeaDisabled && (method.type == D.services.TYPE_INORD || method.type == D.services.TYPE_NORDEA) ){
+		if( this._errorNode ){
+			this._errorNode.remove();
+		}
+		this._errorNode = T.error('Sakarā ar Nordea un DNB banku darbības apvienošanu, iespējami īslaicīgi sistēmas darbības traucējumi. Ja Tev rodas kādas problēmas - pamēģini mazliet vēlāk.');
+		D.insertBefore(this._errorNode, this._steps.method._content);
+	}
+
+	this._currentMethod = method.type;
+	this._selectedMethod = method;
+
+	//this._updateAmountRightTitle();
+	this._drawAmounts();
+};
+D.services.PurchaseCredits.prototype._purchaseCredits = function() {
+	D.loadingOverlay(this.node);
+	var data = {
+		type: this._selectedMethod.type,
+		price: this._selectedAmount,
+		cur: this._currentCurrency,
+		saveCard: D.me.age >= 16 && !this._savedCard ? this._saveCardCB.value() : false,
+	    pb: this._pb,
+		drTrans: this.drTrans,
+		apiTrans: this.apiTrans,
+		userCountry: this._countrySelect ? this._countrySelect.value() : this._userSelectedCountry
+	};
+	this.rpc.async = false;
+	this.rpc.send( 'buyCreditsForm',
+		data,
+		this._purchaseCreditsRe,
+		this
+	);
+	this.rpc.async = true;
+};
+D.services.PurchaseCredits.prototype._purchaseCreditsRe = function( re ) {
+	re = new D.services.PurchaseCredits__purchaseCreditsRe(re);
+	if ( re.errorNr ) {
+		// Dienas kartes limits
+		if( re.errorNr == 6 ){
+			D.removeLoadingOverlay(this.node);
+			alert(D.services.l.get('card_limit_reached'));
+			return;
+		}
+		alert('Create Bank Transaction error #' + re.errorNr);
+		return;
+	}
+	if ( re.chargeAuto ) {
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		return;
+	}
+	if( re.serviceAdded ){
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		return;
+	}
+	var wName = 'draugiemServicesWindow' + ( new Date() ).getTime();
+	var w = D.newWindow('', wName, {
+		width: 1050,
+		height: 650,
+		toolbar: 0
+	} );
+	this.credits = re.credits;
+	var node = mkE( {
+		tag: 'div',
+		prop: {
+			innerHTML: re.form
+		}
+	} ).append( this.node );
+	var form = node.getElementsByTagName('form')[0];
+	form.target = wName;
+	form.submit();
+	node.remove();
+	if (this.specType == D.services.TYPE_DISCOUNT) {
+		var warning_node = mkE( {
+			tag: 'div',
+			style:{
+				margin:'15px auto',
+				"text-align": "center",
+				"font-size": "16px",
+				"font-weight": "bold",
+				"line-height": "18px",
+				color: "red"
+			},
+			prop: {
+				innerHTML: "Lūdzu uzgaidi, kamēr tiek saņemta atbilde no bankas..."
+			}
+		} ).append( this.node._drOverlay );
+	}
+	var interval = setInterval( D.closure( this, function() {
+		if ( !w.closed ) {
+			try {
+				w.document;
+				if ( empty(w.document.body.innerHTML) ) {
+					return;
+				}
+			} catch (e) {
+				return;
+			}
+		}
+		clearInterval(interval);
+		w.close();
+		window.focus();
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		this._progressBar = new D.services.ProgressBar({
+			maxValue: 30,
+			onCancel: D.closure(this, function() {
+				this._checkAutoStatus.n = 31;
+			})
+		}).append( this.node );
+		this.callback();
+	} ), 500 );
+};
+D.services.PurchaseCredits.prototype._checkAutoStatus = function( tid ) {
+	++this._checkAutoStatus.n;
+	var data = {
+		tid: tid
+	};
+	this.rpc.send( 'getOrderStatus',
+		data,
+		D.closure( this, this._getOrderStatusRe, tid )
+	);
+	if ( this._progressBar ) {
+		this._progressBar.setValue( this._checkAutoStatus.n );
+	}
+};
+/**
+ * @param {number} tid
+ * @param {D.services.PurchaseCredits__getOrderStatusRe} re
+ * @private
+ */
+D.services.PurchaseCredits.prototype._getOrderStatusRe = function( tid, re ) {
+	re = new D.services.PurchaseCredits__getOrderStatusRe( re );
+	if ( re.status == 'E' ) {
+		D.removeLoadingOverlay(this.node);
+		this._errorNode.style.display = '';
+		this.onFailed();
+		return;
+	}
+	if ( re.status == 'Y' ) {
+		this.onBuy();
+		return;
+	}
+	if ( this._checkAutoStatus.n > 30 ) {
+		this.onClose();
+		return;
+	}
+	setTimeout( D.closure( this, this._checkAutoStatus, tid ), 1000 );
+};
+D.services.PurchaseCredits.prototype._onSelectService = function(){
+	this._getData();
+	this._selectedAmount = null;
+	this._steps.amount.expand();
+	this._steps.method.disable();
+	this._footer.hide();
+	this._purchaseBtn.disable(true);
+	this._updateAmountRightTitle();
+};
+D.services.PurchaseCredits.prototype._updateServiceTrans = function(serviceOption){
+	this.rpc.send(
+		'updateTransaction',
+		{
+			trid: this.drTrans,
+			count: serviceOption.number
+		},
+		D.closure(this, this._updateServiceTransRe)
+	)
+};
+D.services.PurchaseCredits.prototype._updateServiceTransRe = function(){
+	this._onSelectService();
+};
+
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCreditsStep__par = function( par ) {
+	this.els = [];
+	O2O( this, par || {} );
+};
+D.services.PurchaseCreditsStep__par.prototype.title = '';
+D.services.PurchaseCreditsStep__par.prototype.className = '';
+D.services.PurchaseCreditsStep__par.prototype.disabled = false;
+/** @type {Array.<mkE.Base>} */
+D.services.PurchaseCreditsStep__par.prototype.els = [];
+/** @type {mkE.Base} */
+D.services.PurchaseCreditsStep__par.prototype.rightTitle;
+D.services.PurchaseCreditsStep__par.prototype.collapsed = false;
+D.services.PurchaseCreditsStep__par.prototype.titleNode = '';
+
+/**
+ * @extends {mkE.Base}
+ * @param {D.services.PurchaseCreditsStep__par|Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCreditsStep = function( par ) {
+	this._titleNode = par.titleNode || '';
+
+	this.node = mkE( {
+		tag: 'li',
+		className: 'pStep',
+		els: [
+      this.stepTitleNode = mkE({
+				tag: 'h2',
+				className: 'stepTitle',
+				text: par.title,
+				prop: {
+					onclick: D.closure( this, this.expand )
+				},
+				els: [
+					this._titleNode,
+					this._rightTitle = mkE( {
+						tag: 'p'
+					} )
+				]
+			}),
+			this._content = mkE( {
+				tag: 'div',
+				className: 'stepContent',
+				els: par.els
+			} )
+		]
+	} );
+	if ( par.rightTitle ) {
+		mkE.appendTypeElement( this._rightTitle, par.rightTitle );
+	}
+	if ( par.className ) {
+		addClassName( this.node, par.className );
+	}
+	if ( par.disabled ) {
+		this.disable();
+	}
+	if ( par.collapsed ) {
+		this.collapse();
+	}
+};
+D.services.PurchaseCreditsStep.prototype = new mkE.Base;
+D.services.PurchaseCreditsStep.prototype._disabled = false;
+D.services.PurchaseCreditsStep.prototype._expanded = true;
+
+D.services.PurchaseCreditsStep.prototype.disable = function(){
+	if ( this._disabled ) {
+		return this;
+	}
+
+	this._disabled = true;
+	addClassName( this.node, 'disabled' );
+	this.collapse();
+	return this;
+};
+D.services.PurchaseCreditsStep.prototype.enable = function(){
+	if ( !this._disabled ) {
+		return this;
+	}
+
+	this._disabled = false;
+	removeClassName( this.node, 'disabled' );
+	this.expand();
+	return this;
+};
+D.services.PurchaseCreditsStep.prototype.collapse = function(){
+	if ( !this._expanded ) {
+		return this;
+	}
+
+	this._expanded = false;
+	this._content.style.display = 'none';
+	addClassName(this.node, 'collapsed');
+	return this;
+};
+D.services.PurchaseCreditsStep.prototype.expand = function(){
+	if ( this._disabled || this._expanded ) {
+		return this;
+	}
+
+	this._expanded = true;
+	this._content.style.display = 'block';
+	removeClassName(this.node, 'collapsed');
+	return this;
+};
+
+/**
+ * @extends {mkE.Base}
+ * @constructor
+ */
+D.services.PurchaseCreditsMethods = function() {
+	this.node = mkE({
+		tag: 'ul',
+		className: 'methodsOptions',
+		els: [
+			this._cardsCont = mkE({
+				tag: 'li',
+				className: 'methodGroup cards',
+				style: {
+					display: 'none'
+				},
+				els: [
+					{
+						tag: 'p',
+						text: D.services.l.get('method_group_card') + ':'
+					},
+					this._cards = mkE({
+						tag: 'ul'
+					})
+				]
+			}),
+			this._banksCont = mkE({
+				tag: 'li',
+				className: 'methodGroup banks',
+				style: {
+					display: 'none'
+				},
+				els: [
+					{
+						tag: 'p',
+						text: D.services.l.get('method_group_banks') + ':'
+					},
+					this._banks = mkE({
+						tag: 'ul'
+					})
+				]
+			}),
+			this._otherCont = mkE({
+				tag: 'li',
+				className: 'methodGroup other',
+				style: {
+					display: 'none'
+				},
+				els: [
+					{
+						tag: 'p',
+						text: D.services.l.get('method_group_other') + ':'
+					},
+					this._other = mkE({
+						tag: 'ul'
+					})
+				]
+			})
+		]
+	});
+};
+D.services.PurchaseCreditsMethods.prototype = new mkE.Base;
+D.services.PurchaseCreditsMethods.prototype._cards = null;
+D.services.PurchaseCreditsMethods.prototype._banks = null;
+D.services.PurchaseCreditsMethods.prototype._other = null;
+D.services.PurchaseCreditsMethods.prototype.specType = null;
+
+/**
+ * @param {D.services.PurchaseCreditsMethodItem} method
+ * @returns {D.services.PurchaseCreditsMethods}
+ */
+D.services.PurchaseCreditsMethods.prototype.addMethod = function( method ) {
+	var shouldShowElem = (function(elemName){
+		if(D.services.blockedPaymentMethods[elemName] == 1){
+			return false;
+		}
+		return true;
+	});
+
+	if ( method.type == 'card' ) {
+		method.append( this._cards );
+		if(shouldShowElem('card')){
+			this._cardsCont.style.display = '';
+		}
+	} else if ( method.type == 'hanzanet'
+		|| method.type == 'nordea'
+		|| method.type == 'inord'
+		|| method.type == 'elink'
+		|| method.type == 'digilink' ) {
+
+		method.append( this._banks );
+		if(shouldShowElem('ibank')) {
+			this._banksCont.style.display = '';
+		}
+	} else {
+		if (method.specType != D.services.TYPE_DISCOUNT){
+			method.append( this._other );
+			if(shouldShowElem('paypal')) {
+				this._otherCont.style.display = '';
+			}
+		}
+	}
+
+	return this;
+};
+
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseCreditsMethodItem__par = function( par ) {
+	this.currencies = [];
+	this.amounts = {};
+	O2O( this, par || {} );
+};
+D.services.PurchaseCreditsMethodItem__par.prototype.type = '';
+D.services.PurchaseCreditsMethodItem__par.prototype.caption = '';
+D.services.PurchaseCreditsMethodItem__par.prototype.currencies = [];
+D.services.PurchaseCreditsMethodItem__par.prototype.amounts = {};
+D.services.PurchaseCreditsMethodItem__par.prototype.selected = false;
+
+/**
+ * @param {D.services.PurchaseCreditsMethodItem} item
+ */
+D.services.PurchaseCreditsMethodItem__par.prototype.onclick = function( item ){};
+
+/**
+ * @extends {mkE.Base}
+ * @param {D.services.PurchaseCreditsMethodItem__par} par
+ * @constructor
+ */
+D.services.PurchaseCreditsMethodItem = function( par ) {
+	par = new D.services.PurchaseCreditsMethodItem__par(par);
+
+	this.type = par.type;
+	this.caption = par.caption;
+	this.currencies = par.currencies;
+	this.amounts = par.amounts;
+	this.specType = par.specType;
+	if ( par.onclick ) {
+		this.onclick = par.onclick;
+	}
+
+	var p = new T.Form.RadioBoxPar;
+	p.caption = {
+		tag: 'img',
+		className: 'methodIcon ' + this.type,
+		src: D.PIMG + 'services/img/pm/'+ this.type +'.png?v4',
+		prop: {
+			alt: this.caption
+		}
+	};
+	p.checked = par.selected;
+	p.name = 's[pm]';
+	p.onclick = D.closure( this, this._onclick );
+	p.className = 'pm_'+this.type;
+
+	this.node = mkE( {
+		tag: 'li',
+		className: 'methodItem',
+		els: [
+			new T.Form.RadioBox(p)
+		]
+	} );
+};
+D.services.PurchaseCreditsMethodItem.prototype = new mkE.Base;
+D.services.PurchaseCreditsMethodItem.prototype.type = '';
+D.services.PurchaseCreditsMethodItem.prototype.caption = '';
+D.services.PurchaseCreditsMethodItem.prototype.currencies = [];
+D.services.PurchaseCreditsMethodItem.prototype.amounts = {};
+
+/**
+ * @param {D.services.PurchaseCreditsMethodItem} item
+ */
+D.services.PurchaseCreditsMethodItem.prototype.onclick = function( item ) {};
+D.services.PurchaseCreditsMethodItem.prototype._onclick = function() {
+	this.onclick( this );
+};
+// --- add credits ---
+
+// +++ Purchase with card ***
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseWithCard__par = function(par){
+	O2O( this, par || {} );
+};
+/**
+ * @type {D.services.PurchaseCredits__service}
+ */
+D.services.PurchaseWithCard__par.prototype.service = null;
+/**
+ * @type {D.services}
+ */
+D.services.PurchaseWithCard__par.prototype.services = null;
+D.services.PurchaseWithCard__par.prototype.callback = function(){};
+D.services.PurchaseWithCard__par.prototype.onBuy = function(){};
+D.services.PurchaseWithCard__par.prototype.onClose = function(){};
+D.services.PurchaseWithCard__par.prototype.onFailed = function(){};
+D.services.PurchaseWithCard__par.prototype.addAuto = true;
+D.services.PurchaseWithCard__par.prototype.auto = false;
+
+/**
+ * @extends {mkE.Base}
+ * @param {D.services.PurchaseWithCard__par} par
+ * @constructor
+ */
+D.services.PurchaseWithCard = function(par){
+	this.par = par;
+	this.callback = par.callback;
+	this.onBuy = par.onBuy;
+	this.onClose = par.onClose;
+	this.onFailed = par.onFailed;
+	this.service = par.service;
+	this.services = par.services;
+	this.selectedOption = null;
+	this._selectedAmount = null;
+	this._pb = {};
+	this.node = mkE({
+		tag: 'div',
+		className: 'purchaseWithCard',
+		els: [
+			this._errorNode = T.error( D.services.l.get('Card payment failed') ),
+			{
+				tag: 'div',
+				className: 'service-title',
+				text: this.services.par.caption
+			},
+			{
+				tag: 'div',
+				className: 'options-container',
+				els: [
+					this.optionsNode = mkE({
+						tag: 'div',
+						className: 'options'
+					}) // options node
+				]
+			},
+			this._cardsNode = mkE({
+				tag: 'div',
+				className: 'cards'
+			}),
+			this._userCountry = this._drawUserCountry(),
+			this.saveCardCT = mkE({
+				tag: 'div',
+				className: 'savedCard',
+				els: [
+					{
+						tag: 'div',
+						els: [
+							this._saveCardCB = this._drawSaveCard()
+						]
+					}
+				],
+				style: {
+					display: D.me.age < 16 ? 'none' : ''
+				}
+			}),
+			this.buyButtonContainer = mkE({
+				tag: 'div',
+				className: 'buyButtonContainer',
+				els: [
+					this.buyButton = T.submitButton({
+						type: 'html',
+						color: 'buy',
+						stretch: true,
+						onclick: D.closure( this, this._purchase ),
+						els: [
+							this.buyButtonCaption = mkE({
+								tag: 'span',
+								className: 'pbButtonCaption'
+							}),
+							this.buyButtonPrice = mkE({
+								tag: 'span',
+								className: 'pbButtonPrice'
+							})
+						]
+					}) // buy button
+				]
+			}), // buy button container
+			this.buyAutoButtonContainer = mkE({
+				tag: 'div',
+				className: 'buyAutoButtonContainer',
+				els: [
+					this.autoBuyButton = T.submitButton({
+						type: 'html',
+						color: 'buy',
+						stretch: true,
+						onclick: D.closure( this, this._purchaseAuto ),
+						els: [
+							this.buyAutoButtonCaption = mkE({
+								tag: 'span',
+								className: 'pbButtonCaption'
+							}),
+							this.buyAutoButtonPrice = mkE({
+								tag: 'span',
+								className: 'pbButtonPrice'
+							})
+						]
+					}), // auto buy button
+					{
+						tag: 'span',
+						className: 'formItemTipIcon rules',
+						prop: {
+							title: D.services.l.get('auto_buy_tip')
+						},
+						els: [
+							T.svgIcon({
+								icon: 'info-16',
+								size: 16
+							})
+						]
+					},
+					{
+						tag: 'div',
+						className: 'rules',
+						els: [
+							{
+								tag: 'a',
+								text: '(' + D.services.l.get('rules') + ')',
+								prop: {
+									onclick: D.closure( this, this._showCardRules )
+								}
+							}
+						],
+						style: {
+							display: 'none'
+						}
+					}
+				],
+				style: {
+					display: 'none'
+				}
+			})
+		]
+	}); // node
+
+	if( D.me.age < 16 ){
+		this.buyAutoButtonContainer.style.display = 'none';
+	}
+
+	if (!this.services.donationBox) {
+		this._deleteCard = this._drawDeleteCard();
+		this._deleteCard.append(this.saveCardCT);
+	} else {
+		this._donateAnonymCheck = this._drawDonateAnonym();
+		this._donateAnonymCheck.append(this.saveCardCT);
+	}
+
+	this._errorNode.style.display = 'none';
+
+	new T.Tooltip({
+		node: this._secureNode,
+		content: mkE({
+			tag: 'div',
+			style: {
+				maxWidth: '320px',
+				whiteSpace: 'normal'
+			},
+			text: D.services.l.get('secure_text')
+		})
+	});
+
+	this._drawOptions();
+	this._getData();
+};
+D.services.PurchaseWithCard.prototype = new mkE.Base;
+
+D.services.PurchaseWithCard.prototype.setSelectedCreditOption = function(r) {
+	this.selectedOption = r;
+	this._selectedAmount = r.price;
+	this._buyButtonPriceSet();
+	if( this.services.recommendations && r ) {
+		this.services.recommendations.defaultOption = r.number;
+	}
+	this.services.setSelectedCreditOption(r);
+};
+
+D.services.PurchaseWithCard.prototype._drawOptions = function(){
+	if( !this.service || !this.service.options ){
+		return;
+	}
+	var r;
+	if( count( this.service.options ) == 1 ){
+		r = reset( this.service.options );
+		this.setSelectedCreditOption(r);
+		mkE({
+			tag: 'div',
+			prop: {
+				innerHTML: r.caption
+			}
+		}).append( this.optionsNode );
+	} else {
+		var first = true;
+		this.options = {};
+		for (var k in this.service.options) {
+			r = this.service.options[k];
+			var optCaption = r.caption;
+			if (this.services.donationBox) {
+				if (!(this.services.par.count && this.services.par.count == r.number)) {
+					continue;
+				}
+				optCaption = '<b>' + D.services.l.get('donation') + ' - &euro;' + (r.price / 100).toFixed(2) + '</b>';
+			}
+			var input = T.Forms.radio({
+				caption: optCaption,
+				name: 'services[count]',
+				value: r.number,
+				onclick: D.closure(this, this.setSelectedCreditOption, r)
+			}).append(this.optionsNode);
+			if (this.services.par.count) {
+				if (this.services.par.count == r.number) {
+					input.checked = true;
+					input.defaultChecked = true;
+					input.onclick();
+				}
+			} else if (first) {
+				input.checked = true;
+				input.defaultChecked = true;
+				input.onclick();
+			}
+			if (this.services.donationBox) {
+				input.style.display = 'none';
+			}
+			first = false;
+			this.options[r.number] = input;
+		}
+	}
+	this._buyButtonPriceSet();
+};
+D.services.PurchaseWithCard.prototype._drawUserCountry = function() {
+	return mkE({
+		tag: 'div',
+		className: 'userCountrySelect',
+		els: [
+			{
+				tag: 'div',
+				text: D.services.l.get('user_country_select_title')
+			},
+			{
+				tag: 'span',
+				className: 'color2',
+				text: D.services.l.get('user_country_select_desc')
+			}
+		]
+	});
+};
+/**
+ * @returns {T.Form.CheckBox}
+ * @private
+ */
+D.services.PurchaseWithCard.prototype._drawSaveCard = function() {
+	var p = new T.Form.CheckBoxPar;
+	p.caption = this.services.donationBox ? D.services.l.get('Save card and donate') : D.services.l.get('Save card');
+	p.checked = D.me.age < 16 ? false : false;
+	p.visible = false;
+	p.onchange = D.closure(this, this._onSaveChange);
+	var checkbox = new T.Form.CheckBox(p);
+	var appendNode =  this._cardsNode ?  this._cardsNode : checkbox.node;
+	this._secureNode = mkE({
+		tag: 'div',
+		className: 'secure',
+		text: D.services.l.get('secure')
+	}).append(appendNode);
+	return checkbox;
+};
+
+D.services.PurchaseWithCard.prototype._onSaveChange = function(){
+	if( this._saveCardCB.value() && !this.services.donationBox ){
+		if( !this.par.addAuto && this.par.auto && D.LV ){
+			this.buyAutoButtonContainer.style.display = '';
+		}
+	}else{
+		this.buyAutoButtonContainer.style.display = 'none';
+	}
+};
+
+/**
+ * @returns {T.Form.Item}
+ * @private
+ */
+D.services.PurchaseWithCard.prototype._drawDeleteCard = function() {
+	var p = new T.Form.ItemPar;
+	p.els = [
+		{
+			tag: 'div',
+			className: 'saved-card-info',
+			els: [
+				{
+					tag: 'div',
+					className: 'saved-card-image'
+				},
+				{
+					tag: 'div',
+					className: 'saved-card-text',
+					els: [
+						this._savedCardCaption = mkE({
+							tag: 'div',
+							text: D.services.l.get('Card is saved')
+						}),
+						this._savedCardTime = mkE({
+							tag: 'div',
+							els: [
+								D.services.l.get('card_added') + ' '
+							]
+						}),
+						this._savedCardNumber = mkE({
+							tag: 'div',
+							className: 'saved-card-number'
+						})
+					]
+				}
+			]
+		},
+		{
+			tag: 'div',
+			className: 'saved-card-delete',
+			els: [
+				{
+					tag: 'a',
+					text: D.services.l.get('delete_card_data'),
+					prop: {
+						onclick: D.closure( this, this._deleteSavedCard )
+					}
+				}
+			]
+		}
+	];
+	p.visible = false;
+	return new T.Form.Item(p);
+};
+D.services.PurchaseWithCard.prototype._drawDonateAnonym = function() {
+	var p = new T.Form.CheckBoxPar;
+	p.caption = D.services.l.get('Donate anonymously');
+	p.checked = false;
+	p.visible = true;
+	return new T.Form.CheckBox(p);
+};
+D.services.PurchaseWithCard.prototype._showCardRules = function(){
+	if ( InfoBox.opened ) {
+		var modal = new D.Modal({
+			width: 500,
+			title: 'Noteikumi'
+		});
+		modal.open('/services/save_card_help.php');
+		return
+	}
+
+	InfoBox.open( '/services/save_card_help.php', {
+		width: 500,
+		title: 'Noteikumi'
+	} );
+};
+D.services.PurchaseWithCard.prototype._deleteSavedCard = function() {
+	if ( !D.confirmDelete() ) {
+		return;
+	}
+	this.services.rpc.send( 'delSavedCard',
+		{},
+		this._deleteSavedCardRe,
+		this
+	);
+};
+D.services.PurchaseWithCard.prototype._deleteSavedCardRe = function() {
+	this._savedCard = false;
+	this._saveCardCB.show();
+	this._deleteCard.hide();
+	this._cardsNode.style.display = '';
+	this._onSaveChange();
+};
+D.services.PurchaseWithCard.prototype._buyButtonPriceSet = function(){
+	var tId = this.services.donationBox ? 'donate' : 'create_order';
+
+	var price = this.selectedOption.price;
+	var hideDays = false;
+	if( this.services.recommendations && this.services.recommendations.hasOrder() ) {
+		price += this.services.recommendations.getPrice();
+		hideDays = true;
+	}
+
+	this.buyButtonCaption.innerHTML = D.services.l.get(tId);
+	this.buyButtonPrice.innerHTML = '&euro; ' + (price / 100).toFixed(2);
+
+	this.buyAutoButtonCaption.innerHTML = D.services.l.get('buy_and_subscribe');
+	this.buyAutoButtonPrice.innerHTML = '&euro; ' + (price / 100).toFixed(2);
+	if( !hideDays ) {
+		this.buyAutoButtonPrice.innerHTML += ' / ' + this.selectedOption.number + ' ' + (D.LANG === 'ru' ? 'д.' : 'd.');
+	}
+};
+D.services.PurchaseWithCard.prototype._getData = function(){
+	this.services.rpc.send(
+		'getCardOptions',
+		{},
+		this._getDataRe,
+		this
+	);
+};
+D.services.PurchaseWithCard.prototype._getDataRe = function(re){
+	if( re.savedCard ){
+		if( re.registerDate ){
+			mkE.appendTypeElement(this._savedCardTime, re.registerDate);
+		}
+		if( re.cardInfo ){
+			setNodeText(this._savedCardNumber, re.cardInfo);
+		}
+		if( re.registerDate && re.cardInfo ){
+			this._savedCardCaption.remove();
+		}
+		if (!this.services.donationBox) {
+			this._deleteCard.show();
+			this._cardsNode.style.display = 'none';
+			this._savedCard = true;
+			if( !this.par.addAuto && this.par.auto && D.LV ){
+				this.buyAutoButtonContainer.style.display = '';
+			}
+		} else {
+			this._saveCardCB.show();
+			this._savedCard = false;
+		}
+	}else{
+		this._saveCardCB.show();
+		this._savedCard = false;
+	}
+
+	this._countries = re.countries;
+	this._userSelectedCountry = re.selectedCountry;
+
+	if( this._countries && count(this._countries) > 1 && !this._userSelectedCountry ){
+		var p = new T.Form.SelectPar();
+		p.options = this._countries;
+		p.style = 'margin-top: 8px;';
+		this._countrySelect = new T.Form.Select(p).append(this._userCountry);
+	}else{
+		this._userCountry.remove();
+	}
+};
+
+D.services.PurchaseWithCard.prototype._purchase = function(auto){
+	D.loadingOverlay(this.node);
+	auto = auto === true;
+	this.services.auto_isset = auto;
+	this.services.rpc.async = false;
+	var data = {
+		name: this.services.name,
+		count: this.selectedOption.number,
+		customId: this.services.par.customId,
+		uid: this.services.par.uid,
+		saveCard: D.me.age >= 16 && !this._savedCard ? this._saveCardCB.value() : false,
+		pb: this._pb,
+		type: 'card',
+		cur: 'EUR',
+		price: this.selectedOption.price,
+		donateAnonymously: this._donateAnonymCheck ? this._donateAnonymCheck.value() : false,
+		userCountry: this._countrySelect ? this._countrySelect.value() : this._userSelectedCountry,
+		set_auto: auto,
+		apiTrId: this.services.par.apiTrId
+	};
+	if( this.services.recommendations && this.services.recommendations.hasOrder() ) {
+		data.name = 'batch';
+		data.count = 1;
+		data.price += this.services.recommendations.getPrice();
+		data.customId = null;
+		data.set_auto = false;
+		data.batch = {
+			set_auto: auto,
+			services: [{
+				name:this.services.name,
+				count:this.selectedOption.number,
+			}].concat(this.services.recommendations.getOrderServices())
+		};
+	}
+	this.services.rpc.send(
+		'purchaseWithCard',
+		data,
+		this._purchaseRe,
+		this
+	);
+	this.services.rpc.async = true;
+};
+D.services.PurchaseWithCard.prototype._purchaseAuto = function(){
+	this._purchase(true);
+};
+D.services.PurchaseWithCard.prototype._purchaseRe = function(re){
+	re = new D.services.PurchaseCredits__purchaseCreditsRe(re);
+	if ( re.errorNr ) {
+		alert('Create Card Transaction error #' + re.errorNr);
+		D.removeLoadingOverlay(this.node);
+		return;
+	}
+
+    if (re.chargeAuto) {
+        this._checkAutoStatus.n = 0;
+        this._checkAutoStatus( re.tid );
+        return;
+    }
+
+	if( re.serviceAdded ){
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		return;
+	}
+	var wName = 'draugiemServicesWindow' + ( new Date() ).getTime();
+	var w = D.newWindow('', wName, {
+		width: 1050,
+		height: 650,
+		toolbar: 0
+	} );
+	this.credits = re.credits;
+	var node = mkE( {
+		tag: 'div',
+		prop: {
+			innerHTML: re.form
+		}
+	} ).append( this.node );
+	this.services.transactionId = re.tid;
+	var form = node.getElementsByTagName('form')[0];
+	form.target = wName;
+	form.submit();
+	node.remove();
+	var interval = setInterval( D.closure( this, function() {
+		if ( !w.closed ) {
+			try {
+				w.document;
+				if ( empty(w.document.body.innerHTML) ) {
+					return;
+				}
+			} catch (e) {
+				return;
+			}
+		}
+		clearInterval(interval);
+		w.close();
+		window.focus();
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		this._progressBar = new D.services.ProgressBar({
+			maxValue: 30,
+			onCancel: D.closure(this, function() {
+				this._checkAutoStatus.n = 31;
+			})
+		}).append( this.node );
+		this.callback();
+	} ), 500 );
+};
+D.services.PurchaseWithCard.prototype._checkAutoStatus = function( tid ) {
+	++this._checkAutoStatus.n;
+	var data = {
+		tid: tid
+	};
+	this.services.rpc.send( 'getOrderStatus',
+		data,
+		D.closure( this, this._getOrderStatusRe, tid )
+	);
+	if ( this._progressBar ) {
+		this._progressBar.setValue( this._checkAutoStatus.n );
+	}
+};
+/**
+ * @param {number} tid
+ * @param {D.services.PurchaseCredits__getOrderStatusRe} re
+ * @private
+ */
+D.services.PurchaseWithCard.prototype._getOrderStatusRe = function( tid, re ) {
+	re = new D.services.PurchaseCredits__getOrderStatusRe( re );
+	if ( re.status == 'E' ) {
+		D.removeLoadingOverlay(this.node);
+		this._errorNode.style.display = '';
+		this.onFailed();
+		return;
+	}
+	if ( re.status == 'Y' ) {
+		var cardSaved = D.me.age >= 16 && !this._savedCard ? this._saveCardCB.value() : false;
+		this.onBuy(tid, cardSaved, re.apiLottery);
+		return;
+	}
+	if ( this._checkAutoStatus.n > 30 ) {
+		this.onClose();
+		return;
+	}
+	setTimeout( D.closure( this, this._checkAutoStatus, tid ), 1000 );
+};
+
+D.services.PurchaseWithCard.prototype.onShow = function () {
+	if( this.services._selectedCreditOption && this.options ) {
+		var input = this.options[this.services._selectedCreditOption.number];
+		if( input ) {
+			input.checked = true;
+			input.onclick();
+		}
+	}
+	if( this.services.recommendations ) {
+		D.insertBefore(this.services.recommendations.node, this._cardsNode);
+		this.services.recommendations.onChange = D.closure(this, this._buyButtonPriceSet);
+		this._buyButtonPriceSet();
+	}
+};
+
+// --- Purchase with card ---
+
+// +++ Purchase with banklink ***
+/**
+ * @param {Object} [par]
+ * @constructor
+ */
+D.services.PurchaseWithBanklink__par = function(par){
+	O2O( this, par || {} );
+};
+/**
+ * @type {D.services.PurchaseCredits__service}
+ */
+D.services.PurchaseWithBanklink__par.prototype.service = null;
+/**
+ * @type {D.services}
+ */
+D.services.PurchaseWithBanklink__par.prototype.services = null;
+D.services.PurchaseWithBanklink__par.prototype.callback = function(){};
+D.services.PurchaseWithBanklink__par.prototype.onBuy = function(){};
+D.services.PurchaseWithBanklink__par.prototype.onClose = function(){};
+D.services.PurchaseWithBanklink__par.prototype.onFailed = function(){};
+
+/**
+ * @extends {mkE.Base}
+ * @param {D.services.PurchaseWithBanklink__par} par
+ * @constructor
+ */
+D.services.PurchaseWithBanklink = function(par){
+	this.callback = par.callback;
+	this.onBuy = par.onBuy;
+	this.onClose = par.onClose;
+	this.onFailed = par.onFailed;
+	this.service = par.service;
+	this.services = par.services;
+	this.selectedOption = null;
+	this._selectedAmount = null;
+	this._steps = {};
+	this._pb = {};
+	this.method = 'hanzanet';
+
+	this.node = mkE({
+		tag: 'div',
+		className: 'purchaseWithBanklink',
+		els: [
+			this._errorNode = T.error( D.services.l.get('Banklink payment failed') ),
+			{
+				tag: 'div',
+				className: 'service-title',
+				text: this.services.par.caption
+			},
+			{
+				tag: 'div',
+				className: 'options-container',
+				els: [
+					this.optionsNode = mkE({
+						tag: 'div',
+						className: 'options'
+					}) // options node
+				]
+			},
+			this.banklinkOptions = mkE({
+				tag: 'ul',
+				className: 'banklinkOptions'
+			}),
+			this._userCountry = this._drawUserCountry(),
+			this.buyButtonContainer = mkE({
+				tag: 'div',
+				className: 'buyButtonContainer',
+				els: [
+					this.buyButton = T.submitButton({
+						type: 'html',
+						color: 'buy',
+						stretch: true,
+						onclick: D.closure( this, this._purchase ),
+						els: [
+							this.buyButtonCaption = mkE({
+								tag: 'span',
+								className: 'pbButtonCaption'
+							}),
+							this.buyButtonPrice = mkE({
+								tag: 'span',
+								className: 'pbButtonPrice'
+							})
+						]
+					}) // buy button
+				]
+			}) // buy button container
+		]
+	}); // node
+
+	this._draw();
+};
+D.services.PurchaseWithBanklink.prototype = new mkE.Base;
+/** @type {Object.<string,mkE.Base>} */
+D.services.PurchaseWithBanklink.prototype._steps = {};
+D.services.PurchaseWithBanklink.prototype._draw = function(){
+	var optionEls = this._drawOptions();
+	if (this.services.donationBox) {
+		optionEls = [
+			mkE({
+				tag: 'div',
+				className: 'donationsOptWrapper',
+				els: optionEls
+			})
+		];
+	}
+	mkE.appendTypeElement(this.optionsNode, optionEls);
+
+	for (var type in this.services.banklinks) {
+		var p = new D.services.PurchaseCreditsMethodItem__par;
+		p.type = type;
+		p.caption = this.services.banklinks[type];
+		p.currencies = ['EUR'];
+		p.onclick = D.closure(this, this._selectBanklinkMethod);
+		p.selected = this.method == type;
+
+		var item = new D.services.PurchaseCreditsMethodItem(p);
+		item.append(this.banklinkOptions);
+	}
+
+	this._footer = mkE({
+		tag: 'div',
+		className: 'purchaseContainer'
+	});
+
+	if (this.services.donationBox) {
+		this._donateAnonymCheck = this._drawDonateAnonym();
+		this._donateAnonymCheck.append(this._footer)
+	}
+
+	this.buyButtonContainer.append(this._footer);
+	this._footer.append(this.node);
+
+	this._errorNode.style.display = 'none';
+	this._buyButtonPriceSet();
+
+	this._getData();
+};
+D.services.PurchaseWithBanklink.prototype._drawOptions = function(){
+	if( !this.service || !this.service.options ){
+		return;
+	}
+	var r;
+	var els = [];
+	if (count(this.service.options) == 1) {
+		r = reset(this.service.options);
+		this.setSelectedCreditOption(r);
+		mkE({
+			tag: 'div',
+			prop: {
+				innerHTML: r.caption
+			}
+		}).append( this.optionsNode );
+	} else {
+		var first = true;
+		this.options = {};
+		for (var k in this.service.options) {
+			r = this.service.options[k];
+			var optCaption = r.caption;
+			if (this.services.donationBox) {
+				if (!(this.services.par.count && this.services.par.count == r.number)) {
+					continue;
+				}
+				optCaption = '<b>' + D.services.l.get('donation') + ' - &euro;' + (r.price / 100).toFixed(2) + '</b>';
+			}
+			var input = T.Forms.radio({
+				caption: optCaption,
+				name: 'services[count]',
+				value: r.number,
+				onclick: D.closure(this, this.setSelectedCreditOption, r)
+			});
+			els.push(input);
+			if (this.services.par.count) {
+				if (this.services.par.count == r.number) {
+					input.checked = true;
+					input.defaultChecked = true;
+					input.onclick();
+				}
+			} else if (first) {
+				input.checked = true;
+				input.defaultChecked = true;
+				input.onclick();
+			}
+			if (this.services.donationBox) {
+				input.style.display = 'none';
+			}
+			first = false;
+			this.options[r.number] = input;
+		}
+	}
+	return els;
+};
+
+D.services.PurchaseWithBanklink.prototype.setSelectedCreditOption = function(r) {
+	this.selectedOption = r;
+	this._selectedAmount = r.price;
+	this._buyButtonPriceSet();
+	if( this.services.recommendations && r ) {
+		this.services.recommendations.defaultOption = r.number;
+	}
+	this.services.setSelectedCreditOption(r);
+};
+
+D.services.PurchaseWithBanklink.prototype._drawUserCountry = function() {
+	return mkE({
+		tag: 'div',
+		className: 'userCountrySelect',
+		els: [
+			{
+				tag: 'div',
+				text: D.services.l.get('user_country_select_title')
+			},
+			{
+				tag: 'span',
+				className: 'color2',
+				text: D.services.l.get('user_country_select_desc')
+			}
+		]
+	});
+};
+/**
+ * @param {D.services.PurchaseCreditsMethodItem} method
+ * @private
+ */
+D.services.PurchaseWithBanklink.prototype._selectBanklinkMethod = function( method ){
+	this.method = method.type;
+};
+D.services.PurchaseWithBanklink.prototype._buyButtonPriceSet = function(){
+	var tId = this.services.donationBox ? 'donate' : 'create_order';
+	this.buyButtonCaption.innerHTML = D.services.l.get(tId);
+
+	var price = this.selectedOption.price;
+	if( this.services.recommendations && this.services.recommendations.hasOrder() ) {
+		price += this.services.recommendations.getPrice();
+	}
+	this.buyButtonPrice.innerHTML = '&euro; ' + ( price / 100 ).toFixed(2);
+};
+D.services.PurchaseWithBanklink.prototype._drawDonateAnonym = function() {
+	var p = new T.Form.CheckBoxPar;
+	p.caption = D.services.l.get('Donate anonymously');
+	p.checked = false;
+	p.visible = true;
+	return new T.Form.CheckBox(p);
+};
+D.services.PurchaseWithBanklink.prototype._getData = function(){
+	this.services.rpc.send(
+		'getBanklinkOptions',
+		{},
+		this._getDataRe,
+		this
+	);
+};
+D.services.PurchaseWithBanklink.prototype._getDataRe = function(re){
+	this._countries = re.countries;
+	this._userSelectedCountry = re.selectedCountry;
+
+	if( this._countries && count(this._countries) > 1 && !this._userSelectedCountry ){
+		var p = new T.Form.SelectPar();
+		p.options = this._countries;
+		p.style = 'margin-top: 8px;';
+		this._countrySelect = new T.Form.Select(p).append(this._userCountry);
+	}else{
+		this._userCountry.remove();
+	}
+};
+D.services.PurchaseWithBanklink.prototype._purchase = function(){
+	D.loadingOverlay(this.node);
+	this.services.rpc.async = false;
+	var data = {
+		name: this.services.name,
+		count: this.selectedOption.number,
+		customId: this.services.par.customId,
+		uid: this.services.par.uid,
+		pb: this._pb,
+		type: this.method,
+		cur: 'EUR',
+		price: this.selectedOption.price,
+		donateAnonymously: this._donateAnonymCheck ? this._donateAnonymCheck.value() : false,
+		userCountry: this._countrySelect ? this._countrySelect.value() : this._userSelectedCountry,
+		apiTrId: this.services.par.apiTrId
+	};
+	if( this.services.recommendations && this.services.recommendations.hasOrder() ) {
+		data.name = 'batch';
+		data.count = 1;
+		data.price += this.services.recommendations.getPrice();
+		data.customId = null;
+		data.batch = {
+			services: [{
+				name:this.services.name,
+				count:this.selectedOption.number,
+			}].concat(this.services.recommendations.getOrderServices())
+		};
+	}
+	this.services.rpc.send(
+		'purchaseWithBanklink',
+		data,
+		this._purchaseRe,
+		this
+	);
+	this.services.rpc.async = true;
+};
+D.services.PurchaseWithBanklink.prototype._purchaseRe = function(re){
+	re = new D.services.PurchaseCredits__purchaseCreditsRe(re);
+	if ( re.errorNr ) {
+		alert('Create Banklink Transaction error #' + re.errorNr);
+		D.removeLoadingOverlay(this.node);
+		return;
+	}
+	if( re.serviceAdded ){
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		return;
+	}
+	var wName = 'draugiemServicesWindow' + ( new Date() ).getTime();
+	var w = D.newWindow('', wName, {
+		width: 1050,
+		height: 650,
+		toolbar: 0
+	} );
+	var node = mkE( {
+		tag: 'div',
+		prop: {
+			innerHTML: re.form
+		}
+	} ).append( this.node );
+	this.services.transactionId = re.tid;
+	var form = node.getElementsByTagName('form')[0];
+	form.target = wName;
+	form.submit();
+	node.remove();
+	var interval = setInterval( D.closure( this, function() {
+		if ( !w.closed ) {
+			try {
+				w.document;
+				if ( empty(w.document.body.innerHTML) ) {
+					return;
+				}
+			} catch (e) {
+				return;
+			}
+		}
+		clearInterval(interval);
+		w.close();
+		window.focus();
+		this._checkAutoStatus.n = 0;
+		this._checkAutoStatus( re.tid );
+		this._progressBar = new D.services.ProgressBar({
+			maxValue: 30,
+			onCancel: D.closure(this, function() {
+				this._checkAutoStatus.n = 31;
+			})
+		}).append( this.node );
+		this.callback();
+	} ), 500 );
+};
+D.services.PurchaseWithBanklink.prototype._checkAutoStatus = function( tid ) {
+	++this._checkAutoStatus.n;
+	var data = {
+		tid: tid
+	};
+	this.services.rpc.send( 'getOrderStatus',
+		data,
+		D.closure( this, this._getOrderStatusRe, tid )
+	);
+	if ( this._progressBar ) {
+		this._progressBar.setValue( this._checkAutoStatus.n );
+	}
+};
+/**
+ * @param {number} tid
+ * @param {D.services.PurchaseCredits__getOrderStatusRe} re
+ * @private
+ */
+D.services.PurchaseWithBanklink.prototype._getOrderStatusRe = function( tid, re ) {
+	re = new D.services.PurchaseCredits__getOrderStatusRe( re );
+	if ( re.status == 'E' ) {
+		D.removeLoadingOverlay(this.node);
+		this._errorNode.style.display = '';
+		this.onFailed();
+		return;
+	}
+	if ( re.status == 'Y' ) {
+		this.onBuy(re.apiLottery);
+		return;
+	}
+	if ( this._checkAutoStatus.n > 30 ) {
+		this.onClose();
+		return;
+	}
+	setTimeout( D.closure( this, this._checkAutoStatus, tid ), 1000 );
+};
+
+D.services.PurchaseWithBanklink.prototype.onShow = function () {
+	if( this.services._selectedCreditOption && this.options ) {
+		var input = this.options[this.services._selectedCreditOption.number];
+		if( input ) {
+			input.checked = true;
+			input.onclick();
+		}
+	}
+	if( this.services.recommendations ) {
+		D.insertBefore(this.services.recommendations.node, this.banklinkOptions);
+		this.services.recommendations.onChange = D.closure(this, this._buyButtonPriceSet);
+		this._buyButtonPriceSet();
+	}
+};
+
+// --- Purchase with banklink ---
+
+// section
+D.services.transferSubmit = function () {
+	if (empty(D.services.ac.value())) {
+		D.blink({
+			node: D.services.ac.node
+		});
+		return false;
+	}
+	var node = document.getElementById('servicesTranferCount')
+	if (Number(node.value) < 1) {
+		D.blink({
+			node: node
+		});
+		return false;
+	}
+	if (Number(node.value) < ( D.DEV ? 1 : 50 )) {
+		D.blink({
+			node: node
+		});
+		addClassName(document.getElementById('servicesTranferMin'), 'colorWarn');
+		return false;
+	}
+};
+
+D.services.pb = function (name, par) {
+	par = par || {};
+	var data = {
+		service: name
+	};
+	if (par.uid) {
+		data.uid = par.uid;
+	}
+	if (par.customId) {
+		data.customId = par.customId;
+	}
+	if (par.customType) {
+		data.customType = par.customType;
+	}
+	//if (par.callback) {
+	//	data.callback = par.callback;
+	//}
+	if (par['return']) {
+		data['return'] = par[ 'return' ];
+	}
+	if (par.addAuto) {
+		data['addAuto'] = 1;
+	}
+	if (par.count) {
+		data['count'] = par.count;
+	}
+	if (par.pagePayment) {
+		data['pagePayment'] = par.pagePayment;
+	}
+	if (par.nobizPayment) {
+		data['nobizPayment'] = par.nobizPayment;
+	}
+	if (par.reason) {
+		data['reason'] = par.reason;
+	}
+	if (par.type) {
+		data['type'] = par.type;
+	}
+	if (par.stats) {
+		data['stats'] = par.stats;
+	}
+	if (par.disableCredits) {
+		data['disableCredits'] = par.disableCredits;
+	}
+	if (par.disableCard) {
+		data['disableCard'] = par.disableCard;
+	}
+	if (par.disableBanklinks) {
+		data['disableBanklinks'] = par.disableBanklinks;
+	}
+	if (par.disableSms) {
+		data['disableSms'] = par.disableSms;
+	}
+	if (par.donationBox) {
+		data['donationBox'] = par.donationBox;
+	}
+	var ip = {
+		width: 500,
+		overlayClose: par.overlayClose || false,
+		withoutPadding: true,
+		callback: par.callback || null
+	};
+	if( par.onClose ){
+		ip.onClose = par.onClose;
+	}
+
+	if( name === "numero" ) {
+		ip.onClose = function() {
+			if(!D.services.inst.transactionComplete) {
+				$.get('/stats/ping.php', {key:'numero_service_close'});
+			}
+		}
+	}
+
+	D.services.descr = par.descr;
+	D.services.descrOpen = par.descrOpen;
+	this.rpc.send( 'getPaymentsBlock',
+		data,
+		D.closure( this, this._pb, ip, par )
+	);
+	return false;
+};
+
+D.services._pb = function( ip, par, re ) {
+	re.node = mkE( {
+		tag: 'div',
+		className: 'pb'
+	} );
+	var cb = function() {
+		var modal = new D.Modal(ip);
+		modal.els(re.node);
+		re.modal = modal;
+		D.services.inst = new D.services(re);
+		if( par.callback ){
+			D.services.inst.callback = par.callback instanceof Function ? par.callback : new Function( par.callback );
+		}
+	};
+	if ( !D.onLoad( 'xServices2', cb ) ) {
+		D.addLang('xServices2');
+	}
+	return true;
+};
+
+/* buy credits dialog */
+D.services.bc = function (par) {
+	par = par || {};
+	par.onBuy = par.onBuy || D.reload;
+	var delayInfo = T.info(D.services.l.get('Buy credits delay info'));
+	var bc = new D.services.BuyCredits({
+		onClose: function () {
+			delayInfo.style.display = '';
+			if (par.onClose) {
+				par.onClose();
+			}
+		},
+		onBuy: par.onBuy
+	});
+	InfoBox.html('', { width: 400 });
+	delayInfo.style.display = 'none';
+	delayInfo.append(InfoBox.content);
+	bc.append(InfoBox.content);
+};
+
+D.services.closeExp = function (name) {
+	$('#serviceExp_' + name).fadeOut();
+	this.prototype.rpc.send(
+		'closeExp',
+		{
+			name: name
+		},
+		function (re) {
+		}
+	);
+	return false;
+};
+
+D.services.actual = function (name, buyCredits) {
+	clearTimeout(D.services.actual.timer);
+	var p = {
+		onBuy: function () {
+			D.services.pb(name);
+		},
+		onClose: function () {
+			var cb = function () {
+				D.services.rpc.send(
+					'buyActualCredits',
+					{},
+					function (re) {
+						if (re.buy) {
+							p.onBuy();
+							return;
+						}
+						D.services.actual.timer = setTimeout(cb, 1000);
+					}
+				);
+			};
+			cb();
+		}
+	};
+	if (buyCredits) {
+		p.onBuy();
+		return;
+	}
+	this.rpc.send(
+		'buyActualCredits',
+		{},
+		function (re, par) {
+			if (re.buy) {
+				p.onBuy();
+				return;
+			}
+			D.services.bc(p);
+		}
+	);
+	return false;
+};
+
+D.services.addAuto = function (name, is) {
+	if (is) {
+		InfoBox.open('/services/rq/add_auto.php?name=' + name, { width: 300 });
+	} else {
+		D.services.pb(name, { addAuto: true });
+	}
+	return false;
+};
+
+D.services.addAutoWith = function (pak, type) {
+	this.rpc.send(
+		'addAuto',
+		{
+			pak: pak,
+			type: type
+		},
+		function () {
+			D.reload();
+		},
+		this
+	);
+};
+
+D.services.openBusinessBuyCreditsPopup = function (bid){
+	/*
+	InfoBox.html('<div id="servicesBuyCreditsPopup"></div>', {
+		width: 400
+	});
+	var buy = new D.services.BusinessBuyCredits({
+		page_id: page_id,
+		hideSteps: true,
+		onBuy: D.reload,
+		onClose: function () {
+			$("#servicesDelayInfo").clone().attr("id", "servicesDelayInfoPopup").prependTo("#servicesBuyCreditsPopup");
+			$("#servicesDelayInfoPopup").show();
+		}
+	});
+	buy.append("#servicesBuyCreditsPopup");
+	*/
+	this.openBuyCreditsPopup( {
+		bid:bid
+	} );
+};
+
+D.services.drawBuyCreditsPopup = function(par){
+	if( (D.services.blockedPaymentMethods.card && D.services.blockedPaymentMethods.paypal && D.services.blockedPaymentMethods.ibank) ) {
+		var popupContent = mkE({
+			tag: 'div',
+			els: [
+				mkE({
+					tag: 'div',
+					text: D.services.l.get('cannot_top_up_wallet') + ' ',
+					style: 'display: inline;'
+				}),
+				mkE({
+					tag: 'a',
+					text: D.services.l.get('please_contact_administration'),
+					href: '/help/?tab=4&sub=1&cat=1&suggest'
+				})
+			]
+		});
+		InfoBox.els(popupContent);
+		return;
+	}
+	var popupContent = mkE({
+		tag: 'div',
+		id: 'servicesBuyCreditsPopup'
+	});
+	var ibPar = {
+		width: 500,
+		overlayClose: false,
+		onClose: par.onIbClose || function () {
+		}
+	};
+	var buy;
+	if (par.bid) {
+		buy = new D.services.BuyCredits({
+			hideSteps: true,
+			onBuy: par.onBuy || D.reload,
+			long: true,
+			bid: par.bid || 0,
+			onClose: par.onClose || function () {
+			},
+			minAmount: par.minAmount || 0
+		});
+	} else {
+		ibPar.withoutPadding = true;
+		ibPar.title = D.services.l.get('wallet_increase');
+
+		var p = new D.services.PurchaseCredits__par;
+		p.onBuy = par.onBuy || D.reload;
+		p.onClose = par.onClose || function () {
+			};
+		p.services = this;
+		buy = new D.services.PurchaseCredits(p);
+	}
+
+	InfoBox.els(popupContent, ibPar);
+	buy.append(popupContent);
+	D.services._buy = buy;
+};
+
+D.services.openBuyCreditsPopup = function(par){
+	par = par || {};
+	D.services.rpc.send(
+		'blockedPaymentMethods',
+		{} ,
+		function (paymentMethodBlocks){
+			D.services.blockedPaymentMethods = paymentMethodBlocks;
+			D.services.drawBuyCreditsPopup(par);
+		},
+		this
+	);
+};
+
+D.services.createBillPP = function( par ) {
+	var modal = new D.Modal({
+		width: 300,
+		title: 'Sagatavot rēķinu'
+	});
+
+	var radioList;
+	var inputTitle;
+	var inputRegNr;
+	var inputFizAddr;
+	var inputJurAddr;
+
+	modal.els([
+		radioList = new T.Form.RadioList({
+			caption: '',
+			value: 'private',
+			options: [
+				{
+					caption: 'Fiziska persona',
+					value: 'private'
+				},
+				{
+					caption: 'Juridiska persona',
+					value: 'legal'
+				}
+			],
+			onchange: D.closure( this, function() {
+				if ( radioList.value() == 'private' ) {
+					inputTitle.caption('Vārds, uzvārds:');
+					inputRegNr.caption('Personas kods:');
+					inputFizAddr.caption('Adrese:');
+					inputJurAddr.hide();
+				} else {
+					inputTitle.caption('Nosaukums:');
+					inputRegNr.caption('Reģ. nr.:');
+					inputFizAddr.caption('Fiz. adrese:');
+					inputJurAddr.show().caption('Jurid. adrese:');
+				}
+
+				// set default values
+				if ( isset( par.payer ) && par.payer == radioList.value() ) {
+					inputTitle.value( par.title );
+					inputRegNr.value( par.regnr );
+					inputFizAddr.value( par.fiz_addr );
+					inputJurAddr.value( par.jur_addr );
+				} else {
+					inputTitle.value( radioList.value() == 'private' ? D.me.title : '' );
+					inputRegNr.value( '' );
+					inputFizAddr.value( '' );
+					inputJurAddr.value( '' );
+				}
+			})
+		}),
+		inputTitle = new T.Form.Input({
+			required: true
+		}),
+		inputRegNr = new T.Form.Input({
+			required: true
+		}),
+		inputFizAddr = new T.Form.Input({
+			required: true
+		}),
+		inputJurAddr = new T.Form.Input({
+			required: true
+		}),
+		new T.Form.Button({
+			caption: 'Lejupielādēt rēķinu',
+			onclick: D.closure( this, function() {
+				if ( empty(inputTitle.value()) ) {
+					inputTitle.error('');
+					return false;
+				} else {
+					inputTitle.error( false );
+				}
+
+				if ( empty(inputRegNr.value()) ) {
+					inputRegNr.error('');
+					return false;
+				} else {
+					inputRegNr.error( false );
+				}
+
+				this.rpc.send(
+					'createPPBill',
+					{
+						ts: par.ts,
+						payer: radioList.value(),
+						title: inputTitle.value(),
+						regnr: inputRegNr.value(),
+						fiz_addr: inputFizAddr.value(),
+						jur_addr: inputJurAddr.value(),
+					},
+					function(re){
+						if ( re ) {
+							window.location = '/services/rq/pp_pdf.php?id=' + re;
+						}
+					},
+					this
+				);
+
+				return true;
+			})
+		})
+	]);
+	if ( isset( par.payer ) ) {
+		radioList.value( par.payer );
+	}
+	radioList.onchange();
+};
+
+/**
+ * @Class
+ * @extends {mkE.Base}
+ */
+D.services.ProgressBar = new Class(
+	{
+		speed: 1500,
+		maxValue: 0,
+
+		/**
+		 * @constructs
+		 */
+		__construct: function ( par ) {
+			if ( par.maxValue ) {
+				this.maxValue = par.maxValue;
+			}
+			if ( par.speed ) {
+				this.speed = par.speed;
+			}
+			if( par.onCancel ) {
+				this.onCancel = par.onCancel;
+			}
+
+			this.node = mkE({
+				tag: 'div',
+				className: 'serviceProgressBar',
+				els: [
+					T.info(D.Lang.get('service_progress', 'xServices2')),
+					{
+						tag: 'div',
+						className: 'inner',
+						els: [
+							this._progressBar = mkE({
+								tag: 'div',
+								className: 'bar',
+								style: {
+									transition: 'width '+ (this.speed / 1000) +'s'
+								}
+							})
+						]
+					},
+					this.onCancel ? {
+						tag: 'div',
+						className: 'cancel',
+						els: [
+							new T.Form.Button({
+								caption: D.Lang.get('Aizvērt', 'xServices2'),
+								onclick: this.onCancel
+							})
+						]
+					} : null
+				]
+			});
+		},
+
+		setValue: function( value ) {
+			if ( value > this.maxValue ) {
+				value = this.maxValue;
+			}
+
+			this._progressBar.style.width = Math.round(value / this.maxValue * 100) + '%';
+		}
+	},
+	mkE.Base
+);
+
+/**
+ * @class
+ * @param {[]} recommendations
+ * @extends mkE.Base
+ */
+D.services.Recommendations = Class(
+	/**
+	 * @lends {D.Services.Recommendations#}
+	 */
+	{
+		/** @type {D.services.Recommendations.Item[]} items */
+		items: null,
+		/** @type {int|null} */
+		defaultOption: null,
+		/** @type {Function} */
+		onChange: null,
+		/**
+		 * @param {[]} recommendations
+		 * @private
+		 */
+		__construct: function ( recommendations ) {
+			this.recommendations = recommendations;
+			this.items = [];
+
+			var itemsNode;
+			this.node = mkE({
+				tag: 'div',
+				className: 'recommendations',
+				els: [
+					{
+						tag: 'h3',
+						text: D.Lang.get('recommendations', 'xServices2')
+					},
+					itemsNode = mkE({
+						tag: 'div',
+						className: 'items'
+					})
+				]
+			});
+
+			for( var i = 0; i < this.recommendations.length; i++ ) {
+				this.items.push(
+					new D.services.Recommendations.Item(this.recommendations[i], this).append(itemsNode)
+				);
+			}
+		},
+		/**
+		 * @returns {int}
+		 */
+		getPrice: function() {
+			var price = 0;
+			for( var i = 0; i < this.items.length; i++ ) {
+				var item = this.items[i];
+				price += item.getPrice();
+			}
+			return price;
+		},
+		/**
+		 * @returns {boolean}
+		 */
+		hasOrder: function () {
+			for( var i = 0; i < this.items.length; i++ ) {
+				var item = this.items[i];
+				if( item.getPrice() > 0 ) {
+					return true;
+				}
+			}
+			return false;
+		},
+		/**
+		 * @returns {[]}
+		 */
+		getOrderServices: function () {
+			var re = [];
+			for( var i = 0; i < this.items.length; i++ ) {
+				var item = this.items[i];
+				var creditOption = item.getSelectedCreditOption();
+				if( creditOption && creditOption.price > 0 ) {
+					re.push({
+						name: item.name,
+						count: creditOption.number
+					});
+				}
+			}
+			return re;
+		},
+		getCaption: function () {
+			var re = [];
+			for( var i = 0; i < this.items.length; i++ ) {
+				var item = this.items[i];
+				var creditOption = item.getSelectedCreditOption();
+				if( creditOption && creditOption.price > 0 ) {
+					re.push(item.item.caption);
+				}
+			}
+			return re;
+		}
+	},
+	mkE.Base
+);
+
+
+/**
+ * @class
+ * @param {object} item
+ * @extends mkE.Base
+ */
+D.services.Recommendations.Item = Class(
+	/**
+	 * @lends {D.Services.Recommendations.Item#}
+	 */
+	{
+		/** @type {object} */
+		item: null,
+		/** @type {string} */
+		name: null,
+		/** @type {D.services.Recommendations} */
+		parent: null,
+		/** @type {boolean} */
+		_active: false,
+		/**
+		 * @param {object} item
+		 * @param {D.services.Recommendations} parent
+		 */
+		__construct: function ( item, parent ) {
+			this.item = item;
+			this.name = item.name;
+			this.parent = parent;
+			this.node = mkE({
+				tag: 'div',
+				className: 'item',
+				els: [
+					{
+						tag: 'div',
+						className: 'wrapper',
+						els: [
+							{
+								tag: 'img',
+								className: 'serviceIcon',
+								src: D.PIMG + 'services/img/icons/' + item.name + '128.png'
+							},
+							{
+								tag: 'div',
+								className: 'serviceCaption',
+								text: item.caption
+							},
+							item.wasRecentlyBought ? {
+								tag: 'div',
+								className: 'recently_bought'
+							} : null,
+							{
+								tag: 'span',
+								className: 'info',
+								title: item.description,
+								els: [
+									T.svgIcon({icon:'info-16'})
+								]
+							},
+							{
+								tag: 'div',
+								className: 'btnContainer',
+								els: [
+									this._addButton = new T.Form.Button({
+										caption: D.Lang.get('Pievienot', 'xServices2'),
+										icon: 'plus',
+										stretch: true,
+										onclick: this._onClickAdd
+									})
+								]
+							},
+							this._optionsNode = mkE({
+								tag: 'div',
+								className: 'options',
+								style: {
+									display: 'none'
+								}
+							})
+						]
+					},
+					item.append ? {
+						tag: 'div',
+						className: 'append',
+						innerHTML: item.append
+					} : null
+				]
+			});
+
+			this._drawCreditOptions();
+		},
+		_drawCreditOptions: function () {
+			var options = [
+				{
+					caption: D.Lang.get('none', 'xServices2'),
+					value: -1,
+					checked: true
+				}
+			];
+			for( var i = 0; i < this.item.co.length; i++ ) {
+				var option = this.item.co[i];
+				options.push({
+					caption: option.caption,
+					captionHTML: true,
+					value: i
+				});
+			}
+			this._optionsInput = new T.Form.RadioList({
+				name: 'rec_' + this.item.name + '_co',
+				options: options,
+				onchange: this._onChangeOptions
+			}).append(this._optionsNode);
+		},
+		_onClickAdd: function () {
+			this._addButton.hide();
+			this._optionsNode.style.display = '';
+			this._active = true;
+
+			if( this._optionsInput.value() === "-1" ) {
+				var hasDefault = false;
+				for( var i = 0; i < this.item.co.length; i++ ) {
+					if(this.item.co[i].number === this.parent.defaultOption) {
+						this._optionsInput.value(i);
+						hasDefault = true;
+					}
+				}
+				if( !hasDefault ) {
+					this._optionsInput.value(0);
+				}
+			}
+
+			this.parent.onChange(this);
+		},
+		_onChangeOptions: function () {
+			if( this._optionsInput.value() === "-1" ) {
+				this._addButton.show();
+				this._optionsNode.style.display = 'none';
+				this._active = false;
+			}
+			this.parent.onChange();
+		},
+		getSelectedCreditOption: function () {
+			var val = +this._optionsInput.value();
+			if( !this._active || val < 0 ) {
+				return null;
+			}
+			return this.item.co[val];
+		},
+		/**
+		 * @returns {int}
+		 */
+		getPrice: function() {
+			var co = this.getSelectedCreditOption();
+			if(!co) {
+				return 0;
+			}
+			return co.price;
+		}
+	},
+	mkE.Base
+);
+
+/* +++ D.Vat +++ */
+
+D.Vat = {
+	rpc: new RPC('/services/rq/app.php'),
+	EUCountries: ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'EU', 'FI', 'FR', 'GB', 'HR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SI', 'SK', 'SE']
+};
+
+D.Vat.isValidEUVAT = function( vatInput, countrySelect ) {
+	vatInput._form.error(false);
+
+	var vatValue = vatInput.value;
+	var cc = countrySelect._form.value().toUpperCase();
+	// iso -> eu
+	if ( cc == 'UK' ) {
+		cc = 'GB';
+	} else if ( cc == 'GR' ) {
+		cc = 'EL';
+	}
+	if ( !array_search( cc, this.EUCountries ) ) {
+		return true;
+	}
+
+	// add country letters, if not specified
+	var ccLetters = vatValue.substr(0, 2).toUpperCase();
+	if ( ccLetters != cc ) {
+		vatInput.value = cc + vatValue;
+		vatValue = vatInput.value;
+	}
+
+	var isSyntaxValid = checkVATNumber( vatValue, cc );
+
+	if ( !isSyntaxValid ) {
+		vatInput._form.error( 'Nav korekti ievadīts PVN numurs.' );
+		return false;
+	}
+
+	//this.rpc.async = false;
+	//this.rpc.send(
+	//    'isValidEUVAT', {
+	//        vat: vatInput.value
+	//    },
+	//    D.closure( this, function (re) {
+	//        isSyntaxValid = re;
+	//        if ( !re ) {
+	//            vatInput._vatRe.appendChild( T.error('Nav derīgs PVN numurs.') );
+	//        }
+	//    })
+	//);
+	//this.rpc.async = true;
+
+	return isSyntaxValid !== false;
+};
+
+/*==================================================================================================
+ https://www.braemoor.co.uk/software/vat.shtml
+
+ Version       V1.33
+ 9 June 2020
+
+ Parameters:    toCheck - VAT number be checked.
+
+ This function checks the value of the parameter for a valid European VAT number.
+
+ If the number is found to be invalid format, the function returns a value of false. Otherwise it
+ returns the VAT number re-formatted.
+
+ Example call:
+
+ if (checkVATNumber (myVATNumber))
+ alert ("VAT number has a valid format")
+ else
+ alert ("VAT number has invalid format");
+
+ ---------------------------------------------------------------------------------------------------*/
+
+function checkVATNumber (toCheck, cc) {
+	// Array holds the regular expressions for the valid VAT number
+	var vatexp = [];
+
+	// To change the default country (e.g. from the UK to Germany - DE):
+	//    1.  Change the country code in the defCCode variable below to "DE".
+	//    2.  Remove the question mark from the regular expressions associated with the UK VAT number:
+	//        i.e. "(GB)?" -> "(GB)"
+	//    3.  Add a question mark into the regular expression associated with Germany's number
+	//        following the country code: i.e. "(DE)" -> "(DE)?"
+
+	var defCCode = "LV";
+	var allCountries = false;
+
+	// Note - VAT codes without the "**" in the comment do not have check digit checking.
+
+	if ( allCountries || cc == 'AT' ) {
+		vatexp.push (/^(AT)U(\d{8})$/);                            //** Austria
+	}
+	if ( allCountries || cc == 'BE' ) {
+		vatexp.push( /^(BE)(0?\d{9})$/ );                          //** Belgium
+	}
+	if ( allCountries || cc == 'BG' ) {
+		vatexp.push( /^(BG)(\d{9,10})$/ );                         //** Bulgaria
+	}
+	if ( allCountries || cc == 'CH' ) {
+		vatexp.push( /^(CHE)(\d{9})(MWST|TVA|IVA)?$/ );            //** Switzerland (not EU)
+	}
+	if ( allCountries || cc == 'CY' ) {
+		vatexp.push( /^(CY)([0-59]\d{7}[A-Z])$/ );                 //** Cyprus
+	}
+	if ( allCountries || cc == 'CZ' ) {
+		vatexp.push( /^(CZ)(\d{8,10})(\d{3})?$/ );                 //** Czech Republic
+	}
+	if ( allCountries || cc == 'DE' ) {
+		vatexp.push( /^(DE)([1-9]\d{8})$/ );                       //** Germany
+	}
+	if ( allCountries || cc == 'DK' ) {
+		vatexp.push( /^(DK)(\d{8})$/ );                            //** Denmark
+	}
+	if ( allCountries || cc == 'EE' ) {
+		vatexp.push( /^(EE)(10\d{7})$/ );                          //** Estonia
+	}
+	if ( allCountries || cc == 'EL' ) {
+		vatexp.push( /^(EL)(\d{9})$/ );                            //** Greece
+	}
+	if ( allCountries || cc == 'ES' ) {
+		vatexp.push( /^(ES)([A-Z]\d{8})$/ );                       //** Spain (National juridical entities)
+		vatexp.push( /^(ES)([A-HN-SW]\d{7}[A-J])$/ );              //** Spain (Other juridical entities)
+		vatexp.push( /^(ES)([0-9YZ]\d{7}[A-Z])$/ );                //** Spain (Personal entities type 1)
+		vatexp.push( /^(ES)([KLMX]\d{7}[A-Z])$/ );                 //** Spain (Personal entities type 2)
+	}
+	if ( allCountries || cc == 'EU' ) {
+		vatexp.push( /^(EU)(\d{9})$/ );                            //** EU-type
+	}
+	if ( allCountries || cc == 'FI' ) {
+		vatexp.push( /^(FI)(\d{8})$/ );                            //** Finland
+	}
+	if ( allCountries || cc == 'FR' ) {
+		vatexp.push( /^(FR)(\d{11})$/ );                           //** France (1)
+		vatexp.push( /^(FR)([A-HJ-NP-Z]\d{10})$/ );                // France (2)
+		vatexp.push( /^(FR)(\d[A-HJ-NP-Z]\d{9})$/ );               // France (3)
+		vatexp.push( /^(FR)([A-HJ-NP-Z]{2}\d{9})$/ );              // France (4)
+	}
+	if ( allCountries || cc == 'GB' ) {
+		vatexp.push( /^(GB)?(\d{9})$/ );                           //** UK (Standard)
+		vatexp.push( /^(GB)?(\d{12})$/ );                          //** UK (Branches)
+		vatexp.push( /^(GB)?(GD\d{3})$/ );                         //** UK (Government)
+		vatexp.push( /^(GB)?(HA\d{3})$/ );                         //** UK (Health authority)
+	}
+	if ( allCountries || cc == 'HR' ) {
+		vatexp.push( /^(HR)(\d{11})$/ );                           //** Croatia
+	}
+	if ( allCountries || cc == 'HU' ) {
+		vatexp.push( /^(HU)(\d{8})$/ );                            //** Hungary
+	}
+	if ( allCountries || cc == 'IE' ) {
+		vatexp.push( /^(IE)(\d{7}[A-W])$/ );                       //** Ireland (1)
+		vatexp.push( /^(IE)([7-9][A-Z\*\+)]\d{5}[A-W])$/ );        //** Ireland (2)
+		vatexp.push( /^(IE)(\d{7}[A-W][AH])$/ );                   //** Ireland (3)
+	}
+	if ( allCountries || cc == 'IT' ) {
+		vatexp.push( /^(IT)(\d{11})$/ );                           //** Italy
+	}
+	if ( allCountries || cc == 'LV' ) {
+		vatexp.push( /^(LV)(\d{11})$/ );                           //** Latvia
+	}
+	if ( allCountries || cc == 'LT' ) {
+		vatexp.push( /^(LT)(\d{9}|\d{12})$/ );                     //** Lithunia
+	}
+	if ( allCountries || cc == 'LU' ) {
+		vatexp.push( /^(LU)(\d{8})$/ );                            //** Luxembourg
+	}
+	if ( allCountries || cc == 'MT' ) {
+		vatexp.push( /^(MT)([1-9]\d{7})$/ );                       //** Malta
+	}
+	if ( allCountries || cc == 'NL' ) {
+		vatexp.push (/^(NL)(\d{9}B\d{2})$/);                       //** Netherlands
+		vatexp.push (/^(NL)([A-Z0-9\*\+]{10}\d{2})$/);             //** Netherlands sole proprietor
+	}
+	if ( allCountries || cc == 'NO' ) {
+		vatexp.push( /^(NO)(\d{9})$/ );                            //** Norway (not EU)
+	}
+	if ( allCountries || cc == 'PL' ) {
+		vatexp.push( /^(PL)(\d{10})$/ );                           //** Poland
+	}
+	if ( allCountries || cc == 'PT' ) {
+		vatexp.push( /^(PT)(\d{9})$/ );                            //** Portugal
+	}
+	if ( allCountries || cc == 'RO' ) {
+		vatexp.push( /^(RO)([1-9]\d{1,9})$/ );                     //** Romania
+	}
+	if ( allCountries || cc == 'RU' ) {
+		vatexp.push( /^(RU)(\d{10}|\d{12})$/ );                    //** Russia (not EU)
+	}
+	if ( allCountries || cc == 'RS' ) {
+		vatexp.push( /^(RS)(\d{9})$/ );                            //** Serbia (not EU)
+	}
+	if ( allCountries || cc == 'SI' ) {
+		vatexp.push( /^(SI)([1-9]\d{7})$/ );                       //** Slovenia
+	}
+	if ( allCountries || cc == 'SK' ) {
+		vatexp.push( /^(SK)([1-9]\d[2346-9]\d{7})$/ );             //** Slovakia Republic
+	}
+	if ( allCountries || cc == 'SE' ) {
+		vatexp.push( /^(SE)(\d{10}01)$/ );                         //** Sweden
+	}
+
+	// Load up the string to check
+	var VATNumber = toCheck.toUpperCase();
+
+	// Remove spaces etc. from the VAT number to help validation
+	VATNumber = VATNumber.replace (/(\s|-|\.)+/g, '');
+
+	// Assume we're not going to find a valid VAT number
+	var valid = false;
+
+	// Check the string against the regular expressions for all types of VAT numbers
+	for (i=0; i<vatexp.length; i++) {
+
+		// Have we recognised the VAT number?
+		if (vatexp[i].test(VATNumber)) {
+
+			// Yes - we have
+			var cCode = RegExp.$1;                             // Isolate country code
+			var cNumber = RegExp.$2;                           // Isolate the number
+			if (cCode.length == 0) cCode = defCCode;           // Set up default country code
+
+			// Call the appropriate country VAT validation routine depending on the country code
+			if (eval(cCode+"VATCheckDigit ('"+cNumber+"')")) valid = VATNumber;
+
+			// Having processed the number, we break from the loop
+			break;
+		}
+	}
+
+	// Return with either an error or the reformatted VAT number
+	return valid;
+}
+
+function ATVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of an Austrian VAT number.
+
+	var total = 0;
+	var multipliers = [1,2,1,2,1,2,1];
+	var temp = 0;
+
+	// Extract the next digit and multiply by the appropriate multiplier.
+	for (var i = 0; i < 7; i++) {
+		temp = Number(vatnumber.charAt(i)) * multipliers[i];
+		if (temp > 9)
+			total += Math.floor(temp/10) + temp%10
+		else
+			total += temp;
+	}
+
+	// Establish check digit.
+	total = 10 - (total+4) % 10;
+	if (total == 10) total = 0;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (7,8))
+		return true
+	else
+		return false;
+}
+
+function BEVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Belgium VAT number.
+
+	// Nine digit numbers have a 0 inserted at the front.
+	if (vatnumber.length == 9) vatnumber = "0" + vatnumber;
+
+	if (vatnumber.slice(1,2) == 0) return false;
+
+	// Modulus 97 check on last nine digits
+	if (97 - vatnumber.slice (0,8) % 97 == vatnumber.slice (8,10))
+		return true
+	else
+		return false;
+}
+
+function BGVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Bulgarian VAT number.
+
+	if (vatnumber.length == 9) {
+
+		// Check the check digit of 9 digit Bulgarian VAT numbers.
+		var total = 0;
+
+		// First try to calculate the check digit using the first multipliers
+		var temp = 0;
+		for (var i = 0; i < 8; i++) temp += Number(vatnumber.charAt(i)) * (i+1);
+
+		// See if we have a check digit yet
+		total = temp % 11;
+		if (total != 10) {
+			if (total == vatnumber.slice (8))
+				return true
+			else
+				return false;
+		}
+
+		// We got a modulus of 10 before so we have to keep going. Calculate the new check digit using
+		// the different multipliers
+		var temp = 0;
+		for (var i = 0; i < 8; i++) temp += Number(vatnumber.charAt(i)) * (i+3);
+
+		// See if we have a check digit yet. If we still have a modulus of 10, set it to 0.
+		total = temp % 11;
+		if (total == 10) total = 0;
+		if (total == vatnumber.slice (8))
+			return true
+		else
+			return false;
+	}
+
+	// 10 digit VAT code - see if it relates to a standard physical person
+	if ((/^\d\d[0-5]\d[0-3]\d\d{4}$/).test(vatnumber)) {
+
+		// Check month
+		var month = Number(vatnumber.slice(2,4));
+		if ((month > 0 && month < 13) || (month > 20 && month < 33) || (month > 40 && month < 53)) {
+
+			// Extract the next digit and multiply by the counter.
+			var multipliers = [2,4,8,5,10,9,7,3,6];
+			var total = 0;
+			for (var i = 0; i < 9; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+			// Establish check digit.
+			total = total % 11;
+			if (total == 10) total = 0;
+
+			// Check to see if the check digit given is correct, If not, try next type of person
+			if (total == vatnumber.substr (9,1)) return true;
+		}
+	}
+
+	// It doesn't relate to a standard physical person - see if it relates to a foreigner.
+
+	// Extract the next digit and multiply by the counter.
+	var multipliers = [21,19,17,13,11,9,7,3,1];
+	var total = 0;
+	for (var i = 0; i < 9; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Check to see if the check digit given is correct, If not, try next type of person
+	if (total % 10 == vatnumber.substr (9,1)) return true;
+
+	// Finally, if not yet identified, see if it conforms to a miscellaneous VAT number
+
+	// Extract the next digit and multiply by the counter.
+	var multipliers = [4,3,2,7,6,5,4,3,2];
+	var total = 0;
+	for (var i = 0; i < 9; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = 11 - total % 11;
+	if (total == 10) return false;
+	if (total == 11) total = 0;
+
+	// Check to see if the check digit given is correct, If not, we have an error with the VAT number
+	if (total == vatnumber.substr (9,1))
+		return true;
+	else
+		return false;
+}
+
+function CHEVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Swiss VAT number.
+
+	// Extract the next digit and multiply by the counter.
+	var multipliers = [5,4,3,2,7,6,5,4];
+	var total = 0;
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = 11 - total % 11;
+	if (total == 10) return false;
+	if (total == 11) total = 0;
+
+	// Check to see if the check digit given is correct, If not, we have an error with the VAT number
+	if (total == vatnumber.substr (8,1))
+		return true;
+	else
+		return false;
+}
+
+function CYVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Cypriot VAT number.
+
+	// Not allowed to start with '12'
+	if (Number(vatnumber.slice(0,2) == 12)) return false;
+
+	// Extract the next digit and multiply by the counter.
+	var total = 0;
+	for (var i = 0; i < 8; i++) {
+		var temp = Number(vatnumber.charAt(i));
+		if (i % 2 == 0) {
+			switch (temp) {
+				case 0: temp = 1; break;
+				case 1: temp = 0; break;
+				case 2: temp = 5; break;
+				case 3: temp = 7; break;
+				case 4: temp = 9; break;
+				default: temp = temp*2 + 3;
+			}
+		}
+		total += temp;
+	}
+
+	// Establish check digit using modulus 26, and translate to char. equivalent.
+	total = total % 26;
+	total = String.fromCharCode(total+65);
+
+	// Check to see if the check digit given is correct
+	if (total == vatnumber.substr (8,1))
+		return true
+	else
+		return false;
+}
+
+function CZVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Czech Republic VAT number.
+
+	var total = 0;
+	var multipliers = [8,7,6,5,4,3,2];
+
+	var czexp = new Array ();
+	czexp[0] = (/^\d{8}$/);                                       //  8 digit legal entities
+	// Note - my specification says that that the following should have a range of 0-3 in the fourth
+	// digit, but the valid number CZ395601439 did not confrm, so a range of 0-9 has been allowed.
+	czexp[1] = (/^[0-5][0-9][0|1|5|6][0-9][0-3][0-9]\d{3}$/);     //  9 digit individuals
+	czexp[2] = (/^6\d{8}$/);                                      //  9 digit individuals (Special cases)
+	czexp[3] = (/^\d{2}[0-3|5-8][0-9][0-3][0-9]\d{4}$/);          // 10 digit individuals
+	var i = 0;
+
+	// Legal entities
+	if (czexp[0].test(vatnumber)) {
+
+		// Extract the next digit and multiply by the counter.
+		for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+		// Establish check digit.
+		total = 11 - total % 11;
+		if (total == 10) total = 0;
+		if (total == 11) total = 1;
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (7,8))
+			return true
+		else
+			return false;
+	}
+
+	// Individuals type 1 (Standard) - 9 digits without check digit
+	else if (czexp[1].test(vatnumber)) {
+		if (temp = Number(vatnumber.slice(0,2)) > 62) return false;
+		return true;
+	}
+
+	// Individuals type 2 (Special Cases) - 9 digits including check digit
+	else if (czexp[2].test(vatnumber)) {
+
+		// Extract the next digit and multiply by the counter.
+		for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i+1)) * multipliers[i];
+
+		// Establish check digit pointer into lookup table
+		if (total % 11 == 0)
+			var a = total + 11
+		else
+			var a = Math.ceil (total/11) * 11;
+		var pointer = a - total;
+
+		// Convert calculated check digit according to a lookup table;
+		var lookup  = [8,7,6,5,4,3,2,1,0,9,8];
+		if (lookup[pointer-1] == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+
+	// Individuals type 3 - 10 digits
+	else if (czexp[3].test(vatnumber)) {
+		var temp = Number(vatnumber.slice(0,2)) + Number(vatnumber.slice(2,4)) + Number(vatnumber.slice(4,6)) + Number(vatnumber.slice(6,8)) + Number(vatnumber.slice(8));
+		if (temp % 11 == 0 && Number(vatnumber) % 11 == 0)
+			return true
+		else
+			return false;
+	}
+
+	// else error
+	return false;
+}
+
+function DEVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a German VAT number.
+
+	var product = 10;
+	var sum = 0;
+	var checkdigit = 0;
+	for (var i = 0; i < 8; i++) {
+
+		// Extract the next digit and implement peculiar algorithm!.
+		sum = (Number(vatnumber.charAt(i)) + product) % 10;
+		if (sum == 0) {sum = 10};
+		product = (2 * sum) % 11;
+	}
+
+	// Establish check digit.
+	if (11 - product == 10) {checkdigit = 0} else {checkdigit = 11 - product};
+
+	// Compare it with the last two characters of the VAT number. If the same, then it is a valid
+	// check digit.
+	if (checkdigit == vatnumber.slice (8,9))
+		return true
+	else
+		return false;
+}
+
+function DKVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Danish VAT number.
+
+	var total = 0;
+	var multipliers = [2,7,6,5,4,3,2,1];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = total % 11;
+
+	// The remainder should be 0 for it to be valid..
+	if (total == 0)
+		return true
+	else
+		return false;
+}
+
+function EEVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of an Estonian VAT number.
+
+	var total = 0;
+	var multipliers = [3,7,1,3,7,1,3,7];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits using modulus 10.
+	total = 10 - total % 10;
+	if (total == 10) total = 0;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (8,9))
+		return true
+	else
+		return false;
+}
+
+function ELVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Greek VAT number.
+
+	var total = 0;
+	var multipliers = [256,128,64,32,16,8,4,2];
+
+	//eight character numbers should be prefixed with an 0.
+	if (vatnumber.length == 8) {vatnumber = "0" + vatnumber};
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = total % 11;
+	if (total > 9) {total = 0;};
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (8,9))
+		return true
+	else
+		return false;
+}
+
+function ESVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Spanish VAT number.
+
+	var total = 0;
+	var temp = 0;
+	var multipliers = [2,1,2,1,2,1,2];
+	var esexp = new Array ();
+	esexp[0] = (/^[A-H|J|U|V]\d{8}$/);
+	esexp[1] = (/^[A-H|N-S|W]\d{7}[A-J]$/);
+	esexp[2] = (/^[0-9|Y|Z]\d{7}[A-Z]$/);
+	esexp[3] = (/^[K|L|M|X]\d{7}[A-Z]$/);
+	var i = 0;
+
+	// National juridical entities
+	if (esexp[0].test(vatnumber)) {
+
+		// Extract the next digit and multiply by the counter.
+		for (i = 0; i < 7; i++) {
+			temp = Number(vatnumber.charAt(i+1)) * multipliers[i];
+			if (temp > 9)
+				total += Math.floor(temp/10) + temp%10
+			else
+				total += temp;
+		}
+		// Now calculate the check digit itself.
+		total = 10 - total % 10;
+		if (total == 10) {total = 0;}
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+
+	// Juridical entities other than national ones
+	else if (esexp[1].test(vatnumber)) {
+
+		// Extract the next digit and multiply by the counter.
+		for (i = 0; i < 7; i++) {
+			temp = Number(vatnumber.charAt(i+1)) * multipliers[i];
+			if (temp > 9)
+				total += Math.floor(temp/10) + temp%10
+			else
+				total += temp;
+		}
+
+		// Now calculate the check digit itself.
+		total = 10 - total % 10;
+		total = String.fromCharCode(total+64);
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+
+	// Personal number (NIF) (starting with numeric of Y or Z)
+	else if (esexp[2].test(vatnumber)) {
+		var tempnumber = vatnumber;
+		if (tempnumber.substring(0,1) == 'Y') tempnumber = tempnumber.replace (/Y/, "1");
+		if (tempnumber.substring(0,1) == 'Z') tempnumber = tempnumber.replace (/Z/, "2");
+		return tempnumber.charAt(8) == 'TRWAGMYFPDXBNJZSQVHLCKE'.charAt(Number(tempnumber.substring(0,8)) % 23);
+	}
+
+	// Personal number (NIF) (starting with K, L, M, or X)
+	else if (esexp[3].test(vatnumber)) {
+		return vatnumber.charAt(8) == 'TRWAGMYFPDXBNJZSQVHLCKE'.charAt(Number(vatnumber.substring(1,8)) % 23);
+	}
+
+	else return false;
+}
+
+function EUVATCheckDigit (vatnumber) {
+
+	// We know little about EU numbers apart from the fact that the first 3 digits represent the
+	// country, and that there are nine digits in total.
+	return true;
+}
+
+function FIVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Finnish VAT number.
+
+	var total = 0;
+	var multipliers = [7,9,10,5,8,4,2];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = 11 - total % 11;
+	if (total > 9) {total = 0;};
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (7,8))
+		return true
+	else
+		return false;
+}
+
+function FRVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a French VAT number.
+
+	if (!(/^\d{11}$/).test(vatnumber)) return true;
+
+	// Extract the last nine digits as an integer.
+	var total = vatnumber.substring(2);
+
+	// Establish check digit.
+	total = (total*100+12) % 97;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (0,2))
+		return true
+	else
+		return false;
+}
+
+function GBVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a UK VAT number.
+
+	var multipliers = [8,7,6,5,4,3,2];
+
+	// Government departments
+	if (vatnumber.substr(0,2) == 'GD') {
+		if (vatnumber.substr(2,3) < 500)
+			return true
+		else
+			return false;
+	}
+
+	// Health authorities
+	if (vatnumber.substr(0,2) == 'HA') {
+		if (vatnumber.substr(2,3) > 499)
+			return true
+		else
+			return false;
+	}
+
+	// Standard and commercial numbers
+	var total = 0;
+
+	// 0 VAT numbers disallowed!
+	if (Number(vatnumber.slice(0)) == 0) return false;
+
+	// Check range is OK for modulus 97 calculation
+	var no = Number(vatnumber.slice(0,7));
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Old numbers use a simple 97 modulus, but new numbers use an adaptation of that (less 55). Our
+	// VAT number could use either system, so we check it against both.
+
+	// Establish check digits by subtracting 97 from total until negative.
+	var cd = total;
+	while (cd > 0) {cd = cd - 97;}
+
+	// Get the absolute value and compare it with the last two characters of the VAT number. If the
+	// same, then it is a valid traditional check digit. However, even then the number must fit within
+	// certain specified ranges.
+	cd = Math.abs(cd);
+	if (cd == vatnumber.slice (7,9) && no < 9990001 && (no < 100000 || no > 999999) && (no < 9490001 || no > 9700000)) return true;
+
+	// Now try the new method by subtracting 55 from the check digit if we can - else add 42
+	if (cd >= 55)
+		cd = cd - 55
+	else
+		cd = cd + 42;
+	if (cd == vatnumber.slice (7,9) && no > 1000000)
+		return true;
+	else
+		return false;
+}
+
+function HRVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Croatian VAT number using ISO 7064, MOD 11-10 for check digit.
+
+	var product = 10;
+	var sum = 0;
+	var checkdigit = 0;
+
+	for (var i = 0; i < 10; i++) {
+
+		// Extract the next digit and implement the algorithm
+		sum = (Number(vatnumber.charAt(i)) + product) % 10;
+		if (sum == 0) {sum = 10};
+		product = (2 * sum) % 11;
+	}
+
+	// Now check that we have the right check digit
+	if ((product + vatnumber.slice (10,11)*1) % 10== 1)
+		return true
+	else
+		return false;
+}
+
+function HUVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Hungarian VAT number.
+
+	var total = 0;
+	var multipliers = [9,7,3,1,9,7,3];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digit.
+	total = 10 - total % 10;
+	if (total == 10) total = 0;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (7,8))
+		return true
+	else
+		return false;
+}
+
+function IEVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of an Irish VAT number.
+
+	var total = 0;
+	var multipliers = [8,7,6,5,4,3,2];
+
+	// If the code is type 1 format, we need to convert it to the new before performing the validation.
+	if (/^\d[A-Z\*\+]/.test(vatnumber)) vatnumber = "0" + vatnumber.substring(2,7) + vatnumber.substring(0,1) + vatnumber.substring(7,8);
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// If the number is type 3 then we need to include the trailing A or H in the calculation
+	if (/^\d{7}[A-Z][AH]$/.test(vatnumber)) {
+
+		// Add in a multiplier for the character A (1*9=9) or H (8*9=72)
+		if (vatnumber.charAt(8) == 'H')
+			total += 72
+		else
+			total += 9;
+	}
+
+	// Establish check digit using modulus 23, and translate to char. equivalent.
+	total = total % 23;
+	if (total == 0)
+		total = "W"
+	else
+		total = String.fromCharCode(total+64);
+
+	// Compare it with the eighth character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (7,8))
+		return true
+	else
+		return false;
+}
+
+function ITVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of an Italian VAT number.
+
+	var total = 0;
+	var multipliers = [1,2,1,2,1,2,1,2,1,2];
+	var temp;
+
+	// The last three digits are the issuing office, and cannot exceed more 201, unless 999 or 888
+	if (Number(vatnumber.slice(0,7))==0) return false;
+	temp=Number(vatnumber.slice(7,10));
+	if ((temp<1) || (temp>201) && temp != 999 && temp != 888) return false;
+
+	// Extract the next digit and multiply by the appropriate
+	for (var i = 0; i < 10; i++) {
+		temp = Number(vatnumber.charAt(i)) * multipliers[i];
+		if (temp > 9)
+			total += Math.floor(temp/10) + temp%10
+		else
+			total += temp;
+	}
+
+	// Establish check digit.
+	total = 10 - total % 10;
+	if (total > 9) {total = 0;};
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (10,11))
+		return true
+	else
+		return false;
+}
+
+function LTVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Lithuanian VAT number.
+
+	// 9 character VAT numbers are for legal persons
+	if (vatnumber.length == 9) {
+
+		// 8th character must be one
+		if (!(/^\d{7}1/).test(vatnumber)) return false;
+
+		// Extract the next digit and multiply by the counter+1.
+		var total = 0;
+		for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * (i+1);
+
+		// Can have a double check digit calculation!
+		if (total % 11 == 10) {
+			var multipliers = [3,4,5,6,7,8,9,1];
+			total = 0;
+			for (i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+		}
+
+		// Establish check digit.
+		total = total % 11;
+		if (total == 10) {total = 0;};
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+
+	// 12 character VAT numbers are for temporarily registered taxpayers
+	else {
+
+		// 11th character must be one
+		if (!(/^\d{10}1/).test(vatnumber)) return false;
+
+		// Extract the next digit and multiply by the counter+1.
+		var total = 0;
+		var multipliers = [1,2,3,4,5,6,7,8,9,1,2];
+		for (var i = 0; i < 11; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+		// Can have a double check digit calculation!
+		if (total % 11 == 10) {
+			var multipliers = [3,4,5,6,7,8,9,1,2,3,4];
+			total = 0;
+			for (i = 0; i < 11; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+		}
+
+		// Establish check digit.
+		total = total % 11;
+		if (total == 10) {total = 0;};
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (11,12))
+			return true
+		else
+			return false;
+	}
+}
+
+function LUVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Luxembourg VAT number.
+
+	if (vatnumber.slice (0,6) % 89 == vatnumber.slice (6,8))
+		return true
+	else
+		return false;
+}
+
+function LVVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Latvian VAT number.
+
+	// Differentiate between legal entities and natural bodies. For the latter we simply check that
+	// the first six digits correspond to valid DDMMYY dates.
+	if ((/^[0-3]/).test(vatnumber)) {
+		if ((/^[0-3][0-9][0-1][0-9]/).test(vatnumber) )
+			return true
+		else
+			return false;
+	}
+
+	else {
+
+		var total = 0;
+		var multipliers = [9,1,4,8,3,10,2,5,7,6];
+
+		// Extract the next digit and multiply by the counter.
+		for (var i = 0; i < 10; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+		// Establish check digits by getting modulus 11.
+		if (total%11 == 4 && vatnumber[0] ==9) total = total - 45;
+		if (total%11 == 4)
+			total = 4 - total%11
+		else if (total%11 > 4)
+			total = 14 - total%11
+		else if (total%11 < 4)
+			total = 3 - total%11;
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (10,11))
+			return true
+		else
+			return false;
+	}
+}
+
+function MTVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Maltese VAT number.
+
+	var total = 0;
+	var multipliers = [3,4,6,7,8,9];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 6; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits by getting modulus 37.
+	total = 37 - total % 37;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (6,8) * 1)
+		return true
+	else
+		return false;
+}
+
+function NLVATCheckDigit (vatnumber) {
+
+	// Function to turn a Dutch VAT number in its entirety to a numeric equivalent
+	function convert_string_tonumeric (vatstring) {
+
+		// Add 'NL' back to front of string
+		var vat = 'NL' + vatstring;
+
+		// Each character in the string is looked at one at a time
+		var nextchar = '';
+
+		// The result of the conversion goes here
+		var result = '';
+
+		for (var i = 0; i < vat.length; i++) {
+
+			// Pick up the next character from the vat string as Unicode
+			nextchar = vat.charCodeAt(i);
+
+			// If it a '+' or a '*' convert to numeric 36 and 37 respectively
+			if (nextchar > 41 && nextchar < 44)
+				nextchar = nextchar - 6
+
+			// Convert 0 to 9 to 0 to 9 characters
+			else if (nextchar > 47 && nextchar < 58)
+				nextchar = nextchar - 48
+
+			// Convert A-Z to 10 to 35
+			else if (nextchar > 64 && nextchar < 91)
+				nextchar = nextchar - 55;
+
+			// Add to convert test string
+			result = result + nextchar;
+		}
+		return result;
+	}
+
+	// Function to calculate the modulus of a long number
+	function modulo (divident, divisor) {
+
+		var partLength = 7;
+
+		while (divident.length > partLength) {
+			var part = divident.substring(0, partLength);
+			divident = (part % divisor) +  divident.substring(partLength);
+		}
+
+		return divident % divisor;
+	}
+
+	function standardNo () {
+
+		// Checks the check digits of a Dutch VAT number.
+
+		var total = 0;
+		var multipliers = [9,8,7,6,5,4,3,2];
+
+		// Extract the next digit and multiply by the counter.
+		for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+		// Establish check digits by getting modulus 11.
+		total = total % 11;
+		if (total > 9) total = 0;
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+
+	function soleproprietorNo (vatnumber) {
+
+		// Checks the check digit of a sole proprietor Dutch VAT number
+		var numericvat = convert_string_tonumeric (vatnumber);
+		if (modulo (numericvat, 97) == 1)
+			return true
+		else
+			return false;
+	}
+
+	// First check whether the VAT number is a valid standard one
+	if (standardNo (vatnumber))
+		return true
+
+	// If not, check whether it is a valid sole proprietor vat number
+	else if (soleproprietorNo (vatnumber))
+		return true
+
+	// Neither - it must be invalid
+	else return false;
+
+}
+
+function NOVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Norwegian VAT number.
+	// See http://www.brreg.no/english/coordination/number.html
+
+	var total = 0;
+	var multipliers = [3,2,7,6,5,4,3,2];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits by getting modulus 11. Check digits > 9 are invalid
+	total = 11 - total % 11;
+	if (total == 11) {total = 0;}
+	if (total < 10) {
+
+		// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+		if (total == vatnumber.slice (8,9))
+			return true
+		else
+			return false;
+	}
+}
+
+function PLVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Polish VAT number.
+
+	var total = 0;
+	var multipliers = [6,5,7,2,3,4,5,6,7];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 9; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits subtracting modulus 11 from 11.
+	total = total % 11;
+	if (total > 9) {total = 0;};
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (9,10))
+		return true
+	else
+		return false;
+}
+
+function PTVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Portugese VAT number.
+
+	var total = 0;
+	var multipliers = [9,8,7,6,5,4,3,2];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 8; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits subtracting modulus 11 from 11.
+	total = 11 - total % 11;
+	if (total > 9) {total = 0;};
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (8,9))
+		return true
+	else
+		return false;
+}
+
+function ROVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Romanian VAT number.
+
+	var multipliers = [7,5,3,2,1,7,5,3,2];
+
+	// Extract the next digit and multiply by the counter.
+	var VATlen = vatnumber.length;
+	multipliers = multipliers.slice (10-VATlen);
+	var total = 0;
+	for (var i = 0; i < vatnumber.length-1; i++) {
+		total += Number(vatnumber.charAt(i)) * multipliers[i];
+	}
+
+	// Establish check digits by getting modulus 11.
+	total = (10 * total) % 11;
+	if (total == 10) total = 0;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (total == vatnumber.slice (vatnumber.length-1, vatnumber.length))
+		return true
+	else
+		return false;
+}
+
+function RSVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Serbian VAT number using ISO 7064, MOD 11-10 for check digit.
+
+	var product = 10;
+	var sum = 0;
+	var checkdigit = 0;
+
+	for (var i = 0; i < 8; i++) {
+
+		// Extract the next digit and implement the algorithm
+		sum = (Number(vatnumber.charAt(i)) + product) % 10;
+		if (sum == 0) {sum = 10};
+		product = (2 * sum) % 11;
+	}
+
+	// Now check that we have the right check digit
+	if ((product + vatnumber.slice (8,9)*1) % 10== 1)
+		return true
+	else
+		return false;
+}
+function RUVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Russian INN number
+	// See http://russianpartner.biz/test_inn.html for algorithm
+
+	// 10 digit INN numbers
+	if (vatnumber.length == 10) {
+		var total = 0;
+		var multipliers = [2,4,10,3,5,9,4,6,8,0]
+		for (var i = 0; i < 10; i++) {
+			total += Number(vatnumber.charAt(i)) * multipliers[i];
+		}
+		total = total % 11
+		if (total > 9) {total = total % 10}
+
+		// Compare it with the last character of the VAT number. If it is the same, then it's valid
+		if (total == vatnumber.slice (9,10))
+			return true
+		else
+			return false
+
+		// 12 digit INN numbers
+	} else if(vatnumber.length == 12){
+		var total1 = 0
+		var multipliers1 = [7,2,4,10,3,5,9,4,6,8,0]
+		var total2 = 0
+		var multipliers2 = [3,7,2,4,10,3,5,9,4,6,8,0]
+
+		for (var i = 0; i < 11; i++) total1 += Number(vatnumber.charAt(i)) * multipliers1[i];
+		total1 = total1 % 11
+		if (total1 > 9) {total1 = total1 % 10}
+
+		for (var i = 0; i < 11; i++) total2 += Number(vatnumber.charAt(i)) * multipliers2[i];
+		total2 = total2 % 11
+		if (total2 > 9) {total2 = total2 % 10}
+
+		// Compare the first check with the 11th character and the second check with the 12th and last
+		// character of the VAT number. If they're both the same, then it's valid
+		if ((total1 == vatnumber.slice (10,11)) && (total2 == vatnumber.slice (11,12)))
+			return true
+		else
+			return false
+	}
+}
+
+function SEVATCheckDigit (vatnumber) {
+
+	// Calculate R where R = R1 + R3 + R5 + R7 + R9, and Ri = INT(Ci/5) + (Ci*2) modulo 10
+	var R = 0;
+	var digit;
+	for (var i = 0; i < 9; i=i+2) {
+		digit = Number(vatnumber.charAt(i));
+		R += Math.floor(digit / 5)  + ((digit * 2) % 10);
+	}
+
+	// Calculate S where S = C2 + C4 + C6 + C8
+	var S = 0;
+	for (var i = 1; i < 9; i=i+2) S += Number(vatnumber.charAt(i));
+
+	// Calculate the Check Digit
+	var cd = (10 - (R + S) % 10) % 10;
+
+	// Compare it with the last character of the VAT number. If it's the same, then it's valid.
+	if (cd == vatnumber.slice (9,10))
+		return true
+	else
+		return false;
+}
+
+function SIVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Slovenian VAT number.
+
+	var total = 0;
+	var multipliers = [8,7,6,5,4,3,2];
+
+	// Extract the next digit and multiply by the counter.
+	for (var i = 0; i < 7; i++) total += Number(vatnumber.charAt(i)) * multipliers[i];
+
+	// Establish check digits using modulus 11
+	total = 11 - total % 11;
+	if (total == 10) {total = 0;};
+
+	// Compare the number with the last character of the VAT number. If it is the
+	// same, then it's a valid check digit.
+	if (total != 11 && total == vatnumber.slice (7,8))
+		return true
+	else
+		return false;
+}
+
+function SKVATCheckDigit (vatnumber) {
+
+	// Checks the check digits of a Slovakian VAT number.
+
+	// Check that the modulus of the whole VAT number is 0 - else error
+	if (Number(vatnumber % 11) == 0)
+		return true
+	else
+		return false;
+}
+
+/* --- D.Vat --- */
+
+D.loaded('services');

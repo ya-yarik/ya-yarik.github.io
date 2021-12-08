@@ -1,0 +1,1746 @@
+DR.comments = DR.comments || {};
+DR.comments.struct = DR.comments.struct || {};
+DR.comments.select = DR.comments.select || {};
+/** @extends {DR._Base} */
+DR.comments.struct.Base = function(par){
+	/** @private */
+	this._t = 3077;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.canComment)) this.canComment = Boolean(par.canComment);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.type)) this.type = (parseInt(par.type)||0);
+};
+DR._Base._types[3077] = DR.comments.struct.Base;
+DR.comments.struct.Base[__P] = new DR._Base;
+DR.comments.struct.Base[__P][__C] = DR.comments.struct.Base;
+/** @type {Boolean} */
+DR.comments.struct.Base.prototype.canComment = null;
+/** @type {Number} */
+DR.comments.struct.Base.prototype.count = null;
+/** @type {Number} */
+DR.comments.struct.Base.prototype.id = null;
+/** @type {Number} */
+DR.comments.struct.Base.prototype.type = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.Item = function(par){
+	/** @private */
+	this._t = 35;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.canBlock)) this.canBlock = Boolean(par.canBlock);
+	if(DR._Base.is(par.canDelete)) this.canDelete = Boolean(par.canDelete);
+	if(DR._Base.is(par.canEdit)) this.canEdit = Boolean(par.canEdit);
+	if(DR._Base.is(par.canHide)) this.canHide = Boolean(par.canHide);
+	if(DR._Base.is(par.canRate)) this.canRate = Boolean(par.canRate);
+	if(DR._Base.is(par.childs)){
+		var tmp = [];
+		for( var k in par.childs ) tmp.push(DR._Base.cast(par.childs [k]));
+		this.childs = tmp;
+	}
+	if(DR._Base.is(par.childsPg)) this.childsPg = (parseInt(par.childsPg)||0);
+	if(DR._Base.is(par.cid)) this.cid = (parseInt(par.cid)||0);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.created)) this.created = (parseInt(par.created)||0);
+	if(DR._Base.is(par.dislikeProfiles)){
+		var tmp = [];
+		for( var k in par.dislikeProfiles ) tmp.push((parseInt(par.dislikeProfiles [k])||0));
+		this.dislikeProfiles = tmp;
+	}
+	if(DR._Base.is(par.dislikes)) this.dislikes = (parseInt(par.dislikes)||0);
+	if(DR._Base.is(par.embeds)){
+		var tmp = {};
+		for( var k in par.embeds ) tmp[k] = DR._Base.cast(par.embeds [k]);
+		this.embeds = tmp;
+	}
+	if(DR._Base.is(par.fid)) this.fid = (parseInt(par.fid)||0);
+	if(DR._Base.is(par.gif)) this.gif = DR._Base.cast(par.gif);
+	if(DR._Base.is(par.giphy)) this.giphy = DR._Base.cast(par.giphy);
+	if(DR._Base.is(par.headLinks)){
+		var tmp = [];
+		for( var k in par.headLinks ) tmp.push(DR._Base.cast(par.headLinks [k]));
+		this.headLinks = tmp;
+	}
+	if(DR._Base.is(par.iDislike)) this.iDislike = Boolean(par.iDislike);
+	if(DR._Base.is(par.iLike)) this.iLike = Boolean(par.iLike);
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.isBad)) this.isBad = Boolean(par.isBad);
+	if(DR._Base.is(par.isBlocked)) this.isBlocked = Boolean(par.isBlocked);
+	if(DR._Base.is(par.isHidden)) this.isHidden = Boolean(par.isHidden);
+	if(DR._Base.is(par.lastEditTime)) this.lastEditTime = (parseInt(par.lastEditTime)||0);
+	if(DR._Base.is(par.likeProfiles)){
+		var tmp = [];
+		for( var k in par.likeProfiles ) tmp.push((parseInt(par.likeProfiles [k])||0));
+		this.likeProfiles = tmp;
+	}
+	if(DR._Base.is(par.likes)) this.likes = (parseInt(par.likes)||0);
+	if(DR._Base.is(par.parent)) this.parent = (parseInt(par.parent)||0);
+	if(DR._Base.is(par.sound)) this.sound = DR._Base.cast(par.sound);
+	if(DR._Base.is(par.text)) this.text = String(par.text||'');
+	if(DR._Base.is(par.unseen)) this.unseen = Boolean(par.unseen);
+	if(DR._Base.is(par.url)) this.url = String(par.url||'');
+	if(DR._Base.is(par.user)) this.user = DR._Base.cast(par.user);
+	if(DR._Base.is(par.userDislikes)){
+		var tmp = {};
+		for( var k in par.userDislikes ) tmp[k] = DR._Base.cast(par.userDislikes [k]);
+		this.userDislikes = tmp;
+	}
+	if(DR._Base.is(par.userLikes)){
+		var tmp = {};
+		for( var k in par.userLikes ) tmp[k] = DR._Base.cast(par.userLikes [k]);
+		this.userLikes = tmp;
+	}
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+	if(DR._Base.is(par.video)) this.video = DR._Base.cast(par.video);
+};
+DR._Base._types[35] = DR.comments.struct.Item;
+DR.comments.struct.Item[__P] = new DR._Base;
+DR.comments.struct.Item[__P][__C] = DR.comments.struct.Item;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.canBlock = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.canDelete = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.canEdit = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.canHide = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.canRate = null;
+/** @type {Array.<DR.comments.struct.Item>} */
+DR.comments.struct.Item.prototype.childs = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.childsPg = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.cid = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.count = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.created = null;
+/** @type {Array.<Number>} */
+DR.comments.struct.Item.prototype.dislikeProfiles = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.dislikes = null;
+/** @type {Object.<String,DR.gallery.struct.Embed>} */
+DR.comments.struct.Item.prototype.embeds = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.fid = null;
+/** @type {DR.comments.struct.Gif} */
+DR.comments.struct.Item.prototype.gif = null;
+/** @type {DR.giphy.struct.Item|null} */
+DR.comments.struct.Item.prototype.giphy = null;
+/** @type {Array.<DR.comments.struct.HeadLink>|null} */
+DR.comments.struct.Item.prototype.headLinks = null;
+/** @type {Boolean|null} */
+DR.comments.struct.Item.prototype.iDislike = null;
+/** @type {Boolean|null} */
+DR.comments.struct.Item.prototype.iLike = null;
+/** @type {DR.comments.struct.Image} */
+DR.comments.struct.Item.prototype.image = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.isBad = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.isBlocked = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.isHidden = null;
+/** @type {Number|null} */
+DR.comments.struct.Item.prototype.lastEditTime = null;
+/** @type {Array.<Number>} */
+DR.comments.struct.Item.prototype.likeProfiles = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.likes = null;
+/** @type {Number} */
+DR.comments.struct.Item.prototype.parent = null;
+/** @type {DR.sounds.struct.Item|null} */
+DR.comments.struct.Item.prototype.sound = null;
+/** @type {String} */
+DR.comments.struct.Item.prototype.text = null;
+/** @type {Boolean} */
+DR.comments.struct.Item.prototype.unseen = null;
+/** @type {String|null} */
+DR.comments.struct.Item.prototype.url = null;
+/** @type {DR.users.struct.User} */
+DR.comments.struct.Item.prototype.user = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.Item.prototype.userDislikes = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.Item.prototype.userLikes = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.Item.prototype.users = null;
+/** @type {DR.comments.struct.Video} */
+DR.comments.struct.Item.prototype.video = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.Item = function(){
+	this._fields = {};
+};
+DR.comments.select.Item[__CL] = "Comments__Item";
+DR.comments.select.Item[__P] = new DR._Select;
+DR.comments.select.Item[__P][__C] = DR.comments.select.Item;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.canBlock = function(v){ this._fields.canBlock = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.canDelete = function(v){ this._fields.canDelete = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.canEdit = function(v){ this._fields.canEdit = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.canHide = function(v){ this._fields.canHide = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.canRate = function(v){ this._fields.canRate = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.childs = function(v){ this._fields.childs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.childsPg = function(v){ this._fields.childsPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.cid = function(v){ this._fields.cid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.created = function(v){ this._fields.created = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.dislikeProfiles = function(v){ this._fields.dislikeProfiles = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.dislikes = function(v){ this._fields.dislikes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.embeds = function(v){ this._fields.embeds = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.fid = function(v){ this._fields.fid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.gif = function(v){ this._fields.gif = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.giphy = function(v){ this._fields.giphy = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.headLinks = function(v){ this._fields.headLinks = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.iDislike = function(v){ this._fields.iDislike = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.iLike = function(v){ this._fields.iLike = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.isBad = function(v){ this._fields.isBad = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.isBlocked = function(v){ this._fields.isBlocked = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.isHidden = function(v){ this._fields.isHidden = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.lastEditTime = function(v){ this._fields.lastEditTime = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.likeProfiles = function(v){ this._fields.likeProfiles = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.likes = function(v){ this._fields.likes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.parent = function(v){ this._fields.parent = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.sound = function(v){ this._fields.sound = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.text = function(v){ this._fields.text = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.unseen = function(v){ this._fields.unseen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.url = function(v){ this._fields.url = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.user = function(v){ this._fields.user = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.userDislikes = function(v){ this._fields.userDislikes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.userLikes = function(v){ this._fields.userLikes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Item} */
+DR.comments.select.Item.prototype.video = function(v){ this._fields.video = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.Gif = function(par){
+	/** @private */
+	this._t = 37;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.thumb)) this.thumb = String(par.thumb||'');
+	if(DR._Base.is(par.tmpThumb)) this.tmpThumb = String(par.tmpThumb||'');
+	if(DR._Base.is(par.video)) this.video = String(par.video||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[37] = DR.comments.struct.Gif;
+DR.comments.struct.Gif[__P] = new DR._Base;
+DR.comments.struct.Gif[__P][__C] = DR.comments.struct.Gif;
+/** @type {Number} */
+DR.comments.struct.Gif.prototype.h = null;
+/** @type {String} */
+DR.comments.struct.Gif.prototype.thumb = null;
+/** @type {String} */
+DR.comments.struct.Gif.prototype.tmpThumb = null;
+/** @type {String} */
+DR.comments.struct.Gif.prototype.video = null;
+/** @type {Number} */
+DR.comments.struct.Gif.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.Gif = function(){
+	this._fields = {};
+};
+DR.comments.select.Gif[__CL] = "Comments__Gif";
+DR.comments.select.Gif[__P] = new DR._Select;
+DR.comments.select.Gif[__P][__C] = DR.comments.select.Gif;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Gif} */
+DR.comments.select.Gif.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Gif} */
+DR.comments.select.Gif.prototype.thumb = function(v){ this._fields.thumb = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Gif} */
+DR.comments.select.Gif.prototype.tmpThumb = function(v){ this._fields.tmpThumb = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Gif} */
+DR.comments.select.Gif.prototype.video = function(v){ this._fields.video = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Gif} */
+DR.comments.select.Gif.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.HeadLink = function(par){
+	/** @private */
+	this._t = 38;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.caption)) this.caption = String(par.caption||'');
+	if(DR._Base.is(par.href)) this.href = String(par.href||'');
+};
+DR._Base._types[38] = DR.comments.struct.HeadLink;
+DR.comments.struct.HeadLink[__P] = new DR._Base;
+DR.comments.struct.HeadLink[__P][__C] = DR.comments.struct.HeadLink;
+/** @type {String} */
+DR.comments.struct.HeadLink.prototype.caption = null;
+/** @type {String} */
+DR.comments.struct.HeadLink.prototype.href = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.HeadLink = function(){
+	this._fields = {};
+};
+DR.comments.select.HeadLink[__CL] = "Comments__HeadLink";
+DR.comments.select.HeadLink[__P] = new DR._Select;
+DR.comments.select.HeadLink[__P][__C] = DR.comments.select.HeadLink;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.HeadLink} */
+DR.comments.select.HeadLink.prototype.caption = function(v){ this._fields.caption = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.HeadLink} */
+DR.comments.select.HeadLink.prototype.href = function(v){ this._fields.href = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.Image = function(par){
+	/** @private */
+	this._t = 36;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.large)) this.large = String(par.large||'');
+	if(DR._Base.is(par.say)) this.say = String(par.say||'');
+	if(DR._Base.is(par.uber)) this.uber = String(par.uber||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[36] = DR.comments.struct.Image;
+DR.comments.struct.Image[__P] = new DR._Base;
+DR.comments.struct.Image[__P][__C] = DR.comments.struct.Image;
+/** @type {Number} */
+DR.comments.struct.Image.prototype.h = null;
+/** @type {String} */
+DR.comments.struct.Image.prototype.large = null;
+/** @type {String} */
+DR.comments.struct.Image.prototype.say = null;
+/** @type {String} */
+DR.comments.struct.Image.prototype.uber = null;
+/** @type {Number} */
+DR.comments.struct.Image.prototype.w = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.Image = function(){
+	this._fields = {};
+};
+DR.comments.select.Image[__CL] = "Comments__Image";
+DR.comments.select.Image[__P] = new DR._Select;
+DR.comments.select.Image[__P][__C] = DR.comments.select.Image;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Image} */
+DR.comments.select.Image.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Image} */
+DR.comments.select.Image.prototype.large = function(v){ this._fields.large = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Image} */
+DR.comments.select.Image.prototype.say = function(v){ this._fields.say = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Image} */
+DR.comments.select.Image.prototype.uber = function(v){ this._fields.uber = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.Image} */
+DR.comments.select.Image.prototype.w = function(v){ this._fields.w = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.Video = function(par){
+	/** @private */
+	this._t = 797;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.thumb)) this.thumb = String(par.thumb||'');
+	if(DR._Base.is(par.tmpThumb)) this.tmpThumb = String(par.tmpThumb||'');
+	if(DR._Base.is(par.video)) this.video = String(par.video||'');
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[797] = DR.comments.struct.Video;
+DR.comments.struct.Video[__P] = new DR._Base;
+DR.comments.struct.Video[__P][__C] = DR.comments.struct.Video;
+/** @type {Number} */
+DR.comments.struct.Video.prototype.h = null;
+/** @type {String} */
+DR.comments.struct.Video.prototype.thumb = null;
+/** @type {String} */
+DR.comments.struct.Video.prototype.tmpThumb = null;
+/** @type {String} */
+DR.comments.struct.Video.prototype.video = null;
+/** @type {Number} */
+DR.comments.struct.Video.prototype.w = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.UploadedImageInfo = function(par){
+	/** @private */
+	this._t = 2782;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.w)) this.w = (parseInt(par.w)||0);
+};
+DR._Base._types[2782] = DR.comments.struct.UploadedImageInfo;
+DR.comments.struct.UploadedImageInfo[__P] = new DR._Base;
+DR.comments.struct.UploadedImageInfo[__P][__C] = DR.comments.struct.UploadedImageInfo;
+/** @type {Number} */
+DR.comments.struct.UploadedImageInfo.prototype.h = null;
+/** @type {Number} */
+DR.comments.struct.UploadedImageInfo.prototype.w = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.UploadedImageRe = function(par){
+	/** @private */
+	this._t = 66;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.gif)) this.gif = Boolean(par.gif);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.info)) this.info = DR._Base.cast(par.info);
+	if(DR._Base.is(par.tempImage)){
+		var tmp = {};
+		for( var k in par.tempImage ) tmp[k] = String(par.tempImage [k]||'');
+		this.tempImage = tmp;
+	}
+	if(DR._Base.is(par.tmpId)) this.tmpId = (parseInt(par.tmpId)||0);
+	if(DR._Base.is(par.urlIcon)) this.urlIcon = String(par.urlIcon||'');
+};
+DR._Base._types[66] = DR.comments.struct.UploadedImageRe;
+DR.comments.struct.UploadedImageRe[__P] = new DR._Base;
+DR.comments.struct.UploadedImageRe[__P][__C] = DR.comments.struct.UploadedImageRe;
+/** @type {Boolean|null} */
+DR.comments.struct.UploadedImageRe.prototype.gif = null;
+/** @type {Number|null} */
+DR.comments.struct.UploadedImageRe.prototype.id = null;
+/** @type {DR.comments.struct.UploadedImageInfo|null} */
+DR.comments.struct.UploadedImageRe.prototype.info = null;
+/** @type {Object.<String,String>|null} */
+DR.comments.struct.UploadedImageRe.prototype.tempImage = null;
+/** @type {Number|null} */
+DR.comments.struct.UploadedImageRe.prototype.tmpId = null;
+/** @type {String|null} */
+DR.comments.struct.UploadedImageRe.prototype.urlIcon = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.UploadedImageRe = function(){
+	this._fields = {};
+};
+DR.comments.select.UploadedImageRe[__CL] = "Comments__UploadedImageRe";
+DR.comments.select.UploadedImageRe[__P] = new DR._Select;
+DR.comments.select.UploadedImageRe[__P][__C] = DR.comments.select.UploadedImageRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.gif = function(v){ this._fields.gif = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.info = function(v){ this._fields.info = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.tempImage = function(v){ this._fields.tempImage = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.tmpId = function(v){ this._fields.tmpId = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.UploadedImageRe} */
+DR.comments.select.UploadedImageRe.prototype.urlIcon = function(v){ this._fields.urlIcon = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.LikeRe = function(par){
+	/** @private */
+	this._t = 47;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.dislikeProfiles)){
+		var tmp = [];
+		for( var k in par.dislikeProfiles ) tmp.push((parseInt(par.dislikeProfiles [k])||0));
+		this.dislikeProfiles = tmp;
+	}
+	if(DR._Base.is(par.dislikes)) this.dislikes = (parseInt(par.dislikes)||0);
+	if(DR._Base.is(par.iDislike)) this.iDislike = Boolean(par.iDislike);
+	if(DR._Base.is(par.iLike)) this.iLike = Boolean(par.iLike);
+	if(DR._Base.is(par.likeProfiles)){
+		var tmp = [];
+		for( var k in par.likeProfiles ) tmp.push((parseInt(par.likeProfiles [k])||0));
+		this.likeProfiles = tmp;
+	}
+	if(DR._Base.is(par.likes)) this.likes = (parseInt(par.likes)||0);
+};
+DR._Base._types[47] = DR.comments.struct.LikeRe;
+DR.comments.struct.LikeRe[__P] = new DR._Base;
+DR.comments.struct.LikeRe[__P][__C] = DR.comments.struct.LikeRe;
+/** @type {Array.<Number>} */
+DR.comments.struct.LikeRe.prototype.dislikeProfiles = null;
+/** @type {Number} */
+DR.comments.struct.LikeRe.prototype.dislikes = null;
+/** @type {Boolean} */
+DR.comments.struct.LikeRe.prototype.iDislike = null;
+/** @type {Boolean} */
+DR.comments.struct.LikeRe.prototype.iLike = null;
+/** @type {Array.<Number>} */
+DR.comments.struct.LikeRe.prototype.likeProfiles = null;
+/** @type {Number} */
+DR.comments.struct.LikeRe.prototype.likes = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.LikeRe = function(){
+	this._fields = {};
+};
+DR.comments.select.LikeRe[__CL] = "Comments__LikeRe";
+DR.comments.select.LikeRe[__P] = new DR._Select;
+DR.comments.select.LikeRe[__P][__C] = DR.comments.select.LikeRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.dislikeProfiles = function(v){ this._fields.dislikeProfiles = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.dislikes = function(v){ this._fields.dislikes = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.iDislike = function(v){ this._fields.iDislike = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.iLike = function(v){ this._fields.iLike = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.likeProfiles = function(v){ this._fields.likeProfiles = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.LikeRe} */
+DR.comments.select.LikeRe.prototype.likes = function(v){ this._fields.likes = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.GetRe = function(par){
+	/** @private */
+	this._t = 33;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+};
+DR._Base._types[33] = DR.comments.struct.GetRe;
+DR.comments.struct.GetRe[__P] = new DR._Base;
+DR.comments.struct.GetRe[__P][__C] = DR.comments.struct.GetRe;
+/** @type {Number} */
+DR.comments.struct.GetRe.prototype.count = null;
+/** @type {Array.<DR.comments.struct.Item>} */
+DR.comments.struct.GetRe.prototype.items = null;
+/** @type {Number} */
+DR.comments.struct.GetRe.prototype.pg = null;
+/** @type {Number} */
+DR.comments.struct.GetRe.prototype.pgs = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.GetRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.GetRe = function(){
+	this._fields = {};
+};
+DR.comments.select.GetRe[__CL] = "Comments__GetRe";
+DR.comments.select.GetRe[__P] = new DR._Select;
+DR.comments.select.GetRe[__P][__C] = DR.comments.select.GetRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetRe} */
+DR.comments.select.GetRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetRe} */
+DR.comments.select.GetRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetRe} */
+DR.comments.select.GetRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetRe} */
+DR.comments.select.GetRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetRe} */
+DR.comments.select.GetRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.TopRe = function(par){
+	/** @private */
+	this._t = 45;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+};
+DR._Base._types[45] = DR.comments.struct.TopRe;
+DR.comments.struct.TopRe[__P] = new DR._Base;
+DR.comments.struct.TopRe[__P][__C] = DR.comments.struct.TopRe;
+/** @type {Array.<DR.comments.struct.Item>} */
+DR.comments.struct.TopRe.prototype.items = null;
+/** @type {Object.<String,DR.users.struct.User>} */
+DR.comments.struct.TopRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.TopRe = function(){
+	this._fields = {};
+};
+DR.comments.select.TopRe[__CL] = "Comments__TopRe";
+DR.comments.select.TopRe[__P] = new DR._Select;
+DR.comments.select.TopRe[__P][__C] = DR.comments.select.TopRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.TopRe} */
+DR.comments.select.TopRe.prototype.items = function(v){ this._fields.items = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.TopRe} */
+DR.comments.select.TopRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.PageRe = function(par){
+	/** @private */
+	this._t = 55;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+};
+DR._Base._types[55] = DR.comments.struct.PageRe;
+DR.comments.struct.PageRe[__P] = new DR._Base;
+DR.comments.struct.PageRe[__P][__C] = DR.comments.struct.PageRe;
+/** @type {Number} */
+DR.comments.struct.PageRe.prototype.pg = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.DeleteRe = function(par){
+	/** @private */
+	this._t = 57;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.ok)) this.ok = Boolean(par.ok);
+};
+DR._Base._types[57] = DR.comments.struct.DeleteRe;
+DR.comments.struct.DeleteRe[__P] = new DR._Base;
+DR.comments.struct.DeleteRe[__P][__C] = DR.comments.struct.DeleteRe;
+/** @type {Number} */
+DR.comments.struct.DeleteRe.prototype.count = null;
+/** @type {Boolean} */
+DR.comments.struct.DeleteRe.prototype.ok = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.GetCommentRe = function(par){
+	/** @private */
+	this._t = 60;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+};
+DR._Base._types[60] = DR.comments.struct.GetCommentRe;
+DR.comments.struct.GetCommentRe[__P] = new DR._Base;
+DR.comments.struct.GetCommentRe[__P][__C] = DR.comments.struct.GetCommentRe;
+/** @type {DR.comments.struct.Item} */
+DR.comments.struct.GetCommentRe.prototype.item = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.GetCommentRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.GetCommentRe = function(){
+	this._fields = {};
+};
+DR.comments.select.GetCommentRe[__CL] = "Comments__GetCommentRe";
+DR.comments.select.GetCommentRe[__P] = new DR._Select;
+DR.comments.select.GetCommentRe[__P][__C] = DR.comments.select.GetCommentRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetCommentRe} */
+DR.comments.select.GetCommentRe.prototype.item = function(v){ this._fields.item = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.GetCommentRe} */
+DR.comments.select.GetCommentRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.AddRe = function(par){
+	/** @private */
+	this._t = 62;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.addPg)) this.addPg = (parseInt(par.addPg)||0);
+	if(DR._Base.is(par.cid)) this.cid = (parseInt(par.cid)||0);
+	if(DR._Base.is(par.count)) this.count = (parseInt(par.count)||0);
+	if(DR._Base.is(par.item)) this.item = DR._Base.cast(par.item);
+	if(DR._Base.is(par.pgs)) this.pgs = (parseInt(par.pgs)||0);
+	if(DR._Base.is(par.users)){
+		var tmp = {};
+		for( var k in par.users ) tmp[k] = DR._Base.cast(par.users [k]);
+		this.users = tmp;
+	}
+};
+DR._Base._types[62] = DR.comments.struct.AddRe;
+DR.comments.struct.AddRe[__P] = new DR._Base;
+DR.comments.struct.AddRe[__P][__C] = DR.comments.struct.AddRe;
+/** @type {Number|null} */
+DR.comments.struct.AddRe.prototype.addPg = null;
+/** @type {Number} */
+DR.comments.struct.AddRe.prototype.cid = null;
+/** @type {Number} */
+DR.comments.struct.AddRe.prototype.count = null;
+/** @type {DR.comments.struct.Item} */
+DR.comments.struct.AddRe.prototype.item = null;
+/** @type {Number|null} */
+DR.comments.struct.AddRe.prototype.pgs = null;
+/** @type {Object.<Number,DR.users.struct.User>} */
+DR.comments.struct.AddRe.prototype.users = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.AddRe = function(){
+	this._fields = {};
+};
+DR.comments.select.AddRe[__CL] = "Comments__AddRe";
+DR.comments.select.AddRe[__P] = new DR._Select;
+DR.comments.select.AddRe[__P][__C] = DR.comments.select.AddRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.addPg = function(v){ this._fields.addPg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.cid = function(v){ this._fields.cid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.count = function(v){ this._fields.count = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.item = function(v){ this._fields.item = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.pgs = function(v){ this._fields.pgs = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.AddRe} */
+DR.comments.select.AddRe.prototype.users = function(v){ this._fields.users = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.ImageFromUrlRe = function(par){
+	/** @private */
+	this._t = 64;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.data)) this.data = DR._Base.cast(par.data);
+	if(DR._Base.is(par.type)) this.type = String(par.type||'');
+};
+DR._Base._types[64] = DR.comments.struct.ImageFromUrlRe;
+DR.comments.struct.ImageFromUrlRe.TYPE_IMAGE = "0";
+DR.comments.struct.ImageFromUrlRe.TYPE_GIF = "1";
+DR.comments.struct.ImageFromUrlRe[__P] = new DR._Base;
+DR.comments.struct.ImageFromUrlRe[__P][__C] = DR.comments.struct.ImageFromUrlRe;
+/** @type {DR.comments.struct.UploadedImageRe} */
+DR.comments.struct.ImageFromUrlRe.prototype.data = null;
+/** @type {String} */
+DR.comments.struct.ImageFromUrlRe.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.ImageFromUrlRe = function(){
+	this._fields = {};
+};
+DR.comments.select.ImageFromUrlRe[__CL] = "Comments__ImageFromUrlRe";
+DR.comments.select.ImageFromUrlRe[__P] = new DR._Select;
+DR.comments.select.ImageFromUrlRe[__P][__C] = DR.comments.select.ImageFromUrlRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ImageFromUrlRe} */
+DR.comments.select.ImageFromUrlRe.prototype.data = function(v){ this._fields.data = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ImageFromUrlRe} */
+DR.comments.select.ImageFromUrlRe.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.ParamsRe = function(par){
+	/** @private */
+	this._t = 67;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.canAdd)) this.canAdd = Boolean(par.canAdd);
+	if(DR._Base.is(par.canOrder)) this.canOrder = Boolean(par.canOrder);
+	if(DR._Base.is(par.canRate)) this.canRate = Boolean(par.canRate);
+	if(DR._Base.is(par.canReply)) this.canReply = Boolean(par.canReply);
+	if(DR._Base.is(par.canTrack)) this.canTrack = Boolean(par.canTrack);
+	if(DR._Base.is(par.cid)) this.cid = (parseInt(par.cid)||0);
+	if(DR._Base.is(par.disableBackNext)) this.disableBackNext = Boolean(par.disableBackNext);
+	if(DR._Base.is(par.disableShowNewAnimation)) this.disableShowNewAnimation = Boolean(par.disableShowNewAnimation);
+	if(DR._Base.is(par.dislikeType)) this.dislikeType = (parseInt(par.dislikeType)||0);
+	if(DR._Base.is(par.DS)) this.DS = String(par.DS||'');
+	if(DR._Base.is(par.editor)) this.editor = String(par.editor||'');
+	if(DR._Base.is(par.emptyText)) this.emptyText = String(par.emptyText||'');
+	if(DR._Base.is(par.fid)) this.fid = (parseInt(par.fid)||0);
+	if(DR._Base.is(par.galOwner)) this.galOwner = (parseInt(par.galOwner)||0);
+	if(DR._Base.is(par.galOwnerTitle)) this.galOwnerTitle = String(par.galOwnerTitle||'');
+	if(DR._Base.is(par.h)) this.h = (parseInt(par.h)||0);
+	if(DR._Base.is(par.hideTitle)) this.hideTitle = Boolean(par.hideTitle);
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.isBanned)) this.isBanned = (parseInt(par.isBanned)||0);
+	if(DR._Base.is(par.lastSeen)) this.lastSeen = (parseInt(par.lastSeen)||0);
+	if(DR._Base.is(par.likeType)) this.likeType = (parseInt(par.likeType)||0);
+	if(DR._Base.is(par.maxLevels)) this.maxLevels = (parseInt(par.maxLevels)||0);
+	if(DR._Base.is(par.order)) this.order = String(par.order||'');
+	if(DR._Base.is(par.pg)) this.pg = (parseInt(par.pg)||0);
+	if(DR._Base.is(par.placeHolder)) this.placeHolder = String(par.placeHolder||'');
+	if(DR._Base.is(par.profiles)){
+		var tmp = [];
+		for( var k in par.profiles ) tmp.push(DR._Base.cast(par.profiles [k]));
+		this.profiles = tmp;
+	}
+	if(DR._Base.is(par.rtKey)) this.rtKey = String(par.rtKey||'');
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.type)) this.type = (parseInt(par.type)||0);
+	if(DR._Base.is(par._nodeId)) this._nodeId = String(par._nodeId||'');
+};
+DR._Base._types[67] = DR.comments.struct.ParamsRe;
+DR.comments.struct.ParamsRe[__P] = new DR._Base;
+DR.comments.struct.ParamsRe[__P][__C] = DR.comments.struct.ParamsRe;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.canAdd = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.canOrder = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.canRate = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.canReply = null;
+/** @type {Boolean|null} */
+DR.comments.struct.ParamsRe.prototype.canTrack = null;
+/** @type {Number|null} */
+DR.comments.struct.ParamsRe.prototype.cid = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.disableBackNext = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.disableShowNewAnimation = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.dislikeType = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.DS = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.editor = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.emptyText = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.fid = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.galOwner = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.galOwnerTitle = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.h = null;
+/** @type {Boolean} */
+DR.comments.struct.ParamsRe.prototype.hideTitle = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.id = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.isBanned = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.lastSeen = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.likeType = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.maxLevels = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.order = null;
+/** @type {Number|null} */
+DR.comments.struct.ParamsRe.prototype.pg = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.placeHolder = null;
+/** @type {Array.<DR.users.struct.User>} */
+DR.comments.struct.ParamsRe.prototype.profiles = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.rtKey = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype.title = null;
+/** @type {Number} */
+DR.comments.struct.ParamsRe.prototype.type = null;
+/** @type {String} */
+DR.comments.struct.ParamsRe.prototype._nodeId = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.ParamsRe = function(){
+	this._fields = {};
+};
+DR.comments.select.ParamsRe[__CL] = "Comments__ParamsRe";
+DR.comments.select.ParamsRe[__P] = new DR._Select;
+DR.comments.select.ParamsRe[__P][__C] = DR.comments.select.ParamsRe;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.canAdd = function(v){ this._fields.canAdd = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.canOrder = function(v){ this._fields.canOrder = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.canRate = function(v){ this._fields.canRate = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.canReply = function(v){ this._fields.canReply = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.canTrack = function(v){ this._fields.canTrack = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.cid = function(v){ this._fields.cid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.disableBackNext = function(v){ this._fields.disableBackNext = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.disableShowNewAnimation = function(v){ this._fields.disableShowNewAnimation = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.dislikeType = function(v){ this._fields.dislikeType = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.DS = function(v){ this._fields.DS = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.editor = function(v){ this._fields.editor = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.emptyText = function(v){ this._fields.emptyText = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.fid = function(v){ this._fields.fid = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.galOwner = function(v){ this._fields.galOwner = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.galOwnerTitle = function(v){ this._fields.galOwnerTitle = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.h = function(v){ this._fields.h = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.hideTitle = function(v){ this._fields.hideTitle = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.isBanned = function(v){ this._fields.isBanned = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.lastSeen = function(v){ this._fields.lastSeen = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.likeType = function(v){ this._fields.likeType = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.maxLevels = function(v){ this._fields.maxLevels = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.order = function(v){ this._fields.order = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.pg = function(v){ this._fields.pg = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.placeHolder = function(v){ this._fields.placeHolder = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.profiles = function(v){ this._fields.profiles = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.rtKey = function(v){ this._fields.rtKey = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.ParamsRe} */
+DR.comments.select.ParamsRe.prototype._nodeId = function(v){ this._fields._nodeId = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.comments.LikeArray = function(par){
+	this.select = [];
+	this.uids = [];
+	/** @private */
+	this._t = 1719;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1719] = DR.comments.LikeArray;
+DR.comments.LikeArray[__CL] = "Comments__LikeArray";
+DR.comments.LikeArray[__P] = new DR._Method;
+DR.comments.LikeArray[__P][__C] = DR.comments.LikeArray;
+/** @type {Number} */
+DR.comments.LikeArray.prototype.cid = null;
+/** @type {Number} */
+DR.comments.LikeArray.prototype.id = null;
+/** @type {Number} */
+DR.comments.LikeArray.prototype.type = null;
+/** @type {Array.<Number>} */
+DR.comments.LikeArray.prototype.uids = null;
+/** @type {DR.comments.struct.LikeRe} */
+DR.comments.LikeArray.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.Childs = function(par){
+	/** @private */
+	this._t = 2966;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.items)){
+		var tmp = [];
+		for( var k in par.items ) tmp.push(DR._Base.cast(par.items [k]));
+		this.items = tmp;
+	}
+	if(DR._Base.is(par.more)) this.more = (parseInt(par.more)||0);
+};
+DR._Base._types[2966] = DR.comments.struct.Childs;
+DR.comments.struct.Childs[__P] = new DR._Base;
+DR.comments.struct.Childs[__P][__C] = DR.comments.struct.Childs;
+/** @type {Array.<DR.comments.struct.Item>} */
+DR.comments.struct.Childs.prototype.items = null;
+/** @type {Number} */
+DR.comments.struct.Childs.prototype.more = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Block = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3686;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3686] = DR.comments.Block;
+DR.comments.Block[__CL] = "Comments__Block";
+DR.comments.Block.TYPE_SAY = 1;
+DR.comments.Block.TYPE_RATE = 2;
+DR.comments.Block.TYPE_POSTS = 3;
+DR.comments.Block.TYPE_API = 4;
+DR.comments.Block.TYPE_SPECIAL = 5;
+DR.comments.Block.TYPE_BIZ = 7;
+DR.comments.Block.TYPE_MUSICGUESTBOOK = 9;
+DR.comments.Block.TYPE_FORUMDEV = 12;
+DR.comments.Block.TYPE_SKINS = 17;
+DR.comments.Block.TYPE_BIZPOLLS = 18;
+DR.comments.Block.TYPE_BIZGUESTBOOK = 24;
+DR.comments.Block.TYPE_SATIKSIMIESSTASTI = 26;
+DR.comments.Block.TYPE_EVENTSGUESTBOOK = 27;
+DR.comments.Block.TYPE_SPECIALHOKEJS = 28;
+DR.comments.Block.TYPE_SPECIALLMT = 29;
+DR.comments.Block.TYPE_LIGO2012 = 30;
+DR.comments.Block.TYPE_SPECIAL_POLS = 31;
+DR.comments.Block.TYPE_SPECIAL_POLSPICTURE = 32;
+DR.comments.Block.TYPE_SPECIAL_POLSDIARIES = 33;
+DR.comments.Block.TYPE_BIZMAGAZINE = 34;
+DR.comments.Block.TYPE_SPECIAL_TAVA = 35;
+DR.comments.Block.TYPE_SPECIAL_SAIME = 36;
+DR.comments.Block.TYPE_BIZMARKET = 37;
+DR.comments.Block.TYPE_GUESTBOOK = 38;
+DR.comments.Block.TYPE_GALLERY = 40;
+DR.comments.Block.TYPE_SPECIAL_MAGAZINELOGINS = 41;
+DR.comments.Block.TYPE_SPECIAL_MESEIROPA = 42;
+DR.comments.Block.TYPE_SPECIAL_STATOILDZIESMUSVETKI = 43;
+DR.comments.Block.TYPE_KINO = 44;
+DR.comments.Block.TYPE_SPECIAL_DATUAIZSARDZIBA = 45;
+DR.comments.Block.TYPE_SPECIAL_SKOLASNEWS = 46;
+DR.comments.Block.TYPE_SPECIAL_SKOLASGALLERY = 47;
+DR.comments.Block.TYPE_SPECIAL_SKOLASCHALLANGES = 48;
+DR.comments.Block.TYPE_SPECIAL_SKOLASFORUM = 49;
+DR.comments.Block.TYPE_SPECIAL_LIDO = 50;
+DR.comments.Block.TYPE_BCARD = 51;
+DR.comments.Block.TYPE_ALBUM = 52;
+DR.comments.Block.TYPE_SPECIAL_RATE = 53;
+DR.comments.Block.TYPE_SPECIAL_FESTIVAL = 54;
+DR.comments.Block.TYPE_SPECIAL_JAUNGADS2016 = 56;
+DR.comments.Block.TYPE_SPECIAL_HOKEJS2016 = 57;
+DR.comments.Block.TYPE_FORUMAUTO = 58;
+DR.comments.Block.TYPE_SPECIAL_ADVENTE = 59;
+DR.comments.Block.TYPE_SPECIAL_JAUNGADS2017 = 60;
+DR.comments.Block.TYPE_GROUPSAUTO = 61;
+DR.comments.Block.TYPE_SPECIAL_SKAISTAKIEMIRKLI = 62;
+DR.comments.Block.TYPE_ZINAS = 63;
+DR.comments.Block[__P] = new DR._Method;
+DR.comments.Block[__P][__C] = DR.comments.Block;
+/** @type {Number} */
+DR.comments.Block.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Block.prototype.id = null;
+/** @type {Number} */
+DR.comments.Block.prototype.type = null;
+/** @type {DR.base.struct.Status} */
+DR.comments.Block.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.SetHiddenRe = function(par){
+	/** @private */
+	this._t = 3688;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.isHidden)) this.isHidden = Boolean(par.isHidden);
+};
+DR._Base._types[3688] = DR.comments.struct.SetHiddenRe;
+DR.comments.struct.SetHiddenRe[__P] = new DR._Base;
+DR.comments.struct.SetHiddenRe[__P][__C] = DR.comments.struct.SetHiddenRe;
+/** @type {Boolean} */
+DR.comments.struct.SetHiddenRe.prototype.isHidden = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Get = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 34;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[34] = DR.comments.Get;
+DR.comments.Get[__CL] = "Comments__Get";
+DR.comments.Get.ORDER_DESC = "DESC";
+DR.comments.Get.ORDER_ASC = "ASC";
+DR.comments.Get.TYPE_SAY = 1;
+DR.comments.Get.TYPE_RATE = 2;
+DR.comments.Get.TYPE_POSTS = 3;
+DR.comments.Get.TYPE_API = 4;
+DR.comments.Get.TYPE_SPECIAL = 5;
+DR.comments.Get.TYPE_BIZ = 7;
+DR.comments.Get.TYPE_MUSICGUESTBOOK = 9;
+DR.comments.Get.TYPE_FORUMDEV = 12;
+DR.comments.Get.TYPE_SKINS = 17;
+DR.comments.Get.TYPE_BIZPOLLS = 18;
+DR.comments.Get.TYPE_BIZGUESTBOOK = 24;
+DR.comments.Get.TYPE_SATIKSIMIESSTASTI = 26;
+DR.comments.Get.TYPE_EVENTSGUESTBOOK = 27;
+DR.comments.Get.TYPE_SPECIALHOKEJS = 28;
+DR.comments.Get.TYPE_SPECIALLMT = 29;
+DR.comments.Get.TYPE_LIGO2012 = 30;
+DR.comments.Get.TYPE_SPECIAL_POLS = 31;
+DR.comments.Get.TYPE_SPECIAL_POLSPICTURE = 32;
+DR.comments.Get.TYPE_SPECIAL_POLSDIARIES = 33;
+DR.comments.Get.TYPE_BIZMAGAZINE = 34;
+DR.comments.Get.TYPE_SPECIAL_TAVA = 35;
+DR.comments.Get.TYPE_SPECIAL_SAIME = 36;
+DR.comments.Get.TYPE_BIZMARKET = 37;
+DR.comments.Get.TYPE_GUESTBOOK = 38;
+DR.comments.Get.TYPE_GALLERY = 40;
+DR.comments.Get.TYPE_SPECIAL_MAGAZINELOGINS = 41;
+DR.comments.Get.TYPE_SPECIAL_MESEIROPA = 42;
+DR.comments.Get.TYPE_SPECIAL_STATOILDZIESMUSVETKI = 43;
+DR.comments.Get.TYPE_KINO = 44;
+DR.comments.Get.TYPE_SPECIAL_DATUAIZSARDZIBA = 45;
+DR.comments.Get.TYPE_SPECIAL_SKOLASNEWS = 46;
+DR.comments.Get.TYPE_SPECIAL_SKOLASGALLERY = 47;
+DR.comments.Get.TYPE_SPECIAL_SKOLASCHALLANGES = 48;
+DR.comments.Get.TYPE_SPECIAL_SKOLASFORUM = 49;
+DR.comments.Get.TYPE_SPECIAL_LIDO = 50;
+DR.comments.Get.TYPE_BCARD = 51;
+DR.comments.Get.TYPE_ALBUM = 52;
+DR.comments.Get.TYPE_SPECIAL_RATE = 53;
+DR.comments.Get.TYPE_SPECIAL_FESTIVAL = 54;
+DR.comments.Get.TYPE_SPECIAL_JAUNGADS2016 = 56;
+DR.comments.Get.TYPE_SPECIAL_HOKEJS2016 = 57;
+DR.comments.Get.TYPE_FORUMAUTO = 58;
+DR.comments.Get.TYPE_SPECIAL_ADVENTE = 59;
+DR.comments.Get.TYPE_SPECIAL_JAUNGADS2017 = 60;
+DR.comments.Get.TYPE_GROUPSAUTO = 61;
+DR.comments.Get.TYPE_SPECIAL_SKAISTAKIEMIRKLI = 62;
+DR.comments.Get.TYPE_ZINAS = 63;
+DR.comments.Get[__P] = new DR._Method;
+DR.comments.Get[__P][__C] = DR.comments.Get;
+/** @type {Number|null} */
+DR.comments.Get.prototype.comId = null;
+/** @type {Number} */
+DR.comments.Get.prototype.id = null;
+/** @type {String|null} */
+DR.comments.Get.prototype.order = null;
+/** @type {Number|null} */
+DR.comments.Get.prototype.pg = null;
+/** @type {Number} */
+DR.comments.Get.prototype.type = null;
+/** @type {DR.comments.struct.GetRe} */
+DR.comments.Get.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Top = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 46;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[46] = DR.comments.Top;
+DR.comments.Top[__CL] = "Comments__Top";
+DR.comments.Top[__P] = new DR._Method;
+DR.comments.Top[__P][__C] = DR.comments.Top;
+/** @type {Number} */
+DR.comments.Top.prototype.id = null;
+/** @type {Number} */
+DR.comments.Top.prototype.type = null;
+/** @type {DR.comments.struct.TopRe} */
+DR.comments.Top.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Like = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 48;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[48] = DR.comments.Like;
+DR.comments.Like[__CL] = "Comments__Like";
+DR.comments.Like[__P] = new DR._Method;
+DR.comments.Like[__P][__C] = DR.comments.Like;
+/** @type {Number} */
+DR.comments.Like.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Like.prototype.id = null;
+/** @type {Number} */
+DR.comments.Like.prototype.type = null;
+/** @type {Number|null} */
+DR.comments.Like.prototype.uid = null;
+/** @type {DR.comments.struct.LikeRe} */
+DR.comments.Like.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Dislike = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 50;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[50] = DR.comments.Dislike;
+DR.comments.Dislike[__CL] = "Comments__Dislike";
+DR.comments.Dislike[__P] = new DR._Method;
+DR.comments.Dislike[__P][__C] = DR.comments.Dislike;
+/** @type {Number} */
+DR.comments.Dislike.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Dislike.prototype.id = null;
+/** @type {Number} */
+DR.comments.Dislike.prototype.type = null;
+/** @type {Number|null} */
+DR.comments.Dislike.prototype.uid = null;
+/** @type {DR.comments.struct.LikeRe} */
+DR.comments.Dislike.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.CancelRate = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 52;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[52] = DR.comments.CancelRate;
+DR.comments.CancelRate[__CL] = "Comments__CancelRate";
+DR.comments.CancelRate[__P] = new DR._Method;
+DR.comments.CancelRate[__P][__C] = DR.comments.CancelRate;
+/** @type {Number} */
+DR.comments.CancelRate.prototype.cid = null;
+/** @type {Number} */
+DR.comments.CancelRate.prototype.id = null;
+/** @type {Number} */
+DR.comments.CancelRate.prototype.type = null;
+/** @type {Number|null} */
+DR.comments.CancelRate.prototype.uid = null;
+/** @type {DR.comments.struct.LikeRe} */
+DR.comments.CancelRate.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Page = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 56;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[56] = DR.comments.Page;
+DR.comments.Page[__CL] = "Comments__Page";
+DR.comments.Page[__P] = new DR._Method;
+DR.comments.Page[__P][__C] = DR.comments.Page;
+/** @type {Number} */
+DR.comments.Page.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Page.prototype.id = null;
+/** @type {Number} */
+DR.comments.Page.prototype.type = null;
+/** @type {DR.comments.struct.PageRe} */
+DR.comments.Page.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Delete = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 58;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[58] = DR.comments.Delete;
+DR.comments.Delete[__CL] = "Comments__Delete";
+DR.comments.Delete[__P] = new DR._Method;
+DR.comments.Delete[__P][__C] = DR.comments.Delete;
+/** @type {Number} */
+DR.comments.Delete.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Delete.prototype.id = null;
+/** @type {Number} */
+DR.comments.Delete.prototype.type = null;
+/** @type {DR.comments.struct.DeleteRe} */
+DR.comments.Delete.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.SetOrder = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 59;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[59] = DR.comments.SetOrder;
+DR.comments.SetOrder[__CL] = "Comments__SetOrder";
+DR.comments.SetOrder[__P] = new DR._Method;
+DR.comments.SetOrder[__P][__C] = DR.comments.SetOrder;
+/** @type {Number} */
+DR.comments.SetOrder.prototype.id = null;
+/** @type {String} */
+DR.comments.SetOrder.prototype.order = null;
+/** @type {Number} */
+DR.comments.SetOrder.prototype.type = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.GetComment = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 61;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[61] = DR.comments.GetComment;
+DR.comments.GetComment[__CL] = "Comments__GetComment";
+DR.comments.GetComment[__P] = new DR._Method;
+DR.comments.GetComment[__P][__C] = DR.comments.GetComment;
+/** @type {Number} */
+DR.comments.GetComment.prototype.cid = null;
+/** @type {Number} */
+DR.comments.GetComment.prototype.id = null;
+/** @type {Number} */
+DR.comments.GetComment.prototype.type = null;
+/** @type {DR.comments.struct.GetCommentRe} */
+DR.comments.GetComment.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Add = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 63;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[63] = DR.comments.Add;
+DR.comments.Add[__CL] = "Comments__Add";
+DR.comments.Add[__P] = new DR._Method;
+DR.comments.Add[__P][__C] = DR.comments.Add;
+/** @type {Number|null} */
+DR.comments.Add.prototype.cid = null;
+/** @type {Number|null} */
+DR.comments.Add.prototype.fid = null;
+/** @type {Boolean|null} */
+DR.comments.Add.prototype.gif = null;
+/** @type {String|null} */
+DR.comments.Add.prototype.giphy = null;
+/** @type {Number} */
+DR.comments.Add.prototype.id = null;
+/** @type {Boolean|null} */
+DR.comments.Add.prototype.isHTML = null;
+/** @type {Number|null} */
+DR.comments.Add.prototype.sound = null;
+/** @type {String|null} */
+DR.comments.Add.prototype.stats = null;
+/** @type {String} */
+DR.comments.Add.prototype.text = null;
+/** @type {Number|null} */
+DR.comments.Add.prototype.tmpId = null;
+/** @type {Number} */
+DR.comments.Add.prototype.type = null;
+/** @type {Boolean|null} */
+DR.comments.Add.prototype.video = null;
+/** @type {Number|null} */
+DR.comments.Add.prototype.videoHeight = null;
+/** @type {Number|null} */
+DR.comments.Add.prototype.videoWidth = null;
+/** @type {DR.comments.struct.AddRe} */
+DR.comments.Add.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.ImageFromUrl = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 65;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[65] = DR.comments.ImageFromUrl;
+DR.comments.ImageFromUrl[__CL] = "Comments__ImageFromUrl";
+DR.comments.ImageFromUrl[__P] = new DR._Method;
+DR.comments.ImageFromUrl[__P][__C] = DR.comments.ImageFromUrl;
+/** @type {String|null} */
+DR.comments.ImageFromUrl.prototype.rtKey = null;
+/** @type {Number|null} */
+DR.comments.ImageFromUrl.prototype.type = null;
+/** @type {String} */
+DR.comments.ImageFromUrl.prototype.url = null;
+/** @type {DR.comments.struct.ImageFromUrlRe} */
+DR.comments.ImageFromUrl.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Params = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 68;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[68] = DR.comments.Params;
+DR.comments.Params[__CL] = "Comments__Params";
+DR.comments.Params[__P] = new DR._Method;
+DR.comments.Params[__P][__C] = DR.comments.Params;
+/** @type {Number|null} */
+DR.comments.Params.prototype.comId = null;
+/** @type {Number} */
+DR.comments.Params.prototype.id = null;
+/** @type {Number} */
+DR.comments.Params.prototype.type = null;
+/** @type {DR.comments.struct.ParamsRe} */
+DR.comments.Params.prototype.re = null;
+ 
+/** @extends {DR._Base} */
+DR.comments.struct.FormUser = function(par){
+	/** @private */
+	this._t = 69;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.id)) this.id = (parseInt(par.id)||0);
+	if(DR._Base.is(par.image)) this.image = DR._Base.cast(par.image);
+	if(DR._Base.is(par.title)) this.title = String(par.title||'');
+	if(DR._Base.is(par.type)) this.type = (parseInt(par.type)||0);
+};
+DR._Base._types[69] = DR.comments.struct.FormUser;
+DR.comments.struct.FormUser[__P] = new DR._Base;
+DR.comments.struct.FormUser[__P][__C] = DR.comments.struct.FormUser;
+/** @type {Number} */
+DR.comments.struct.FormUser.prototype.id = null;
+/** @type {DR.base.struct.Image} */
+DR.comments.struct.FormUser.prototype.image = null;
+/** @type {String} */
+DR.comments.struct.FormUser.prototype.title = null;
+/** @type {Number} */
+DR.comments.struct.FormUser.prototype.type = null;
+ 
+/** @extends {DR._Select} */
+DR.comments.select.FormUser = function(){
+	this._fields = {};
+};
+DR.comments.select.FormUser[__CL] = "Comments__FormUser";
+DR.comments.select.FormUser[__P] = new DR._Select;
+DR.comments.select.FormUser[__P][__C] = DR.comments.select.FormUser;
+/** @param {boolean} [v]
+  * @return {DR.comments.select.FormUser} */
+DR.comments.select.FormUser.prototype.id = function(v){ this._fields.id = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.FormUser} */
+DR.comments.select.FormUser.prototype.image = function(v){ this._fields.image = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.FormUser} */
+DR.comments.select.FormUser.prototype.title = function(v){ this._fields.title = !DR._Base.is(v) || !!v; return this; };
+/** @param {boolean} [v]
+  * @return {DR.comments.select.FormUser} */
+DR.comments.select.FormUser.prototype.type = function(v){ this._fields.type = !DR._Base.is(v) || !!v; return this; };
+ 
+/** @extends {DR._Method} */
+DR.comments.TrackStats = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1530;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1530] = DR.comments.TrackStats;
+DR.comments.TrackStats[__CL] = "Comments__TrackStats";
+DR.comments.TrackStats[__P] = new DR._Method;
+DR.comments.TrackStats[__P][__C] = DR.comments.TrackStats;
+/** @type {String} */
+DR.comments.TrackStats.prototype.key = null;
+/** @type {DR.base.struct.Status} */
+DR.comments.TrackStats.prototype.re = null;
+ 
+/** @extends {DR.comments.LikeArray} */
+DR.comments.DislikeArray = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 1720;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[1720] = DR.comments.DislikeArray;
+DR.comments.DislikeArray[__CL] = "Comments__DislikeArray";
+DR.comments.DislikeArray[__P] = new DR.comments.LikeArray;
+DR.comments.DislikeArray[__P][__C] = DR.comments.DislikeArray;
+ 
+/** @extends {DR._Method} */
+DR.comments.GetChilds = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 2967;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[2967] = DR.comments.GetChilds;
+DR.comments.GetChilds[__CL] = "Comments__GetChilds";
+DR.comments.GetChilds.TYPE_SAY = 1;
+DR.comments.GetChilds.TYPE_RATE = 2;
+DR.comments.GetChilds.TYPE_POSTS = 3;
+DR.comments.GetChilds.TYPE_API = 4;
+DR.comments.GetChilds.TYPE_SPECIAL = 5;
+DR.comments.GetChilds.TYPE_BIZ = 7;
+DR.comments.GetChilds.TYPE_MUSICGUESTBOOK = 9;
+DR.comments.GetChilds.TYPE_FORUMDEV = 12;
+DR.comments.GetChilds.TYPE_SKINS = 17;
+DR.comments.GetChilds.TYPE_BIZPOLLS = 18;
+DR.comments.GetChilds.TYPE_BIZGUESTBOOK = 24;
+DR.comments.GetChilds.TYPE_SATIKSIMIESSTASTI = 26;
+DR.comments.GetChilds.TYPE_EVENTSGUESTBOOK = 27;
+DR.comments.GetChilds.TYPE_SPECIALHOKEJS = 28;
+DR.comments.GetChilds.TYPE_SPECIALLMT = 29;
+DR.comments.GetChilds.TYPE_LIGO2012 = 30;
+DR.comments.GetChilds.TYPE_SPECIAL_POLS = 31;
+DR.comments.GetChilds.TYPE_SPECIAL_POLSPICTURE = 32;
+DR.comments.GetChilds.TYPE_SPECIAL_POLSDIARIES = 33;
+DR.comments.GetChilds.TYPE_BIZMAGAZINE = 34;
+DR.comments.GetChilds.TYPE_SPECIAL_TAVA = 35;
+DR.comments.GetChilds.TYPE_SPECIAL_SAIME = 36;
+DR.comments.GetChilds.TYPE_BIZMARKET = 37;
+DR.comments.GetChilds.TYPE_GUESTBOOK = 38;
+DR.comments.GetChilds.TYPE_GALLERY = 40;
+DR.comments.GetChilds.TYPE_SPECIAL_MAGAZINELOGINS = 41;
+DR.comments.GetChilds.TYPE_SPECIAL_MESEIROPA = 42;
+DR.comments.GetChilds.TYPE_SPECIAL_STATOILDZIESMUSVETKI = 43;
+DR.comments.GetChilds.TYPE_KINO = 44;
+DR.comments.GetChilds.TYPE_SPECIAL_DATUAIZSARDZIBA = 45;
+DR.comments.GetChilds.TYPE_SPECIAL_SKOLASNEWS = 46;
+DR.comments.GetChilds.TYPE_SPECIAL_SKOLASGALLERY = 47;
+DR.comments.GetChilds.TYPE_SPECIAL_SKOLASCHALLANGES = 48;
+DR.comments.GetChilds.TYPE_SPECIAL_SKOLASFORUM = 49;
+DR.comments.GetChilds.TYPE_SPECIAL_LIDO = 50;
+DR.comments.GetChilds.TYPE_BCARD = 51;
+DR.comments.GetChilds.TYPE_ALBUM = 52;
+DR.comments.GetChilds.TYPE_SPECIAL_RATE = 53;
+DR.comments.GetChilds.TYPE_SPECIAL_FESTIVAL = 54;
+DR.comments.GetChilds.TYPE_SPECIAL_JAUNGADS2016 = 56;
+DR.comments.GetChilds.TYPE_SPECIAL_HOKEJS2016 = 57;
+DR.comments.GetChilds.TYPE_FORUMAUTO = 58;
+DR.comments.GetChilds.TYPE_SPECIAL_ADVENTE = 59;
+DR.comments.GetChilds.TYPE_SPECIAL_JAUNGADS2017 = 60;
+DR.comments.GetChilds.TYPE_GROUPSAUTO = 61;
+DR.comments.GetChilds.TYPE_SPECIAL_SKAISTAKIEMIRKLI = 62;
+DR.comments.GetChilds.TYPE_ZINAS = 63;
+DR.comments.GetChilds[__P] = new DR._Method;
+DR.comments.GetChilds[__P][__C] = DR.comments.GetChilds;
+/** @type {Boolean|null} */
+DR.comments.GetChilds.prototype.before = null;
+/** @type {Number} */
+DR.comments.GetChilds.prototype.cid = null;
+/** @type {Number} */
+DR.comments.GetChilds.prototype.id = null;
+/** @type {Number} */
+DR.comments.GetChilds.prototype.type = null;
+/** @type {DR.comments.struct.Childs} */
+DR.comments.GetChilds.prototype.re = null;
+ 
+/** @extends {DR._Method} */
+DR.comments.Edit = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3685;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3685] = DR.comments.Edit;
+DR.comments.Edit[__CL] = "Comments__Edit";
+DR.comments.Edit.TYPE_SAY = 1;
+DR.comments.Edit.TYPE_RATE = 2;
+DR.comments.Edit.TYPE_POSTS = 3;
+DR.comments.Edit.TYPE_API = 4;
+DR.comments.Edit.TYPE_SPECIAL = 5;
+DR.comments.Edit.TYPE_BIZ = 7;
+DR.comments.Edit.TYPE_MUSICGUESTBOOK = 9;
+DR.comments.Edit.TYPE_FORUMDEV = 12;
+DR.comments.Edit.TYPE_SKINS = 17;
+DR.comments.Edit.TYPE_BIZPOLLS = 18;
+DR.comments.Edit.TYPE_BIZGUESTBOOK = 24;
+DR.comments.Edit.TYPE_SATIKSIMIESSTASTI = 26;
+DR.comments.Edit.TYPE_EVENTSGUESTBOOK = 27;
+DR.comments.Edit.TYPE_SPECIALHOKEJS = 28;
+DR.comments.Edit.TYPE_SPECIALLMT = 29;
+DR.comments.Edit.TYPE_LIGO2012 = 30;
+DR.comments.Edit.TYPE_SPECIAL_POLS = 31;
+DR.comments.Edit.TYPE_SPECIAL_POLSPICTURE = 32;
+DR.comments.Edit.TYPE_SPECIAL_POLSDIARIES = 33;
+DR.comments.Edit.TYPE_BIZMAGAZINE = 34;
+DR.comments.Edit.TYPE_SPECIAL_TAVA = 35;
+DR.comments.Edit.TYPE_SPECIAL_SAIME = 36;
+DR.comments.Edit.TYPE_BIZMARKET = 37;
+DR.comments.Edit.TYPE_GUESTBOOK = 38;
+DR.comments.Edit.TYPE_GALLERY = 40;
+DR.comments.Edit.TYPE_SPECIAL_MAGAZINELOGINS = 41;
+DR.comments.Edit.TYPE_SPECIAL_MESEIROPA = 42;
+DR.comments.Edit.TYPE_SPECIAL_STATOILDZIESMUSVETKI = 43;
+DR.comments.Edit.TYPE_KINO = 44;
+DR.comments.Edit.TYPE_SPECIAL_DATUAIZSARDZIBA = 45;
+DR.comments.Edit.TYPE_SPECIAL_SKOLASNEWS = 46;
+DR.comments.Edit.TYPE_SPECIAL_SKOLASGALLERY = 47;
+DR.comments.Edit.TYPE_SPECIAL_SKOLASCHALLANGES = 48;
+DR.comments.Edit.TYPE_SPECIAL_SKOLASFORUM = 49;
+DR.comments.Edit.TYPE_SPECIAL_LIDO = 50;
+DR.comments.Edit.TYPE_BCARD = 51;
+DR.comments.Edit.TYPE_ALBUM = 52;
+DR.comments.Edit.TYPE_SPECIAL_RATE = 53;
+DR.comments.Edit.TYPE_SPECIAL_FESTIVAL = 54;
+DR.comments.Edit.TYPE_SPECIAL_JAUNGADS2016 = 56;
+DR.comments.Edit.TYPE_SPECIAL_HOKEJS2016 = 57;
+DR.comments.Edit.TYPE_FORUMAUTO = 58;
+DR.comments.Edit.TYPE_SPECIAL_ADVENTE = 59;
+DR.comments.Edit.TYPE_SPECIAL_JAUNGADS2017 = 60;
+DR.comments.Edit.TYPE_GROUPSAUTO = 61;
+DR.comments.Edit.TYPE_SPECIAL_SKAISTAKIEMIRKLI = 62;
+DR.comments.Edit.TYPE_ZINAS = 63;
+DR.comments.Edit[__P] = new DR._Method;
+DR.comments.Edit[__P][__C] = DR.comments.Edit;
+/** @type {Number} */
+DR.comments.Edit.prototype.cid = null;
+/** @type {Number} */
+DR.comments.Edit.prototype.id = null;
+/** @type {String} */
+DR.comments.Edit.prototype.text = null;
+/** @type {Number} */
+DR.comments.Edit.prototype.type = null;
+/** @type {DR.comments.struct.Item} */
+DR.comments.Edit.prototype.re = null;
+ 
+/** @extends {DR.comments.Block} */
+DR.comments.Unblock = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3687;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3687] = DR.comments.Unblock;
+DR.comments.Unblock[__CL] = "Comments__Unblock";
+DR.comments.Unblock[__P] = new DR.comments.Block;
+DR.comments.Unblock[__P][__C] = DR.comments.Unblock;
+ 
+/** @extends {DR._Method} */
+DR.comments.SetHidden = function(par){
+	this.select = [];
+	/** @private */
+	this._t = 3689;
+	if(!par || typeof par != 'object'){return;}
+	if(DR._Base.is(par.re)) this.re = DR._Base.cast(par.re);
+	if(DR._Base.is(par.error)) this.error = par.error;
+};
+DR._Base._types[3689] = DR.comments.SetHidden;
+DR.comments.SetHidden[__CL] = "Comments__SetHidden";
+DR.comments.SetHidden[__P] = new DR._Method;
+DR.comments.SetHidden[__P][__C] = DR.comments.SetHidden;
+/** @type {Number} */
+DR.comments.SetHidden.prototype.cid = null;
+/** @type {Boolean} */
+DR.comments.SetHidden.prototype.hidden = null;
+/** @type {DR.comments.struct.SetHiddenRe} */
+DR.comments.SetHidden.prototype.re = null;
+ 
+D.loaded();

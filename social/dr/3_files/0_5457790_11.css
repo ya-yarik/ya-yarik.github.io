@@ -1,0 +1,79 @@
+html, body {
+	background:#FFF ; /* Lapas background */
+}
+
+#skinTop {
+		padding-top:15px; /* Galvenes augstums */
+	}
+
+#skinFootWrap {
+	}
+
+#skinBg {
+
+}
+
+#skinFixed {
+}
+
+
+#skinFoot{
+	height:120px; /* Footer bildes pozicija */
+			}
+
+#nologinHeader {
+	border-bottom-color:#;
+}
+
+
+#menu td a {
+	border-top-color:#d86500; /* default border */
+	border-bottom-color:#d86500; /* default border */
+	border-left-color:#d86500; /* default border */
+		background-image:url('https://i7.ifrype.com/skins/000/000/v11/default.png');
+	    color:#fff; /* default text_color */
+	text-shadow: 0 -1px 0 #914400; /* default text_shadow */
+}
+
+#menu td a .hasdropdown .svg-icon {
+	filter: drop-shadow(0 -1px 0 #914400);
+}
+
+#menu td.last a {
+	border-right: 1px solid #d86500; /* default border */
+}
+#menu td.last a:hover {
+	border-right: 1px solid #d86500; /* hover border */
+}
+#menu td a:hover {
+	color:#fff; /* Hover text_color */
+	text-shadow: 0 -1px 0 #822b00; /* Hover text_shadow */
+	border-bottom-color:#d86500; /* hover border */
+    border-top-color:#d86500;  /* hover border */
+	border-left-color:#d86500;  /* hover border */
+}
+#menu td a:hover .hasdropdown .svg-icon {
+	filter: drop-shadow(0 -1px 0 #914400);
+}
+#menu td:hover + td a {
+	border-left-color:#d86500;  /* hover border */
+}
+	#menu td a {
+		background: #fe8400;
+		background-image: linear-gradient(to bottom, #fe8400, #fa7803);
+	}
+
+	#menu td a:hover {
+		background: #e16c00;
+		background-image: linear-gradient(to bottom, #e16c00, #e16c00);
+	}
+
+#menu td.open a:hover, #menu td a:active {
+	border-left-color:#d86500;
+}
+
+#menu a span.badge.off{
+	background-color: #e16c00; /* hover gradient_2 */
+}
+
+#menu a span.badge.off {background:#da6500;} #menu a span.badge.on{background:#cd1800;} #menu td a {text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.16);} #menu td a .hasdropdown .svg-icon, #menu td a:hover .hasdropdown .svg-icon {filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.16));}
