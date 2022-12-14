@@ -1,0 +1,380 @@
+/** Variables **/
+
+const domain = document.domain;
+const uagent = {
+  os: null,
+  client: null,
+  userAgent: null,
+};
+
+let preprocess = 0;
+let cookie_installed = null;
+let jsworked = null;
+let webview = null;
+let alarm = null;
+
+let log_message = null;
+let code = null; // Result code
+
+/** Helper functions **/
+
+/**
+ * Get cookie by name
+ * @param {string} name - Cokkie name
+ * @returns {string} cookie value
+ */
+const getCookie = (name) => {
+  let matches = document.cookie.match(
+    new RegExp(
+      "(?:^|; )" +
+        name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") +
+        "=([^;]*)"
+    )
+  );
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+};
+
+/**
+ * Get `standardstack` string for ELK logging
+ * @returns {string} `standardstack` string
+ */
+const getStandardStack = () => {
+  return {
+    domain,
+    uagent,
+    cookie_installed,
+    jsworked,
+    webview,
+    alarm,
+  };
+};
+
+/**
+ * Write cookie, timestamp and User-Agent to localStorage
+ * @param {string} cookie - Cookie value to write
+ */
+const setLocalStorageContent = (cookie) => {
+  localStorage.setItem("cookie", cookie);
+  localStorage.setItem("timestamp", Date.now());
+  localStorage.setItem("uagent", JSON.stringify(uagent));
+};
+
+/**
+ * Get cookie, timestamp and User-Agent from localStorage
+ * @returns {Object} - localStorage content
+ */
+const getLocalStorageContent = () => {
+  const cookie = localStorage.getItem("cookie");
+  const timestamp = localStorage.getItem("timestamp");
+  const uagent = localStorage.getItem("uagent");
+
+  return { cookie, timestamp, uagent };
+};
+
+/**
+ * Post log message to Kibana
+ * @param {Object} data - JSON to post
+ */
+const logRequest = (data) => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify(data);
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    async: false,
+  };
+
+  fetch(
+    "http://clid.tele2.ru/log/92b98392-ecca-46c6-8a6f-fa7697c7da09",
+    requestOptions
+  )
+    .then(() => console.log("Log request success"))
+    .catch((error) => console.error("Log request error", error));
+};
+
+/**
+ * Makes request and gets headers from the device
+ * @returns {Object} - response headers in JSON
+ */
+const getHeaders = async () => {
+  const requestOptions = {
+    method: "GET",
+    async: false,
+  };
+
+  const text = await fetch("http://clid.tele2.ru/header", requestOptions)
+    .then((resp) => resp.text())
+    .then((res) => res)
+    .catch((err) => console.log(err));
+
+  const json = JSON.parse(text);
+
+  return json;
+};
+
+/** Main algorhytm function **/
+
+/**
+ * Set uagent variable: OS and client
+ */
+const setUagent = () => {
+  const standalone = window.navigator.standalone;
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isIos = /iphone|ipod|ipad/.test(userAgent);
+  const isSafari = /safari/.test(userAgent);
+  const isAndroid = /android/.test(userAgent);
+  const hasVersion = /version/.test(userAgent) && /wv/.test(userAgent);
+  const headers = getHeaders();
+
+  if (isIos) {
+    uagent.os = "IOS";
+
+    if (!standalone && isSafari) {
+      // W2: iOS Safari browser
+      uagent.client = "safari";
+    } else if (!standalone && !isSafari) {
+      // W3: iOS webView
+      uagent.client = "webView";
+    } else if (standalone || !isSafari) {
+      // W1: iOS standalone (not Safari)
+      uagent.client = "standalone";
+    } else {
+      // W4: Removed, but should be handled. standalone = standalone browser
+    }
+  } else if (isAndroid) {
+    uagent.os = "android";
+
+    if (hasVersion) {
+      // W5: Android webView
+      uagent.client = "webView";
+    } else {
+      if (headers["X-Requested-With"]) {
+        // W6: Old Android
+        uagent.client = "webView";
+      } else {
+        // W7: Android standalone browser
+        uagent.client = "standalone_browser";
+      }
+      console.log("Page: getHeaders called");
+      console.log("Page headers: " + JSON.stringify(headers));
+    }
+  } else {
+    // W8: Neither iOS, nor Android
+
+    uagent.os = "other";
+    uagent.client = "other";
+  }
+
+  uagent.userAgent = window.navigator.userAgent;
+};
+
+/** Event handlers **/
+
+const DOMContentLoadedHandler = () => {
+  preprocess = 1;
+  setUagent();
+  webview = +(uagent.client === "webView");
+
+  const cookie = getCookie("cookieparameters");
+
+  if (cookie) {
+    // Branch 1: кука стоит
+    cookie_installed = 1;
+
+    const storedCookie = localStorage.getItem("cookie");
+
+    if (!storedCookie) {
+      // Branch 2: кука не записана в localStorage
+
+      jsworked = 0;
+      alarm = 0;
+
+      setLocalStorageContent(cookie);
+
+      log_message = {
+        message: `Кука стояла до js`,
+        standardstack: getStandardStack(),
+        localstoragecontent: getLocalStorageContent(),
+        code: 2,
+      };
+    } else if (cookie !== storedCookie) {
+      // Branch 3: кука записана в localStorage, значения НЕ совпадают
+
+      jsworked = 1;
+      alarm = 3;
+
+      setLocalStorageContent(cookie);
+
+      log_message = {
+        message: `Кука была изменена`,
+        standardstack: getStandardStack(),
+        localstoragecontent: getLocalStorageContent(),
+        code: 3,
+      };
+    } else {
+      // Branch 4: кука записана в localStorage, значения совпадают
+
+      jsworked = 1;
+      alarm = 0;
+
+      log_message = {
+        message: `Кука совпадает с проставленной сервером`,
+        standardstack: getStandardStack(),
+        localstoragecontent: getLocalStorageContent(),
+        code: 4,
+      };
+    }
+  } else if (localStorage.getItem("cookie")) {
+    // Branch 5: кука не стоит, но записана в localStorage
+
+    cookie_installed = 0;
+    jsworked = 1;
+    alarm = 2;
+
+    log_message = {
+      message: `Кука удалена или недоступна после простановки`,
+      standardstack: getStandardStack(),
+      localstoragecontent: getLocalStorageContent(),
+      code: 5,
+    };
+  } else {
+    // Branch 6: кука не стоит и НЕ записана в localStorage
+
+    cookie_installed = 0;
+    jsworked = 0;
+    alarm = 0;
+
+    log_message = {
+      message: `Новый девайс`,
+      standardstack: getStandardStack(),
+      code: 6,
+    };
+  }
+
+  console.log("Event triggered: DOMContentLoaded");
+  console.log(log_message);
+  logRequest(log_message);
+};
+
+const loadHandler = () => {
+  if (preprocess === 1) {
+    const cookie = getCookie("cookieparameters");
+
+    if (!cookie) {
+      // Branch 7: кука не стоит
+
+      cookie_installed = 0;
+      jsworked = 1;
+      alarm = 4;
+
+      log_message = {
+        message: `Сбой при простановке куки`,
+        standardstack: getStandardStack(),
+        localstoragecontent: getLocalStorageContent(),
+        code: 7,
+      };
+    } else {
+      const storedCookie = localStorage.getItem("cookie");
+
+      if (storedCookie) {
+        // Branch 8: cкрипт отработал, кука стоит и записана в localStorage
+
+        cookie_installed = 1;
+        jsworked = 1;
+        alarm = 0;
+
+        log_message = {
+          message: `Ветка 2: кука/storage проставлены без сбоев`,
+          standardstack: getStandardStack(),
+          localstoragecontent: getLocalStorageContent(),
+          code: 8,
+        };
+      } else {
+        // Branch 9: cкрипт отработал, кука стоит, но НЕ записана в localStorage
+
+        cookie_installed = 1;
+        jsworked = 1;
+        alarm = 5;
+
+        log_message = {
+          message: `Ветка 2: сбой при записи localStorage`,
+          standardstack: getStandardStack(),
+          code: 9,
+        };
+      }
+    }
+  } else {
+    setUagent();
+
+    const cookie = getCookie("cookieparameters");
+
+    if (cookie) {
+      cookie_installed = 1;
+      jsworked = 1;
+      alarm = 0;
+
+      if (localStorage.getItem("cookie") === cookie) {
+        // Branch 10: cкрипт НЕ отработал, кука стоит, записана в localStorage и совпадает
+
+        log_message = {
+          message: `Ветка 2: кука/storage проставлены без сбоев`,
+          standardstack: getStandardStack(),
+          localstoragecontent: getLocalStorageContent(),
+          code: 10,
+        };
+      } else if (localStorage.getItem("cookie")) {
+        // Branch 11: скрипт НЕ отработал, кука стоит, записана в localStorage, но НЕ совпадает
+
+        alarm = 3;
+
+        setLocalStorageContent(cookie);
+
+        log_message = {
+          message: `Ветка 2: кука была изменена`,
+          standardstack: getStandardStack(),
+          localstoragecontent: getLocalStorageContent(),
+          code: 11,
+        };
+      } else {
+        // Branch 12: скрипт НЕ отработал, кука не стоит (новый девайс)
+
+        alarm = 0;
+
+        setLocalStorageContent(cookie);
+
+        log_message = {
+          message: `Ветка 2: новый девайс`,
+          standardstack: getStandardStack(),
+          localstoragecontent: getLocalStorageContent(),
+          code: 12,
+        };
+      }
+    } else {
+      // Branch 13: скрипт НЕ отработал, кука НЕ стоит
+      cookie_installed = 0;
+      jsworked = 1;
+      alarm = 6;
+
+      log_message = {
+        message: `Ветка 2: сбой при простановке куки сразу после простановки`,
+        standardstack: getStandardStack(),
+        localstoragecontent: getLocalStorageContent(),
+        code: 13,
+      };
+    }
+  }
+
+  console.log("Event triggered: load");
+  console.log(log_message);
+  logRequest(log_message);
+};
+
+/**
+ * Events
+ */
+
+window.addEventListener("DOMContentLoaded", DOMContentLoadedHandler);
+window.addEventListener("load", loadHandler);
