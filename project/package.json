@@ -2,7 +2,7 @@
   "name": "project",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ya-yarik.github.io/project",
+  "homepage": "https://ya-yarik.github.io/project/",
   "dependencies": {
     "@nestjs/cli": "^9.5.0",
     "@testing-library/jest-dom": "^5.16.5",
