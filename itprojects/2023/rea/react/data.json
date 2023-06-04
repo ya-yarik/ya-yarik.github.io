@@ -2,19 +2,19 @@
 	{
 	"id":1,
 	"myId": 1,
-	"title": "СПА ОТЕЛЬ ВЕРШИНЫ",
-	"description": "Сочи из Москвы",
-	"price": "45000",
-	"img": "/img/1.jpeg"
+	"title": "Мебель для собак",
+	"description": "Предметы интерьера",
+	"price": "5000",
+	"img": "/project/img/1.jpeg"
 	},
 
 
 	{
 	"id":2,
 	"myId": 2,
-	"title": "СПА ОТЕЛЬ АКВАГРАД",
-	"description": "Сочи из Москвы",
-	"price": "85000",
-	"img": "/img/2.jpeg"
+	"title": "Мебель для кошек",
+	"description": "Предметы интерьера",
+	"price": "15000",
+	"img": "/project/img/2.jpeg"
 	}
 ]
