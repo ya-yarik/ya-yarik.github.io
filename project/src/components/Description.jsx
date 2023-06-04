@@ -58,7 +58,7 @@ const Description = () => {
       duration:2
     }}
     ><motion.img
-    src='/img/logoaboutus/3.gif'
+    src='/project/img/logoaboutus/3.gif'
     className='ball'
     width={'83%'}
     initial={{
@@ -90,7 +90,7 @@ const Description = () => {
       duration:2
     }}
     ><p id="initP2">Дружелюбная атмосфера и обслуживание</p><motion.img drag='x'
-    src='/img/logoaboutus/4.gif'
+    src='/project/img/logoaboutus/4.gif'
     className='ball'
     width={'90%'}
     initial={{
@@ -108,7 +108,7 @@ const Description = () => {
     <motion.div id="div1" ><motion.img
     opacity={'0.1'}
     width={'30%'}
-    src='/img/logoaboutus/1.jpg'
+    src='/project/img/logoaboutus/1.jpg'
     alt=''
     //анимация
     animate={{rotate:360}}
@@ -129,7 +129,7 @@ const Description = () => {
       duration:2
     }}
     ><p class="aboutus">В нашем магазине есть всё, как в Греции!</p><motion.img
-    src='/img/logoaboutus/2.jpeg'
+    src='/project/img/logoaboutus/2.jpeg'
     className='banner'
     width={'33%'}
     initial={{

@@ -18,7 +18,7 @@ const Slider = () => {
     <div className="card mb-6 rounded-4 ">
       <div className="card-header py-3 px-3">
         <p>Собачий шоколад</p>
-        <img className='rounded' src="./img/chocodog.jpeg" width={'85%'}></img>
+        <img className='rounded' src="/project/img/chocodog.jpeg" width={'85%'}></img>
         <p>Цена: </p>
         <div >
             <span>100P / плитку</span>
@@ -51,7 +51,7 @@ const Slider = () => {
     <div className="card mb-6 rounded-4 ">
       <div className="card-header py-3 px-3">
         <p>Памперсы для птиц</p>
-        <img className='rounded' src="./img/birdpamp.jpeg" width={'85%'}></img>
+        <img className='rounded' src="/project/img/birdpamp.jpeg" width={'85%'}></img>
         <p >Цена: </p>
         <div >
             <span>200Р / упак.</span>
@@ -84,7 +84,7 @@ const Slider = () => {
     <div className="card mb-6 rounded-4 ">
       <div className="card-header py-3 px-3">
         <p>Пиво для собак</p>
-        <img className='rounded' src="./img/dogbeer.jpeg" width={'85%'}></img>
+        <img className='rounded' src="/project/img/dogbeer.jpeg" width={'85%'}></img>
         <p >Цена: </p>
         <div >
             <span>170Р / бут.</span>
@@ -117,7 +117,7 @@ const Slider = () => {
       <div className="card-header py-3 px-3">
         
         <p class="attention">В подарок за покупку!</p>
-        <img className='rounded' src="./img/spaotel.jpg" width={'85%'}></img>
+        <img className='rounded' src="/project/img/spaotel.jpg" width={'85%'}></img>
         <div >
         <button type="button" className="w-100 btn btn-lg btn-primary" >Подробнее
         </button>

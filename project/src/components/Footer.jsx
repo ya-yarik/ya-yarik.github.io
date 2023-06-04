@@ -7,8 +7,8 @@ const Footer = () => {
       <footer class="footer" className="py-5 my-5 p-4 border-top">
         <div className='col mb-3 row row-col-cols-1 row-cols-sm-2 row-cols-md-1'>
           <a className=''>
-            <img src='/img/logo/1.jpg' className='bi me-2' width={100} height={100}></img><text class="foottext"> Магазин "Ёжик" - для людей и других животных </text>
-            <img src='/img/logo/2.png' className='bi me-2' width={100} height={100}></img>
+            <img src='/project/img/logo/1.jpg' className='bi me-2' width={100} height={100}></img><text class="foottext"> Магазин "Ёжик" - для людей и других животных </text>
+            <img src='/project/img/logo/2.png' className='bi me-2' width={100} height={100}></img>
           </a></div>
           <div className='col mb-3 row row-col-cols-1 row-cols-sm-2 row-cols-md-3'>
           <div className='col mb-4'>
@@ -43,13 +43,13 @@ const Footer = () => {
           </div>
           <logo>
             <a href="https://www.youtube.com/channel/UCxvq-8wL1qyR74tCo9AKslQ">
-              <img src='/img/logo/YT.png' class="logoSN">
+              <img src='/project/img/logo/YT.png' class="logoSN">
                 </img>
                 </a>
             
-            <a href="https://ya-yarik.github.io"><img src='/img/logo/GH.jpg' class="logoSN"></img></a>
-            <a href="tel:+79123456789"><img src='/img/logo/Phone.jpg' class="logoSN"></img></a>
-            <a href="mailto:yarodex@yandex.ru"><img src='/img/logo/Letter.jpg' class="logoSN"></img></a>    
+            <a href="https://ya-yarik.github.io"><img src='/project/img/logo/GH.jpg' class="logoSN"></img></a>
+            <a href="tel:+79123456789"><img src='/project/img/logo/Phone.jpg' class="logoSN"></img></a>
+            <a href="mailto:yarodex@yandex.ru"><img src='/project/img/logo/Letter.jpg' class="logoSN"></img></a>    
                 </logo>
 
   </footer>

@@ -73,7 +73,7 @@ const AllGoods = (props) => {
 
           <button type="button" className="w-100 btn btn-lg btn-primary" onClick={onClickAddCart}>{context.isAddCart(props.myId)?
           <img width={15}
-          src={context.isAddCart(props.myId)? '/img/icon.png':''}
+          src={context.isAddCart(props.myId)? '/project/img/icon.png':''}
           alt=""/>:'Добавить в корзину'}
           </button>
           

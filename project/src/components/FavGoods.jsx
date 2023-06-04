@@ -40,7 +40,7 @@ const FavGoods = (props) => {
                             <button type='button' className='w-100 btn btn-lg btn-primary'
                 onClick={onClickAdd} > { favorites ?  
                 <img width={13}
-                 src={favorites ? '/img/icon.png':'' }
+                 src={favorites ? '/project/img/icon.png':'' }
                  alt=""/>:'Добавить в корзину' }
                
                 </button>
