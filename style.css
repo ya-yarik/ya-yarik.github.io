@@ -38,25 +38,26 @@ header2 {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 header a {
     color: yellow;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     text-decoration: none;
 }
 
 header1 a {
     color: yellow;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     text-decoration: none;
 }
 
 header2 a {
     color: yellow;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     text-decoration: none;
 }
